@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load catalog_extras %}
+
+{% block java_script %}
+{% load static %}
+<script type='text/javascript' src='{% get_static_prefix %}js/catalogs.js'></script>
+<script type='text/javascript' src='{% get_static_prefix %}js/bootstrap-tabdrop.js'></script>
+{% endblock java_script %}
+
+{% block extra_style %}
+<link href="{% get_static_prefix %}css/tapdrop.css" rel="stylesheet" type="text/css">
+<link href="{% get_static_prefix %}css/catalogs.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
+
+{% block navbar-default_extensions %}
+<span class='dropdown'>
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+	{% if catalog_name == 'all' %}
+		All items
+	{% else %}
+		{{ catalog_name }}
+	{% endif %}
+	<b class="caret"></b>
+  </a>
+  <ul class="dropdown-menu">
+	{% for item in catalog_list %}
+	  <li>
+	  	<a href="/catalog/{{ item }}">
+	  	{% if item == 'all' %}
+			All items
+		{% else %}
+			{{ item }}
+		{% endif %}
+	  	</a>
+	  </li>
+	{% endfor %}
+  </ul>
+</span>
+{% endblock %}
+
+{% block content %}
+<div class="row" style="height:100%;">
+	<div class="col-md-4" style="height:100%;">
+	{% if catalog_name %}
+		{% if catalog %}
+		<div style="height:100%;">
+			<div id="listbig" class="list-group" style="font-size:12pt; height:100%; overflow-y: scroll;">    
+				{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
+				{% for item_name in catalog_items %}
+					{% with item_name.list|dictsortreversed:'version' as item_list %}
+					<a class='list-group-item' data-state="all" id='{{ item_name.grouper }}' href='#' onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
+						<img src='{{ item_list.0.icon_name }}' width="16" style="padding-bottom:4px;" />   {{ item_list.0.display_name }}
+					</a>
+					{% endwith %}
+				{% endfor %}
+			</div>
+		</div>
+		{% else %}
+		  <p>Catalog {{ catalog_name }} is empty.</p>
+		{% endif %}
+	{% endif %}
+	</div>
+	<div class='col-md-8' style="height:100%">
+		<div id="catalog_item_detail" style="height: 100%; padding-top:30px;">
+			{% for item_name in catalog_items %}
+			{% with item_name.list|dictsortreversed:'version' as item_list %}
+			<div class='softwareversion hidden' id='{{ item_name.grouper }}' style="margin-top:-50px;">
+				<h3><img src='{{ item_list.0.icon_name }}' width="30" style="padding-bottom:5px;" /> {{ item_list.0.display_name }}</h3>
+				<div>
+					<ul class="nav nav-tabs" role="tablist">
+			  			{% for item in item_name.list|dictsortreversed:'version' %}
+							<li class="activetabs" id="{{ item.version }}"><a href="#" onClick="getCatalogItem('{{ catalog_name }}', '{{ item.index }}', '{{ item_name.grouper }}', '{{ item.version }}')">{{ item.version|wrappable }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			{% endwith %}
+			{% endfor %}
+			<div id='item_detail' class='item_detail' style="height:100%; overflow-y: scroll;">
+			</div>
+			
+		</div>
+	</div>
+</div>
+{% endblock content %}

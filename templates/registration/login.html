@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <meta content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        {% load static %}
+        <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.css' type="text/css" media="all" />
+        
+        <style>
+            body {
+                padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+                background-color: #f8f8f8;
+            }
+
+            /* fix iPhone autozoom */
+            .form-control {
+                font-size: 16px;
+            }
+
+            .login {
+                border: 1px #e4e4e4 solid;
+                border-radius: 4px;
+                box-shadow: 0 0 6px #ccc;
+                background-color: white;
+            }
+        </style>
+        
+        {% block extra_style %}{% endblock %}
+        
+        <script type='text/javascript' src='{% get_static_prefix %}js/jquery.min.js'></script>
+        <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui-1.10.3.custom.min.js'></script>
+        <script type='text/javascript' src='{% get_static_prefix %}js/jquery.dataTables.min.js'></script>
+        <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap.min.js'></script>
+        
+        {% block java_script %}{% endblock %}
+
+        <title>MunkiWebAdmin</title>
+    </head>
+    <body>
+        {% load url from future %}
+        {% block content %}
+        <div class="container text-center" style="margin: 0 auto; max-width: 350px;">
+            <img src="{% get_static_prefix %}img/Munki.png" style="padding-bottom: 30px; margin-left:-5px; max-width: 150px; margin: 0 auto;">
+            <div class="login text-left">
+            {% if user.is_authenticated %}
+            	<form class="form-signin" style="padding: 15px;" method="post" action="{% url "django.contrib.auth.views.login" %}">
+                	<h2>Welcome, <b>{{ user.username }}</b>.</h2>
+                	<input class="btn btn-lg btn-primary btn-block" type="button" value="Next" onClick="document.location.href='/';" />
+            		<input class="btn btn-lg btn-primary btn-block" type="button" value="Logout" onClick="document.location.href='/logout';" />
+            	</form>
+            {% else %}
+                <form class="form-signin" style="max-width: 330px; padding: 15px; margin: 0 auto;" method="post" action="{% url "django.contrib.auth.views.login" %}">
+                    {% csrf_token %}
+                    <h2 class="form-signin-heading">Please log in</h2>
+                    <hr>
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                    Your username and password didn't match. Please try again.
+                    </div>
+            		{% endif %}
+                    <input type="text" class="form-control" placeholder="Username" name="username" autofocus>
+                    <input type="password" class="form-control" placeholder="Password" name="password" style="margin-top:10px;">
+                    <br>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                </form>
+            {% endif %}
+            </div>
+        </div>
+        {% endblock %}
+    </body>

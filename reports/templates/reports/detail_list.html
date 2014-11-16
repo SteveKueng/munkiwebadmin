@@ -1,0 +1,19 @@
+<tr id='{{ item }}' class="{{ class }}">
+<td class="text-center" style="width:25px;">
+  <img src='{{ icon }}' width="20"/>
+</td>
+<td>
+  {{ itemdetail }}
+</td>
+<td>
+  {{ version }}
+</td>
+<td>
+  {% if manifest %}
+  <a href='{% url "manifests.views.view" manifest %}'>{{ manifest }}</a>
+  {% endif %}
+</td>
+<td class="{{ editclass }}">
+{% if item in report.InstalledItems %}<span class='label label-primary'>installed</span>{% else %}<span class='label label-danger'>not installed</span>{% endif %}
+</td>
+</tr>

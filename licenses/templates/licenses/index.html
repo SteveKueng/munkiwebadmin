@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block java_script %}
+
+{% endblock %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'licenses.views.index' %}" class="navbar-brand" >Licenses</a>{% endblock %}
+
+{% block content %}
+  {% with license_list=licenses list_title='Licenses' %}
+    {% include 'licenses/licensetable.html' %}
+  {% endwith %}
+{% endblock %}

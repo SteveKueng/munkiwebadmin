@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+{% block java_script %}
+{% load static %}
+<script type='text/javascript' src='{% get_static_prefix %}js/manifests.js'></script>
+{% if manifest_name %}
+	<script>
+	function sideSecific() {
+    	getManifestDetail('{{manifest_name}}');
+	}
+	</script>
+{% endif %}
+{% endblock %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand" >Manifests</a>{% endblock %}
+
+{% block content %}
+	<div class="row" style="height:100%">
+		<div class="col-md-4 hidden-sm hidden-xs" style="height:100%;">
+			<div style="height:100%; padding-top: 150px;">
+				<div style="margin-top: -150px;">
+					<button class='btn btn-success btn-group-justified 
+					{% if not perms.reports.change_machine %}
+					disabled
+					{% endif %}
+					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">
+					<span class="glyphicon glyphicon-plus"></span> New manifest
+					</button>
+					<!--<h3>Manifests
+						<span class="badge badge-info">{{ manifest_list|length }}</span> 
+					</h3>-->
+				</div>
+				{% if manifest_list %}
+				{% url "manifests.views.index" as the_url %}
+				<div id="listbig" class="list-group" style="font-size:12pt; overflow-y: scroll; height:100%;">
+					{% for manifest in manifest_list %}
+					<a class='manifest list-group-item' data-state="all" id='{{ manifest.name }}' href='#'>{{ manifest.name }}</a>
+					{% endfor %}
+				</div>
+				{% else %}
+				<p>No manifests are available.</p>
+				{% endif %}
+			</div>
+		</div>
+		
+		<div class="col-md-4 hidden-md hidden-lg" style="padding-left:15px; padding-right:15px;">
+			<div>
+				<div>
+					<button class='btn btn-success btn-group-justified 
+					{% if not perms.reports.change_machine %}
+					disabled
+					{% endif %}
+					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">
+					<span class="glyphicon glyphicon-plus"></span> New manifest
+					</button>
+					<h3>Manifests
+						<span class="badge badge-info">{{ manifest_list|length }}</span>
+					</h3>
+				</div>
+				{% if manifest_list %}
+				{% url "manifests.views.index" as the_url %}
+				<div id="listsmall" class="list-group" style="font-size:12pt; overflow-y: scroll; max-height:250px;">
+					{% for manifest in manifest_list %}
+					<a class='manifest list-group-item' data-state='all' id='{{ manifest.name }}' href='#'>{{ manifest.name }}</a>
+					{% endfor %}
+				</div>
+				{% else %}
+				<p>No manifests are available.</p>
+				{% endif %}
+			</div>
+		</div>
+		
+		<div class="col-md-8" style="height: 100%;">
+			<div id="detail" style="height: 100%; padding-top:50px;">
+			</div>
+		</div>
+	</div>
+ 
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
+{% endblock %}
+

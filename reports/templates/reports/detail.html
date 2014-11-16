@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+{% block extra_style %}
+{% endblock %}
+
+{% block java_script %}
+{% load static %}
+<script type='text/javascript' src='{% get_static_prefix %}js/edit.js'></script>
+<script type='text/javascript' src='{% get_static_prefix %}js/warranty.js'></script>
+{% endblock %}
+
+<!-- Page title -->
+{% block page_title %}<a href="{% url 'reports.views.index' %}" class="navbar-brand" >Computers</a>{% endblock %}
+
+{% block content %}
+{% load report_extras %}
+
+<script>
+$('#SearchFieldMobile').prop('disabled', true);
+$('#SearchField').prop('disabled', true);
+$("#imgProgress").show();
+getManifestDetail('{{manifest_name}}', "{{ machine.serial_number }}");
+</script>
+
+
+<!-- Head -->
+<div class="row">
+	<div class="col-md-3 text-center">
+  	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{machine.serial_number|slice:"8:" }}&size=240x240' width="150" />
+	</div>
+  <div class="col-md-5">
+    <h2>{{ machine.hostname }}</h2>
+    {% if model_lookup_enabled and additional_info.model_description|length > 1 %}
+    <h4><small>{{ additional_info.model_description }} <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a></small></h4>
+    {% endif %}
+    <!--	<p>
+        <a href='{% url "inventory.views.detail" machine.mac %}'>Inventory</a>
+    	</p>-->
+  </div>
+  <div class="col-md-4 hidden-xs hidden-sm hidden-print" style="text-align: right">
+		<a href="vnc://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">Screen Sharing</a>
+		<a href="ssh://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">SSH</a>
+  </div>
+</div>
+
+<div id="data">
+</div>
+
+<!-- Machine info -->
+<div class="row hidden">
+  <div class="col-md-6">
+    <h3>Machine</h3>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Model:</th>
+          <td>
+            {{ machine.machine_model }}
+            {{ machine.cpu_type }}
+            {{ machine.cpu_speed}}
+          </td>
+        </tr>
+        <tr>
+          <th>RAM:</th>
+          <td>{{ machine.ram }}</td>
+        </tr>
+        <tr>
+          <th>Serial:</th>
+          <td>{{ machine.serial_number }}</td>
+        </tr>
+        <tr>
+          <th>MAC:</th>
+          <td>{{ machine.mac }}</td>
+        </tr>
+        <tr>
+          <th>Remote IP:</th>
+          <td>{{ machine.remote_ip }}</td>
+        </tr>
+        {% if 'MachineInfo' in report %}
+        <tr>
+          <th>Hostname:</th>
+          <td>{{ report.MachineInfo.hostname }}</td>
+        </tr>
+        <tr>
+          <th>OS version:</th>
+          <td>{{ report.MachineInfo.os_vers }}
+              {{ report.MachineInfo.arch }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Free disk space:</th>
+          <td>{{ report.AvailableDiskSpace|humanreadablesize  }}</td>
+        </tr>
+        <tr>
+          <th>Console user:</th>
+          <td>{{ report.ConsoleUser }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class='col-md-6'>
+    <h3>Munki</h3>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Version:</th>
+          <td>{{ report.ManagedInstallVersion }}</td>
+        </tr>
+        {% if 'ManifestName' in report %}
+        <tr>
+          <th>Manifest:</th>
+          <td>
+            <a href='{% url "manifests.views.view" report.ManifestNameLink %}'>
+            {{ report.ManifestName }}</a>
+          </td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Run Type:</th>
+          <td>{{ report.RunType }}</td>
+        </tr>
+        <tr>
+          <th>Start:</th>
+          <td>{{ report.StartTime }}</td>
+        </tr>
+        <tr>
+          <th>End:</th>
+          <td>{{ report.EndTime }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if warranty_lookup_enabled %}
+    <h3>Warranty Information</h3>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Warranty status:</th>
+          <td>
+            <col-md- id='warranty_status_checking' style='display: none;'>
+              Checking warranty status 
+              <img src="{% get_static_prefix %}img/loading.gif" height="20" width="20"/>
+            </col-md->
+            <col-md- id='warranty_status'>
+              <a href='javascript:void(0)' onclick="get_warranty_status('{{ machine.serial_number }}')">Check status</a>
+            </col-md->
+          </td>
+        </tr>
+        <tr>
+          <th>Manufacture date:</th>
+          <td>{{ additional_info.manufacture_date }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Error / Warnings -->
+<div class="row">
+  <div class="col-md-12">
+    <a name="errors">&nbsp;</a>
+    {% if report.Errors|length %}
+      <h3>Errors <span class="badge">{{ report.Errors|length }}</span></h3>
+      <pre class="alert alert-danger">{{ report.Errors|join:'<br>' }}</pre>
+    {% endif %}
+    {% if report.Warnings|length %}
+    <h3>Warnings <span class="badge">{{ report.Warnings|length }}</span></h3>
+    <pre class="alert alert-warning">{{ report.Warnings|join:'<br>' }}</pre>
+    {% endif %}
+  </div>
+</div>
+
+
+{{ report.ManagedInstalls }}
+
+
+<div class="row">
+  <div class="col-md-12">
+      {% with title='Managed Installs' pkglist=report.ManagedInstalls %}
+        {% include 'reports/pkgtable.html' %}
+      {% endwith %}
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>
+<div class="hidden manifest_name" id="{{ manifest_name }}"></div>
+<div class="hidden serial_number" id="{{ machine.serial_number }}"></div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block java_script %}
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('.clientlist').dataTable({
+            "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+            "iDisplayLength": 20,
+            "aLengthMenu": [[20, 50, -1], [20, 50, "All"]],
+            "sPaginationType": "bootstrap",
+            "bStateSave": true,
+            "aaSorting": [[3,'desc']]
+        });
+    } );
+    
+    // Auto-refresh the page after 5 minutes
+    window.setTimeout(function(){location.reload(true)}, 1000*60*5);
+</script>
+{% endblock %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'inventory.views.index' %}" class="navbar-brand" >Invntory</a>{% endblock %}
+
+{% block content %}
+  {% with machine_list=machines list_title='Inventory Clients' %}
+    {% include 'inventory/machinetable.html' %}
+  {% endwith %}
+{% endblock %}

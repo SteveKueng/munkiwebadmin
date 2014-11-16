@@ -1,0 +1,26 @@
+.gridelement {
+	list-style-type: none;
+	cursor:pointer;
+	text-align: center;
+	padding: 0px 4px 0px 4px;
+}
+.gridfont {
+	font-size:16px;
+}
+.thumbnail:hover {
+	background-color:#eeeeee;
+}
+.thumbnail {
+	margin-bottom:8px;
+	background-color: #f8f8f8
+}
+.dataTables_filter {
+   display: none;
+}
+.grid {
+	margin-left:-4px;
+	margin-right:-4px;
+}
+#gridview {
+	margin-top:-19px;
+}

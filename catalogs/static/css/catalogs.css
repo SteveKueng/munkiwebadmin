@@ -1,0 +1,7 @@
+td.prewrap, td.code {
+  white-space: pre-wrap;
+}
+td.code {
+  font-family: Andale Mono, monospace;
+  font-size: 9pt;
+}

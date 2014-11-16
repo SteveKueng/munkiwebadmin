@@ -1,0 +1,6 @@
+*.pyc
+*.pyo
+settings.py
+munkiwebadmin.db
+.DS_Store
+unused_*

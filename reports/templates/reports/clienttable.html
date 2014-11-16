@@ -1,0 +1,107 @@
+{% load url from future %}
+
+<!--
+<div class="well well-sm">
+	<div class="btn-group">
+		<a href="#" id="list" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> List</a>
+		<a href="#" id="grid" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> Grid</a>
+	</div>
+	<div class="btn-group pull-right">
+		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> MacBook</a>
+		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> iMac</a>
+		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> MacPro</a>
+		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> MacMini</a>
+	</div>
+	
+</div>-->
+
+<script>
+	$("#imgProgress").show();
+</script>
+
+{% if report_list|length %}
+<div id="gridview" class="hidden">
+	<ul id="products" class="grid list-group">
+		{% for report in report_list %}
+		<li class="gridelement col-xs-4 col-md-3" data-state="all" onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';">
+            <div class="thumbnail">
+                <img class="group list-group-image" src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.machine.serial_number|slice:"8:"  }}&size=120x120' alt="" width="72" />
+                <div class="caption">
+                    <h4 class="gridfont list-group-item-heading">
+ 	                  {% if report.machine.hostname %}
+ 	                      {{ report.machine.hostname }}
+ 	                  {% else %}
+ 	                      {{ report.machine.mac }}
+ 	                  {% endif %}
+                      </h4>
+                </div>
+            </div>
+        </li>
+		{% endfor %}
+	</ul>
+</div>
+
+<div id="listview" class="table-responsive hidden">
+	<table class="table table-striped table-bordered table-hover" id="dataTables-clients">
+		<thead>
+			<tr>
+				<th class="text-center"></th>
+				<th>Machine</th>
+				<th>User</th>
+				<th class="visible-md visible-lg">IP</th>
+				<th class="visible-lg">Latest Run</th>
+				<th class="visible-md visible-lg">Info</th>
+			</tr>
+		</thead>
+		<tbody>
+	        {% for report in report_list %}
+	            <tr onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';" style="cursor: pointer">
+	                <td class="text-center">
+	                	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.machine.serial_number|slice:"8:"  }}&size=72x72' width="20" />
+	                </td>
+	                <td>
+	                  {% if report.machine.hostname %}
+	                      {{ report.machine.hostname }}
+	                  {% else %}
+	                      {{ report.machine.mac }}
+	                  {% endif %}
+	                </td>
+	                <td>{{ report.console_user }}</td>
+	                <td class='visible-md visible-lg'>{{ report.machine.remote_ip }}</td>
+	                <td class="visible-lg">
+	                    {{ report.timestamp|date:"Y-m-d H:i" }}
+	                </td>
+	                <td class="visible-md visible-lg">
+	                    {% if report.updating %}
+	                      {{ report.runtype }} run in progress
+	                    {% else %}
+	                      {{ report.runtype }}
+	                    {% endif %}
+	                    {{ report.runstate }}
+	                    {% if report.errors %}
+	                      {{ report.errors }} error{{ report.errors|pluralize }}
+	                    {% endif %}
+	                    {% if report.warnings %}
+	                      {{ report.warnings }} warning{{ report.warnings|pluralize }}
+	                    {% endif %}
+	                    {% if report.pending_installs %}
+	                      {{ report.pending_installs }} pending install{{ report.pending_installs|pluralize }}
+	                    {% endif %}
+	                    {% if report.install_results %}
+	                      {{ report.install_results }} package{{ report.install_results|pluralize }} installed
+	                    {% endif %}
+	                    {% if report.pending_removals %}
+	                      {{ report.pending_removals }} pending removal{{ report.pending_removals|pluralize }}
+	                    {% endif %}
+	                    {% if report.removal_results %}
+	                      {{ report.removal_results }} package{{ report.removal_results|pluralize }} removed
+	                    {% endif %}
+	                </td>
+	            </tr>
+	        {% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+{% endif %}

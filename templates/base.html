@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html style="height: 100%;" lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}> 
+    <head>
+        <meta content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        {% load static %}
+		<!-- Bootstrap Core CSS -->
+	    <link href="{% get_static_prefix %}css/bootstrap.min.css" rel="stylesheet">
+	    <!-- MetisMenu CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
+	    <!-- DataTables CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+	    <!-- Timeline CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/timeline.css" rel="stylesheet">
+	    <!-- Custom CSS -->
+	    <link href="{% get_static_prefix %}css/sb-admin-2.css" rel="stylesheet">
+	    <!-- Morris Charts CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/morris.css" rel="stylesheet">
+	    <!-- jQueryUI CSS -->
+	    <link href="{% get_static_prefix %}css/smoothness/jquery-ui.min.css" rel="stylesheet">
+	    <!-- Custom Fonts -->
+	    <link href="{% get_static_prefix %}font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+        {% block extra_style %}{% endblock %}
+
+	    <!-- jQuery Version 1.11.0 -->
+	    <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
+	    <!-- jQueryUI -->
+	    <script src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
+	    <!-- Bootstrap Core JavaScript -->
+	    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+	    <!-- Metis Menu Plugin JavaScript -->
+	    <script src="{% get_static_prefix %}js/plugins/metisMenu/metisMenu.min.js"></script>
+	    <!-- DataTables JavaScript -->
+	    <script src="{% get_static_prefix %}js/plugins/dataTables/jquery.dataTables.js"></script>
+	    <script src="{% get_static_prefix %}js/plugins/dataTables/dataTables.bootstrap.js"></script>
+	    <!-- Custom Theme JavaScript -->
+	    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
+		<!-- Typeahead fix -->
+        <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
+		<!-- Morris -->
+		<script src="{% get_static_prefix %}js/plugins/morris/morris.min.js"></script>
+		<script src="{% get_static_prefix %}js/plugins/morris/raphael.min.js"></script>
+	    <!-- Flot Charts JavaScript -->
+	    <script src="{% get_static_prefix %}js/plugins/flot/excanvas.min.js"></script>
+	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.js"></script>
+	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.pie.js"></script>
+	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.resize.js"></script>
+	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+		
+	    {% block java_script %}{% endblock %}
+		
+	    <!-- webadmin.js -->
+	    <script src="{% get_static_prefix %}js/webadmin.js"></script>
+		
+        <title>MunkiWebAdmin</title>
+		
+	    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	    <!--[if lt IE 9]>
+	        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+    </head>
+
+    {% block body_tag %}
+    <body>{% endblock %}
+		<div id="wrapper">
+			 {% block main_menu %}
+			<!-- Navigation --> 
+			<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+	            <div class="navbar-header">
+	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	                    <span class="sr-only">Toggle navigation</span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                </button>
+	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;"><img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
+	                {% block page_title %}{% endblock %}
+		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
+						<li>
+	                		<img src="{% get_static_prefix %}img/loading.gif" style="display: none; padding-top:3px;" id="imgProgress" width="30"/>
+	                	</li>
+	                	{% block navbar-default_extensions %}{% endblock %}
+		            </ul>
+	            </div>
+
+	            <ul class="nav navbar-top-links navbar-right">
+	            	{% block navbar-top_extensions %}{% endblock %}
+	                <li class="dropdown">
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	                        <i class="glyphicon glyphicon-user"></i>  <i class="fa fa-caret-down"></i>
+	                    </a>
+	                    <ul class="dropdown-menu dropdown-task">
+	                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+	                        <li class="divider"></li>
+	                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i> logout {{ user.username }}</a></li>
+	                    </ul>
+	                </li>
+	                <li class="sidebar-search hidden-sm hidden-md hidden-lg" style="padding-top:8px;">
+		            	<input type="text" class="form-control dropdown-toggle" id="SearchFieldMobile" autocomplete="off" data-provide="typeahead" data-source='{% block data-source-mobile %}{% endblock %}' data-items="4" placeholder="Search...">
+		            </li>
+	            </ul>
+	            
+	            <div class="navbar-default sidebar" role="navigation">
+	                <div class="sidebar-nav navbar-collapse">
+	                    <ul class="nav" id="side-menu">
+	                    	<li class="sidebar-search hidden-xs">
+		                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="8" placeholder="Search...">
+		                	</li>
+							<li>
+	                            <a {% if page == 'dashboard' %} class="active" {% endif %} href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
+	                        </li>
+	                        <li>
+	                            <a {% if page == 'reports' %} class="active" {% endif %} href="{% url 'reports.views.index' %}"><i class="glyphicon glyphicon-phone"></i> Computer</a>
+	                        </li>
+	                        <li>
+	                            <a {% if page == 'catalogs' %} class="active" {% endif %} href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-table fa-fw"></i> Catalogs</a>
+	                        </li>
+	                        <li>
+	                            <a {% if page == 'manifests' %} class="active" {% endif %} href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
+	                        </li>
+	                        <!--
+	                        <li>
+	                            <a {% if page == 'inventory' %} class="active" {% endif %} href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
+	                        </li>-->
+	                        <li>
+	                            <a {% if page == 'licenses' %} class="active" {% endif %} href="{% url 'licenses.views.index' %}"><i class="fa fa-edit fa-fw"></i> Licenses</a>
+	                        </li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </nav>
+				
+        	{% endblock %}
+			
+			<!-- Page Content -->
+        	<div id="page-wrapper">
+            {% block content %}{% endblock %}
+        	</div>
+        	<div id="footer">
+            	<div class="clearingdiv"></div>
+        	</div>
+		</div>
+		<script>
+		window.onload = function() {
+			windowload();
+		};
+		</script>       	
+    </body>
+</html>

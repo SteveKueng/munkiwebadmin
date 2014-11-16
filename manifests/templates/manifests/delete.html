@@ -1,0 +1,17 @@
+{% block content %}
+
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<h4 class="modal-title" id="newLabel">Delete manifest</h4>
+</div>
+<div class="modal-body">
+	<form name='delete_form' action='{% url "manifests.views.delete" manifest_name %}' method="post">
+	{% csrf_token %}
+	<h4>Really delete manifest <b>{{ manifest_name }}?</b></h4>
+	<br>	
+	<input class='btn btn-danger pull-right' type="submit" value="Delete" />
+	<input type="reset" class="btn btn-default" data-dismiss="modal" value="Close"/>
+	</form>	
+</div>
+
+{% endblock content %}
