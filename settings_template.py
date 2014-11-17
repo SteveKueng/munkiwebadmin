@@ -38,7 +38,8 @@ MODEL_LOOKUP_ENABLED = True
 # optional), otherwise leave blank
 PROXY_ADDRESS = ""
 
-
+# needed for productive mode
+ALLOWED_HOSTS = ['*']
 
 # -----
 
@@ -126,12 +127,12 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -149,7 +150,6 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_DIR, 'site_static'),
-    MUNKI_REPO_DIR,
 )
 
 # List of finder classes that know how to find static files in

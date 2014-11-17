@@ -6,6 +6,7 @@ from django.conf import settings
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 STATIC_URL = settings.STATIC_URL
+MEDIA_URL = settings.MEDIA_URL
 ICONS_DIR = settings.ICONS_DIR
 
 class Catalog(object):
@@ -86,7 +87,7 @@ class Catalog(object):
             item_name = item_name + ".png"
         icons_path = os.path.join(os.path.join(REPO_DIR, ICONS_DIR), item_name)
         default_icon = STATIC_URL + 'img/PackageIcon.png'
-        item_icon = STATIC_URL + ICONS_DIR + item_name
+        item_icon = MEDIA_URL + item_name
         if os.path.exists(icons_path):
             return item_icon
         else:

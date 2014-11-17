@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Uncomment the next two lines to enable the admin:
@@ -24,8 +25,14 @@ urlpatterns = patterns('',
     url(r'^$', include('reports.urls')),
     url(r'^lookup/', include('reports.urls')),
     url(r'^update/', include('reports.urls')),
-
 )
 # comment out the following if you are serving
 # static files a different way
 urlpatterns += staticfiles_urlpatterns()
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        url(r'^media/(?P<path>.*)$',
+            'django.views.static.serve',
+            {'document_root': settings.MEDIA_ROOT, }),
+    )
