@@ -9,6 +9,7 @@ body {
 	height:100%;
 	padding-bottom:80px;
 	overflow:hidden;
+    word-wrap: break-word;
 }
 
 #wrapper {
