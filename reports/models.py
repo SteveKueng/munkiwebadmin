@@ -45,6 +45,9 @@ class MunkiReport(models.Model):
         
     def mac(self):
         return self.machine.mac
+
+    def serial(self):
+        return self.machine.serial_number
     
     def encode(self, plist):
         string = plistlib.writePlistToString(plist)
