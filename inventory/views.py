@@ -125,9 +125,9 @@ def index(request):
 @login_required
 def detail(request, serial):
     machine = None
-    if mac:
+    if serial:
         try:
-            machine = Machine.objects.get(serial=serial)
+            machine = Machine.objects.get(serial_number=serial)
         except Machine.DoesNotExist:
             raise Http404
     else:
@@ -135,7 +135,7 @@ def detail(request, serial):
 
     machine = None
     try:
-        machine = Machine.objects.get(serial=serial)
+        machine = Machine.objects.get(serial_number=serial)
     except Machine.DoesNotExist:
         pass
         

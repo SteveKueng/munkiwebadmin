@@ -17,8 +17,7 @@
 {% load report_extras %}
 
 <script>
-$("#imgProgress").show();
-getManifestDetail('{{manifest_name}}', "{{ machine.serial_number }}");
+getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
 </script>
 
 <!-- Head -->
@@ -32,10 +31,10 @@ getManifestDetail('{{manifest_name}}', "{{ machine.serial_number }}");
     <h4><small>{{ additional_info.model_description }} <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a></small></h4>
     {% endif %}
     <div class="btn-group" role="group" aria-label="...">
-      <a href='#' id="Software" class="btn btn-default buttons" onclick="getManifestDetail('{{manifest_name}}', '{{ machine.serial_number }}');">Software</a>
-      <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getManifestDetail();">Apple Updates</a>
-      <a href='#' id="Machine" class="btn btn-default buttons" onclick="getMachineDetail('{{ machine.serial_number }}');">Machine</a>
-      <a href='#' onclick="getInventory('{{ machine.mac }}');" id="Inventory" class="btn btn-default buttons">Inventory</a>
+      <a href='#' id="Manifest" class="btn btn-default buttons" onclick="getDetail('Manifest', '{{ machine.serial_number }}', '{{manifest_name}}');">Software</a>
+      <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getDetail();">Apple Updates</a>
+      <a href='#' id="Machine" class="btn btn-default buttons" onclick="getDetail('Machine', '{{ machine.serial_number }}');">Machine</a>
+      <a href='#' onclick="getDetail('Inventory', '{{ machine.serial_number }}');" id="Inventory" class="btn btn-default buttons">Inventory</a>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm hidden-print" style="text-align: right">

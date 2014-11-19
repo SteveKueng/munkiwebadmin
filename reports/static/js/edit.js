@@ -146,10 +146,10 @@ function makeEditableItem(manifest_name, autocomplete_data, editable_div) {
     });
 }
 
-function cancelEdit(manifest_name, serial) {
+function cancelEdit(manifest_name, serial, manifest_name) {
     inEditMode = false;
     $(window).unbind("beforeunload");
-    getManifestDetail(manifest_name, serial);
+    getDetail("Manifest", serial);
 }
 
 function getManifestSectionArray(section_name) {
@@ -223,8 +223,7 @@ function getManifestDetailFromDOMAndSave() {
       data: postdata,
       success: function(data) {
         //alert("SUCCESS: " + data);
-        getManifestDetail();
-        //$("#imgProgress").hide();
+        getDetail("Manifest");
       },
       error: function(jqXHR, textStatus, errorThrown) {
         $("#imgProgress").hide();
@@ -234,63 +233,54 @@ function getManifestDetailFromDOMAndSave() {
     });
 }
 
-function getManifestDetail(manifest_name, serial) {
-    if (inEditMode) {
-        if (! confirm('Discard current changes?')) {
-            event.preventDefault();
-            return;
-        }
-        inEditMode = false;
-        $(window).unbind("beforeunload");
+function getDetail(type, serial, manifest_name) {
+    switch (type) {
+        case "Inventory":
+            enableSearch();
+            var manifestURL = '/inventory/detail/' + serial;
+            break;
+
+        case "Machine":
+            diableSearch();
+            // get new detail for the pane
+            var manifestURL = '/update/detailmachine/' + serial;
+            break;
+
+        case "Manifest":
+            if (inEditMode) {
+                if (! confirm('Discard current changes?')) {
+                    event.preventDefault();
+                    return;
+                }
+                inEditMode = false;
+                $(window).unbind("beforeunload");
+            }
+            if (!manifest_name) {
+                var manifest_name = $('.manifest_name').attr('id');
+            };
+            if (!serial) {
+                var serial = $('.serial_number').attr('id');
+            };
+            cleanDetailPane();
+            diableSearch();
+            var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
+            break;
+
+        case "AppleUpdate":
+            diableSearch();
+            break;
     }
-    if (!manifest_name) {
-        var manifest_name = $('.manifest_name').attr('id');
-    };
-    if (!serial) {
-        var serial = $('.serial_number').attr('id');
-    };
     $("#imgProgress").show();
-    cleanDetailPane();
-    diableSearch();
-    
     // get new detail for the pane
-    var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
     $.get(manifestURL, function(data) {
         $('#data').html(data);
-        $('.edit').click(function(){
-            makeEditableItems(manifest_name, serial);
-        });
-        activeButton("Software");
+        if(type == "Manifest") {
+            $('.edit').click(function(){
+                makeEditableItems(manifest_name, serial);
+            });
+        }
+        activeButton(type);
         $("#imgProgress").hide();
-    });
-    //event.preventDefault();
-}
-
-function getMachineDetail(serial) {
-    $("#imgProgress").show();
-
-    diableSearch();
-
-    // get new detail for the pane
-    var manifestURL = '/update/detailmachine/' + serial;
-
-    $.get(manifestURL, function(data) {
-        $('#data').html(data);
-        $("#imgProgress").hide();
-        activeButton("Machine");
-    });
-}
-
-function getInventory(serial) {
-    $("#imgProgress").show();
-    enableSearch();
-
-    // get new detail for the pane
-    var manifestURL = '/inventory/detail/' + serial;
-    $.get(manifestURL, function(data) {
-        $('#data').html(data);
-        $("#imgProgress").hide();
-        activeButton("Inventory");
     });
 }
 
