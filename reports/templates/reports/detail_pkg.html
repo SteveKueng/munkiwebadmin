@@ -6,6 +6,21 @@
   </div>    
 </div>
 
+<!-- Error / Warnings -->
+<div class="row">
+  <div class="col-md-12">
+    <a name="errors">&nbsp;</a>
+    {% if report.Errors|length %}
+      <h4>Errors></h4>
+      <pre class="alert alert-danger">{{ report.Errors|join:'<br>' }}</pre>
+    {% endif %}
+    {% if report.Warnings|length %}
+    <h4>Warnings</h4>
+    <pre class="alert alert-warning">{{ report.Warnings|join:'<br>' }}</pre>
+    {% endif %}
+  </div>
+</div>
+
 <!-- Manifests / Catalog -->
 <div class="row" id="manifest_detail">
   <!-- Manifests -->
