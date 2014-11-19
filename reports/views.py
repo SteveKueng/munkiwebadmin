@@ -53,9 +53,9 @@ def submit(request, submission_type):
     client = None
     if serial:
         try:
-            machine = Machine.objects.get(serial=serial)
+            machine = Machine.objects.get(serial_number=serial)
         except Machine.DoesNotExist:
-            machine = Machine(serial=serial)
+            machine = Machine(serial_number=serial)
     if machine:
         try:
             report = MunkiReport.objects.get(machine=machine)
@@ -99,7 +99,7 @@ def submit(request, submission_type):
                 machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or u'unknown'
                 machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or u'0'
                 machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or u'0'
-                machine.serial_number = hwinfo.get('serial_number') and hwinfo.get('serial_number')[0:15] or u'unknown'
+                #machine.serial_number = hwinfo.get('serial_number') and hwinfo.get('serial_number')[0:15] or u'unknown'
             
             machine.save()
             report.save()

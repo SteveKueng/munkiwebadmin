@@ -49,9 +49,9 @@ def submit(request):
     machine = None
     if serial:
         try:
-            machine = Machine.objects.get(serial=serial)
+            machine = Machine.objects.get(serial_number=serial)
         except Machine.DoesNotExist:
-            machine = Machine(serial=serial)
+            machine = Machine(serial_number=serial)
     if machine:
         if 'hostname' in submission:
             machine.hostname = submission.get('hostname')
@@ -103,7 +103,7 @@ def inventory_hash(request, serial):
     machine = None
     if mac:
         try:
-            machine = Machine.objects.get(serial=serial)
+            machine = Machine.objects.get(serial_number=serial)
             inventory_meta = Inventory.objects.get(machine=machine)
             sha256hash = inventory_meta.sha256hash
         except (Machine.DoesNotExist, Inventory.DoesNotExist):
