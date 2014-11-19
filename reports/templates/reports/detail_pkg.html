@@ -11,7 +11,7 @@
   <div class="col-md-12">
     <a name="errors">&nbsp;</a>
     {% if report.Errors|length %}
-      <h4>Errors></h4>
+      <h4>Errors</h4>
       <pre class="alert alert-danger">{{ report.Errors|join:'<br>' }}</pre>
     {% endif %}
     {% if report.Warnings|length %}
