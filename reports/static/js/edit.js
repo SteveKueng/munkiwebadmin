@@ -66,6 +66,8 @@ function getManifestDetail(manifest_name, serial) {
         $('.edit').click(function(){
             makeEditableItems(manifest_name, serial);
         });
+        $('.buttons[id="Software"]').addClass('active');
+        $('.buttons[id!="Software"]').removeClass('active');
         $("#imgProgress").hide();
     });
     //event.preventDefault();
@@ -264,6 +266,22 @@ function getManifestDetailFromDOMAndSave() {
       dataType: 'json'
     });
 }
+
+function getMachineDetail(serial) {
+    $("#imgProgress").show();
+    
+    // get new detail for the pane
+    var manifestURL = '/update/detailmachine/' + serial;
+
+    $.get(manifestURL, function(data) {
+        $('#data').html(data);
+        $("#imgProgress").hide();
+        $('.buttons[id="Machine"]').addClass('active');
+        $('.buttons[id!="Machine"]').removeClass('active');
+    });
+}
+
+
 
 function sideSecific() {
 }

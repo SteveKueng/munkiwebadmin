@@ -261,24 +261,6 @@ def detail(request, serial):
     else:
         raise Http404
     
-    report_plist = {}
-    if machine:
-        try:
-            report = MunkiReport.objects.get(machine=machine)
-            report_plist = report.get_report()
-        except MunkiReport.DoesNotExist:
-            pass
-            
-    # convert forward slashes in manifest names to colons
-    if 'ManifestName' in report_plist:
-        report_plist['ManifestNameLink'] = report_plist['ManifestName'].replace('/', ':')
-
-    # determine if the warranty lookup information should be shown
-    try:
-        WARRANTY_LOOKUP_ENABLED = settings.WARRANTY_LOOKUP_ENABLED
-    except:
-        WARRANTY_LOOKUP_ENABLED = False
-
     # determine if the model description information should be shown
     try:
         MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
@@ -287,67 +269,10 @@ def detail(request, serial):
 
     # Determine Manufacture Date
     additional_info = {}
-    if WARRANTY_LOOKUP_ENABLED and machine.serial_number:
-        additional_info['manufacture_date'] = \
-            estimate_manufactured_date(machine.serial_number)
-
     # If enabled lookup the model description
     if MODEL_LOOKUP_ENABLED and machine.serial_number:
         additional_info['model_description'] = \
             model_description_lookup(machine.serial_number)
-              
-    # handle items that were installed during the most recent run
-    install_results = {}
-    for result in report_plist.get('InstallResults', []):
-        nameAndVers = result['name'] + '-' + result['version']
-        if result['status'] == 0:
-            install_results[nameAndVers] = "installed"
-        else:
-            install_results[nameAndVers] = 'error'
-    
-    if install_results:         
-        for item in report_plist.get('ItemsToInstall', []):
-            name = item.get('display_name', item['name'])
-            nameAndVers = ('%s-%s' 
-                % (name, item['version_to_install']))
-            item['install_result'] = install_results.get(
-                nameAndVers, 'pending')
-                
-        for item in report_plist.get('ManagedInstalls', []):
-            if 'version_to_install' in item:
-                name = item.get('display_name', item['name'])
-                nameAndVers = ('%s-%s' 
-                    % (name, item['version_to_install']))
-                if install_results.get(nameAndVers) == 'installed':
-                    item['installed'] = True
-                    
-    # handle items that were removed during the most recent run
-    # this is crappy. We should fix it in Munki.
-    removal_results = {}
-    for result in report_plist.get('RemovalResults', []):
-        m = re.search('^Removal of (.+): (.+)$', result)
-        if m:
-            try:
-                if m.group(2) == 'SUCCESSFUL':
-                    removal_results[m.group(1)] = 'removed'
-                else:
-                    removal_results[m.group(1)] = m.group(2)
-            except IndexError:
-                pass
-    
-    if removal_results:
-        for item in report_plist.get('ItemsToRemove', []):
-            name = item.get('display_name', item['name'])
-            item['install_result'] = removal_results.get(
-                name, 'pending')
-            if item['install_result'] == 'removed':
-                if not 'RemovedItems' in report_plist:
-                    report_plist['RemovedItems'] = [item['name']]
-                elif not name in report_plist['RemovedItems']:
-                    report_plist['RemovedItems'].append(item['name'])
-                
-    if 'managed_uninstalls_list' in report_plist:
-        report_plist['managed_uninstalls_list'].sort()
 
     manifest_name = machine.hostname
     #print report_plist['ManifestName']
@@ -355,10 +280,8 @@ def detail(request, serial):
     return render_to_response('reports/detail.html',
                               {'machine': machine,
                                'manifest_name': manifest_name,
-                               'report': report_plist,
                                'user': request.user,
                                'additional_info': additional_info,
-                               'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
                                'model_lookup_enabled': MODEL_LOOKUP_ENABLED,
                                'page': 'reports'})
 
@@ -451,6 +374,112 @@ def detail_pkg(request, manifest_name, serial):
     c.update(csrf(request))
     return render_to_response('reports/detail_pkg.html',c)
 
+def machine_detail(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+    
+    report_plist = {}
+    if machine:
+        try:
+            report = MunkiReport.objects.get(machine=machine)
+            report_plist = report.get_report()
+        except MunkiReport.DoesNotExist:
+            pass
+            
+    # convert forward slashes in manifest names to colons
+    if 'ManifestName' in report_plist:
+        report_plist['ManifestNameLink'] = report_plist['ManifestName'].replace('/', ':')
+
+    # determine if the warranty lookup information should be shown
+    try:
+        WARRANTY_LOOKUP_ENABLED = settings.WARRANTY_LOOKUP_ENABLED
+    except:
+        WARRANTY_LOOKUP_ENABLED = False
+
+    # determine if the model description information should be shown
+    try:
+        MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
+    except:
+        MODEL_LOOKUP_ENABLED = False
+
+    # Determine Manufacture Date
+    additional_info = {}
+    if WARRANTY_LOOKUP_ENABLED and machine.serial_number:
+        additional_info['manufacture_date'] = \
+            estimate_manufactured_date(machine.serial_number)
+
+    # If enabled lookup the model description
+    if MODEL_LOOKUP_ENABLED and machine.serial_number:
+        additional_info['model_description'] = \
+            model_description_lookup(machine.serial_number)
+              
+    # handle items that were installed during the most recent run
+    install_results = {}
+    for result in report_plist.get('InstallResults', []):
+        nameAndVers = result['name'] + '-' + result['version']
+        if result['status'] == 0:
+            install_results[nameAndVers] = "installed"
+        else:
+            install_results[nameAndVers] = 'error'
+    
+    if install_results:         
+        for item in report_plist.get('ItemsToInstall', []):
+            name = item.get('display_name', item['name'])
+            nameAndVers = ('%s-%s' 
+                % (name, item['version_to_install']))
+            item['install_result'] = install_results.get(
+                nameAndVers, 'pending')
+                
+        for item in report_plist.get('ManagedInstalls', []):
+            if 'version_to_install' in item:
+                name = item.get('display_name', item['name'])
+                nameAndVers = ('%s-%s' 
+                    % (name, item['version_to_install']))
+                if install_results.get(nameAndVers) == 'installed':
+                    item['installed'] = True
+                    
+    # handle items that were removed during the most recent run
+    # this is crappy. We should fix it in Munki.
+    removal_results = {}
+    for result in report_plist.get('RemovalResults', []):
+        m = re.search('^Removal of (.+): (.+)$', result)
+        if m:
+            try:
+                if m.group(2) == 'SUCCESSFUL':
+                    removal_results[m.group(1)] = 'removed'
+                else:
+                    removal_results[m.group(1)] = m.group(2)
+            except IndexError:
+                pass
+    
+    if removal_results:
+        for item in report_plist.get('ItemsToRemove', []):
+            name = item.get('display_name', item['name'])
+            item['install_result'] = removal_results.get(
+                name, 'pending')
+            if item['install_result'] == 'removed':
+                if not 'RemovedItems' in report_plist:
+                    report_plist['RemovedItems'] = [item['name']]
+                elif not name in report_plist['RemovedItems']:
+                    report_plist['RemovedItems'].append(item['name'])
+                
+    if 'managed_uninstalls_list' in report_plist:
+        report_plist['managed_uninstalls_list'].sort()
+
+    return render_to_response('reports/detail_machine.html',
+                              {'machine': machine,
+                               'report': report_plist,
+                               'user': request.user,
+                               'additional_info': additional_info,
+                               'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
+                               'model_lookup_enabled': MODEL_LOOKUP_ENABLED,
+                               'page': 'reports'})
 
 def raw(request, serial):
     machine = None
