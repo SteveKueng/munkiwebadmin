@@ -248,7 +248,7 @@ $('#SearchField').prop('disabled', true);
             {% for item in low_disk_machines|dictsort:'available_disk_space' %}
                 <tr>
                     <td>
-                        <a href='{% url 'reports.views.detail' item.mac %}'>
+                        <a href='{% url 'reports.views.detail' item.serial_number %}'>
                         {{ item.hostname }}
                         <span class="pull-right">
                             {{ item.available_disk_space|humanreadablesize }}

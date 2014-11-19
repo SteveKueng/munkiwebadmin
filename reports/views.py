@@ -239,7 +239,7 @@ def dashboard(request):
     # find machines with less than 5GB of available disk space
     low_disk_machines = Machine.objects.filter(
             available_disk_space__lt=5*2**20).values(
-                'mac', 'hostname', 'available_disk_space')
+                'serial_number', 'hostname', 'available_disk_space')
                       
     return render_to_response('reports/dashboard.html',
         {'munki': munki,
