@@ -45,13 +45,13 @@ def submit(request):
         'com.apple.print.PrinterProxy'
     ]
     submission = request.POST
-    mac = submission.get('mac')
+    serial = submission.get('serial')
     machine = None
-    if mac:
+    if serial:
         try:
-            machine = Machine.objects.get(mac=mac)
+            machine = Machine.objects.get(serial=serial)
         except Machine.DoesNotExist:
-            machine = Machine(mac=mac)
+            machine = Machine(serial=serial)
     if machine:
         if 'hostname' in submission:
             machine.hostname = submission.get('hostname')
@@ -98,12 +98,12 @@ def submit(request):
     return HttpResponse("No inventory submitted.\n")
 
 
-def inventory_hash(request, mac):
+def inventory_hash(request, serial):
     sha256hash = ''
     machine = None
     if mac:
         try:
-            machine = Machine.objects.get(mac=mac)
+            machine = Machine.objects.get(serial=serial)
             inventory_meta = Inventory.objects.get(machine=machine)
             sha256hash = inventory_meta.sha256hash
         except (Machine.DoesNotExist, Inventory.DoesNotExist):
@@ -123,11 +123,11 @@ def index(request):
 
 
 @login_required
-def detail(request, mac):
+def detail(request, serial):
     machine = None
     if mac:
         try:
-            machine = Machine.objects.get(mac=mac)
+            machine = Machine.objects.get(serial=serial)
         except Machine.DoesNotExist:
             raise Http404
     else:
@@ -135,7 +135,7 @@ def detail(request, mac):
 
     machine = None
     try:
-        machine = Machine.objects.get(mac=mac)
+        machine = Machine.objects.get(serial=serial)
     except Machine.DoesNotExist:
         pass
         
