@@ -41,39 +41,6 @@ function cleanDetailPane() {
     // $('#detail').html('<div></div>')
 }
 
-function getManifestDetail(manifest_name, serial) {
-    if (inEditMode) {
-        if (! confirm('Discard current changes?')) {
-            event.preventDefault();
-            return;
-        }
-        inEditMode = false;
-        $(window).unbind("beforeunload");
-    }
-    if (!manifest_name) {
-        var manifest_name = $('.manifest_name').attr('id');
-    };
-    if (!serial) {
-        var serial = $('.serial_number').attr('id');
-    };
-    $("#imgProgress").show();
-    cleanDetailPane();
-    
-    // get new detail for the pane
-    var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
-    $.get(manifestURL, function(data) {
-        $('#data').html(data);
-        $('.edit').click(function(){
-            makeEditableItems(manifest_name, serial);
-        });
-        $('.buttons[id="Software"]').addClass('active');
-        $('.buttons[id!="Software"]').removeClass('active');
-        $("#imgProgress").hide();
-    });
-    //event.preventDefault();
-}
-
-
 var inEditMode = false;
 function makeEditableItems(manifest_name, serial) {
     // grab autocomplete data from document
@@ -267,21 +234,81 @@ function getManifestDetailFromDOMAndSave() {
     });
 }
 
+function getManifestDetail(manifest_name, serial) {
+    if (inEditMode) {
+        if (! confirm('Discard current changes?')) {
+            event.preventDefault();
+            return;
+        }
+        inEditMode = false;
+        $(window).unbind("beforeunload");
+    }
+    if (!manifest_name) {
+        var manifest_name = $('.manifest_name').attr('id');
+    };
+    if (!serial) {
+        var serial = $('.serial_number').attr('id');
+    };
+    $("#imgProgress").show();
+    cleanDetailPane();
+    diableSearch();
+    
+    // get new detail for the pane
+    var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
+    $.get(manifestURL, function(data) {
+        $('#data').html(data);
+        $('.edit').click(function(){
+            makeEditableItems(manifest_name, serial);
+        });
+        activeButton("Software");
+        $("#imgProgress").hide();
+    });
+    //event.preventDefault();
+}
+
 function getMachineDetail(serial) {
     $("#imgProgress").show();
-    
+
+    diableSearch();
+
     // get new detail for the pane
     var manifestURL = '/update/detailmachine/' + serial;
 
     $.get(manifestURL, function(data) {
         $('#data').html(data);
         $("#imgProgress").hide();
-        $('.buttons[id="Machine"]').addClass('active');
-        $('.buttons[id!="Machine"]').removeClass('active');
+        activeButton("Machine");
     });
 }
 
+function getInventory(serial) {
+    $("#imgProgress").show();
+    enableSearch();
 
+    // get new detail for the pane
+    var manifestURL = '/inventory/detail/' + serial;
+    $.get(manifestURL, function(data) {
+        $('#data').html(data);
+        $("#imgProgress").hide();
+        activeButton("Inventory");
+    });
+}
+
+function diableSearch() {
+    $('#SearchFieldMobile').prop('disabled', true);
+    $('#SearchField').prop('disabled', true);
+}
+
+function enableSearch() {
+    $('#SearchFieldMobile').prop('disabled', false);
+    $('#SearchField').prop('disabled', false);
+    document.getElementById("SearchField").select();
+}
+
+function activeButton(id) {
+    $('.buttons[id="' + id + '"]').addClass('active');
+    $('.buttons[id!="' + id + '"]').removeClass('active');
+}
 
 function sideSecific() {
 }

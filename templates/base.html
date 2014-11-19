@@ -55,6 +55,7 @@
 	    <!-- webadmin.js -->
 	    <script src="{% get_static_prefix %}js/webadmin.js"></script>
 		
+	    <link rel="shortcut icon" href="{% get_static_prefix %}img/favicon.ico" />
         <title>MunkiWebAdmin</title>
 		
 	    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -123,10 +124,9 @@
 	                        <li>
 	                            <a {% if page == 'manifests' %} class="active" {% endif %} href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
 	                        </li>
-	                        <!--
 	                        <li>
 	                            <a {% if page == 'inventory' %} class="active" {% endif %} href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
-	                        </li>-->
+	                        </li>
 	                        <li>
 	                            <a {% if page == 'licenses' %} class="active" {% endif %} href="{% url 'licenses.views.index' %}"><i class="fa fa-edit fa-fw"></i> Licenses</a>
 	                        </li>

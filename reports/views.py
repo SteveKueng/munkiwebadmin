@@ -49,13 +49,13 @@ def submit(request, submission_type):
         raise Http404
     
     submit = request.POST
-    mac = submit.get('mac')
+    serial = submit.get('serial')
     client = None
-    if mac:
+    if serial:
         try:
-            machine = Machine.objects.get(mac=mac)
+            machine = Machine.objects.get(serial=serial)
         except Machine.DoesNotExist:
-            machine = Machine(mac=mac)
+            machine = Machine(serial=serial)
     if machine:
         try:
             report = MunkiReport.objects.get(machine=machine)

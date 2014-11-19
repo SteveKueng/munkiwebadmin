@@ -6,7 +6,7 @@ import base64
 import bz2
 
 class Machine(models.Model):
-    mac = models.CharField(max_length=17, unique=True, primary_key=True)
+    serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
     hostname = models.CharField(max_length=64)
     username = models.CharField(max_length=256)
     location = models.CharField(max_length=256)
@@ -19,7 +19,7 @@ class Machine(models.Model):
     ram = models.CharField(max_length=16)
     os_version = models.CharField(max_length=16)
     available_disk_space = models.IntegerField(default=0)
-    serial_number = models.CharField(max_length=16)
+    mac = models.CharField(max_length=17)
     last_munki_update = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
     last_inventory_update = models.DateTimeField(
         default=datetime(1, 1, 1, 0, 0))
