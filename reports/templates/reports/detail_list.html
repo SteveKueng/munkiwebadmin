@@ -8,12 +8,12 @@
 <td>
   {{ version }}
 </td>
-<td>
+<td class="visible-md visible-lg">
   {% if manifest %}
   <a href='{% url "manifests.views.view" manifest %}'>{{ manifest }}</a>
   {% endif %}
 </td>
-<td class="{{ editclass }}">
+<td class="{{ editclass }} text-right">
 {% if item in report.InstalledItems %}<span class='label label-primary'>installed</span>{% else %}<span class='label label-danger'>not installed</span>{% endif %}
 </td>
 </tr>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="height: 100%;" lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}> 
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}> 
     <head>
         <meta content="text/html; charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,7 +7,7 @@
 
         {% load static %}
 		<!-- Bootstrap Core CSS -->
-	    <link href="{% get_static_prefix %}css/bootstrap.min.css" rel="stylesheet">
+	    <link href="{% get_static_prefix %}css/bootstrap.css" rel="stylesheet">
 	    <!-- MetisMenu CSS -->
 	    <link href="{% get_static_prefix %}css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
 	    <!-- DataTables CSS -->

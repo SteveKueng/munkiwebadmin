@@ -1,4 +1,22 @@
 {% load report_extras %}
 {% load static %}
 
-{{ report }}
+<br>
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-condensed" id="dataTables-clients">
+      <tbody>
+        {% for item in history|dictsortreversed:'install_date' %}
+        {% ifequal item.package_source "package_source_apple" %}
+          <tr>
+            <td class="text-center"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+            <td>{{ item|get:"_name" }}</td>
+            <td>{{ item.install_version }}</td>
+            <td class="visible-md visible-lg">{{ item.install_date|date:"d. F Y" }}</td>
+          </tr>
+        {% endifequal %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -25,7 +25,7 @@
 <div class="row" id="manifest_detail">
   <!-- Manifests -->
   <div class='col-md-6 manifest_section'>
-    <div class="section_label">Included Manifests</div>
+    <div class="section_label"><h4>Included Manifests</h4></div>
       <ul id='included_manifests' class='included_manifests_section list-group unstyled'>
         {% for item in manifest.included_manifests %}
           <li id='{{ item }}'class='list-group-item entrys 
@@ -45,7 +45,7 @@
 
   <!-- Catalogs -->
   <div class='col-md-6 manifest_section'>
-    <div class="section_label">Catalogs</div>
+    <div class="section_label"><h4>Catalogs</h4></div>
       <ul id='catalogs' class='catalogs_section list-group unstyled'>
         {% for item in manifest.catalogs %}
             <li id='{{ item }}' class='list-group-item entrys 
@@ -68,17 +68,8 @@
 <!-- Software -->
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software">Managed Installs</div>
-    <table class="client_info table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Version</th>
-          <th>Manifest</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+    <div class="section_label_software"><h4>Managed Installs</h4></div>
+    <table class="client_info table table-condensed">
       <!-- Managed Installs -->
       <tbody id="managed_installs" class="catalogs_section">
       {% for item in manifest.managed_installs %}
@@ -107,17 +98,8 @@
 
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software">Optional Installs</div>
-    <table class="client_info table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Version</th>
-          <th>Manifest</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+    <div class="section_label_software"><h4>Optional Installs</h4></div>
+    <table class="client_info table table-condensed">
       <tbody id="optional_installs" class="catalogs_section">
       {% for item in manifest.optional_installs %}
         {% if item in true_items %}
@@ -146,17 +128,8 @@
 
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software">Managed Uninstalls</div>
-    <table class="client_info table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Version</th>
-          <th>Manifest</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+    <div class="section_label_software"><h4>Managed Uninstalls</h4></div>
+    <table class="client_info table table-condensed">
       <tbody id="managed_uninstalls" class="catalogs_section">
       {% for item in manifest.managed_uninstalls %}
         {% if item in true_items %}

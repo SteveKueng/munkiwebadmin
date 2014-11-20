@@ -34,3 +34,7 @@ def access_size(value, arg):
 @register.filter
 def access_icon(value, arg):
     return value[arg].icon_name
+
+@register.filter(name='get')
+def get(d, k):
+    return d.get(k, None)

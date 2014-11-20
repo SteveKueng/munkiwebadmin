@@ -392,19 +392,16 @@ def appleupdate(request, serial):
         except MunkiReport.DoesNotExist:
             pass
 
+    history = {}
     if 'SystemProfile' in report_plist.get('MachineInfo', []):
                 for profile in report_plist['MachineInfo']['SystemProfile']:
-                    if profile['_dataType'] == 'SPHardwareDataType':
-                        hwinfo = profile._items[0]
+                    if profile['_dataType'] == 'SPInstallHistoryDataType':
+                        history = profile._items
                     if profile['_dataType'] == 'SPNetworkDataType':
                         network = profile._items[1]
 
-
-
-
-    print network
     return render_to_response('reports/appleupdates.html',
-                              {'report': report_plist,
+                              {'history': history,
                                'page': 'reports'})
 
 

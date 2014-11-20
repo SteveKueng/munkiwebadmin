@@ -234,6 +234,14 @@ function getManifestDetailFromDOMAndSave() {
 }
 
 function getDetail(type, serial, manifest_name) {
+    if (inEditMode) {
+        if (! confirm('Discard current changes?')) {
+            event.preventDefault();
+            return;
+        }
+        inEditMode = false;
+        $(window).unbind("beforeunload");
+    }
     switch (type) {
         case "Inventory":
             enableSearch();
@@ -247,14 +255,6 @@ function getDetail(type, serial, manifest_name) {
             break;
 
         case "Manifest":
-            if (inEditMode) {
-                if (! confirm('Discard current changes?')) {
-                    event.preventDefault();
-                    return;
-                }
-                inEditMode = false;
-                $(window).unbind("beforeunload");
-            }
             if (!manifest_name) {
                 var manifest_name = $('.manifest_name').attr('id');
             };
@@ -266,8 +266,9 @@ function getDetail(type, serial, manifest_name) {
             var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
             break;
 
-        case "AppleUpdate":
+        case "AppleUpdates":
             diableSearch();
+            var manifestURL = '/update/appleupdate/' + serial;
             break;
     }
     $("#imgProgress").show();
