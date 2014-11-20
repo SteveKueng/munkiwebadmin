@@ -96,7 +96,7 @@ function makeEditableItems(manifest_name, serial) {
     $('.edit').val('Save').unbind('click').click(function() {
         getManifestDetailFromDOMAndSave();
     });
-    $('#save_and_cancel').append("<input type='button' class='cancel btn' value='Cancel' onClick='cancelEdit(\"" + manifest_name + "\", \"" + serial + "\")'></input>");
+    $('#save_and_cancel').append("<input type='button' class='cancel btn btn-default' value='Cancel' onClick='cancelEdit(\"" + manifest_name + "\", \"" + serial + "\")'></input>");
     $(window).bind('beforeunload', function(){
         return "Changes will be lost!";
     });

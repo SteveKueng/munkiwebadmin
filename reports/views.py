@@ -374,6 +374,31 @@ def detail_pkg(request, manifest_name, serial):
     c.update(csrf(request))
     return render_to_response('reports/detail_pkg.html',c)
 
+def appleupdate(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+    
+    report_plist = {}
+    if machine:
+        try:
+            report = MunkiReport.objects.get(machine=machine)
+            report_plist = report.get_report()
+        except MunkiReport.DoesNotExist:
+            pass
+
+
+
+    return render_to_response('reports/detail_machine.html',
+                              {'report': report_plist,
+                               'page': 'reports'})
+
+
 def machine_detail(request, serial):
     machine = None
     if serial:

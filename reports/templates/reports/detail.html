@@ -32,7 +32,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
     {% endif %}
     <div class="btn-group" role="group" aria-label="...">
       <a href='#' id="Manifest" class="btn btn-default buttons" onclick="getDetail('Manifest', '{{ machine.serial_number }}', '{{manifest_name}}');">Software</a>
-      <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getDetail();">Apple Updates</a>
+      <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getDetail('AppleUpdates', '{{ machine.serial_number }}');">Apple Updates</a>
       <a href='#' id="Machine" class="btn btn-default buttons" onclick="getDetail('Machine', '{{ machine.serial_number }}');">Machine</a>
       <a href='#' onclick="getDetail('Inventory', '{{ machine.serial_number }}');" id="Inventory" class="btn btn-default buttons">Inventory</a>
     </div>
