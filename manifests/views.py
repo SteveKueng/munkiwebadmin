@@ -104,12 +104,18 @@ def index(request, manifest_name=None):
         username = None
         manifest = None
         
+        manifest_list_josn = list()
+        for item in manifest_list:
+            manifest_list_josn.append(item['name'])
+        manifest_list_josn = json.dumps(manifest_list_josn)
+
         if manifest_name:
             manifest = Manifest.read(manifest_name)
             username = manifest.get(MANIFEST_USERNAME_KEY)
             manifest_name = manifest_name.replace(':', '/')
         c = RequestContext(request,     
             {'manifest_list': manifest_list,
+             'manifest_list_josn': manifest_list_josn,
              'section': section,
              'findtext': findtext,
              'available_sections': available_sections,

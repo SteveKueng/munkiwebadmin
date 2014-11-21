@@ -13,14 +13,17 @@
 {% endif %}
 {% endblock %}
 
+{% block data-source %}{{ manifest_list_josn }}{% endblock %}
+{% block data-source-mobile %}{{ manifest_list_josn }}{% endblock %}
+
 <!-- page title -->
 {% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand" >Manifests</a>{% endblock %}
 
 {% block content %}
-	<div class="row" style="height:100%">
-		<div class="col-md-4 hidden-sm hidden-xs" style="height:100%;">
-			<div style="height:100%; padding-top: 150px;">
-				<div style="margin-top: -150px;">
+	<div class="row">
+		<div class="col-md-4 hidden-sm hidden-xs">
+			<div>
+				<div>
 					<button class='btn btn-success btn-group-justified 
 					{% if not perms.reports.change_machine %}
 					disabled
@@ -28,13 +31,11 @@
 					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">
 					<span class="glyphicon glyphicon-plus"></span> New manifest
 					</button>
-					<!--<h3>Manifests
-						<span class="badge badge-info">{{ manifest_list|length }}</span> 
-					</h3>-->
 				</div>
+				<br>
 				{% if manifest_list %}
 				{% url "manifests.views.index" as the_url %}
-				<div id="listbig" class="list-group" style="font-size:12pt; overflow-y: scroll; height:100%;">
+				<div id="listbig" class="list-group">
 					{% for manifest in manifest_list %}
 					<a class='manifest list-group-item' data-state="all" id='{{ manifest.name }}' href='#'>{{ manifest.name }}</a>
 					{% endfor %}
