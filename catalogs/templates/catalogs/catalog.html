@@ -17,7 +17,7 @@
 
 {% block navbar-default_extensions %}
 <span class='dropdown'>
-  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#catalogdropdown').height())">
 	{% if catalog_name == 'all' %}
 		All items
 	{% else %}
@@ -25,7 +25,7 @@
 	{% endif %}
 	<b class="caret"></b>
   </a>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu" id="catalogdropdown">
 	{% for item in catalog_list %}
 	  <li>
 	  	<a href="/catalog/{{ item }}">

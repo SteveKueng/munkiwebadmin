@@ -45,3 +45,12 @@ $(document).ready(function() {
 function applySearch() {
   $('#SearchField').keyup();
 }
+
+function addWrapperMargin(height) {
+    height = height + 75;
+    $('#page-wrapper').animate({ marginTop: height + 'px' , opacity: 1 }, 300);
+}
+
+function removeWrapperMargin() {
+    $('#page-wrapper').animate({ marginTop: '0px' , opacity: 1 }, 300);
+}

@@ -92,10 +92,10 @@
 	            <ul class="nav navbar-right top-nav">
 	            	{% block navbar-top_extensions %}{% endblock %}
 	                <li class="dropdown">
-	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
 	                        <i class="glyphicon glyphicon-user"></i>  <i class="fa fa-caret-down"></i>
 	                    </a>
-	                    <ul class="dropdown-menu">
+	                    <ul class="dropdown-menu" id="userpanel">
 	                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
 	                        <li class="divider"></li>
 	                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
@@ -141,6 +141,14 @@
             	{% block content %}{% endblock %}
             	</div>
         	</div>
+
+        	<div style="position:absolute; top:10px; right:0px; z-index:2000;">
+	        	<ul class="dropdown-menu">
+		            <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+		            <li class="divider"></li>
+		            <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
+	        	</ul>
+       		</div>
         	<div id="footer">
             	<div class="clearingdiv"></div>
         	</div>
