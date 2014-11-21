@@ -402,6 +402,7 @@ def appleupdate(request, serial):
 
     return render_to_response('reports/appleupdates.html',
                               {'history': history,
+                               'AppleUpdates': report_plist.AppleUpdates,
                                'page': 'reports'})
 
 

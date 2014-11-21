@@ -2,6 +2,42 @@
 {% load static %}
 
 <br>
+<div class"row">
+  <div class="col-md-12">
+    <table class="table table-condensed">
+    <tbody>
+      {% for item in AppleUpdates|dictsort:"display_name" %}
+      <tr>
+        <td class="text-center"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+        <td>
+          {% if item.display_name|length %}
+            {{ item.display_name }}
+          {% else %}
+            {{ item.name }}
+          {% endif %}
+        </td>
+        <td>
+          {{ item.version_to_install }}
+          {{ item.installed_version }}
+        </td>
+        <td>
+          {% if 'install_result' in item %}
+            {{ item.install_result }}
+          {% else %}
+            {% if item.installed %}
+              <span class='label label-primary'>installed</span>
+            {% else %}
+              <span class='label label-danger'>not installed</span>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-12">
     <table class="table table-condensed" id="dataTables-clients">
