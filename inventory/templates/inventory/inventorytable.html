@@ -1,17 +1,8 @@
 {% load url from future %}
 <!-- <h3>{{ list_title }} <span class="badge badge-info">{{ inventory_items|length }}</span></h3> -->
 {% if inventory_items|length %}
-  <p/>
-  <table class='clientlist table table-striped table-condensed'>
-      <thead>
-          <tr>
-            <th>Name</th>
-            <th>Version</th>
-            <th>BundleID</th>
-            <th>Path</th>
-          </tr>
-          </tr>
-      </thead>
+  <br>
+  <table class='clientlist table table-condensed'>
       <tbody>
       {% for item in inventory_items %}
           <tr>
@@ -25,8 +16,8 @@
                   {{ item.version }}
                 </a>
               </td>
-              <td>{{ item.bundleid }}</td>
-              <td title='{{ item.path }}'>{{ item.path }}</td>
+              <td class="hidden">{{ item.bundleid }}</td>
+              <td class="visible-md visible-lg" title='{{ item.path }}'>{{ item.path|truncatechars:50 }}</td>
           </tr>
       {% endfor %}
       </tbody>
