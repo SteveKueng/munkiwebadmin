@@ -26,6 +26,15 @@ tr {
 .table.table-condensed tr td {
    border-bottom: 1px solid #ddd; /* Change the color you want to set */
 }
+
+.typeahead>li>a {
+    text-align: left !important;
+    padding-bottom: 3px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-top: 3px !important;
+    color:#333 !important;
+}
 /* ---------------- */
 
 @media(max-width:768px) {
