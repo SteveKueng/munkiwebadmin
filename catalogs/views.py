@@ -85,6 +85,11 @@ def catalog_view(request, catalog_name=None, item_index=None):
 
     catalog = Catalog.detail(catalog_name)
 
+    catalog_items = list()
+    for item in catalog:
+        catalog_items.append(item.display_name)
+    catalog_items_json = json.dumps(catalog_items)  
+
     if item_index:
         catalog_item = Catalog.item_detail(catalog_name, item_index)
 
@@ -104,5 +109,6 @@ def catalog_view(request, catalog_name=None, item_index=None):
                            'catalog': catalog,
                            'item_index': item_index,
                            'catalog_item': catalog_item,
+                           'catalog_items': catalog_items_json,
                            'user': request.user,
                            'page': 'catalogs'})

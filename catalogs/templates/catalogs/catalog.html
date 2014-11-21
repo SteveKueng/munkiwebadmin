@@ -12,6 +12,9 @@
 <link href="{% get_static_prefix %}css/catalogs.css" rel="stylesheet" type="text/css">
 {% endblock %}
 
+{% block data-source %}{{ catalog_items }}{% endblock %}
+{% block data-source-mobile %}{{ catalog_items }}{% endblock %}
+
 <!-- page title -->
 {% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
 

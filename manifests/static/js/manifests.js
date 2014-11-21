@@ -1,37 +1,45 @@
 /* Javascript for manifests/index template */
-$(document).on('keyup', "#SearchField", function(){
-	var filter = $(this).val();
-	var regExPattern = "gi";
-	var regEx = new RegExp(filter, regExPattern);
-	$('#listbig a').each(function(){	 
-		if (
-		$(this).text().search(new RegExp(filter, "i")) < 0 &&
-		$(this).data('state').search(regEx) < 0 
-		){
-				
-				$(this).hide();
-			} else {
-				$(this).show();
-			}		 
-	});
-});
+$(document).ready(function() {
+    $('#SearchField').keyup(function(){
+        var filter = $(this).val();
+        var regExPattern = "gi";
+        var regEx = new RegExp(filter, regExPattern);
+        $('#listbig a').each(function(){     
+            if (
+                $(this).text().search(new RegExp(filter, "i")) < 0 &&
+                $(this).data('state').search(regEx) < 0 
+                ){
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }        
+        });
+    });
+    $('#SearchFieldMobile').keyup(function(){
+        var filter = $(this).val();
+        var regExPattern = "gi";
+        var regEx = new RegExp(filter, regExPattern);
+        $('#listsmall a').each(function(){     
+            if (
+                $(this).text().search(new RegExp(filter, "i")) < 0 &&
+                $(this).data('state').search(regEx) < 0 
+                ){
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }        
+        });
+    });
 
-$(document).on('keyup', "#SearchFieldMobile", function(){
-    var filter = $(this).val();
-    var regExPattern = "gi";
-    var regEx = new RegExp(filter, regExPattern);
-    $('#listsmall a').each(function(){   
-        if (
-        $(this).text().search(new RegExp(filter, "i")) < 0 &&
-        $(this).data('state').search(regEx) < 0 
-        ){
-                
-                $(this).hide();
-            } else {
-                $(this).show();
-            }        
+    $('#SearchField').change(function(){
+        $('#SearchField').keyup();
+    });
+
+    $('#SearchFieldMobile').change(function(){
+        $('#SearchFieldMobile').keyup();
     });
 });
+
 
 $(document).on('hidden.bs.modal', function (e) {
     $(e.target).removeData('bs.modal');
