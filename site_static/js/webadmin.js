@@ -47,10 +47,10 @@ function applySearch() {
 }
 
 function addWrapperMargin(height) {
-    height = height + 75;
+    height = height + 80;
     $('#page-wrapper').animate({ marginTop: height + 'px' , opacity: 1 }, 300);
 }
 
 function removeWrapperMargin() {
-    $('#page-wrapper').animate({ marginTop: '0px' , opacity: 1 }, 300);
+    $('#page-wrapper').animate({ marginTop: '0px' , opacity: 1 }, 500);
 }
