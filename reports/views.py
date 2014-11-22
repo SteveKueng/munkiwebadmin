@@ -392,6 +392,11 @@ def appleupdate(request, serial):
         except MunkiReport.DoesNotExist:
             pass
 
+    try:
+        AppleUpdates = report_plist.AppleUpdates
+    except:
+        AppleUpdates = {}
+
     history = {}
     if 'SystemProfile' in report_plist.get('MachineInfo', []):
                 for profile in report_plist['MachineInfo']['SystemProfile']:
@@ -402,7 +407,7 @@ def appleupdate(request, serial):
 
     return render_to_response('reports/appleupdates.html',
                               {'history': history,
-                               'AppleUpdates': report_plist.AppleUpdates,
+                               'AppleUpdates': AppleUpdates,
                                'page': 'reports'})
 
 
