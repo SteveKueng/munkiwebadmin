@@ -19,7 +19,7 @@
 {% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
 
 {% block navbar-default_extensions %}
-<span class='dropdown'>
+<span class='dropdown' style="margin-left:45px;">
   <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#catalogdropdown').height())">
 	{% if catalog_name == 'all' %}
 		All items

@@ -18,20 +18,20 @@
 {% endblock %}
 
 <!-- page title -->
-{% block page_title %}Manifests{% endblock %}
+{% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand" >Manifests</a>{% endblock %}
 
 {% block content %}
 <form name='new_manifest_form' action='{% url "manifests.views.new" %}' method="post">
-{% csrf_token %}
-<div class="col-md-4">
-<h3>Create new manifest</h3>
-<div class="form-group {% if form.manifest_name.errors %}has-error{% endif %}">
-  <label class="control-label" for="error1">{{ form.manifest_name.errors.as_text }}</label>
-  {{ form.manifest_name }}
-<br>
-<input class='btn btn-primary' type="submit" value="Create" />
-<input class='btn btn-default' type='button' class='cancel' value='Cancel' onclick="history.go(-1);"></input>
-</div>
-</div>
+	{% csrf_token %}
+	<div class="col-md-4">
+		<h3>Create new manifest</h3>
+		<div class="form-group {% if form.manifest_name.errors %}has-error{% endif %}">
+			 <label class="control-label" for="error1">{{ form.manifest_name.errors.as_text }}</label>
+			  {{ form.manifest_name }}
+			<br>
+			<input class='btn btn-primary' type="submit" value="Create" />
+			<input class='btn btn-default' type='button' class='cancel' value='Cancel' onclick="history.go(-1);"></input>
+		</div>
+	</div>
 </form>
 {% endblock content %}

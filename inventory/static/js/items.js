@@ -52,32 +52,10 @@ $(document).ready(function()
         return '<a href="?name=' + encodeURIComponent(data)
             + '">' + data + "</a>";
     }
-
-
-    $("#inventory-items-table").dataTable({
-    	"sDom": "<'row'<'col-md-8'i><'col-md-4'f>>t<'row'<'col-md-8'l><'col-md-4'p>>",
-        "sAjaxSource": window.location.href + ".json",
-        "fnServerData": process_json,
-        "sPaginationType": "bootstrap",
-        "bStateSave": false,
-        "bPaginate": false,
-        "aaSorting": [[4,'desc']],
-        "sScrollY": ($(window).height() - 235),
-        "bScrollInfinite": true,
-    	"bScrollCollapse": true,
-            "oLanguage": {
-      				"sInfo": "_TOTAL_ entries to show.",
-      				"sSearch": 'Search' ,
-      				"sZeroRecords": "No entries to show",
-      				"sInfoFiltered": "(filtering from _MAX_ records)"
-    		},
-        "aoColumns": [
-            {'mData': 'name',
-             'mRender': format_name_column
-             },
-            {'mData': 'versions',
-             'mRender': format_versions_column
-            }
-        ]
-    });
 });
+
+function sideSecific() {
+}
+
+function setview() {
+}

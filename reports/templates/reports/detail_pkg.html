@@ -1,10 +1,10 @@
 {% load report_extras %}
 
-<div id='save_and_cancel' class="hidden-print text-right">   
-  <div class="btn-group">
+<div class="row text-right" style="position:absolute; top:110px; right:40px;">
+  <div id='save_and_cancel' class="hidden-print btn-group">
     <input type='button' class='edit btn btn-primary' value='Edit'></input>
-  </div>    
-</div>
+  </div>
+</div>    
 
 {% if report.Errors|length or report.Warnings|length %}
 <!-- Error / Warnings -->

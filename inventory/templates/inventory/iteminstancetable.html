@@ -17,7 +17,7 @@
       {% for item in inventory_items %}
           <tr>
               <td>
-                <a href='{% url "inventory.views.detail" item.mac %}'>
+                <a href='{% url "inventory.views.detail" item.serial_number %}'>
                   {{ item.hostname }}
                 </a>
               </td>
