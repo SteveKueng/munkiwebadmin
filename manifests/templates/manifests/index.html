@@ -20,13 +20,7 @@
 {% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand" >Manifests</a>{% endblock %}
 
 {% block navbar-default_extensions %}
-<button style="margin-left:40px;" class='btn btn-success btn-group-justified 
-					{% if not perms.reports.change_machine %}
-					disabled
-					{% endif %}
-					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">
-					<span class="glyphicon glyphicon-plus"></span> New manifest
-</button>
+<a style="margin-left:40px;" class='btn btn-default {% if not perms.reports.change_machine %}disabled{% endif %}' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest</a>
 {% endblock %}
 
 {% block content %}
