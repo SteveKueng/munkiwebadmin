@@ -48,11 +48,11 @@ function makeEditableItems(manifest_name, serial) {
     // make sections sortable and drag/droppable
     //$('#managed_installs').sortable();
     $('.row').removeClass("hidden");
+    $('.label').addClass("hidden");
     $('.catalogs_section').sortable();
     $('.included_manifests_section').sortable();
-    $('.section').sortable({
-        connectWith: '.section'
-    });
+    $('.section').sortable({connectWith: '.section'});
+    
     //replace <a> links with 'editable' divs
     $('.entrys').children($('a')).each(function(){
         var item = "<div class='editable'>" + $(this).parent().attr('id') + "</div>";
@@ -79,14 +79,14 @@ function makeEditableItems(manifest_name, serial) {
           $(this).parent().parent().remove();
       }
     });
-    $('.section_label').append("<a class='btn btn-success btn-mini add_item pull-right' href='#' style='margin-top:-20px;'></a>");
+    $('.section_label').append("<a class='btn btn-success btn-mini add_item pull-right' style='margin-top:-20px;'></a>");
     $('.add_item').click(function() {
         var list_item = $("<li class='list-group-item entrys'><span class='btn btn-danger btn-mini lineitem_delete pull-right' style='margin-top:4px;'></span><div class='editable'></div></li>");
         $(this).parent().siblings($('ul')).append(list_item);   
         makeEditableItem(manifest_name, autocomplete_data, list_item.children(".editable"));
     });
 
-    $('.section_label_software').append("<a class='btn btn-success btn-mini add_software pull-right' href='#'></a>");
+    $('.section_label_software').append("<a class='btn btn-success btn-mini add_software pull-right' style='margin-top:-20px;'></a>");
     $('.add_software').click(function() {
         var list_item = $("<tr><td></td><td><div class='editable'></div></td><td></td><td></td><td><span class='btn btn-danger btn-mini sw_delete pull-right' style='margin-top:6px;'></span></td></tr>");
         $(this).parent().siblings($('tbody')).append(list_item);
@@ -227,6 +227,7 @@ function getManifestDetailFromDOMAndSave() {
       },
       error: function(jqXHR, textStatus, errorThrown) {
         $("#imgProgress").hide();
+        $('.label').removeClass("hidden");
         alert("ERROR: " + textStatus + "\n" + errorThrown);
       },
       dataType: 'json'
