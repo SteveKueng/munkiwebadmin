@@ -1,19 +1,13 @@
 {% if manifest %}
 	<h3 class="manifest_name" id="{{ manifest_name }}" style="margin-top:-50px;">
-	  {{ manifest_name }}
-  	<div class='pull-right' id='save_and_cancel'>
-  	{% if perms.reports.change_machine %}
-  		<div class="btn-group">
+	  	{{ manifest_name }}
+	  	<div class='pull-right btn-group' id='save_and_cancel'>
+	  	{% if perms.reports.change_machine %}
   			<a class='btn btn-danger pull-left' data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a>
-  	  	</div>
-  	  	
-  		<div class="btn-group">
-  			<input type='button' class='edit btn' value='Edit'></input>
-		</div>  	
-  	{% endif %}
-  	</div>
+  			<input type='button' class='edit btn btn-primary' value='Edit'></input>
+	  	{% endif %}
+	  	</div>
 	</h3>
-	<p /><p />
 	<div id="manifest_detail" style="height: 100%; overflow-y: scroll; padding-top:10px;">
 		<div class='manifest_section'>
 		<div class="section_label">Catalogs</div>
