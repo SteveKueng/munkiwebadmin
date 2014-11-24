@@ -6,3 +6,7 @@ munkiwebadmin.db
 unused_*
 
 *.db
+
+*.pkg
+
+site_static/downloads/MunkiEnroll.pkg
