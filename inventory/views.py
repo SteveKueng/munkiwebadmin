@@ -254,4 +254,4 @@ def model_description_lookup(serial):
         et = ElementTree.parse(response)
         return et.findtext("configCode").decode("utf-8")
     except:
-        return ''
+        return 'unknown'
