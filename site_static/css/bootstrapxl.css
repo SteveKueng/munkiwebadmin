@@ -14,7 +14,7 @@
     display: none !important;
 }
 
-@media (min-width: 1600px) {
+@media (min-width: 1800px) {
     .container {
         width: 1570px;
     }
