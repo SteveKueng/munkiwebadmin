@@ -12,7 +12,8 @@
 }
 .thumbnail {
 	margin-bottom:8px;
-	background-color: #f8f8f8
+	background-color: #f8f8f8;
+	height:125px;
 }
 .dataTables_filter {
    display: none;
