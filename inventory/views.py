@@ -194,6 +194,8 @@ def items(request):
         for item in items:
             instance = {}
             instance['mac'] = item.machine.mac
+            instance['name'] = name
+            instance['serial'] = item.machine.serial_number
             instance['hostname'] = item.machine.hostname
             instance['username'] = item.machine.username
             instance['version'] = item.version
@@ -254,4 +256,4 @@ def model_description_lookup(serial):
         et = ElementTree.parse(response)
         return et.findtext("configCode").decode("utf-8")
     except:
-        return 'unknown'
+        return ''

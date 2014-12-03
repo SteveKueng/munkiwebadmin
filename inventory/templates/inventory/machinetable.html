@@ -13,10 +13,11 @@
           </tr>
       </thead>
       <tbody>
+      {{ machine_list }}
       {% for machine in machine_list %}
           <tr>
               <td>
-                  <a href='{% url "inventory.views.detail" machine.serial_number %}'>
+                  <a href='{% url "inventory.views.detail" %}'>
                   {{ machine.hostname }}
                 </a>
               </td>

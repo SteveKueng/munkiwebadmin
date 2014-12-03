@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 <!-- page title -->
-{% block page_title %}<a href="{% url 'inventory.views.index' %}" class="navbar-brand" >Invntory</a>{% endblock %}
+{% block page_title %}<a href="{% url 'inventory.views.items' %}" class="navbar-brand" >Inventory</a>{% endblock %}
 
 {% block content %}
   {% with machine_list=machines list_title='Inventory Clients' %}

@@ -27,9 +27,11 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
 	</div>
   <div class="col-md-6">
     <h2>{{ machine.hostname }}</h2>
+    <h4><small>
     {% if model_lookup_enabled and additional_info.model_description|length > 1 %}
-    <h4><small>{{ additional_info.model_description }} <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a></small></h4>
+    {{ additional_info.model_description }} 
     {% endif %}
+    <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a></small></h4>
     <div class="btn-group" role="group" aria-label="...">
       <a href='#' id="Manifest" class="btn btn-default buttons" onclick="getDetail('Manifest', '{{ machine.serial_number }}', '{{manifest_name}}');">Software</a>
       <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getDetail('AppleUpdates', '{{ machine.serial_number }}');">Apple Updates</a>
