@@ -308,12 +308,12 @@ function sideSecific() {
 function hideTable(element, button) {
     $('.' + element).addClass("hidden");
     $('#' + button).attr("onclick","showTable('" + element + "', this.id)");
-    $('#' + button).html("<span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span>");
+    $('#' + button).html("<span class=\"glyphicon glyphicon-expand\" aria-hidden=\"true\"></span>");
 }
 
 function showTable(element, button) {
     $('.' + element).removeClass("hidden");
     $('#' + button).attr("onclick","hideTable('" + element + "', this.id)");
-    $('#' + button).html("<span class=\"glyphicon glyphicon-minus\" aria-hidden=\"true\"></span>");
+    $('#' + button).html("<span class=\"glyphicon glyphicon-collapse-down\" aria-hidden=\"true\"></span>");
 }
 // ---------------------------------------------------------------------------

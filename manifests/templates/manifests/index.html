@@ -43,12 +43,11 @@
 		<div class="col-md-4 hidden-md hidden-lg" style="padding-left:15px; padding-right:15px;">
 			<div>
 				<div>
-					<button class='btn btn-success btn-group-justified 
+					<button class='btn btn-default btn-group-justified 
 					{% if not perms.reports.change_machine %}
 					disabled
 					{% endif %}
-					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">
-					<span class="glyphicon glyphicon-plus"></span> New manifest
+					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest
 					</button>
 					<h3>Manifests
 						<span class="badge badge-info">{{ manifest_list|length }}</span>
