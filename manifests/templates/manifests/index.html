@@ -30,7 +30,7 @@
 				{% if manifest_list %}
 				{% url "manifests.views.index" as the_url %}
 				<div id="listbig" class="list-group">
-					{% for manifest in manifest_list %}
+					{% for manifest in manifest_list|dictsort:"name"  %}
 					<a class='manifest list-group-item' data-state="all" id='{{ manifest.name }}' href='#'>{{ manifest.name }}</a>
 					{% endfor %}
 				</div>
@@ -57,7 +57,7 @@
 				{% if manifest_list %}
 				{% url "manifests.views.index" as the_url %}
 				<div id="listsmall" class="list-group" style="font-size:12pt; overflow-y: scroll; max-height:250px;">
-					{% for manifest in manifest_list %}
+					{% for manifest in manifest_list|dictsort:"name"  %}
 					<a class='manifest list-group-item' data-state='all' id='{{ manifest.name }}' href='#'>{{ manifest.name }}</a>
 					{% endfor %}
 				</div>
