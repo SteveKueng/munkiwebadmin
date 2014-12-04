@@ -70,8 +70,14 @@
 <!-- Software -->
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software"><h4>Managed Installs</h4></div>
-    <table class="client_info table table-condensed">
+    <div class="section_label_software">
+      <h4>Managed Installs 
+        <div class="btn-group">
+          <button type="button" id="managed_installs_btn" onclick="hideTable('managed_installs', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+        </div>
+      </h4>
+    </div>
+    <table class="managed_installs client_info table table-condensed">
       <!-- Managed Installs -->
       <tbody id="managed_installs" class="catalogs_section">
       {% for item in manifest.managed_installs %}
@@ -100,8 +106,14 @@
 
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software"><h4>Optional Installs</h4></div>
-    <table class="client_info table table-condensed">
+    <div class="section_label_software">
+      <h4>Optional Installs 
+        <div class="btn-group">
+          <button type="button" id="optional_installs_btn" onclick="showTable('optional_installs', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+        </div>
+      </h4>
+    </div>
+    <table class="optional_installs client_info table table-condensed hidden">
       <tbody id="optional_installs" class="catalogs_section">
       {% for item in manifest.optional_installs %}
         {% if item in true_items %}
@@ -130,8 +142,14 @@
 
 <div class="row">
   <div class="col-md-12 manifest_section">
-    <div class="section_label_software"><h4>Managed Uninstalls</h4></div>
-    <table class="client_info table table-condensed">
+    <div class="section_label_software">
+      <h4>Managed Uninstalls 
+        <div class="btn-group">
+          <button type="button" id="managed_uninstalls_btn" onclick="hideTable('managed_uninstalls', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+        </div>
+      </h4>
+    </div>
+    <table class="managed_uninstalls client_info table table-condensed">
       <tbody id="managed_uninstalls" class="catalogs_section">
       {% for item in manifest.managed_uninstalls %}
         {% if item in true_items %}
