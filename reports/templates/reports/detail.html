@@ -46,6 +46,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
 </div>
 
 <div id="data">
+  <img class="loading" src="{% get_static_prefix %}img/loading.png" style="display: none;" id="imgProgress" />
 </div>
 
 <div class="hidden manifest_name" id="{{ manifest_name }}"></div>

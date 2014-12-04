@@ -84,8 +84,8 @@
 	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;"><img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
 	                {% block page_title %}{% endblock %}
 		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
-						<li>
-	                		<img src="{% get_static_prefix %}img/loading.gif" style="display: none; padding-top:3px;" id="imgProgress" width="30"/>
+						<li style="padding-top:7px;">
+	                		<img class="loading" src="{% get_static_prefix %}img/loading.png" style="display: none;" id="imgProgress" width="20"/>
 	                	</li>
 	                	{% block navbar-default_extensions %}{% endblock %}
 		            </ul>
