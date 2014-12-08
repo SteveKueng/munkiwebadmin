@@ -141,24 +141,10 @@ def detail(request, serial):
         
     inventory_items = machine.inventoryitem_set.all()
     
-    # determine if the model description information should be shown
-    try:
-        MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
-    except:
-        MODEL_LOOKUP_ENABLED = False
-
-    # If enabled lookup the model description
-    additional_info = {}
-    if MODEL_LOOKUP_ENABLED and machine.serial_number:
-        additional_info['model_description'] = \
-            model_description_lookup(machine.serial_number)
-    
     return render_to_response('inventory/detail.html',
                              {'machine': machine,
                               'inventory_items': inventory_items,
                               'user': request.user,
-                              'additional_info': additional_info,
-                              'model_lookup_enabled': MODEL_LOOKUP_ENABLED,
                               'page': 'inventory'})
 
 

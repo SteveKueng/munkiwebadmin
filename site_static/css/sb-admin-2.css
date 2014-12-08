@@ -54,6 +54,10 @@ tr {
     transform:rotate(360deg);
     }
 }
+
+.loader {
+    background-color: black;
+}
 /* ---------------- */
 
 @media(max-width:768px) {

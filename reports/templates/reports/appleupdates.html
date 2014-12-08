@@ -1,6 +1,5 @@
 {% load report_extras %}
 {% load static %}
-
 <br>
 <div class"row">
   <div class="col-md-12">
@@ -8,7 +7,7 @@
     <tbody>
       {% for item in AppleUpdates|dictsort:"display_name" %}
       <tr>
-        <td class="text-center"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+        <td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
         <td>
           {% if item.display_name|length %}
             {{ item.display_name }}
@@ -16,11 +15,11 @@
             {{ item.name }}
           {% endif %}
         </td>
-        <td>
+        <td class="visible-md visible-lg">
           {{ item.version_to_install }}
           {{ item.installed_version }}
         </td>
-        <td>
+        <td class="text-right">
           {% if 'install_result' in item %}
             {{ item.install_result }}
           {% else %}
@@ -45,10 +44,10 @@
         {% for item in history|dictsortreversed:'install_date' %}
         {% ifequal item.package_source "package_source_apple" %}
           <tr>
-            <td class="text-center"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+            <td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
             <td>{{ item|get:"_name" }}</td>
             <td>{{ item.install_version }}</td>
-            <td class="visible-md visible-lg">{{ item.install_date|date:"d. F Y" }}</td>
+            <td class="text-right visible-md visible-lg">{{ item.install_date|date:"d. F Y" }}</td>
           </tr>
         {% endifequal %}
         {% endfor %}

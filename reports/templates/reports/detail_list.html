@@ -1,4 +1,4 @@
-<tr id='{{ item }}' class="{{ class }}">
+<tr id='{{ item }}' class="{{ class }} {% if manifest %}active{% endif %}">
 <td class="text-center" style="width:25px;">
   <img src='{{ icon }}' width="20"/>
 </td>
@@ -10,10 +10,14 @@
 </td>
 <td class="visible-md visible-lg">
   {% if manifest %}
-  <a href='{% url "manifests.views.view" manifest %}'>{{ manifest }}</a>
+  	<a href='{% url "manifests.views.view" manifest %}'>{{ manifest }}</a>
   {% endif %}
 </td>
 <td class="{{ editclass }} text-right">
-{% if item in report.InstalledItems %}<span class='label label-primary'>installed</span>{% else %}<span class='label label-danger'>not installed</span>{% endif %}
+	{% if item in report.InstalledItems %}
+		<span id='installed' class='label label-primary'>installed</span>
+	{% else %}
+		<span id='notinstalled' class='label label-danger'>not installed</span>
+	{% endif %}
 </td>
 </tr>
