@@ -22,25 +22,6 @@ $(document).ajaxSend(function(event, xhr, settings) {
     }
 });
 
-function deleteManifest() {
-  var manifest_name = $('.manifest_name').attr('id');
-  location.href='/manifest/delete/' + manifest_name.replace(/\//g, ':');
-}
-
-function cleanDetailPane() {
-  // unbind any existing event handlers for the detail pane
-    $('.editable').off('dblclick');
-    $('.lineitem_delete').off('click');
-
-    // destroy sortability for existing elements
-    //$('.catalogs_section').sortable('destroy');
-    //$('.included_manifests_section').sortable('destroy');
-    //$('.section').sortable('destroy');
-    
-    // clear detail pane
-    // $('#detail').html('<div></div>')
-}
-
 var inEditMode = false;
 function makeEditableItems(manifest_name, serial) {
     // grab autocomplete data from document
@@ -63,20 +44,58 @@ function makeEditableItems(manifest_name, serial) {
     $('.manifest_section').on('dblclick', '.editable', function() {
         makeEditableItem(manifest_name, autocomplete_data, $(this));
     });
+
     $('.manifest_section').on('click', '.lineitem_delete', function() {
-      if ($(this).parent().attr('id')) {    
-        var r = confirm("Really delete " + $(this).parent().attr('id') + " from " + $(this).parent().parent().attr('id') + "?");
-        if (r == true){ $(this).parent().remove(); };
+      if ($(this).parent().attr('id')) { 
+        element = $(this).parent();   
+        bootbox.dialog({
+          message: "Really delete <b>" + $(this).parent().attr('id') + "</b> from <b>" + $(this).parent().parent().attr('id') + "</b>?",
+          title: "Delete",
+          buttons: {
+            danger: {
+              label: "Delete",
+              className: "btn-danger",
+              callback: function() {
+                element.remove();
+              }
+            },
+            main: {
+              label: "Cancel",
+              className: "btn-default",
+              callback: function() {
+              }
+            }
+          }
+        });
       } else {
           $(this).parent().remove();
       }
     });
+
     $('.manifest_section').on('click', '.sw_delete', function() {
       if ($(this).parent().parent().attr('id')) {    
-        var r = confirm("Really delete " + $(this).parent().parent().attr('id') + " from " + $(this).parent().parent().parent().parent().attr('id') + "?");
-        if (r == true){ $(this).parent().parent().remove(); };
+        element = $(this).parent().parent();   
+        bootbox.dialog({
+          message: "Really delete <b>" + $(this).parent().attr('id') + "</b> from <b>" + $(this).parent().parent().attr('id') + "</b>?",
+          title: "Delete",
+          buttons: {
+            danger: {
+              label: "Delete",
+              className: "btn-danger",
+              callback: function() {
+                removeItem(element);
+              }
+            },
+            main: {
+              label: "Cancel",
+              className: "btn-default",
+              callback: function() {
+              }
+            }
+          }
+        });
       } else {
-          $(this).parent().parent().remove();
+            removeItem($(this).parent().parent());
       }
     });
     $('.section_label').append("<a class='btn btn-success btn-mini add_item pull-right' style='margin-top:-20px;'></a>");
@@ -103,18 +122,54 @@ function makeEditableItems(manifest_name, serial) {
     inEditMode = true;
 }
 
+function removeItem(item) {
+    var type = item.parent().attr('id');
+    if (type == "managed_installs") {
+        if(item.find('#installed').attr('id')) {
+            if ($('#managed_uninstalls #'+ item.attr('id')).length == 0) {
+                $(".managed_uninstalls").children($('tbody')).append(item);
+            }
+        }
+    }
+    item.remove();
+}
+
 function updateLineItem(item) {
     var text_value = item.val();
+    //small or large parentID (catalog/manifest or ManagedInstalls)
+    parentIDL = item.parent().parent().parent().attr('id')
+    parentIDS = item.parent().parent().attr('id')
+    parentItemL = item.parent().parent()
+    parentItemS = item.parent()
+
     if (text_value.length) {
-        if (item.parent().parent().parent().attr('id') == "managed_installs" || item.parent().parent().parent().attr('id') == "optional_installs" || item.parent().parent().parent().attr('id') == "managed_uninstalls") {
-            item.parent().parent().attr('id', text_value);
+        if (parentIDL == "managed_installs" || parentIDL == "optional_installs" || parentIDL == "managed_uninstalls") {
+            if(parentIDL == "managed_installs") {
+                if ($('#managed_uninstalls #'+ text_value).length) {
+                    $('#managed_uninstalls #'+ text_value).remove();
+                }
+            }
+            if ($('#'+ parentIDL +' #'+ text_value).length) {
+                parentItemL.remove();
+            } else {
+                parentItemL.attr('id', text_value);
+            }
         } else {
-            item.parent().attr('id', text_value);
+            if ($('#'+ parentIDS +' #'+ text_value).length) {
+                parentItemS.remove();
+            } else {
+                parentItemS.attr('id', text_value);
+            }
         }
         var new_div = $("<div class='editable'>" + text_value + "</div>")
         item.replaceWith(new_div);
+
     } else {
-        item.parent().remove();
+        if (parentIDL == "managed_installs" || parentIDL == "optional_installs" || parentIDL == "managed_uninstalls") {
+            parentItemL .remove();
+        } else {
+            parentItemS.remove();
+        }
     }
 }
 
@@ -176,8 +231,6 @@ function getManifestDetailFromDOMAndSave() {
     // reads elements from the DOM to build up a JSON object
     // describing the manifest post-edit
     // then POSTs to server
-    
-    //
     $("#imgProgress").show();
     
     //unbind beforeunload
@@ -215,14 +268,12 @@ function getManifestDetailFromDOMAndSave() {
     });
     var postdata = JSON.stringify(manifest)
     var postURL = '/manifest/detail/' + manifest_name.replace(/\//g, ':');
-    //alert(postdata);
-    //console.log(postdata);
+
     $.ajax({
       type: 'POST',
       url: postURL,
       data: postdata,
       success: function(data) {
-        //alert("SUCCESS: " + data);
         getDetail("Manifest");
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -262,7 +313,6 @@ function getDetail(type, serial, manifest_name) {
             if (!serial) {
                 var serial = $('.serial_number').attr('id');
             };
-            cleanDetailPane();
             diableSearch();
             var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
             break;
@@ -286,23 +336,15 @@ function getDetail(type, serial, manifest_name) {
     });
 }
 
-function diableSearch() {
-    $('#SearchFieldMobile').prop('disabled', true);
-    $('#SearchField').prop('disabled', true);
-}
-
-function enableSearch() {
-    $('#SearchFieldMobile').prop('disabled', false);
-    $('#SearchField').prop('disabled', false);
-    document.getElementById("SearchField").select();
-}
-
 function activeButton(id) {
     $('.buttons[id="' + id + '"]').addClass('active');
     $('.buttons[id!="' + id + '"]').removeClass('active');
 }
 
 function sideSecific() {
+}
+
+function setview() {
 }
 
 function hideTable(element, button) {
