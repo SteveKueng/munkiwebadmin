@@ -5,11 +5,9 @@
 {% load static %}
 <script type='text/javascript' src='{% get_static_prefix %}js/manifests.js'></script>
 {% if manifest_name %}
-	<script>
-	function sideSecific() {
-    	getManifestDetail('{{manifest_name}}');
-	}
-	</script>
+<script>
+	function sideSecific() {getManifestDetail('{{manifest_name}}');}
+</script>
 {% endif %}
 {% endblock %}
 
@@ -17,7 +15,7 @@
 {% block data-source-mobile %}{{ manifest_list_josn }}{% endblock %}
 
 <!-- page title -->
-{% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand" >Manifests</a>{% endblock %}
+{% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand">Manifests</a>{% endblock %}
 
 {% block navbar-default_extensions %}
 <a style="margin-left:40px;" class='btn btn-default btn-sm hidden-xs {% if not perms.reports.change_machine %}disabled{% endif %}' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest</a>
@@ -39,7 +37,6 @@
 				{% endif %}
 			</div>
 		</div>
-		
 		<div class="col-md-4 hidden-md hidden-lg" style="padding-left:15px; padding-right:15px;">
 			<div>
 				<div>
@@ -47,9 +44,9 @@
 					{% if not perms.reports.change_machine %}
 					disabled
 					{% endif %}
-					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest
-					</button>
-					<h3>Manifests
+					' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest</button>
+					<h3>
+						Manifests
 						<span class="badge badge-info">{{ manifest_list|length }}</span>
 					</h3>
 				</div>
