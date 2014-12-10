@@ -1,20 +1,4 @@
 {% load url from future %}
-
-<!--
-<div class="well well-sm">
-	<div class="btn-group">
-		<a href="#" id="list" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> List</a>
-		<a href="#" id="grid" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> Grid</a>
-	</div>
-	<div class="btn-group pull-right">
-		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"></span> MacBook</a>
-		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> iMac</a>
-		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> MacPro</a>
-		<a href="#" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> MacMini</a>
-	</div>
-	
-</div>-->
-
 <script>
 	$("#imgProgress").show();
 </script>
@@ -31,7 +15,7 @@
  	                  {% if report.machine.hostname %}
  	                      {{ report.machine.hostname }}
  	                  {% else %}
- 	                      {{ report.machine.mac }}
+ 	                      {{ report.machine.serial_number }}
  	                  {% endif %}
                       </h4>
                 </div>
@@ -63,7 +47,7 @@
 	                  {% if report.machine.hostname %}
 	                      {{ report.machine.hostname }}
 	                  {% else %}
-	                      {{ report.machine.mac }}
+	                      {{ report.machine.serial_number }}
 	                  {% endif %}
 	                </td>
 	                <td>{{ report.console_user }}</td>

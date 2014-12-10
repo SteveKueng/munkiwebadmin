@@ -18,6 +18,10 @@ body {
     }
 }
 
+.dataTables_filter {
+    display: none; 
+}
+
 /* -------- special kuengst */
 tr {
     height: 40px;

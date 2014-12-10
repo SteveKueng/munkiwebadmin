@@ -52,6 +52,38 @@ $(document).ready(function()
         return '<a href="?name=' + encodeURIComponent(data)
             + '">' + data + "</a>";
     }
+
+
+    oTable = $("#inventory-items-table").dataTable({
+        "sAjaxSource": window.location.href + ".json",
+        "fnServerData": process_json,
+        "paging":false,
+        "bStateSave": true,
+        "aaSorting": [[1,'desc']],
+        "aoColumns": [
+            {'mData': 'name',
+             'mRender': format_name_column
+             },
+            {'mData': 'versions',
+             'mRender': format_versions_column
+            }
+        ]
+    });
+
+    $('#SearchField').keyup(function(){
+        oTable.fnFilter( $(this).val() );       
+    });
+    $('#SearchFieldMobile').keyup(function(){
+        oTable.fnFilter( $(this).val() );    
+    });
+
+    $('#SearchField').change(function(){
+        $('#SearchField').keyup();
+    });
+
+    $('#SearchFieldMobile').change(function(){
+        $('#SearchFieldMobile').keyup();
+    });
 });
 
 function sideSecific() {
