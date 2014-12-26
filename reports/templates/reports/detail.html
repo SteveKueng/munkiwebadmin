@@ -40,8 +40,12 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm hidden-print" style="text-align: right">
-		<a href="vnc://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">Screen Sharing</a>
+		{% if vnc_button_enabled %}
+    <a href="vnc://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">Screen Sharing</a>
+    {% endif %}
+    {% if ssh_button_enabled %}
 		<a href="ssh://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">SSH</a>
+    {% endif %}
   </div>
 </div>
 

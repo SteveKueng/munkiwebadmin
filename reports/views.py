@@ -261,6 +261,18 @@ def detail(request, serial):
     else:
         raise Http404
     
+    # get SSH option
+    try:
+        SSH_BUTTON_ENABLED = settings.SSH_BUTTON_ENABLED
+    except:
+        SSH_BUTTON_ENABLED = False
+
+    # get VNC option
+    try:
+        VNC_BUTTON_ENABLED = settings.VNC_BUTTON_ENABLED
+    except:
+        VNC_BUTTON_ENABLED = False
+
     # determine if the model description information should be shown
     try:
         MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
@@ -283,6 +295,8 @@ def detail(request, serial):
                                'user': request.user,
                                'additional_info': additional_info,
                                'model_lookup_enabled': MODEL_LOOKUP_ENABLED,
+                               'ssh_button_enabled': SSH_BUTTON_ENABLED,
+                               'vnc_button_enabled': VNC_BUTTON_ENABLED,
                                'page': 'reports'})
 
 def detail_pkg(request, manifest_name, serial):
@@ -345,7 +359,6 @@ def detail_pkg(request, manifest_name, serial):
             if key not in sorted_Manifests:
                 sorted_Manifests[key] = includetManifests[key]
 
-
     # item_details -> list with software and details
     # true_items for check if a software is in catalog or not
     item_details = {}
@@ -363,12 +376,61 @@ def detail_pkg(request, manifest_name, serial):
                         icon = Catalog.get_icon(detail.name)
                     item_details[detail.name].icon_name = icon
 
+    # installs
+    installs = {}
+    installsTypes = ["managed_installs", "managed_uninstalls", "optional_installs"]
+
+    for installsType in installsTypes:
+        installs[installsType] = {}
+        manifests = "test_manifest"
+        installs[installsType][manifests] = {}
+
+        if installsType == "managed_installs":
+            ManagedInstallsDetail = {}
+            if report_plist.has_key("ManagedInstalls"):
+                for item in report_plist.ManagedInstalls:
+                    ManagedInstallsDetail[item.name] = item
+        else:
+            ManagedInstallsDetail = {}
+
+        if manifest.has_key(installsType):
+            for index, item in enumerate(manifest[installsType]):
+                if ManagedInstallsDetail.has_key(item):
+                    installs[installsType][manifests][item] = ManagedInstallsDetail[item]
+                    ManagedInstallsDetail.pop(item, None)
+                
+                if item in true_items:
+                    if installs.get(installsType, {}).has_key(item):
+                        installs[installsType][manifests][item].update(item_details[item])
+                    else:
+                        installs[installsType][manifests][item] = item_details[item]
+
+                    installs[installsType][manifests][item].update({"incatalog" : "True"})
+                else:
+                    if installs.get(installsType, {}).has_key(item):
+                        installs[installsType][manifests][item].update({"incatalog" : "False"})
+                    else:
+                        installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False"}
+
+                installs[installsType][manifests][item].update({"order" : index})
+
+        #        if installs[installsType][manifests].get(item, {}).has_key("requires"):
+        #            for require in installs[installsType][manifests][item].requires:
+        #                manifest.managed_installs.append(require)
+
+         #       if installs[installsType][manifests].get(item, {}).has_key("update_for"):     
+         #           for update in installs[installsType][manifests][item].update_for:
+         #               manifest.managed_installs.append(update)
+
+    print installs
+
     c = RequestContext(request,{'manifest_name': manifest_name,
                                'manifest': manifest,
                                'report': report_plist,
                                'item_details': item_details,
                                'includetManifests': sorted_Manifests,
                                'true_items': true_items,
+                               'installs': installs,
                                'autocomplete_data': autocomplete_data,
                                })
     c.update(csrf(request))
@@ -439,22 +501,11 @@ def machine_detail(request, serial):
     except:
         WARRANTY_LOOKUP_ENABLED = False
 
-    # determine if the model description information should be shown
-    try:
-        MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
-    except:
-        MODEL_LOOKUP_ENABLED = False
-
     # Determine Manufacture Date
     additional_info = {}
     if WARRANTY_LOOKUP_ENABLED and machine.serial_number:
         additional_info['manufacture_date'] = \
             estimate_manufactured_date(machine.serial_number)
-
-    # If enabled lookup the model description
-    if MODEL_LOOKUP_ENABLED and machine.serial_number:
-        additional_info['model_description'] = \
-            model_description_lookup(machine.serial_number)
               
     # handle items that were installed during the most recent run
     install_results = {}
@@ -515,7 +566,6 @@ def machine_detail(request, serial):
                                'user': request.user,
                                'additional_info': additional_info,
                                'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
-                               'model_lookup_enabled': MODEL_LOOKUP_ENABLED,
                                'page': 'reports'})
 
 def raw(request, serial):
