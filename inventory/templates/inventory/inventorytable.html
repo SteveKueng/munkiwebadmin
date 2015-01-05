@@ -2,7 +2,7 @@
 <!-- <h3>{{ list_title }} <span class="badge badge-info">{{ inventory_items|length }}</span></h3> -->
 {% if inventory_items|length %}
   <br>
-  <table class='clientlist table table-condensed table-hover'>
+  <table class='clientlist table table-hover table-condensed '>
       <tbody>
       {% for item in inventory_items %}
           <tr onclick="document.location = '{% url "inventory.views.items" %}?name={{ item.name|urlencode }}';">

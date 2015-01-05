@@ -25,6 +25,12 @@ WARRANTY_LOOKUP_ENABLED = True
 # managed updates visible in manifests
 MANAGED_UPDATES_ENABLED = False
 
+# display SSH-Button in detal view
+SSH_BUTTON_ENABLED = False
+
+# display VNC-Button in detal view
+VNC_BUTTON_ENABLED = False
+
 #show all items
 ALL_ITEMS = True
 

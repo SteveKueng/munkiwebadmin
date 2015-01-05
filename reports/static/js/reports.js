@@ -42,9 +42,7 @@ $(document).ready(function() {
 	$('#SearchFieldMobile').change(function(){
 		$('#SearchFieldMobile').keyup();
 	});
-});
 
-$(document).ready(function() {
 	$('#list').click(function(event){
 		event.preventDefault();
 		setview("list");
@@ -54,7 +52,7 @@ $(document).ready(function() {
 		event.preventDefault();
 		setview("grid");
 		setCookie("view", "grid", 7);
-	});
+	});  
 });
 
 function setview(view) {
