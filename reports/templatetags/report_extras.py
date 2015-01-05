@@ -23,24 +23,3 @@ def replace(value):
     value = value.replace ("_", " ")
     value = value.title()
     return value
-
-@register.filter
-def access_name(value, arg):
-    return value[arg].display_name
-
-@register.filter
-def access_version(value, arg):
-    return value[arg].version
-
-@register.filter
-def access_size(value, arg):
-    size = humanreadablesize(value[arg].installer_item_size)
-    return size
-
-@register.filter
-def access_icon(value, arg):
-    return value[arg].icon_name
-
-@register.filter(name='get')
-def get(d, k):
-    return d.get(k, None)
