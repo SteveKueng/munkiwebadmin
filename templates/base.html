@@ -100,8 +100,10 @@
 	                        <i class="glyphicon glyphicon-user"></i>  <i class="fa fa-caret-down"></i>
 	                    </a>
 	                    <ul class="dropdown-menu" id="userpanel">
+	                    	{% if user.is_staff %}
 	                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
 	                        <li class="divider"></li>
+	                        {% endif %}
 	                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
 	                    </ul>
 	                </li>
@@ -124,9 +126,11 @@
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
                             <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-table fa-fw"></i> Catalogs</a>
                         </li>
+                        {% if user.is_staff %}
                         <li {% if page == 'manifests' %} class="active" {% endif %}>
                             <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
                         </li>
+                        {% endif %}
                         <li {% if page == 'inventory' %} class="active" {% endif %}>
                             <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
                         </li>

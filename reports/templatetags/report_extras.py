@@ -19,6 +19,12 @@ def humanreadablesize(kbytes):
 humanreadablesize.is_safe = True
 
 @register.filter
+def replace(value):
+    value = value.replace ("_", " ")
+    value = value.title()
+    return value
+
+@register.filter
 def access_name(value, arg):
     return value[arg].display_name
 

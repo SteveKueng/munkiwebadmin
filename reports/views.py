@@ -299,7 +299,8 @@ def detail(request, serial):
                                'vnc_button_enabled': VNC_BUTTON_ENABLED,
                                'page': 'reports'})
 
-def detail_pkg(request, manifest_name, serial):
+@login_required
+def detail_pkg(request, serial, manifest_name):
     machine = None
     manifest = None
     install_items = None
@@ -345,6 +346,7 @@ def detail_pkg(request, manifest_name, serial):
 
     manifest = Manifest.read(manifest_name)
     sorted_Manifests = SortedDict()
+    sorted_Manifests[manifest_name] = manifest
     if "included_manifests" in manifest:
         for includetManifest in manifest.included_manifests:
             get_addition_manifests(includetManifest)
@@ -377,65 +379,62 @@ def detail_pkg(request, manifest_name, serial):
                     item_details[detail.name].icon_name = icon
 
     # installs
-    installs = {}
+    installs = SortedDict()
+    update_requires = list()
     installsTypes = ["managed_installs", "managed_uninstalls", "optional_installs"]
-
     for installsType in installsTypes:
-        installs[installsType] = {}
-        manifests = "test_manifest"
-        installs[installsType][manifests] = {}
+        installs[installsType] = SortedDict()
+         
+        for number, manifests in enumerate(sorted_Manifests):
+            installs[installsType][manifests] = SortedDict()
 
-        if installsType == "managed_installs":
-            ManagedInstallsDetail = {}
+            ManagedInstallsDetail = SortedDict()
             if report_plist.has_key("ManagedInstalls"):
                 for item in report_plist.ManagedInstalls:
                     ManagedInstallsDetail[item.name] = item
-        else:
-            ManagedInstallsDetail = {}
 
-        if manifest.has_key(installsType):
-            for index, item in enumerate(manifest[installsType]):
+            for index, item in enumerate(sorted_Manifests[manifests][installsType]):
                 if ManagedInstallsDetail.has_key(item):
                     installs[installsType][manifests][item] = ManagedInstallsDetail[item]
-                    ManagedInstallsDetail.pop(item, None)
                 
                 if item in true_items:
-                    if installs.get(installsType, {}).has_key(item):
+                    if installs[installsType].get(manifests, {}).has_key(item):
                         installs[installsType][manifests][item].update(item_details[item])
                     else:
                         installs[installsType][manifests][item] = item_details[item]
 
                     installs[installsType][manifests][item].update({"incatalog" : "True"})
                 else:
-                    if installs.get(installsType, {}).has_key(item):
-                        installs[installsType][manifests][item].update({"incatalog" : "False"})
+                    if installs[installsType].get(manifests, {}).has_key(item):
+                        installs[installsType][manifests][item].update({"incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'})
                     else:
-                        installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False"}
+                        installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'}
 
-                installs[installsType][manifests][item].update({"order" : index})
+                if installs[installsType][manifests].get(item, {}).has_key("requires"):
+                    for require in installs[installsType][manifests][item].requires:
+                        if not require in sorted_Manifests[manifests][installsType]:
+                            sorted_Manifests[manifests][installsType].append(require)
+                            if not require in update_requires:
+                                update_requires.append(require)
 
-        #        if installs[installsType][manifests].get(item, {}).has_key("requires"):
-        #            for require in installs[installsType][manifests][item].requires:
-        #                manifest.managed_installs.append(require)
-
-         #       if installs[installsType][manifests].get(item, {}).has_key("update_for"):     
-         #           for update in installs[installsType][manifests][item].update_for:
-         #               manifest.managed_installs.append(update)
-
-    print installs
+                if installs[installsType][manifests].get(item, {}).has_key("update_for"):     
+                    for update in installs[installsType][manifests][item].update_for:
+                        if not update in sorted_Manifests[manifests][installsType]:
+                            sorted_Manifests[manifests][installsType].append(update)
+                            if not update in update_requires:
+                                update_requires.append(update)
 
     c = RequestContext(request,{'manifest_name': manifest_name,
-                               'manifest': manifest,
+                                'manifest': manifest,
                                'report': report_plist,
-                               'item_details': item_details,
-                               'includetManifests': sorted_Manifests,
-                               'true_items': true_items,
                                'installs': installs,
+                               'update_requires': update_requires,
                                'autocomplete_data': autocomplete_data,
                                })
     c.update(csrf(request))
     return render_to_response('reports/detail_pkg.html',c)
 
+@login_required
 def appleupdate(request, serial):
     machine = None
     if serial:
@@ -568,6 +567,7 @@ def machine_detail(request, serial):
                                'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
                                'page': 'reports'})
 
+@login_required
 def raw(request, serial):
     machine = None
     if serial:
