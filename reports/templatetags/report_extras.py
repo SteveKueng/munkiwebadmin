@@ -23,3 +23,7 @@ def replace(value):
     value = value.replace ("_", " ")
     value = value.title()
     return value
+
+@register.filter(name='get')
+def get(d, k):
+    return d.get(k, None)
