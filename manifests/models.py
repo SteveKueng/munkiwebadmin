@@ -126,7 +126,6 @@ def trimVersionString(version_string):
         del(version_parts[-1])
     return '.'.join(version_parts)
 
-
 class Manifest(object):
     @staticmethod
     def __pathForManifestNamed(aManifestName):

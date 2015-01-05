@@ -1,7 +1,9 @@
 {% load report_extras %}
 <div class="row text-right" style="position:absolute; top:110px; right:40px;">
   <div id='save_and_cancel' class="hidden-print btn-group">
+    {% if perms.reports.change_machine %}
     <input type='button' class='edit btn btn-primary' value='Edit'></input>
+    {% endif %}
   </div>
 </div>    
 
@@ -65,116 +67,64 @@
     </div>
   </div>
 </div>
-
 <!-- Software -->
+{% for name, install in installs.items %}
 <div class="row">
   <div class="col-md-12 manifest_section">
     <div class="section_label_software">
       <h4>
         <div class="btn-group">
-          <button type="button" id="managed_installs_btn" onclick="hideTable('managed_installs', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span></button>
+          <button type="button" id="{{ name }}_btn" onclick="{% if name == 'optional_installs' %}showTable{% else %}hideTable{% endif %}('{{ name }}', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-{% if name == 'optional_installs' %}expand{% else %}collapse-down{% endif %}" aria-hidden="true"></span></button>
         </div> 
-        Managed Installs 
+        {{ name|replace }}
       </h4>
     </div>
-    <table class="managed_installs client_info table table-condensed">
-      <!-- Managed Installs -->
-      <tbody id="managed_installs" class="catalogs_section">
-      {% for item in manifest.managed_installs %}
-        {% if item in true_items %}
-            {% include "reports/detail_list.html" with itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item editclass="sw_entrys" item=item manifest="" %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" editclass="sw_entrys" manifest="" %}
-          {% endif %}
-      {% endfor %}
-      </tbody>
-      <tbody>
-      {% for values, manifest in includetManifests.items %}
-        {% for item in manifest.managed_installs %}
-          {% if item in true_items %}
-            {% include "reports/detail_list.html" with item=item itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item manifest=values %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" manifest=values %}
-          {% endif %}
+    <table class="{{ name }} client_info table table-condensed {% if name == 'optional_installs' %} hidden{% endif %}">
+      {% for manifestname, manifest_detail in install.items  %}
+      <tbody {% if manifest_name == manifestname %} id="{{ name }}" class="catalogs_section" {% endif %}>
+        {% for sw_name, sw_detail in manifest_detail.items  %}
+          <tr {% if not sw_name in update_requires %}id='{{ sw_name }}'{% endif %} class="{% if manifest_name != manifestname or sw_name in update_requires %}active{% endif %} {% if sw_detail.incatalog == 'False' %}danger{% endif %} ">
+            <td class="text-center" style="width:25px;">
+              <img src='{{ sw_detail.icon_name }}' width="20"/>
+            </td>
+            <td>
+              {% if sw_detail.display_name %}
+                {{ sw_detail.display_name }}
+              {% else %}
+                {{ sw_name }}
+              {% endif %}
+            </td>
+            <td>
+              {% if sw_detail.installed_version %}
+                {{ sw_detail.installed_version }}
+              {% else %}  
+                {{ sw_detail.installs.0.CFBundleShortVersionString }}
+              {% endif %}
+            </td>
+            <td class="visible-md visible-lg">
+              {% if manifest_name != manifestname %}
+                <a href='{% url "manifests.views.view" manifestname %}'>{{ manifestname }}</a>
+              {% endif %}
+            </td>
+            <td class="{% if manifest_name == manifestname and not sw_name in update_requires %}sw_entrys {% endif %}text-right">
+              {% if 'install_result' in sw_detail %}
+                  <span id='installed' class='label label-warning'>{{ sw_detail.install_result }}</span>
+              {% else %}
+                {% if sw_detail.installed %}
+                  <span id='installed' class='label label-primary'>installed</span>
+                {% else %}
+                  <span id='notinstalled' class='label label-danger'>not installed</span>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
         {% endfor %}
-      {% endfor %}
       </tbody>
+      {% endfor %}
     </table>
     </div>
   </div>
 </div>
-
-<div class="row">
-  <div class="col-md-12 manifest_section">
-    <div class="section_label_software">
-      <h4>
-        <div class="btn-group">
-          <button type="button" id="managed_uninstalls_btn" onclick="hideTable('managed_uninstalls', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span></button>
-        </div> 
-        Managed Uninstalls 
-      </h4>
-    </div>
-    <table class="managed_uninstalls client_info table table-condensed">
-      <tbody id="managed_uninstalls" class="catalogs_section">
-      {% for item in manifest.managed_uninstalls %}
-        {% if item in true_items %}
-            {% include "reports/detail_list.html" with itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item editclass="sw_entrys" item=item manifest="" %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" editclass="sw_entrys" manifest="" %}
-          {% endif %}
-      {% endfor %}
-      </tbody>
-      <tbody>
-      {% for values, manifest in includetManifests.items %}
-        {% for item in manifest.managed_uninstalls %}
-          {% if item in true_items %}
-            {% include "reports/detail_list.html" with item=item itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item manifest=values %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" manifest=values %}
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12 manifest_section">
-    <div class="section_label_software">
-      <h4> 
-        <div class="btn-group">
-          <button type="button" id="optional_installs_btn" onclick="showTable('optional_installs', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-expand" aria-hidden="true"></span></button>
-        </div> 
-        Optional Installs
-      </h4>
-    </div>
-    <table class="optional_installs client_info table table-condensed hidden">
-      <tbody id="optional_installs" class="catalogs_section">
-      {% for item in manifest.optional_installs %}
-        {% if item in true_items %}
-            {% include "reports/detail_list.html" with itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item editclass="sw_entrys" item=item manifest="" %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" editclass="sw_entrys" manifest="" %}
-          {% endif %}
-      {% endfor %}
-      </tbody>
-      <tbody>
-      {% for values, manifest in includetManifests.items %}
-        <!-- Optional installs -->
-        {% for item in manifest.optional_installs %}
-          {% if item in true_items %}
-            {% include "reports/detail_list.html" with item=item itemdetail=item_details|access_name:item version=item_details|access_version:item icon=item_details|access_icon:item manifest=values %}
-          {% else %}
-            {% include "reports/detail_list.html" with itemdetail=item item=item class="danger" icon="/static/img/PackageIcon.png" manifest=values %}
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
-</div>
+{% endfor %}
 
 <div id="data_storage" data-autocomplete_data='{{ autocomplete_data }}' />

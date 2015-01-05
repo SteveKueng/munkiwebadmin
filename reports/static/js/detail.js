@@ -314,7 +314,7 @@ function getDetail(type, serial, manifest_name) {
                 var serial = $('.serial_number').attr('id');
             };
             diableSearch();
-            var manifestURL = '/update/detailpkg/' + manifest_name.replace(/\//g, ':') + "/" + serial;
+            var manifestURL = '/update/detailpkg/' + serial + "/" + manifest_name.replace(/\//g, ':');
             break;
 
         case "AppleUpdates":
