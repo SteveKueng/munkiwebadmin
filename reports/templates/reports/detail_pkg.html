@@ -97,10 +97,10 @@
             <td>
               {% if sw_detail.installed_version %}
                 {{ sw_detail.installed_version }}
+                hhh
               {% else %}  
-                {{ sw_detail.installs.0.CFBundleShortVersionString }}
+                {{ sw_detail.version }}
               {% endif %}
-              {{ sw_detail }}
             </td>
             <td class="visible-md visible-lg">
               {% if manifest_name != manifestname %}
