@@ -222,7 +222,8 @@ class Manifest(object):
             print "Unable to find manifest to copy '%s'" % manifest_name
             return -1
 
-        shutil.copy(manifest_name, manifest_copy)
+        if not os.path.exists(manifest_copy):
+            shutil.copy(manifest_name, manifest_copy)
 
     @classmethod
     def getInstallItemNames(cls, manifest_name):
