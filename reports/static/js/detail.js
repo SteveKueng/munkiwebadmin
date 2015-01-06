@@ -73,10 +73,10 @@ function makeEditableItems(manifest_name, serial) {
     });
 
     $('.manifest_section').on('click', '.sw_delete', function() {
-      if ($(this).parent().parent().attr('id')) {    
-        element = $(this).parent().parent();   
+      element = $(this).parent().parent();
+      if (element.attr('id')) {       
         bootbox.dialog({
-          message: "Really delete <b>" + $(this).parent().attr('id') + "</b> from <b>" + $(this).parent().parent().attr('id') + "</b>?",
+          message: "Really delete <b>" + element.attr('id') + "</b> from <b>" + element.parent().attr('id') + "</b>?",
           title: "Delete",
           buttons: {
             danger: {
@@ -95,7 +95,7 @@ function makeEditableItems(manifest_name, serial) {
           }
         });
       } else {
-            removeItem($(this).parent().parent());
+            removeItem(element);
       }
     });
     $('.section_label').append("<a class='btn btn-success btn-mini add_item pull-right' style='margin-top:-20px;'></a>");
@@ -123,15 +123,21 @@ function makeEditableItems(manifest_name, serial) {
 }
 
 function removeItem(item) {
+    var add = item;
     var type = item.parent().attr('id');
     if (type == "managed_installs") {
         if(item.find('#installed').attr('id')) {
             if ($('#managed_uninstalls #'+ item.attr('id')).length == 0) {
-                $(".managed_uninstalls").children($('tbody')).append(item);
-            }
-        }
-    }
-    item.remove();
+                $("#managed_uninstalls").append(item);
+            } else {
+                item.remove();
+            } 
+        } else {
+            item.remove();
+        } 
+    } else {
+        item.remove();
+    } 
 }
 
 function updateLineItem(item) {
