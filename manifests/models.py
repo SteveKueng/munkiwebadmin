@@ -1,6 +1,7 @@
 #from django.db import models
 # we're not using a database for out manifests, so no need to import models
 import os
+import shutil
 import subprocess
 import plistlib
 from catalogs.models import Catalog
@@ -209,6 +210,19 @@ class Manifest(object):
         else:
             git = MunkiGit()
             git.deleteFileAtPathForCommitter(manifest_path, committer)
+    
+    @classmethod
+    def copy(cls, manifest_name, manifest_copy):
+        manifest_name = cls.__pathForManifestNamed(manifest_name)
+        manifest_copy = cls.__pathForManifestNamed(manifest_copy)
+        print manifest_name
+        print manifest_copy
+
+        if not os.path.exists(manifest_name):
+            print "Unable to find manifest to copy '%s'" % manifest_name
+            return -1
+
+        shutil.copy(manifest_name, manifest_copy)
 
     @classmethod
     def getInstallItemNames(cls, manifest_name):

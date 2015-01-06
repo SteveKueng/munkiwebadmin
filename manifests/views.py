@@ -2,7 +2,9 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
+from django.http import Http404
 #from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
@@ -178,3 +180,15 @@ def detail(request, manifest_name):
             'page': 'manifests'})
         c.update(csrf(request))
         return render_to_response('manifests/detail.html', c)
+
+@csrf_exempt
+def copymanifest(request):
+    if request.method != 'POST':
+        raise Http404
+    submit = request.POST
+    manifest_name = submit.get('manifest_name')
+    manifest_copy = submit.get('manifest_copy')
+
+    Manifest.copy(manifest_name, manifest_copy)
+
+    return HttpResponse("No report submitted.\n")
