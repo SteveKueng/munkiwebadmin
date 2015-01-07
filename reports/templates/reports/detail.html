@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% load url from future %}
 
+{% load static %}
+
 {% block extra_style %}
+<link href="{% get_static_prefix %}css/report.css" rel="stylesheet">
 {% endblock %}
 
 {% block java_script %}
-{% load static %}
 <script type='text/javascript' src='{% get_static_prefix %}js/detail.js'></script>
 <script type='text/javascript' src='{% get_static_prefix %}js/warranty.js'></script>
 {% endblock %}
@@ -52,10 +54,13 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
   </div>
 </div>
 
-<div id="data">
-  <div class="text-center" style="padding-top:50px;">
+<div class="loading_modal">
+  <div class="text-center" style="padding-top:10px;">
       <img class="loading" src="{% get_static_prefix %}img/loading.png" width="50" id="imgProgress" />
   </div>
+</div>
+
+<div id="data">
 </div>
 
 <div class="hidden manifest_name" id="{{ manifest_name }}"></div>

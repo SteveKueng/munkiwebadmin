@@ -388,41 +388,42 @@ def detail_pkg(request, serial, manifest_name):
         for number, manifests in enumerate(sorted_Manifests):
             installs[installsType][manifests] = SortedDict()
 
-            ManagedInstallsDetail = SortedDict()
-            if report_plist.has_key("ManagedInstalls"):
-                for item in report_plist.ManagedInstalls:
-                    ManagedInstallsDetail[item.name] = item
+            if manifest:
+                ManagedInstallsDetail = SortedDict()
+                if report_plist.has_key("ManagedInstalls"):
+                    for item in report_plist.ManagedInstalls:
+                        ManagedInstallsDetail[item.name] = item
 
-            for index, item in enumerate(sorted_Manifests[manifests][installsType]):
-                if ManagedInstallsDetail.has_key(item):
-                    installs[installsType][manifests][item] = ManagedInstallsDetail[item]
-                
-                if item in true_items:
-                    if installs[installsType].get(manifests, {}).has_key(item):
-                        installs[installsType][manifests][item].update(item_details[item])
+                for index, item in enumerate(sorted_Manifests[manifests][installsType]):
+                    if ManagedInstallsDetail.has_key(item):
+                        installs[installsType][manifests][item] = ManagedInstallsDetail[item]
+                    
+                    if item in true_items:
+                        if installs[installsType].get(manifests, {}).has_key(item):
+                            installs[installsType][manifests][item].update(item_details[item])
+                        else:
+                            installs[installsType][manifests][item] = item_details[item]
+
+                        installs[installsType][manifests][item].update({"incatalog" : "True"})
                     else:
-                        installs[installsType][manifests][item] = item_details[item]
+                        if installs[installsType].get(manifests, {}).has_key(item):
+                            installs[installsType][manifests][item].update({"incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'})
+                        else:
+                            installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'}
 
-                    installs[installsType][manifests][item].update({"incatalog" : "True"})
-                else:
-                    if installs[installsType].get(manifests, {}).has_key(item):
-                        installs[installsType][manifests][item].update({"incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'})
-                    else:
-                        installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False", 'icon_name' : '/static/img/PackageIcon.png'}
+                    if installs[installsType][manifests].get(item, {}).has_key("requires"):
+                        for require in installs[installsType][manifests][item].requires:
+                            if not require in sorted_Manifests[manifests][installsType]:
+                                sorted_Manifests[manifests][installsType].append(require)
+                                if not require in update_requires:
+                                    update_requires.append(require)
 
-                if installs[installsType][manifests].get(item, {}).has_key("requires"):
-                    for require in installs[installsType][manifests][item].requires:
-                        if not require in sorted_Manifests[manifests][installsType]:
-                            sorted_Manifests[manifests][installsType].append(require)
-                            if not require in update_requires:
-                                update_requires.append(require)
-
-                if installs[installsType][manifests].get(item, {}).has_key("update_for"):     
-                    for update in installs[installsType][manifests][item].update_for:
-                        if not update in sorted_Manifests[manifests][installsType]:
-                            sorted_Manifests[manifests][installsType].append(update)
-                            if not update in update_requires:
-                                update_requires.append(update)
+                    if installs[installsType][manifests].get(item, {}).has_key("update_for"):     
+                        for update in installs[installsType][manifests][item].update_for:
+                            if not update in sorted_Manifests[manifests][installsType]:
+                                sorted_Manifests[manifests][installsType].append(update)
+                                if not update in update_requires:
+                                    update_requires.append(update)
 
     c = RequestContext(request,{'manifest_name': manifest_name,
                                 'manifest': manifest,

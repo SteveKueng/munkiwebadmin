@@ -329,6 +329,7 @@ function getDetail(type, serial, manifest_name) {
             break;
     }
     $("#imgProgress").show();
+    $(".loading_modal").show();
     // get new detail for the pane
     $.get(manifestURL, function(data) {
         $('#data').html(data);
@@ -339,6 +340,7 @@ function getDetail(type, serial, manifest_name) {
         }
         activeButton(type);
         $("#imgProgress").hide();
+        $(".loading_modal").hide();
     });
 }
 
