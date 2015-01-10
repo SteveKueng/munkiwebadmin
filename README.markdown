@@ -27,11 +27,7 @@ Go in to the created virtual enviroment:
   
 Install django and tools for django
 
-    pip install django==1.5.1
-
-    pip install django-wsgiserver==0.8.0beta
-
-    pip install django-ajax-search
+    pip install django==1.7.2
 	
 	pip install simplejson
   

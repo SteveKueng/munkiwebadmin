@@ -223,8 +223,7 @@ def items_json(request):
                      'versions': versions})
 
     # send it back in JSON format
-    return HttpResponse(json.dumps(rows),
-                        mimetype='application/json')
+    return HttpResponse(json.dumps(rows), content_type='application/json')
 
 
 def model_description_lookup(serial):
