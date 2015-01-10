@@ -67,6 +67,7 @@
     </div>
   </div>
 </div>
+
 <!-- Software -->
 {% for name, install in installs.items %}
 <div class="row">
@@ -106,7 +107,7 @@
                 <a href='{% url "manifests.views.view" manifestname %}'>{{ manifestname }}</a>
               {% endif %}
             </td>
-            <td class="{% if manifest_name == manifestname and not sw_name in update_requires %}sw_entrys {% endif %}text-right">
+            <td class="{% if manifest_name == manifestname %}sw_entrys {% endif %}text-right">
               {% if 'install_result' in sw_detail %}
                   <span id='installed' class='label label-warning'>{{ sw_detail.install_result }}</span>
               {% else %}
@@ -121,6 +122,45 @@
         {% endfor %}
       </tbody>
       {% endfor %}
+      {% if name == 'managed_installs' %}
+        <tbody>
+        {% for sw_name, sw_detail in required.items %}
+              <tr class="active {% if sw_detail.incatalog == 'False' %}danger{% endif %}">
+                <td class="text-center" style="width:25px;">
+                  <img src='{{ sw_detail.icon_name }}' width="20"/>
+                </td>
+                <td>
+                  {% if sw_detail.display_name %}
+                    {{ sw_detail.display_name }}
+                  {% else %}
+                    {{ sw_name }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if sw_detail.installed_version %}
+                    {{ sw_detail.installed_version }}
+                  {% else %}  
+                    {{ sw_detail.version_to_install }}
+                  {% endif %}
+                </td>
+                <td class="visible-md visible-lg">
+                  <p>required</p>
+                </td>
+                <td class="text-right">
+                  {% if 'install_result' in sw_detail %}
+                      <span id='installed' class='label label-warning'>{{ sw_detail.install_result }}</span>
+                  {% else %}
+                    {% if sw_detail.installed %}
+                      <span id='installed' class='label label-primary'>installed</span>
+                    {% else %}
+                      <span id='notinstalled' class='label label-danger'>not installed</span>
+                    {% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+        {% endfor %}
+        </tbody>
+      {% endif %}
     </table>
     </div>
   </div>
