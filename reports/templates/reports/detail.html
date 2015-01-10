@@ -31,7 +31,9 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
     <h2>{{ machine.hostname }}</h2>
     <h4><small>
     {% if model_lookup_enabled and additional_info.model_description|length > 1 %}
-    {{ additional_info.model_description }} 
+      {{ additional_info.model_description }}
+    {% else %}
+      {{ machine.machine_model }}
     {% endif %}
     {% if perms.reports.delete_machine %}
     <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a>
