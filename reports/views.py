@@ -380,7 +380,6 @@ def detail_pkg(request, serial, manifest_name):
                         icon = Catalog.get_icon(detail.name)
                     item_details[detail.name].icon_name = icon
 
-
     ManagedInstallsDetail = SortedDict()
     if report_plist.has_key("ManagedInstalls"):
         for item in report_plist.ManagedInstalls:
@@ -432,7 +431,6 @@ def detail_pkg(request, serial, manifest_name):
 
 
     required = SortedDict()
-    print item_details["SW_Skype"].icon_name
     for item in sorted(ManagedInstallsDetail.items(),key=lambda x: x[1]['display_name']):
         if not item[0] in listed:
             if item_details.has_key(item[0]):
