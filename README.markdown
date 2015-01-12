@@ -2,7 +2,7 @@ MunkiWebAdmin
 --------------
 
 This is an updatet version of MunkiWebAdmin form Greg Neagle.
-See http://code.google.com/p/munki/wiki/MunkiWebAdmin
+See https://github.com/munki/munkiwebadmin
 
 
 
@@ -27,7 +27,8 @@ Go in to the created virtual enviroment:
   
 Install django and tools for django
 
-    pip install django==1.7.2
+    pip install django==1.6.9  (Python2.6)
+    pip install django==1.7.2  (Python2.7)
 	
 	pip install simplejson
   
@@ -50,4 +51,5 @@ Edit settings.py:
 ---
 
     python manage.py syncdb
+    python manage.py collectstatic
     python manage.py runwsgiserver port=8000 host=0.0.0.0
