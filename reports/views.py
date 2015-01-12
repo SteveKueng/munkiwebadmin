@@ -446,7 +446,6 @@ def detail_pkg(request, serial, manifest_name):
                                'installs': installs,
                                'autocomplete_data': autocomplete_data,
                                'required': required,
-                               'test': item_details["SW_Facter"];
                                })
     c.update(csrf(request))
     return render_to_response('reports/detail_pkg.html',c)
