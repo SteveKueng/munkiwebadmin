@@ -432,13 +432,14 @@ def detail_pkg(request, serial, manifest_name):
 
 
     required = SortedDict()
+    print item_details["SW_Skype"].icon_name
     for item in sorted(ManagedInstallsDetail.items(),key=lambda x: x[1]['display_name']):
         if not item[0] in listed:
-            if "icon_name" in ManagedInstallsDetail[item[0]]:
-                icon = Catalog.get_icon(ManagedInstallsDetail[item[0]].icon_name)
+            if item_details.has_key(item[0]):
+                ManagedInstallsDetail[item[0]].icon_name = item_details[item[0]].icon_name
             else:
-                icon = Catalog.get_icon(item[0])
-            ManagedInstallsDetail[item[0]].icon_name = icon
+                ManagedInstallsDetail[item[0]].icon_name = "/static/img/PackageIcon.png"
+
             required[item[0]] = ManagedInstallsDetail[item[0]]
 
     c = RequestContext(request,{'manifest_name': manifest_name,
