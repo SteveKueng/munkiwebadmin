@@ -106,6 +106,10 @@ tr {
     }
 }
 
+.side-nav ul li a.active {
+    background-color: #eee;
+}
+
 /* Top Navigation */
 
 .top-nav {

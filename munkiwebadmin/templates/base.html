@@ -123,17 +123,17 @@
                         <li {% if page == 'reports' %} class="active" {% endif %}>
                             <a href="javascript:;" data-toggle="collapse" data-target="#computers"><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
 	                        <ul id="computers" class="collapse">
-	                            <li {% if subpage == 'reports' %} class="active" {% endif %}>
-	                                <a href="{% url 'reports.views.index' %}"><i class="fa fa-apple"></i> All</a>
+	                            <li>
+	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple"></i> All</a>
 	                            </li>
-	                            <li {% if subpage == 'macbook' %} class="active" {% endif %}>
-	                                <a href="{% url 'reports.views.index' %}?show=macbook"><i class="fa fa-laptop"></i> MacBook</a>
+	                            <li>
+	                                <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop"></i> MacBook</a>
 	                            </li>
-	                            <li {% if subpage == 'mac' %} class="active" {% endif %}>
-	                                <a href="{% url 'reports.views.index' %}?show=mac"><i class="fa fa-desktop"></i> Mac</a>
+	                            <li>
+	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop"></i> Mac</a>
 	                            </li>
-	                            <li {% if subpage == 'vm' %} class="active" {% endif %}>
-	                                <a href="{% url 'reports.views.index' %}?show=vm"><i class="fa fa-spinner fa-pulse"></i> Virtual Machine</a>
+	                            <li>
+	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-pulse"></i> Virtual Machine</a>
 	                            </li>
 	                        </ul>
                         </li>

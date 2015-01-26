@@ -185,6 +185,8 @@ def index(request):
         elif show == 'vm':
             reports = reports.filter(machine__machine_model__startswith="VMware")
             subpage = "vm"
+    else:
+        subpage = "reports"
         
     if os_version is not None:
         reports = reports.filter(machine__os_version__exact=os_version)
