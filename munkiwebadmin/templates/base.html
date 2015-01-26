@@ -23,7 +23,7 @@
 	    <!-- jQueryUI CSS -->
 	    <link href="{% get_static_prefix %}css/smoothness/jquery-ui.min.css" rel="stylesheet">
 	    <!-- Custom Fonts -->
-	    <link href="{% get_static_prefix %}font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	    <link href="{% get_static_prefix %}font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
         {% block extra_style %}{% endblock %}
 
@@ -85,7 +85,7 @@
 	                {% block page_title %}{% endblock %}
 		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
 						<li style="padding-top:7px;">
-	                		<img class="loading" src="{% get_static_prefix %}img/loading.png" style="display: none;" id="imgProgress" width="20"/>
+	                		<i id="imgProgress" class="fa fa-spinner fa-pulse fa-lg" style="display: none; color:#777;"></i>
 	                	</li>
 	                	<li style="margin-top:-10px;">
 	                		{% block navbar-default_extensions %}{% endblock %}
@@ -133,7 +133,7 @@
 	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop"></i> Mac</a>
 	                            </li>
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-pulse"></i> Virtual Machine</a>
+	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner"></i> Virtual Machine</a>
 	                            </li>
 	                        </ul>
                         </li>

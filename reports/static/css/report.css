@@ -6,8 +6,5 @@
     margin-top: 50px;
     left: 45%;
     z-index:2000; 
-    background:#e4e4e4;
-    border: 1px #e4e4e4 solid;
-    border-radius: 4px;
-	box-shadow: 0 0 6px #ccc;
+    color:#777;
 }
