@@ -384,15 +384,16 @@ def detail_pkg(request, serial, manifest_name):
     if "catalogs" in manifest:
         for catalog in manifest.catalogs:
             catalog_detail = Catalog.detail(catalog)
-            for detail in reversed(catalog_detail):
-                if not detail.name in item_details:
-                    item_details[detail.name] = detail
-                    true_items.append(detail.name)
-                    if "icon_name" in item_details[detail.name]:
-                        icon = Catalog.get_icon(item_details[detail.name].icon_name)
-                    else:
-                        icon = Catalog.get_icon(detail.name)
-                    item_details[detail.name].icon_name = icon
+            if catalog_detail:
+                for detail in reversed(catalog_detail):
+                    if not detail.name in item_details:
+                        item_details[detail.name] = detail
+                        true_items.append(detail.name)
+                        if "icon_name" in item_details[detail.name]:
+                            icon = Catalog.get_icon(item_details[detail.name].icon_name)
+                        else:
+                            icon = Catalog.get_icon(detail.name)
+                        item_details[detail.name].icon_name = icon
 
     ManagedInstallsDetail = SortedDict()
     if report_plist.has_key("ManagedInstalls"):
@@ -460,6 +461,8 @@ def detail_pkg(request, serial, manifest_name):
                                'installs': installs,
                                'autocomplete_data': autocomplete_data,
                                'required': required,
+                               'valid_manifest_names': valid_manifest_names,
+                               'valid_catalogs': valid_catalogs,
                                })
     c.update(csrf(request))
     return render_to_response('reports/detail_pkg.html',c)

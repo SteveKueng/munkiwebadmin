@@ -50,6 +50,7 @@
   <div class='col-md-6 manifest_section'>
     <div class="section_label"><h4>Catalogs</h4></div>
       <ul id='catalogs' class='catalogs_section list-group unstyled'>
+
         {% for item in manifest.catalogs %}
             <li id='{{ item }}' class='list-group-item entrys 
             {% if item not in valid_catalogs %}
