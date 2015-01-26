@@ -141,7 +141,8 @@ def index(request):
     typeFilter = request.GET.get('typeFilter')
     
     reports = MunkiReport.objects.all()
-    
+    subpage = ""
+
     if show is not None:
         now = datetime.now()
         hour_ago = now - timedelta(hours=1)
@@ -173,8 +174,17 @@ def index(request):
                 machine__last_munki_update__range=(three_months_ago,
                                                    month_ago))
         elif show == 'notquarter':
-            reports = reports.exclude(
-                machine__last_munki_update__gte=three_months_ago)
+            reports = reports.exclude(machine__last_munki_update__gte=three_months_ago)
+        elif show == 'macbook':
+            reports = reports.filter(machine__machine_model__startswith="MacBook")
+            subpage = "macbook"
+        elif show == 'mac':
+            reports = reports.exclude(machine__machine_model__startswith="MacBook")
+            reports = reports.exclude(machine__machine_model__startswith="VMware")
+            subpage = "mac"
+        elif show == 'vm':
+            reports = reports.filter(machine__machine_model__startswith="VMware")
+            subpage = "vm"
         
     if os_version is not None:
         reports = reports.filter(machine__os_version__exact=os_version)
@@ -197,7 +207,9 @@ def index(request):
         {'reports': reports,
          'user': request.user,
          'hostnames': hostnames_json,
-         'page': 'reports'})
+         'page': 'reports',
+         'subpage': subpage,
+         })
 
 
 @login_required     

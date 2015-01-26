@@ -121,10 +121,24 @@
                             <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
                         </li>
                         <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a href="{% url 'reports.views.index' %}"><i class="glyphicon glyphicon-phone"></i> Computer</a>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#computers"><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
+	                        <ul id="computers" class="collapse">
+	                            <li {% if subpage == 'reports' %} class="active" {% endif %}>
+	                                <a href="{% url 'reports.views.index' %}"><i class="fa fa-apple"></i> All</a>
+	                            </li>
+	                            <li {% if subpage == 'macbook' %} class="active" {% endif %}>
+	                                <a href="{% url 'reports.views.index' %}?show=macbook"><i class="fa fa-laptop"></i> MacBook</a>
+	                            </li>
+	                            <li {% if subpage == 'mac' %} class="active" {% endif %}>
+	                                <a href="{% url 'reports.views.index' %}?show=mac"><i class="fa fa-desktop"></i> Mac</a>
+	                            </li>
+	                            <li {% if subpage == 'vm' %} class="active" {% endif %}>
+	                                <a href="{% url 'reports.views.index' %}?show=vm"><i class="fa fa-spinner fa-pulse"></i> Virtual Machine</a>
+	                            </li>
+	                        </ul>
                         </li>
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
-                            <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-table fa-fw"></i> Catalogs</a>
+                            <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt"></i> Catalogs</a>
                         </li>
                         {% if user.is_staff %}
                         <li {% if page == 'manifests' %} class="active" {% endif %}>

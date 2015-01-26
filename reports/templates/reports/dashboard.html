@@ -22,7 +22,7 @@ $('#SearchField').prop('disabled', true);
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-3">
-                        <i class="fa fa-bolt fa-5x"></i>
+                        <i class="fa fa-exclamation-circle fa-5x"></i>
                     </div>
                     <div class="col-xs-9 text-right">
                         <div class="huge">{{ munki.errors }}</div>
@@ -64,6 +64,30 @@ $('#SearchField').prop('disabled', true);
         </div>
     </div>
 	{% endif %}	
+    {% if munki.activity %}
+    <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-info-circle fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right">
+                        <div class="huge">{{ munki.activity }}</div>
+                        <div>Client active</div>
+                    </div>
+                </div>
+            </div>
+            <a href='{% url 'reports.views.index' %}?show=activity'>
+                <div class="panel-footer">
+                    <span class="pull-left">View Details</span>
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endif %} 
 </div>
 <div class="row">
     <div class='col-md-4'>
