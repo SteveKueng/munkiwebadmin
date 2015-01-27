@@ -121,8 +121,8 @@
                             <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
                         </li>
                         <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a href="javascript:;" data-toggle="collapse" data-target="#computers"><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
-	                        <ul id="computers" class="collapse">
+                            <a><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
+	                        <ul id="computers" class="collapse in">
 	                            <li>
 	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple"></i> All</a>
 	                            </li>
