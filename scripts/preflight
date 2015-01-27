@@ -5,7 +5,7 @@ LOOKUPURL="${MWA_HOST}/lookup/ip"
 
 RUNTYPE="$1"
 MAC=`ifconfig en0 | awk '$1=="ether" {print $2}'`
-SERIAL=`ioreg -c IOPlatformExpertDevice | grep IOPlatformSerialNumber | awk '{print $4}' | tr -d '"'`
+SERIAL=`ioreg -c IOPlatformExpertDevice | grep IOPlatformSerialNumber | awk '{print $4}' | tr -d '"' | tr -d + | tr -d /`
 NAME=`/usr/sbin/scutil --get ComputerName`
 
 
