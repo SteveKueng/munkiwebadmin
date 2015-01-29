@@ -78,8 +78,9 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+
 ADMINS = (
-     ('Steve Kueng', 'steve.kueng@ikueng.ch'),
+     ('Admin', 'admin@mydomain.com'),
 )
 
 MANAGERS = ADMINS
@@ -167,6 +168,9 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
+
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
