@@ -22,7 +22,6 @@ Create a new virtual environment:
 Go in to the created virtual enviroment:
 
     cd munkiwebadmin_env
-
     source bin/activate
   
 Install django and tools for django
@@ -31,13 +30,13 @@ Install django and tools for django
     pip install django==1.7.2  (Python2.7)
 	
 	pip install simplejson
-  
+    pip install django-wsgiserver
  
 Clone MunkiWebAdmin
 
     git clone https://github.com/SteveKueng/munkiwebadmin.git
     
-    cd munkiwebadmin
+    cd munkiwebadmin/munkiwebadmin
     cp settings_template.py settings.py
     
 Edit settings.py:
@@ -52,4 +51,4 @@ Edit settings.py:
 
     python manage.py syncdb
     python manage.py collectstatic
-    python manage.py runwsgiserver port=8000 host=0.0.0.0
+    python manage.py runserver 0.0.0.0:8000
