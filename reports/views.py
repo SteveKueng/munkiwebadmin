@@ -505,6 +505,7 @@ def appleupdate(request, serial):
                                'page': 'reports'})
 
 
+@login_required
 def machine_detail(request, serial):
     machine = None
     if serial:
