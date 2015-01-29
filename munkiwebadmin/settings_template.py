@@ -31,8 +31,8 @@ SSH_BUTTON_ENABLED = False
 # display VNC-Button in detal view
 VNC_BUTTON_ENABLED = False
 
-#show all items
-ALL_ITEMS = True
+#if true all software packages are shown in autocompletion not only the one in included catalogs
+ALL_ITEMS = False
 
 # enable MODEL_LOOKUP_ENABLED to show a human readable version of the machines 
 # model
@@ -219,8 +219,6 @@ INSTALLED_APPS = (
     # Uncomment the next line if you've installed django_wsgiserver
     # and want to serve this Django app using it
     #'django_wsgiserver',
-    #'ajax_search',
-    #'todo',
     'reports',
     'catalogs',
     'manifests',
