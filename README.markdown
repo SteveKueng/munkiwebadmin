@@ -28,6 +28,8 @@ Install django and tools for django
 
     pip install django==1.6.9  (Python2.6)
     pip install django==1.7.2  (Python2.7)
+    
+    pip install django-tokenapi
  
 Clone MunkiWebAdmin
 

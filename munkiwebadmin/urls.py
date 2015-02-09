@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^$', include('reports.urls')),
     url(r'^lookup/', include('reports.urls')),
     url(r'^update/', include('reports.urls')),
+    (r'', include('tokenapi.urls')),
 )
 # comment out the following if you are serving
 # static files a different way
