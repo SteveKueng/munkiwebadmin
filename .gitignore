@@ -10,3 +10,5 @@ unused_*
 *.pkg
 
 site_static/downloads/MunkiEnroll.pkg
+
+*.bak
