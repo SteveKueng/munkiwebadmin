@@ -94,7 +94,7 @@
           <td>
             <col-md- id='warranty_status_checking' style='display: none;'>
               Checking warranty status 
-              <img src="{% get_static_prefix %}img/loading.gif" height="20" width="20"/>
+              <i id="imgProgress" class="fa fa-spinner fa-pulse"></i>
             </col-md->
             <col-md- id='warranty_status'>
               <a href='javascript:void(0)' onclick="get_warranty_status('{{ machine.serial_number }}')">Check status</a>

@@ -205,13 +205,14 @@ def index(request):
         hostnames.append(report.machine.hostname)
     hostnames_json = json.dumps(hostnames)  
 
-    return render_to_response('reports/index.html', 
-        {'reports': reports,
-         'user': request.user,
-         'hostnames': hostnames_json,
-         'page': 'reports',
-         'subpage': subpage,
-         })
+    c = RequestContext(request,{'reports': reports,
+                                'user': request.user,
+                                'hostnames': hostnames_json,
+                                'page': 'reports',
+                                'subpage': subpage,
+                                })
+    c.update(csrf(request))
+    return render_to_response('reports/index.html', c)
 
 
 @login_required     
@@ -256,14 +257,16 @@ def dashboard(request):
     low_disk_machines = Machine.objects.filter(
             available_disk_space__lt=5*2**20).values(
                 'serial_number', 'hostname', 'available_disk_space')
-                      
-    return render_to_response('reports/dashboard.html',
-        {'munki': munki,
-         'os_info': os_info,
-         'machine_info': machine_info,
-         'low_disk_machines': low_disk_machines,
-         'user': request.user,
-         'page': 'dashboard'})
+    
+    c = RequestContext(request,{'munki': munki,
+                                'os_info': os_info,
+                                'machine_info': machine_info,
+                                'low_disk_machines': low_disk_machines,
+                                'user': request.user,
+                                'page': 'dashboard'})
+
+    c.update(csrf(request))                  
+    return render_to_response('reports/dashboard.html', c)
 
 
 @login_required
@@ -305,8 +308,7 @@ def detail(request, serial):
     manifest_name = machine.hostname
     #print report_plist['ManifestName']
 
-    return render_to_response('reports/detail.html',
-                              {'machine': machine,
+    c = RequestContext(request,{'machine': machine,
                                'manifest_name': manifest_name,
                                'user': request.user,
                                'additional_info': additional_info,
@@ -314,6 +316,9 @@ def detail(request, serial):
                                'ssh_button_enabled': SSH_BUTTON_ENABLED,
                                'vnc_button_enabled': VNC_BUTTON_ENABLED,
                                'page': 'reports'})
+
+    c.update(csrf(request))
+    return render_to_response('reports/detail.html',c)
 
 @login_required
 def detail_pkg(request, serial, manifest_name):
@@ -499,10 +504,12 @@ def appleupdate(request, serial):
                     if profile['_dataType'] == 'SPNetworkDataType':
                         network = profile._items[1]
 
-    return render_to_response('reports/appleupdates.html',
-                              {'history': history,
+    c = RequestContext(request,{'history': history,
                                'AppleUpdates': AppleUpdates,
                                'page': 'reports'})
+
+    c.update(csrf(request))
+    return render_to_response('reports/appleupdates.html', c)
 
 
 @login_required

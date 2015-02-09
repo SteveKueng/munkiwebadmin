@@ -117,9 +117,12 @@
                     	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
 	                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
 	                	</li>
+	                	{% if perms.reports.can_view_dashboard %}
 						<li {% if page == 'dashboard' %} class="active" {% endif %} >
                             <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
                         </li>
+                        {% endif %}
+                        {% if perms.reports.can_view_reports %}
                         <li {% if page == 'reports' %} class="active" {% endif %}>
                             <a><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
 	                        <ul id="computers" class="collapse in">
@@ -137,20 +140,27 @@
 	                            </li>
 	                        </ul>
                         </li>
+                        {% endif %}
+                        {% if perms.catalogs.can_view_catalogs %}
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
                             <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt"></i> Catalogs</a>
                         </li>
-                        {% if user.is_staff %}
+                        {% endif %}
+                        {% if perms.manifests.can_view_manifests %}
                         <li {% if page == 'manifests' %} class="active" {% endif %}>
                             <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
                         </li>
                         {% endif %}
+                        {% if perms.inventory.can_view_inventory %}
                         <li {% if page == 'inventory' %} class="active" {% endif %}>
                             <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
                         </li>
+                        {% endif %}
+                        {% if perms.licenses.can_view_licenses %}
                         <li {% if page == 'licenses' %} class="active" {% endif %}>
                             <a href="{% url 'licenses.views.index' %}"><i class="fa fa-edit fa-fw"></i> Licenses</a>
                         </li>
+                        {% endif %}
                     </ul>
 	            </div>
 	        </nav>

@@ -6,6 +6,7 @@ import subprocess
 import plistlib
 from catalogs.models import Catalog
 from django.conf import settings
+from django.db import models
 
 USERNAME_KEY = settings.MANIFEST_USERNAME_KEY
 APPNAME = settings.APPNAME
@@ -263,3 +264,7 @@ class Manifest(object):
         '''returns a username for a given manifest name'''
         if USERNAME_KEY:
             return cls.read(manifest_name).get(USERNAME_KEY, '')
+
+class Manifests(models.Model):
+    class Meta:
+            permissions = (("can_view_manifests", "Can view manifests"),)

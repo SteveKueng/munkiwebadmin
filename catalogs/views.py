@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.template import RequestContext
+from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from models import Catalog
@@ -68,8 +70,9 @@ def item_detail(request, catalog_name, item_index):
         if key not in featured_keys:
             sorted_dict[key] = catalog_item[key]
 
-    return render_to_response('catalogs/item_detail.html', 
-                              {'catalog_item': sorted_dict})
+    c = RequestContext(request,{'catalog_item': sorted_dict})
+    c.update(csrf(request))
+    return render_to_response('catalogs/item_detail.html', c)
                               
 
 @login_required
@@ -104,12 +107,13 @@ def catalog_view(request, catalog_name=None, item_index=None):
         catalog[counter].icon_name = icon
         counter += 1
 
-    return render_to_response('catalogs/catalog.html',
-                          {'catalog_list': catalog_list,
-                           'catalog_name': catalog_name,
-                           'catalog': catalog,
-                           'item_index': item_index,
-                           'catalog_item': catalog_item,
-                           'catalog_items': catalog_items_json,
-                           'user': request.user,
-                           'page': 'catalogs'})
+    c = RequestContext(request,{'catalog_list': catalog_list,
+                                'catalog_name': catalog_name,
+                                'catalog': catalog,
+                                'item_index': item_index,
+                                'catalog_item': catalog_item,
+                                'catalog_items': catalog_items_json,
+                                'user': request.user,
+                                'page': 'catalogs'})
+    c.update(csrf(request))
+    return render_to_response('catalogs/catalog.html', c)

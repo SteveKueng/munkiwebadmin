@@ -3,6 +3,7 @@ import os
 import plistlib
 
 from django.conf import settings
+from django.db import models
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 STATIC_URL = settings.STATIC_URL
@@ -92,3 +93,7 @@ class Catalog(object):
             return item_icon
         else:
             return default_icon
+
+class Catalogs(models.Model):
+    class Meta:
+            permissions = (("can_view_catalogs", "Can view catalogs"),)

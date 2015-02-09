@@ -24,9 +24,11 @@
         
         {% block extra_style %}{% endblock %}
         
-        <script type='text/javascript' src='{% get_static_prefix %}js/jquery.min.js'></script>
-        <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui-1.10.3.custom.min.js'></script>
-        <script type='text/javascript' src='{% get_static_prefix %}js/jquery.dataTables.min.js'></script>
+        <!-- jQuery Version 1.11.0 -->
+        <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
+        
+        <!-- jQueryUI -->
+        <script src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
         <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap.min.js'></script>
         
         {% block java_script %}{% endblock %}

@@ -9,6 +9,7 @@ class Inventory(models.Model):
     sha256hash = models.CharField(max_length=64)
     class Meta:
         ordering = ['datestamp']
+        permissions = (("can_view_inventory", "Can view inventory"),)
 
 
 class InventoryItem(models.Model):

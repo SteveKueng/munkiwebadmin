@@ -101,7 +101,7 @@ def submit(request):
 def inventory_hash(request, serial):
     sha256hash = ''
     machine = None
-    if mac:
+    if serial:
         try:
             machine = Machine.objects.get(serial_number=serial)
             inventory_meta = Inventory.objects.get(machine=machine)
@@ -116,10 +116,12 @@ def inventory_hash(request, serial):
 @login_required
 def index(request):
     all_machines = Machine.objects.all()
-    return render_to_response('inventory/index.html',
-                              {'machines': all_machines,
+
+    c = RequestContext(request,{'machines': all_machines,
                                'user': request.user,
                                'page': 'inventory'})
+    c.update(csrf(request))
+    return render_to_response('inventory/index.html', c)
 
 
 @login_required
@@ -141,11 +143,12 @@ def detail(request, serial):
         
     inventory_items = machine.inventoryitem_set.all()
     
-    return render_to_response('inventory/detail.html',
-                             {'machine': machine,
-                              'inventory_items': inventory_items,
-                              'user': request.user,
-                              'page': 'inventory'})
+    c = RequestContext(request,{'machine': machine,
+                                'inventory_items': inventory_items,
+                                'user': request.user,
+                                'page': 'inventory'})
+    c.update(csrf(request))
+    return render_to_response('inventory/detail.html', c)
 
 
 @login_required
@@ -190,15 +193,16 @@ def items(request):
             instance['path'] = item.path
             item_detail['instances'].append(instance)
         
-        return render_to_response(
-            'inventory/item_detail.html',
-            {'item_detail': item_detail,
-             'user': request.user,
-             'page': 'inventory'})
+        c = RequestContext(request,{'item_detail': item_detail,
+                                    'user': request.user,
+                                    'page': 'inventory'})
+        c.update(csrf(request))
+        return render_to_response('inventory/item_detail.html', c)
     else:
-        return render_to_response('inventory/items.html',
-                                  {'user': request.user,
-                                   'page': 'inventory'})
+        c = RequestContext(request,{'user': request.user,
+                                       'page': 'inventory'})
+        c.update(csrf(request))
+        return render_to_response('inventory/items.html', c)
 
 
 def items_json(request):

@@ -61,3 +61,4 @@ class License(models.Model):
         
     class Meta:
         ordering = ['item_name']
+        permissions = (("can_view_licenses", "Can view licenses"),)

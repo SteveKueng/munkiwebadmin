@@ -168,6 +168,8 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
 
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -187,10 +189,12 @@ if USE_LDAP:
     AUTHENTICATION_BACKENDS = (
         'django_auth_ldap.backend.LDAPBackend',
         'django.contrib.auth.backends.ModelBackend',
+        'tokenapi.backends.TokenBackend',
     )
 else:
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
+        'tokenapi.backends.TokenBackend',
     )
 
 LOGIN_URL='/login/'
@@ -219,6 +223,7 @@ INSTALLED_APPS = (
     # Uncomment the next line if you've installed django_wsgiserver
     # and want to serve this Django app using it
     #'django_wsgiserver',
+    'tokenapi',
     'reports',
     'catalogs',
     'manifests',

@@ -39,6 +39,8 @@ class MunkiReport(models.Model):
     report = models.TextField(editable=False, null=True)
     class Meta:
         ordering = ['machine']
+        permissions = (("can_view_reports", "Can view reports"),
+                       ("can_view_dashboard", "Can view dashboard"),)
         
     def hostname(self):
         return self.machine.hostname
@@ -131,4 +133,3 @@ class MunkiReport(models.Model):
         self.console_user = "unknown"
         if "ConsoleUser" in plist:
             self.console_user = unicode(plist["ConsoleUser"])
-    

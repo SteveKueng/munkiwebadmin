@@ -1,5 +1,7 @@
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.template import RequestContext
 from django.shortcuts import render_to_response
+from django.core.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -11,10 +13,12 @@ from models import License
 def index(request):
     '''MWA index page for licenses.'''
     all_licenses = License.objects.all()
-    return render_to_response('licenses/index.html', 
-        {'licenses': all_licenses,
-         'user': request.user,
-         'page': 'licenses'})
+
+    c = RequestContext(request,{'licenses': all_licenses,
+                                'user': request.user,
+                                'page': 'licenses'})
+    c.update(csrf(request))
+    return render_to_response('licenses/index.html', c)
 
 
 def available(request, item_name=''):
