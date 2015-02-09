@@ -169,10 +169,6 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
 
-<<<<<<< HEAD
-=======
-
->>>>>>> FETCH_HEAD
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # List of callables that know how to import templates from various sources.
