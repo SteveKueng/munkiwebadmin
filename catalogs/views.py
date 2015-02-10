@@ -90,6 +90,8 @@ def catalog_view(request, catalog_name=None, item_index=None):
 
     catalog_items = list()
     for item in catalog:
+        if 'display_name' not in item:
+            item['display_name'] = item['name']
         if item.display_name not in catalog_items:
             catalog_items.append(item.display_name) 
     catalog_items_json = json.dumps(catalog_items)
