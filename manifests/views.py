@@ -89,6 +89,7 @@ def getManifestInfo(manifest_names):
 
 
 @login_required
+@permission_required('manifests.can_view_manifests', login_url='/login/') 
 def index(request, manifest_name=None):
     if request.method == 'GET':
         manifest_names = Manifest.list()
@@ -131,11 +132,13 @@ def index(request, manifest_name=None):
         
 
 @login_required
+@permission_required('manifests.can_view_manifests', login_url='/login/') 
 def view(request, manifest_name=None):
     return index(request, manifest_name)
 
 
 @login_required
+@permission_required('manifests.can_view_manifests', login_url='/login/') 
 def detail(request, manifest_name):
     if request.method == 'POST':
         if not request.user.has_perm('reports.change_machine'):

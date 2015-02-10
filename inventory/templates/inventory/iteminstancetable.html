@@ -14,7 +14,7 @@
       </thead>
       <tbody>
       {% for item in inventory_items %}
-          <tr onclick="document.location = '{% url 'reports.views.detail' item.serial %}';">
+          <tr {% if perms.reports.can_view_reports %}onclick="document.location = '{% url 'reports.views.detail' item.serial %}';"{% endif %}>
               <td>
                   {{ item.hostname }}
               </td>

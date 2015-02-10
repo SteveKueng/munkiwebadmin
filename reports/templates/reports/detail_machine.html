@@ -66,8 +66,13 @@
         <tr>
           <th>Manifest:</th>
           <td>
+            {% if perms.manifests.can_view_manifests %}
             <a href='{% url "manifests.views.view" report.ManifestNameLink %}'>
-            {{ report.ManifestName }}</a>
+            {% endif %}
+            {{ report.ManifestName }}
+            {% if perms.manifests.can_view_manifests %}
+            </a>
+            {% endif %}
           </td>
         </tr>
         {% endif %}

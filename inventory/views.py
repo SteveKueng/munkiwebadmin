@@ -7,6 +7,8 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 #from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.conf import settings
 from django import forms
 from django.db.models import Q
@@ -114,6 +116,7 @@ def inventory_hash(request, serial):
 
 
 @login_required
+@permission_required('inventory.can_view_inventory', login_url='/login/')
 def index(request):
     all_machines = Machine.objects.all()
 
@@ -125,6 +128,7 @@ def index(request):
 
 
 @login_required
+@permission_required('inventory.can_view_inventory', login_url='/login/')
 def detail(request, serial):
     machine = None
     if serial:
@@ -152,6 +156,7 @@ def detail(request, serial):
 
 
 @login_required
+@permission_required('inventory.can_view_inventory', login_url='/login/')
 def items(request):
     name = request.GET.get('name')
     version = request.GET.get('version')

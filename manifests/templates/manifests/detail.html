@@ -21,9 +21,13 @@
 			        <div class='editable'>{{ item }}</div>
 			    {% else %}
 			    list-group-item-info'>
+			      {% if perms.catalogs.can_view_catalogs %}
 			      <a href='/catalog/{{ item }}/'>
+			      {% endif %}
 			          <div class='editable'>{{ item }}</div>
+			      {% if perms.catalogs.can_view_catalogs %}
 			      </a>
+			      {% endif %}
 			    {% endif %}
 			    </li>
 			{% endfor %}

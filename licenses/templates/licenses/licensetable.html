@@ -16,7 +16,7 @@
       </thead>
       <tbody>
       {% for license in license_list %}
-          <tr onclick="document.location = '{% url 'inventory.views.items' %}{{ license.inventory_query_string }}';" style="cursor: pointer">
+          <tr {% if perms.inventory.can_view_inventory %}onclick="document.location = '{% url 'inventory.views.items' %}{{ license.inventory_query_string }}';"{% endif %} style="cursor: pointer">
               <td{% if license.available < 0 %} class='error'{% endif %}>{{ license.item_name }}</td>
               <td>{{ license.total }}</td>
               <td>{{ license.used }}</td>

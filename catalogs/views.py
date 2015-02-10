@@ -2,7 +2,9 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from models import Catalog
 from django.utils.datastructures import SortedDict
 
@@ -48,7 +50,8 @@ def trimVersionString(version_string):
     return '.'.join(version_parts)
 
 
-@login_required                              
+@login_required
+@permission_required('catalogs.can_view_catalogs', login_url='/login/')                             
 def item_detail(request, catalog_name, item_index):
     catalog_item = Catalog.item_detail(catalog_name, item_index)
     featured_keys = ['name', 'version', 'display_name', 
@@ -76,6 +79,7 @@ def item_detail(request, catalog_name, item_index):
                               
 
 @login_required
+@permission_required('catalogs.can_view_catalogs', login_url='/login/')
 def catalog_view(request, catalog_name=None, item_index=None):
     catalog_list = Catalog.list()
     if request.is_ajax():

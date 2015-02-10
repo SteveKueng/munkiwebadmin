@@ -4,12 +4,16 @@ from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 
 import plistlib
 import json
 
 from models import License
 
+@login_required
+@permission_required('licenses.can_view_licenses', login_url='/login/')
 def index(request):
     '''MWA index page for licenses.'''
     all_licenses = License.objects.all()

@@ -37,9 +37,13 @@
                 <div class='editable'>{{ item }}</div>
           {% else %}
             list-group-item-info'>
+            {% if perms.manifests.can_view_manifests %}
             <a href='{% url "manifests.views.view" item %}'>
+            {% endif %}
                 <div class='editable'>{{ item }}</div>
+            {% if perms.manifests.can_view_manifests %}
             </a>
+            {% endif %}
           {% endif %}
           </li>
         {% endfor %}
@@ -105,7 +109,13 @@
             </td>
             <td class="visible-md visible-lg">
               {% if manifest_name != manifestname %}
-                <a href='{% url "manifests.views.view" manifestname %}'>{{ manifestname }}</a>
+                {% if perms.manifests.can_view_manifests %}
+                <a href='{% url "manifests.views.view" manifestname %}'>
+                {% endif %}
+                {{ manifestname }}
+                {% if perms.manifests.can_view_manifests %}
+                </a>
+                {% endif %}
               {% endif %}
             </td>
             <td class="{% if manifest_name == manifestname %}sw_entrys {% endif %}text-right">

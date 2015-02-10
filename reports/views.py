@@ -5,7 +5,9 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Count
 from django.utils.datastructures import SortedDict
@@ -133,6 +135,7 @@ def submit(request, submission_type):
 
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/')
 def index(request):
     show = request.GET.get('show')
     os_version = request.GET.get('os_version')
@@ -215,7 +218,8 @@ def index(request):
     return render_to_response('reports/index.html', c)
 
 
-@login_required     
+@login_required
+@permission_required('reports.can_view_dashboard', login_url='/login/')     
 def dashboard(request):
     munki = {}
     munki['errors'] = MunkiReport.objects.filter(errors__gt=0).count()
@@ -270,6 +274,7 @@ def dashboard(request):
 
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/')
 def detail(request, serial):
     machine = None
     if serial:
@@ -321,6 +326,7 @@ def detail(request, serial):
     return render_to_response('reports/detail.html',c)
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/') 
 def detail_pkg(request, serial, manifest_name):
     machine = None
     manifest = None
@@ -473,6 +479,7 @@ def detail_pkg(request, serial, manifest_name):
     return render_to_response('reports/detail_pkg.html',c)
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/') 
 def appleupdate(request, serial):
     machine = None
     if serial:
@@ -513,6 +520,7 @@ def appleupdate(request, serial):
 
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/') 
 def machine_detail(request, serial):
     machine = None
     if serial:
@@ -609,6 +617,7 @@ def machine_detail(request, serial):
                                'page': 'reports'})
 
 @login_required
+@permission_required('reports.can_view_reports', login_url='/login/') 
 def raw(request, serial):
     machine = None
     if serial:

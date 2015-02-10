@@ -18,7 +18,9 @@
 {% block page_title %}<a href="{% url 'manifests.views.index' %}" class="navbar-brand">Manifests</a>{% endblock %}
 
 {% block navbar-default_extensions %}
+{% if perms.reports.add_machine %}
 <a style="margin-left:40px;" class='hidden-xs {% if not perms.reports.change_machine %}disabled{% endif %}' id='new_manifest' onclick="location.href='{% url "manifests.views.new" %}';">New manifest</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
