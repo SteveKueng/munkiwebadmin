@@ -119,31 +119,31 @@
 	                	</li>
 	                	{% if perms.reports.can_view_dashboard %}
 						<li {% if page == 'dashboard' %} class="active" {% endif %} >
-                            <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
+                            <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         {% endif %}
                         {% if perms.reports.can_view_reports %}
                         <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a><i class="fa fa-desktop"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
+                            <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
 	                        <ul id="computers" class="collapse in">
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple"></i> All</a>
+	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
 	                            </li>
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop"></i> MacBook</a>
+	                                <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>
 	                            </li>
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop"></i> Mac</a>
+	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop fa-fw"></i> Mac</a>
 	                            </li>
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner"></i> Virtual Machine</a>
+	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-fw"></i> Virtual Machine</a>
 	                            </li>
 	                        </ul>
                         </li>
                         {% endif %}
                         {% if perms.catalogs.can_view_catalogs %}
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
-                            <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt"></i> Catalogs</a>
+                            <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
                         </li>
                         {% endif %}
                         {% if perms.manifests.can_view_manifests %}
@@ -158,7 +158,7 @@
                         {% endif %}
                         {% if perms.licenses.can_view_licenses %}
                         <li {% if page == 'licenses' %} class="active" {% endif %}>
-                            <a href="{% url 'licenses.views.index' %}"><i class="fa fa-edit fa-fw"></i> Licenses</a>
+                            <a href="{% url 'licenses.views.index' %}"><i class="fa fa-file-text-o fa-fw"></i> Licenses</a>
                         </li>
                         {% endif %}
                     </ul>
