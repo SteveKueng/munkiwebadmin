@@ -1,7 +1,7 @@
 {% load report_extras %}
 <div class="row text-right" style="position:absolute; top:110px; right:40px;">
   <div id='save_and_cancel' class="hidden-print btn-group">
-    {% if perms.reports.change_machine %}
+    {% if perms.manifests.change_manifests %}
     <input type='button' class='edit btn btn-primary' value='Edit'></input>
     {% endif %}
   </div>

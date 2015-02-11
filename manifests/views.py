@@ -36,7 +36,7 @@ class NewManifestForm(forms.Form):
         
     
 @login_required
-@permission_required('reports.add_machine', login_url='/login/')
+@permission_required('manifests.add_manifests', login_url='/login/')
 def new(request):
     if request.method == 'POST': # If the form has been submitted...
         form = NewManifestForm(request.POST) # A form bound to the POST data
@@ -64,10 +64,8 @@ def new(request):
     
 
 @login_required
-@permission_required('reports.delete_machine', login_url='/login/')
+@permission_required('manifests.delete_manifests', login_url='/login/')
 def delete(request, manifest_name=None):
-    if not request.user.has_perm('reports.delete_machine'):
-        return HttpResponse(json.dumps('error'))
     if request.method == 'POST':
         Manifest.delete(manifest_name, request.user)
         return HttpResponseRedirect('/manifest/')
@@ -138,10 +136,9 @@ def view(request, manifest_name=None):
 
 
 @login_required
-@permission_required('manifests.can_view_manifests', login_url='/login/') 
 def detail(request, manifest_name):
     if request.method == 'POST':
-        if not request.user.has_perm('reports.change_machine'):
+        if not request.user.has_perm('manifests.change_manifests'):
             return HttpResponse(json.dumps('error'))
         if request.is_ajax():
             json_data = json.loads(request.body)
@@ -153,6 +150,8 @@ def detail(request, manifest_name):
                                request.user)
             return HttpResponse(json.dumps('success'))
     if request.method == 'GET':
+        if not request.user.has_perm('manifests.can_view_manifests'):
+            return HttpResponse(json.dumps('error'))
         manifest = Manifest.read(manifest_name)
         #valid_install_items = Manifest.getValidInstallItems(manifest_name)
         install_items = Manifest.getInstallItemNames(manifest_name)
