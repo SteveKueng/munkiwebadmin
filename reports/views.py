@@ -310,8 +310,14 @@ def detail(request, serial):
         additional_info['model_description'] = \
             model_description_lookup(machine.serial_number)
 
-    manifest_name = machine.hostname
-    #print report_plist['ManifestName']
+    # get CLIENT_MANIFEST option
+    try:
+        if settings.CLIENT_MANIFEST == "hostname":
+            manifest_name = machine.hostname
+        else:
+            manifest_name = machine.serial_number
+    except:
+        manifest_name = machine.serial_number
 
     c = RequestContext(request,{'machine': machine,
                                'manifest_name': manifest_name,

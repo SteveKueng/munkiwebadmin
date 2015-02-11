@@ -34,8 +34,10 @@ VNC_BUTTON_ENABLED = False
 #if true all software packages are shown in autocompletion not only the one in included catalogs
 ALL_ITEMS = False
 
-# enable MODEL_LOOKUP_ENABLED to show a human readable version of the machines 
-# model
+#user serial_number or hostname for client manifest
+CLIENT_MANIFEST = 'serial_number'
+
+# enable MODEL_LOOKUP_ENABLED to show a human readable version of the machines model
 MODEL_LOOKUP_ENABLED = True
 
 # if MunkiWebAdmin is behind a proxy, and WARRANTY_LOOKUP_ENABLED or
