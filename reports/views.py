@@ -12,6 +12,9 @@ from django.conf import settings
 from django.db.models import Count
 from django.utils.datastructures import SortedDict
 
+from tokenapi.decorators import token_required
+from tokenapi.http import JsonResponse, JsonError
+
 from models import Machine, MunkiReport
 from manifests.models import Manifest
 from catalogs.models import Catalog
@@ -45,7 +48,7 @@ if PROXY_ADDRESS:
     urllib2.install_opener(opener)
 
 
-@csrf_exempt
+@token_required
 def submit(request, submission_type):
     if request.method != 'POST':
         raise Http404
@@ -122,7 +125,7 @@ def submit(request, submission_type):
     
         if submission_type == 'report_broken_client':
             report.runstate = u"broken client"
-            report.report = None
+            #report.report = None
             report.errors = 1
             report.warnings = 0
             machine.save()

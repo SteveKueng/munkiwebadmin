@@ -14,6 +14,9 @@ from django import forms
 from django.db.models import Q
 from django.db.models import Count
 
+from tokenapi.decorators import token_required
+from tokenapi.http import JsonResponse, JsonError
+
 import plistlib
 import base64
 import bz2
@@ -37,7 +40,7 @@ def decode_to_string(base64bz2data):
         return ''
 
 
-@csrf_exempt
+@token_required
 def submit(request):
     if request.method != 'POST':
         raise Http404
@@ -99,7 +102,7 @@ def submit(request):
     
     return HttpResponse("No inventory submitted.\n")
 
-
+@token_required
 def inventory_hash(request, serial):
     sha256hash = ''
     machine = None

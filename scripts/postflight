@@ -20,7 +20,7 @@ cp "$REPORTPATH" "$TMPPLIST"
 
 # Generate a system_profiler report.
 PROFILEPLIST=/tmp/`head -c10 /dev/urandom | md5`.plist
-/usr/sbin/system_profiler -xml SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType > "$PROFILEPLIST"
+/usr/sbin/system_profiler -xml SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType SPStorageDataType SPPrintersDataType SPNetworkVolumeDataType SPThunderboltDataType > "$PROFILEPLIST"
 
 # Merge system profiler report with munki report.
 $PLISTBUDDY -c "Add :MachineInfo:SystemProfile array" "$TMPPLIST"
@@ -45,7 +45,7 @@ if [ -e "$INVENTORYPATH" ] ; then
     #INVENTORY_CHECKSUM=`cat /Library/Managed\ Installs/ApplicationInventory.plist | openssl dgst -sha256`
     # Above doesn't work on Leopard. So let's call Python.
     INVENTORY_CHECKSUM=`/usr/bin/python -c 'import hashlib; f = open("/Library/Managed Installs/ApplicationInventory.plist").read(); print hashlib.sha256(f).hexdigest()'`
-    STORED_CHECKSUM=`mwa_curl --max-time 30 "$INVENTORYHASHURL/$MAC"`
+    STORED_CHECKSUM=`mwa_curl --max-time 30 "$INVENTORYHASHURL/$SERIAL"`
     if [ "$INVENTORY_CHECKSUM" != "$STORED_CHECKSUM" ]; then 
         # inventory changed, sumbit to server
         # Compress and encode inventory.
