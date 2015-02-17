@@ -37,6 +37,7 @@ mwa_curl --max-time 30 \
     -d mac="$MAC" \
     -d serial="$SERIAL" \
     -d name=\""$NAME"\" \
+    -d unit="$businessunit" \
     -d "@$REPORTTMP" \
     "$REPORTSUBMITURL/postflight"
     

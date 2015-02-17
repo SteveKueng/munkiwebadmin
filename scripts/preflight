@@ -48,6 +48,7 @@ mwa_curl --max-time 5 \
     -d runtype="$RUNTYPE" \
     -d mac="$MAC" \
     -d serial="$SERIAL" \
+    -d unit="$businessunit" \
     -d name=\""$NAME"\" \
     "$SUBMITURL/preflight"
 

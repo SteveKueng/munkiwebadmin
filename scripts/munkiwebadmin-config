@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # The fqdn for your Munki Web Admin server.
 # EXAMPLE: https://example.com
 MWA_HOST="http://localhost:8000"
@@ -9,6 +8,7 @@ MWA_HOST="http://localhost:8000"
 username="reportuser"
 password="report"
 
+businessunit="cc78c783-047f-4713-af03-f77528e997b3"
 # The optional name of your SSL certificate to use when communicating with
 # Munki Web Admin. If you place the certificate in the same directory as this
 # script, you don't need to include the full path.

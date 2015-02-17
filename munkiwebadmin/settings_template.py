@@ -41,6 +41,9 @@ CLIENT_MANIFEST = 'serial_number'
 # enable MODEL_LOOKUP_ENABLED to show a human readable version of the machines model
 MODEL_LOOKUP_ENABLED = True
 
+# enable Business units
+BUSINESS_UNITS_ENABLED = False
+
 # if MunkiWebAdmin is behind a proxy, and WARRANTY_LOOKUP_ENABLED or
 # MODEL_LOOKUP_ENABLED are enabled, enter the details for the proxy server in
 # the format user:password@example.com:port (user:password@ and :port are 

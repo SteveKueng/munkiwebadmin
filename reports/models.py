@@ -4,6 +4,15 @@ import plistlib
 from xml.parsers.expat import ExpatError
 import base64
 import bz2
+from uuid import uuid4
+
+
+class BusinessUnit(models.Model):
+    hash = models.CharField(max_length=36, default=uuid4, primary_key=True, unique=True)
+    name = models.CharField(max_length=30, unique=True)
+    
+    def machines(self):
+        return Machine.objects.filter(businessunit=self).count()
 
 class Machine(models.Model):
     serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
@@ -11,6 +20,7 @@ class Machine(models.Model):
     username = models.CharField(max_length=256)
     location = models.CharField(max_length=256)
     remote_ip = models.CharField(max_length=15)
+    businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default = None)
     machine_model = models.CharField(
         max_length=64, blank=True, default="virtual-machine")
     cpu_type = models.CharField(max_length=64, blank=True)
@@ -25,7 +35,6 @@ class Machine(models.Model):
         default=datetime(1, 1, 1, 0, 0))
     class Meta:
         ordering = ['hostname']
-
 
 class MunkiReport(models.Model):
     machine = models.ForeignKey(Machine)

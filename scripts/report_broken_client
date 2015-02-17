@@ -15,6 +15,7 @@ mwa_curl --max-time 5 \
     -d serial="$SERIAL" \
     -d mac="$MAC" \
     -d name="$NAME" \
+    -d unit="$businessunit" \
     "$SUBMITURL/report_broken_client"
 
 exit 0

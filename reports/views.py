@@ -15,7 +15,7 @@ from django.utils.datastructures import SortedDict
 from tokenapi.decorators import token_required
 from tokenapi.http import JsonResponse, JsonError
 
-from models import Machine, MunkiReport
+from models import Machine, MunkiReport, BusinessUnit
 from manifests.models import Manifest
 from catalogs.models import Catalog
 
@@ -79,7 +79,9 @@ def submit(request, submission_type):
         
         report.runtype = submit.get('runtype')
         report.timestamp = datetime.now()
-        
+        unit = BusinessUnit.objects.get(hash=submit.get('unit'))  
+        machine.businessunit = unit
+
         if submission_type == 'postflight':
             report.runstate = u"done"
             if 'base64bz2report' in submit:
@@ -106,8 +108,7 @@ def submit(request, submission_type):
                 machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or u'0'
                 machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or u'0'
                 machine.mac = mac
-                #machine.serial_number = hwinfo.get('serial_number') and hwinfo.get('serial_number')[0:15] or u'unknown'
-            
+           
             machine.save()
             report.save()
             return HttpResponse("Postflight report submmitted for %s.\n" 
@@ -145,6 +146,7 @@ def index(request):
     model = request.GET.get('model')
     nameFilter = request.GET.get('nameFilter')
     typeFilter = request.GET.get('typeFilter')
+    businessunit = request.GET.get('businessunit')
     
     reports = MunkiReport.objects.all()
     subpage = ""
@@ -205,6 +207,10 @@ def index(request):
     
     if typeFilter is not None and model is None:
         reports = reports.filter(machine__machine_model__contains=typeFilter)
+
+    if businessunit is not None:
+        reports = reports.filter(machine__businessunit__exact=businessunit)
+        subpage = businessunit
 
     hostnames = list()
     for report in reports:
