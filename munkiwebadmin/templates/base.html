@@ -127,12 +127,9 @@
                         <li {% if page == 'reports' %} class="active" {% endif %}>
                             <a><i class="fa fa-building-o fa-fw"></i> Business Units <i class="fa fa-fw fa-caret-down"></i></a>
 	                        <ul id="computers" class="collapse in">
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}>All Macs <span class="badge pull-right">{{ machines_count }}</span></a>
-	                            </li>
 	                            {% for business_unit in business_units %}
 	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == '{{ business_unit.hash }}' %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
+	                                <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
 	                            </li>
 	                            {% endfor %}
 	                        </ul>
