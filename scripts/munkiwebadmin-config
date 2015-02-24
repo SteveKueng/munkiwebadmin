@@ -8,7 +8,9 @@ MWA_HOST="http://localhost:8000"
 username="reportuser"
 password="report"
 
-businessunit="cc78c783-047f-4713-af03-f77528e997b3"
+# add the businessunit hash if you use business units. Otherways leaf it empty
+businessunit="8dd857d2-2c5d-4943-a6c2-62812d266820"
+
 # The optional name of your SSL certificate to use when communicating with
 # Munki Web Admin. If you place the certificate in the same directory as this
 # script, you don't need to include the full path.

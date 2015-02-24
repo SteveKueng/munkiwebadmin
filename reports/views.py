@@ -79,8 +79,10 @@ def submit(request, submission_type):
         
         report.runtype = submit.get('runtype')
         report.timestamp = datetime.now()
-        unit = BusinessUnit.objects.get(hash=submit.get('unit'))  
-        machine.businessunit = unit
+
+        if submit.get('unit'):
+            unit = BusinessUnit.objects.get(hash=submit.get('unit'))  
+            machine.businessunit = unit
 
         if submission_type == 'postflight':
             report.runstate = u"done"
