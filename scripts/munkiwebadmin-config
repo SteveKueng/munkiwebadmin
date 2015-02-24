@@ -9,7 +9,7 @@ username="reportuser"
 password="report"
 
 # add the businessunit hash if you use business units. Otherways leaf it empty
-businessunit="8dd857d2-2c5d-4943-a6c2-62812d266820"
+businessunit=""
 
 # The optional name of your SSL certificate to use when communicating with
 # Munki Web Admin. If you place the certificate in the same directory as this
@@ -27,13 +27,8 @@ MWA_ALLOWED_NETWORKS=( )
 # specified in $MWA_SSL_CERTIFICATE. It also defaults to using the "--silent"
 # flag.
 function mwa_curl {
-	token=$(curl -s -d "username=$username&password=$password" $MWA_HOST/token/new.json)
-	user=$(echo $token | tr -d " " | cut -d: -f3 | cut -d, -f1 | tr -d \")
-	token=$(echo $token | tr -d " " | cut -d: -f2 | cut -d, -f1 | tr -d \")
-
 	# production mode
-	paramList=" -k --silent -d \"user=$user&token=$token\" "
-
+	paramList=" --silent"
 
 	if [ ! -z "${MWA_SSL_CERTIFICATE}" ]
 	then
@@ -45,9 +40,17 @@ function mwa_curl {
 			echo "Cannot locate cert named '${MWA_SSL_CERTIFICATE}'"
 		fi
 	fi
+
+	token=$(/usr/bin/curl${paramList} -s -d "username=$username&password=$password" $MWA_HOST/token/new.json)
+	user=$(echo $token | tr -d " " | cut -d: -f3 | cut -d, -f1 | tr -d \")
+	token=$(echo $token | tr -d " " | cut -d: -f2 | cut -d, -f1 | tr -d \")
+
+	paramList="${paramList} -d \"user=$user&token=$token\" "
+
 	for _param_ in $@
 	do
 		paramList="${paramList} ${_param_}"
 	done
+
 	/bin/bash -c "/usr/bin/curl$paramList"
 }
