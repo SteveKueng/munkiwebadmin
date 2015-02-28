@@ -12,11 +12,7 @@ except:
     BUSINESS_UNITS_ENABLED = False
 
 def index(request):
-	if BUSINESS_UNITS_ENABLED:
-		business_units = BusinessUnit.objects.all()
-	else:
-		business_units = ""
-	
+	business_units = BusinessUnit.objects.all()
 	machines_count = Machine.objects.all().count()
 
 	return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
