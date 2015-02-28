@@ -136,7 +136,7 @@ def submit(request, submission_type):
             return HttpResponse(
                 "Broken client report submmitted for %s.\n" %
                  submit.get('name'))
-        return HttpResponse("No report submitted.\n")
+
     return HttpResponse("No report submitted.\n")
 
 
