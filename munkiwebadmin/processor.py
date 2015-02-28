@@ -12,8 +12,13 @@ except:
     BUSINESS_UNITS_ENABLED = False
 
 def index(request):
-	business_units = BusinessUnit.objects.all()
+	if BUSINESS_UNITS_ENABLED:
+		business_units = BusinessUnit.objects.all()
+	else:
+		business_units = ""
+	
 	machines_count = Machine.objects.all().count()
+
 	return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
 			'business_units': business_units,
 			'machines_count': machines_count}
