@@ -51,10 +51,10 @@ def available(request, item_name=''):
             info[license.item_name] = license.available()
             
     if output_style == 'json':
-        return HttpResponse(json.dumps(info), mimetype='application/json')
+        return HttpResponse(json.dumps(info), content_type='application/json')
     else:
         return HttpResponse(plistlib.writePlistToString(info),
-                            mimetype='application/xml')
+                            content_type='application/xml')
 
 
 def usage(request, item_name=''):
@@ -77,7 +77,7 @@ def usage(request, item_name=''):
         except (License.DoesNotExist):
             info[name] = {}
     if output_style == 'json':
-        return HttpResponse(json.dumps(info), mimetype='application/json')
+        return HttpResponse(json.dumps(info), content_type='application/json')
     else:
         return HttpResponse(plistlib.writePlistToString(info),
-                            mimetype='application/xml')
+                            content_type='application/xml')
