@@ -1,7 +1,8 @@
 from django.contrib import admin
 from reports.models import Machine, MunkiReport, BusinessUnit
+from guardian.admin import GuardedModelAdmin
 
-class BusinessUnitAdmin(admin.ModelAdmin):
+class BusinessUnitAdmin(GuardedModelAdmin):
     list_display = ('hash', 'name')
 
 class MachineAdmin(admin.ModelAdmin):

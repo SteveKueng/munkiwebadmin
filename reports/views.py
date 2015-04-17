@@ -18,6 +18,7 @@ from tokenapi.http import JsonResponse, JsonError
 from models import Machine, MunkiReport, BusinessUnit
 from manifests.models import Manifest
 from catalogs.models import Catalog
+from guardian.shortcuts import get_objects_for_user
 
 import base64
 import bz2
@@ -36,6 +37,11 @@ try:
     PROXY_ADDRESS = settings.PROXY_ADDRESS
 except:
     PROXY_ADDRESS = ""
+
+try:
+    BUSINESS_UNITS_ENABLED = settings.BUSINESS_UNITS_ENABLED
+except:
+    BUSINESS_UNITS_ENABLED = False
 
 proxies = {
     "http":  PROXY_ADDRESS, 
@@ -150,7 +156,12 @@ def index(request):
     typeFilter = request.GET.get('typeFilter')
     businessunit = request.GET.get('businessunit')
     
-    reports = MunkiReport.objects.all()
+    if BUSINESS_UNITS_ENABLED:
+        business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
+        reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
+    else:
+        reports = MunkiReport.objects.all()
+
     subpage = ""
 
     if show is not None:
@@ -232,10 +243,19 @@ def index(request):
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')     
 def dashboard(request):
+
+    if BUSINESS_UNITS_ENABLED:
+        business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
+        reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
+        machines = Machine.objects.filter(businessunit__exact=business_units)
+    else:
+        reports = MunkiReport.objects.all()
+        machines = Machine.objects.all()
+
     munki = {}
-    munki['errors'] = MunkiReport.objects.filter(errors__gt=0).count()
-    munki['warnings'] = MunkiReport.objects.filter(warnings__gt=0).count()
-    munki['activity'] = MunkiReport.objects.filter(
+    munki['errors'] = reports.filter(errors__gt=0).count()
+    munki['warnings'] = reports.filter(warnings__gt=0).count()
+    munki['activity'] = reports.filter(
                             activity__isnull=False).count()
                             
     now = datetime.now()
@@ -245,31 +265,31 @@ def dashboard(request):
     month_ago = today - timedelta(days=30)
     three_months_ago = today - timedelta(days=90)
 
-    munki['checked_in_this_hour'] = Machine.objects.filter(
+    munki['checked_in_this_hour'] = machines.filter(
         last_munki_update__gte=hour_ago).count()
-    munki['checked_in_today'] = Machine.objects.filter(
+    munki['checked_in_today'] = machines.filter(
         last_munki_update__gte=today).count()
-    munki['checked_in_past_week'] = Machine.objects.filter(
+    munki['checked_in_past_week'] = machines.filter(
         last_munki_update__gte=week_ago).count()
     
-    munki['not_for_week'] = Machine.objects.filter(
+    munki['not_for_week'] = machines.filter(
         last_munki_update__range=(month_ago, week_ago)).count()
-    munki['not_for_month'] = Machine.objects.filter(
+    munki['not_for_month'] = machines.filter(
         last_munki_update__range=(three_months_ago, month_ago)).count()
-    munki['not_three_months'] = Machine.objects.exclude(
+    munki['not_three_months'] = machines.exclude(
         last_munki_update__gte=three_months_ago).count()
     
     # get counts of each os version
-    os_info = Machine.objects.values(
+    os_info = machines.values(
                 'os_version').annotate(count=Count('os_version')).order_by()
     
     # get counts of each machine_model type
-    machine_info = Machine.objects.values(
+    machine_info = machines.values(
                      'machine_model').annotate(
                        count=Count('machine_model')).order_by()
     
     # find machines with less than 5GB of available disk space
-    low_disk_machines = Machine.objects.filter(
+    low_disk_machines = machines.filter(
             available_disk_space__lt=5*2**20).values(
                 'serial_number', 'hostname', 'available_disk_space')
     

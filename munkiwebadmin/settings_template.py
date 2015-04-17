@@ -1,4 +1,5 @@
 import os
+from django.conf import global_settings
 
 ##############################
 # MunkiWeb-specific settings #
@@ -166,6 +167,10 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    "munkiwebadmin.processor.index",
 )
 
 MIDDLEWARE_CLASSES = (

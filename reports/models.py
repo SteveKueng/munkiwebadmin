@@ -5,12 +5,15 @@ from xml.parsers.expat import ExpatError
 import base64
 import bz2
 from uuid import uuid4
-
+from django.contrib.auth.models import User, Group
 
 class BusinessUnit(models.Model):
     hash = models.CharField(max_length=36, default=uuid4, primary_key=True, unique=True)
     name = models.CharField(max_length=30, unique=True)
     
+    class Meta:
+        permissions = (("can_view_businessunit", "Can view business unit"),)   
+
     def machines(self):
         return Machine.objects.filter(businessunit=self).count()
 
