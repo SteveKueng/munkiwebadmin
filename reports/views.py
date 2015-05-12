@@ -105,7 +105,7 @@ def submit(request, submission_type):
            
 
             machine.available_disk_space = \
-                report_data.get('AvailableDiskSpace') or 0
+                report_data.get('AvailableDiskSpace') or machine.available_disk_space
             hwinfo = {}
             if 'SystemProfile' in report_data.get('MachineInfo', []):
                 for profile in report_data['MachineInfo']['SystemProfile']:
