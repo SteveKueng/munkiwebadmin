@@ -4,14 +4,9 @@ settings.py
 munkiwebadmin.db
 .DS_Store
 unused_*
-
 *.db
-
 *.pkg
-
 site_static/downloads/MunkiEnroll.pkg
-
 *.bak
-
 munkiwebadmin/munkiwebadmin.db.old
-static/
+munkiwebadmin/static/
