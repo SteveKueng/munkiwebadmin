@@ -14,3 +14,4 @@ site_static/downloads/MunkiEnroll.pkg
 *.bak
 
 munkiwebadmin/munkiwebadmin.db.old
+static/
