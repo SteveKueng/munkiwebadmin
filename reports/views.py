@@ -532,15 +532,15 @@ def detail_pkg(request, serial, manifest_name):
                 pass
     
     if removal_results:
-        for item in report_plist.get('ItemsToRemove', []):
-            name = item.get('display_name', item['name'])
-            item['install_result'] = removal_results.get(
-                name, 'pending')
-            if item['install_result'] == 'removed':
-                if not 'RemovedItems' in report_plist:
-                    report_plist['RemovedItems'] = [item['name']]
-                elif not name in report_plist['RemovedItems']:
-                    report_plist['RemovedItems'].append(item['name'])
+#        for item in report_plist.get('ItemsToRemove', []):
+#            name = item.get('display_name', item['name'])
+#            item['install_result'] = removal_results.get(
+#                name, 'pending')
+#            if item['install_result'] == 'removed':
+#                if not 'RemovedItems' in report_plist:
+#                    report_plist['RemovedItems'] = [item['name']]
+#                elif not name in report_plist['RemovedItems']:
+#                    report_plist['RemovedItems'].append(item['name'])
 
     c = RequestContext(request,{'manifest_name': manifest_name,
                                 'manifest': manifest,
