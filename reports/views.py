@@ -106,6 +106,7 @@ def submit(request, submission_type):
 
             machine.available_disk_space = \
                 report_data.get('AvailableDiskSpace') or machine.available_disk_space
+
             hwinfo = {}
             if 'SystemProfile' in report_data.get('MachineInfo', []):
                 for profile in report_data['MachineInfo']['SystemProfile']:
@@ -614,7 +615,19 @@ def machine_detail(request, serial):
             report_plist = report.get_report()
         except MunkiReport.DoesNotExist:
             pass
-            
+    
+
+    for profile in report_plist['MachineInfo']['SystemProfile']:
+        if profile['_dataType'] == 'SPSoftwareDataType':
+            SoftwareData = profile._items
+        elif profile['_dataType'] == 'SPDisplaysDataType':
+            DisplaysData = profile._items
+        elif profile['_dataType'] == 'SPNetworkDataType':
+            NetworkData = profile._items
+        elif profile['_dataType'] == 'SPStorageDataType':
+            SPStorageDataType = profile._items
+
+
     # convert forward slashes in manifest names to colons
     if 'ManifestName' in report_plist:
         report_plist['ManifestNameLink'] = report_plist['ManifestName'].replace('/', ':')
@@ -636,6 +649,10 @@ def machine_detail(request, serial):
                               {'machine': machine,
                                'report': report_plist,
                                'user': request.user,
+                               'SoftwareData': SoftwareData,
+                               'DisplaysData': DisplaysData,
+                               'NetworkData': NetworkData,
+                               'SPStorageDataType': SPStorageDataType,
                                'additional_info': additional_info,
                                'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
                                'page': 'reports'})
@@ -661,10 +678,10 @@ def raw(request, serial):
             pass
     
     return HttpResponse(plistlib.writePlistToString(report_plist),
-        mimetype='text/plain')
+        content_type='text/plain')
 
 def lookup_ip(request):
-    return HttpResponse(request.META['REMOTE_ADDR'], mimetype='text/plain')
+    return HttpResponse(request.META['REMOTE_ADDR'], content_type='text/plain')
 
 def estimate_manufactured_date(serial):
     """Estimates the week the machine was manfactured based off it's serial

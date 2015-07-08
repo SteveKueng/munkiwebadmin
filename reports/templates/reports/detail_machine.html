@@ -13,7 +13,7 @@
           <td>
             {{ machine.machine_model }}
             {{ machine.cpu_type }}
-            {{ machine.cpu_speed}}
+            {{ machine.cpu_speed }}
           </td>
         </tr>
         <tr>
@@ -50,6 +50,10 @@
         <tr>
           <th>Console user:</th>
           <td>{{ report.ConsoleUser }}</td>
+        </tr>
+        <tr>
+          <th>Uptime:</th>
+          <td>{{ SoftwareData.uptime }}</td>
         </tr>
       </tbody>
     </table>
@@ -113,5 +117,39 @@
       </tbody>
     </table>
     {% endif %}
+  </div>
+  <div class='col-md-6'>
+  <h4>Storage</h4>
+  {% for disk in SPStorageDataType %}
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>{{ disk|get:"_name" }}</th>
+          <td>
+            <table class="client_info table table-condensed">
+              <tbody>
+                <tr>
+                  <th>Mount point</th>
+                  <td>{{ disk.mount_point }}</td>
+                </tr>
+                <tr>
+                  <th>Disk name</th>
+                  <td>{{ disk.bsd_name }}</td>
+                </tr>
+                <tr>
+                  <th>Ignore ownership</th>
+                  <td>{{ disk.ignore_ownership }}</td>
+                </tr>
+                <tr>
+                  <th>File system</th>
+                  <td>{{ disk.file_system }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  {% endfor %}
   </div>
 </div>
