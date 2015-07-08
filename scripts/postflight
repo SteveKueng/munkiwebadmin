@@ -20,7 +20,7 @@ cp "$REPORTPATH" "$TMPPLIST"
 
 # Generate a system_profiler report.
 PROFILEPLIST=/tmp/`head -c10 /dev/urandom | md5`.plist
-/usr/sbin/system_profiler -xml SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType SPStorageDataType SPPrintersDataType SPNetworkVolumeDataType SPThunderboltDataType > "$PROFILEPLIST"
+/usr/sbin/system_profiler -xml SPSoftwareDataType SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType SPStorageDataType SPPrintersDataType SPNetworkVolumeDataType SPThunderboltDataType > "$PROFILEPLIST"
 
 # Merge system profiler report with munki report.
 $PLISTBUDDY -c "Add :MachineInfo:SystemProfile array" "$TMPPLIST"
