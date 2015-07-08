@@ -521,16 +521,16 @@ def detail_pkg(request, serial, manifest_name):
     # handle items that were removed during the most recent run
     # this is crappy. We should fix it in Munki.
     removal_results = {}
-    for result in report_plist.get('RemovalResults', []):
-        m = re.search('^Removal of (.+): (.+)$', result)
-        if m:
-            try:
-                if m.group(2) == 'SUCCESSFUL':
-                    removal_results[m.group(1)] = 'removed'
-                else:
-                    removal_results[m.group(1)] = m.group(2)
-            except IndexError:
-                pass
+#    for result in report_plist.get('RemovalResults', []):
+#        m = re.search('^Removal of (.+): (.+)$', result)
+#        if m:
+#            try:
+#                if m.group(2) == 'SUCCESSFUL':
+#                    removal_results[m.group(1)] = 'removed'
+#                else:
+#                    removal_results[m.group(1)] = m.group(2)
+#            except IndexError:
+#                pass
     
     if removal_results:
         for item in report_plist.get('ItemsToRemove', []):
