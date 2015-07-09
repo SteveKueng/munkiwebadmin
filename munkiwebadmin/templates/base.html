@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}> 
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
         <meta content="text/html; charset=UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -53,9 +53,9 @@
 	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.pie.js"></script>
 	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.resize.js"></script>
 	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.tooltip.min.js"></script>
-		
+
 	    {% block java_script %}{% endblock %}
-		
+
 	    <!-- webadmin.js -->
 	    <script src="{% get_static_prefix %}js/webadmin.js"></script>
 
@@ -72,7 +72,7 @@
     <body>{% endblock %}
 		<div id="wrapper">
 			 {% block main_menu %}
-			<!-- Navigation --> 
+			<!-- Navigation -->
 			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 	            <div class="navbar-header">
 	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -111,7 +111,7 @@
 		            	<input type="text" class="form-control dropdown-toggle" id="SearchFieldMobile" autocomplete="off" data-provide="typeahead" data-source='{% block data-source-mobile %}{% endblock %}' data-items="4" placeholder="Search...">
 		            </li>
 	            </ul>
-	            
+
 	            <div class="collapse navbar-collapse navbar-ex1-collapse" role="navigation">
                     <ul class="nav navbar-nav side-nav" id="side-menu">
                     	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
@@ -176,9 +176,10 @@
                         {% endif %}
                     </ul>
 	            </div>
+              
 	        </nav>
         	{% endblock %}
-			
+
 			<!-- Page Content -->
         	<div id="page-wrapper">
         		<div class="container-fluid">
@@ -207,6 +208,6 @@
 		    <div class="modal-content">
 		    </div>
 		  </div>
-		</div>   	
+		</div>
     </body>
 </html>

@@ -13,9 +13,16 @@ try:
 except:
     BUSINESS_UNITS_ENABLED = False
 
+PROJECT_DIR = settings.PROJECT_DIR
+
+
 def index(request):
 	#business_units = BusinessUnit.objects.all()
 	business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
+
+	hanlde=open(PROJECT_DIR+"version")
+	var=hanlde.read()
+	print var
 
 	return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
 			'business_units': business_units}
