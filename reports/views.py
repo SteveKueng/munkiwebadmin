@@ -520,27 +520,18 @@ def detail_pkg(request, serial, manifest_name):
     # handle items that were removed during the most recent run
     # this is crappy. We should fix it in Munki.
     removal_results = {}
-#    for result in report_plist.get('RemovalResults', []):
-#         m = re.search('^Removal of (.+): (.+)$', result)
-#         if m:
-#             try:
-#                 if m.group(2) == 'SUCCESSFUL':
-#                     removal_results[m.group(1)] = 'removed'
-#                 else:
-#                     removal_results[m.group(1)] = m.group(2)
-#             except IndexError:
-#                 pass
+
     
     if removal_results:
-#        for item in report_plist.get('ItemsToRemove', []):
-#            name = item.get('display_name', item['name'])
-#            item['install_result'] = removal_results.get(
-#                name, 'pending')
-#            if item['install_result'] == 'removed':
-#                if not 'RemovedItems' in report_plist:
-#                    report_plist['RemovedItems'] = [item['name']]
-#                elif not name in report_plist['RemovedItems']:
-#                    report_plist['RemovedItems'].append(item['name'])
+        for item in report_plist.get('ItemsToRemove', []):
+            name = item.get('display_name', item['name'])
+            item['install_result'] = removal_results.get(
+                name, 'pending')
+            if item['install_result'] == 'removed':
+                if not 'RemovedItems' in report_plist:
+                    report_plist['RemovedItems'] = [item['name']]
+                elif not name in report_plist['RemovedItems']:
+                    report_plist['RemovedItems'].append(item['name'])
 
     c = RequestContext(request,{'manifest_name': manifest_name,
                                 'manifest': manifest,
