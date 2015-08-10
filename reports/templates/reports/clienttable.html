@@ -31,6 +31,7 @@
 			<tr>
 				<th class="text-center"></th>
 				<th>Machine</th>
+				<th class="visible-md visible-lg">Serialnumber</th>
 				<th>User</th>
 				<th class="visible-md visible-lg">IP</th>
 				<th class="visible-lg">Latest Run</th>
@@ -49,6 +50,9 @@
 	                  {% else %}
 	                      {{ report.machine.serial_number }}
 	                  {% endif %}
+	                </td>
+									<td class="visible-md visible-lg">
+	                  {{ report.machine.serial_number }}
 	                </td>
 	                <td>{{ report.console_user }}</td>
 	                <td class='visible-md visible-lg'>{{ report.machine.remote_ip }}</td>
