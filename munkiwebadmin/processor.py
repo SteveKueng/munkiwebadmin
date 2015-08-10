@@ -20,9 +20,9 @@ def index(request):
 	#business_units = BusinessUnit.objects.all()
 	business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
 
-	hanlde=open(PROJECT_DIR+"version")
-	var=hanlde.read()
-	print var
+	hanlde=open(PROJECT_DIR+"/../version", 'r+')
+	version=hanlde.read()
 
 	return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
-			'business_units': business_units}
+			'business_units': business_units,
+			'webadmin_version': version}
