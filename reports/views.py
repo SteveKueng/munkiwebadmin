@@ -32,7 +32,7 @@ import fnmatch
 import json
 import os
 
-# Configure URLLIB2 to use a proxy. 
+# Configure URLLIB2 to use a proxy.
 try:
     PROXY_ADDRESS = settings.PROXY_ADDRESS
 except:
@@ -44,7 +44,7 @@ except:
     BUSINESS_UNITS_ENABLED = False
 
 proxies = {
-    "http":  PROXY_ADDRESS, 
+    "http":  PROXY_ADDRESS,
     "https": PROXY_ADDRESS
 }
 
@@ -58,7 +58,7 @@ if PROXY_ADDRESS:
 def submit(request, submission_type):
     if request.method != 'POST':
         raise Http404
-    
+
     submit = request.POST
     serial = submit.get('serial')
     mac = submit.get('mac')
@@ -73,7 +73,7 @@ def submit(request, submission_type):
             report = MunkiReport.objects.get(machine=machine)
         except MunkiReport.DoesNotExist:
             report = MunkiReport(machine=machine)
-    
+
     if machine and report:
         machine.hostname = submit.get('name', '<NO NAME>')
         machine.remote_ip = request.META['REMOTE_ADDR']
@@ -82,12 +82,12 @@ def submit(request, submission_type):
             machine.username = submit.get('username')
         if 'location' in submit:
             machine.location = submit.get('location')
-        
+
         report.runtype = submit.get('runtype')
         report.timestamp = datetime.now()
 
         if submit.get('unit'):
-            unit = BusinessUnit.objects.get(hash=submit.get('unit'))  
+            unit = BusinessUnit.objects.get(hash=submit.get('unit'))
             machine.businessunit = unit
 
         if submission_type == 'postflight':
@@ -102,7 +102,7 @@ def submit(request, submission_type):
                     'os_vers', machine.os_version)
                 machine.cpu_arch = report_data['MachineInfo'].get(
                     'arch', machine.cpu_arch)
-           
+
 
             machine.available_disk_space = \
                 report_data.get('AvailableDiskSpace') or machine.available_disk_space
@@ -119,12 +119,12 @@ def submit(request, submission_type):
                 machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
                 machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
                 machine.mac = mac
-           
+
             machine.save()
             report.save()
-            return HttpResponse("Postflight report submmitted for %s.\n" 
+            return HttpResponse("Postflight report submmitted for %s.\n"
                                  % submit.get('name'))
-        
+
         if submission_type == 'preflight':
             report.runstate = u"in progress"
             report.activity = report.encode(
@@ -134,7 +134,7 @@ def submit(request, submission_type):
             return HttpResponse(
                 "Preflight report submmitted for %s.\n" %
                  submit.get('name'))
-    
+
         if submission_type == 'report_broken_client':
             report.runstate = u"broken client"
             #report.report = None
@@ -158,7 +158,7 @@ def index(request):
     nameFilter = request.GET.get('nameFilter')
     typeFilter = request.GET.get('typeFilter')
     businessunit = request.GET.get('businessunit')
-    
+
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
         reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
@@ -175,7 +175,7 @@ def index(request):
         week_ago = today - timedelta(days=7)
         month_ago = today - timedelta(days=30)
         three_months_ago = today - timedelta(days=90)
-    
+
         if show == 'errors':
             reports = reports.filter(errors__gt=0)
         elif show == 'warnings':
@@ -211,16 +211,16 @@ def index(request):
             subpage = "vm"
     else:
         subpage = "reports"
-        
+
     if os_version is not None:
         reports = reports.filter(machine__os_version__exact=os_version)
-        
+
     if model is not None:
         reports = reports.filter(machine__machine_model__exact=model)
-        
+
     if nameFilter is not None:
         reports = reports.filter(machine__hostname__startswith=nameFilter)
-    
+
     if typeFilter is not None and model is None:
         reports = reports.filter(machine__machine_model__contains=typeFilter)
 
@@ -231,7 +231,7 @@ def index(request):
     hostnames = list()
     for report in reports:
         hostnames.append(report.machine.hostname)
-    hostnames_json = json.dumps(hostnames)  
+    hostnames_json = json.dumps(hostnames)
 
     c = RequestContext(request,{'reports': reports,
                                 'user': request.user,
@@ -244,7 +244,7 @@ def index(request):
 
 
 @login_required
-@permission_required('reports.can_view_dashboard', login_url='/login/')     
+@permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
 
     if BUSINESS_UNITS_ENABLED:
@@ -260,7 +260,7 @@ def dashboard(request):
     munki['warnings'] = reports.filter(warnings__gt=0).count()
     munki['activity'] = reports.filter(
                             activity__isnull=False).count()
-                            
+
     now = datetime.now()
     hour_ago = now - timedelta(hours=1)
     today = date.today()
@@ -274,28 +274,28 @@ def dashboard(request):
         last_munki_update__gte=today).count()
     munki['checked_in_past_week'] = machines.filter(
         last_munki_update__gte=week_ago).count()
-    
+
     munki['not_for_week'] = machines.filter(
         last_munki_update__range=(month_ago, week_ago)).count()
     munki['not_for_month'] = machines.filter(
         last_munki_update__range=(three_months_ago, month_ago)).count()
     munki['not_three_months'] = machines.exclude(
         last_munki_update__gte=three_months_ago).count()
-    
+
     # get counts of each os version
     os_info = machines.values(
                 'os_version').annotate(count=Count('os_version')).order_by()
-    
+
     # get counts of each machine_model type
     machine_info = machines.values(
                      'machine_model').annotate(
                        count=Count('machine_model')).order_by()
-    
+
     # find machines with less than 5GB of available disk space
     low_disk_machines = machines.filter(
             available_disk_space__lt=5*2**20).values(
                 'serial_number', 'hostname', 'available_disk_space')
-    
+
     c = RequestContext(request,{'munki': munki,
                                 'os_info': os_info,
                                 'machine_info': machine_info,
@@ -303,7 +303,7 @@ def dashboard(request):
                                 'user': request.user,
                                 'page': 'dashboard'})
 
-    c.update(csrf(request))                  
+    c.update(csrf(request))
     return render_to_response('reports/dashboard.html', c)
 
 
@@ -318,7 +318,7 @@ def detail(request, serial):
             raise Http404
     else:
         raise Http404
-    
+
     # get SSH option
     try:
         SSH_BUTTON_ENABLED = settings.SSH_BUTTON_ENABLED
@@ -366,7 +366,7 @@ def detail(request, serial):
     return render_to_response('reports/detail.html',c)
 
 @login_required
-@permission_required('reports.can_view_reports', login_url='/login/') 
+@permission_required('reports.can_view_reports', login_url='/login/')
 def detail_pkg(request, serial, manifest_name):
     machine = None
     manifest = None
@@ -379,7 +379,7 @@ def detail_pkg(request, serial, manifest_name):
             raise Http404
     else:
         raise Http404
-    
+
     report_plist = {}
     if machine:
         try:
@@ -390,7 +390,7 @@ def detail_pkg(request, serial, manifest_name):
 
     # get autocomplete data
     install_items = Manifest.getInstallItemNames(manifest_name)
-    valid_install_items = (install_items['suggested'] + 
+    valid_install_items = (install_items['suggested'] +
                            install_items['updates'] +
                             install_items['with_version'])
     suggested_install_items = install_items['suggested']
@@ -421,7 +421,7 @@ def detail_pkg(request, serial, manifest_name):
 
         for key in sort_list:
             sorted_Manifests[key] = includetManifests[key]
-        
+
         key_list = includetManifests.keys()
         key_list.sort()
         for key in key_list:
@@ -458,7 +458,7 @@ def detail_pkg(request, serial, manifest_name):
     installsTypes = ["managed_installs", "managed_uninstalls", "optional_installs"]
     for installsType in installsTypes:
         installs[installsType] = SortedDict()
-         
+
         for number, manifests in enumerate(sorted_Manifests):
             installs[installsType][manifests] = SortedDict()
 
@@ -467,7 +467,7 @@ def detail_pkg(request, serial, manifest_name):
                     listed.append(item)
                     if ManagedInstallsDetail.has_key(item):
                         installs[installsType][manifests][item] = ManagedInstallsDetail[item]
-                    
+
                     if item in true_items:
                         if installs[installsType].get(manifests, {}).has_key(item):
                             installs[installsType][manifests][item].update(item_details[item])
@@ -501,23 +501,23 @@ def detail_pkg(request, serial, manifest_name):
             install_results[nameAndVers] = "installed"
         else:
             install_results[nameAndVers] = 'error'
-    
-    if install_results:         
+
+    if install_results:
         for item in report_plist.get('ItemsToInstall', []):
             name = item.get('display_name', item['name'])
-            nameAndVers = ('%s-%s' 
+            nameAndVers = ('%s-%s'
                 % (name, item['version_to_install']))
             item['install_result'] = install_results.get(
                 nameAndVers, 'pending')
-                
+
         for item in report_plist.get('ManagedInstalls', []):
             if 'version_to_install' in item:
                 name = item.get('display_name', item['name'])
-                nameAndVers = ('%s-%s' 
+                nameAndVers = ('%s-%s'
                     % (name, item['version_to_install']))
                 if install_results.get(nameAndVers) == 'installed':
                     item['installed'] = True
-                    
+
     # handle items that were removed during the most recent run
     # this is crappy. We should fix it in Munki.
     removal_results = {}
@@ -531,7 +531,7 @@ def detail_pkg(request, serial, manifest_name):
 #                    removal_results[m.group(1)] = m.group(2)
 #            except IndexError:
 #                pass
-    
+
     if removal_results:
         for item in report_plist.get('ItemsToRemove', []):
             name = item.get('display_name', item['name'])
@@ -556,7 +556,7 @@ def detail_pkg(request, serial, manifest_name):
     return render_to_response('reports/detail_pkg.html',c)
 
 @login_required
-@permission_required('reports.can_view_reports', login_url='/login/') 
+@permission_required('reports.can_view_reports', login_url='/login/')
 def appleupdate(request, serial):
     machine = None
     if serial:
@@ -566,7 +566,7 @@ def appleupdate(request, serial):
             raise Http404
     else:
         raise Http404
-    
+
     report_plist = {}
     if machine:
         try:
@@ -597,7 +597,7 @@ def appleupdate(request, serial):
 
 
 @login_required
-@permission_required('reports.can_view_reports', login_url='/login/') 
+@permission_required('reports.can_view_reports', login_url='/login/')
 def machine_detail(request, serial):
     machine = None
     if serial:
@@ -607,7 +607,7 @@ def machine_detail(request, serial):
             raise Http404
     else:
         raise Http404
-    
+
     report_plist = {}
     if machine:
         try:
@@ -615,7 +615,12 @@ def machine_detail(request, serial):
             report_plist = report.get_report()
         except MunkiReport.DoesNotExist:
             pass
-    
+
+
+    SoftwareData = ""
+    DisplaysData = ""
+    NetworkData = ""
+    SPStorageDataType = ""
 
     for profile in report_plist['MachineInfo']['SystemProfile']:
         if profile['_dataType'] == 'SPSoftwareDataType':
@@ -643,7 +648,7 @@ def machine_detail(request, serial):
     if WARRANTY_LOOKUP_ENABLED and machine.serial_number:
         additional_info['manufacture_date'] = \
             estimate_manufactured_date(machine.serial_number)
-              
+
 
     return render_to_response('reports/detail_machine.html',
                               {'machine': machine,
@@ -658,7 +663,7 @@ def machine_detail(request, serial):
                                'page': 'reports'})
 
 @login_required
-@permission_required('reports.can_view_reports', login_url='/login/') 
+@permission_required('reports.can_view_reports', login_url='/login/')
 def raw(request, serial):
     machine = None
     if serial:
@@ -668,7 +673,7 @@ def raw(request, serial):
             raise Http404
     else:
         raise Http404
-    
+
     report_plist = {}
     if machine:
         try:
@@ -676,7 +681,7 @@ def raw(request, serial):
             report_plist = report.decode(report.report)
         except MunkiReport.DoesNotExist:
             pass
-    
+
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
@@ -695,7 +700,7 @@ def estimate_manufactured_date(serial):
             week = serial[3:5]
             return formatted_manafactured_date(int(est_year), int(week))
         except:
-            return 'Unknown'    
+            return 'Unknown'
     elif len(serial) == 12:
         try:
             year_code = 'cdfghjklmnpqrstvwxyz'
@@ -707,10 +712,10 @@ def estimate_manufactured_date(serial):
             est_week = week_code.index(week) + (est_half * 26)
             return formatted_manafactured_date(int(est_year), int(est_week))
         except:
-            return 'Unknown'    
+            return 'Unknown'
     else:
         return 'Unknown'
-        
+
 def formatted_manafactured_date(year, week):
     """Converts the manufactured year and week number into a nice string"""
     # Based on accepted solution to this stackoverflow question
@@ -730,7 +735,7 @@ def formatted_manafactured_date(year, week):
         suffix = "th"
     else:
         suffix = ["st", "nd", "rd"][int(day) % 10 - 1]
-    
+
     # Build formatted date string
     formatted_date = 'Week of %s %s %s' % \
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
@@ -768,11 +773,11 @@ def warranty(request, serial):
                 return HttpResponse('<span style="color:green">Active</span>'\
                     '<br/><a href="javascript:postwith(\'%s\',%s)">'\
                     'More Information</a>' % (expiry_date, url, values))
-        elif 'Expired' in match_obj.group(): 
+        elif 'Expired' in match_obj.group():
             return HttpResponse('<span>Expired</span>'
                 '<br/><a href="javascript:postwith(\'%s\',%s)">'\
                 'More Information</a>' % (url, values))
-            
+
         else:
             return HttpResponse('<span>Unknown Status: Try clicking '
                 '<a href="javascript:postwith(\'%s\',%s)">here</a> to '
@@ -790,21 +795,18 @@ def warranty(request, serial):
                 ' manually check' % (url, values))
 
 def model_description_lookup(serial):
-    """Determines the models human readable description based off the serial 
+    """Determines the models human readable description based off the serial
     number"""
     # Based off https://github.com/MagerValp/MacModelShelf/
-    
+
     snippet = serial[-3:]
     if (len(serial) == 12):
         snippet = serial[-4:]
     try:
         response = urllib2.urlopen(
-            "http://support-sp.apple.com/sp/product?cc=%s&lang=en_US" 
+            "http://support-sp.apple.com/sp/product?cc=%s&lang=en_US"
             % snippet, timeout=2)
         et = ElementTree.parse(response)
         return et.findtext("configCode").decode("utf-8")
     except:
         return ''
-
-
-
