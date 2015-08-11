@@ -19,7 +19,7 @@ body {
 }
 
 .dataTables_filter {
-    display: none; 
+    display: none;
 }
 
 /* -------- special kuengst */
@@ -45,12 +45,12 @@ tr {
     -moz-animation:spin 2s linear infinite;
     animation:spin 2s linear infinite;
 }
-@-moz-keyframes spin { 100% { 
-    -moz-transform:rotate(360deg); 
+@-moz-keyframes spin { 100% {
+    -moz-transform:rotate(360deg);
     }
 }
-@-webkit-keyframes spin { 100% { 
-    -webkit-transform:rotate(360deg); 
+@-webkit-keyframes spin { 100% {
+    -webkit-transform:rotate(360deg);
     }
 }
 @keyframes spin { 100% {
