@@ -55,6 +55,8 @@ PROXY_ADDRESS = ""
 ALLOWED_HOSTS = ['*']
 
 TOKEN_TIMEOUT_DAYS = 1
+
+ANONYMOUS_USER_ID = -1
 # -------------------------
 
 USE_LDAP = False
