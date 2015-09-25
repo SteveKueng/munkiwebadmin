@@ -28,6 +28,8 @@ class Catalog(object):
                 pass
             else:
                 catalogs.append(name)
+        if not PROD_CATALOG in catalogs:
+            catalogs.append(PROD_CATALOG)
         return catalogs
             
     
