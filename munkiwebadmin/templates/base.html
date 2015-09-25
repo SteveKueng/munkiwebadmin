@@ -166,6 +166,11 @@
                             <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
                         </li>
                         {% endif %}
+                        {% if perms.pkgs.can_view_pkgs %}
+                        <li {% if page == 'pkgs' %} class="active" {% endif %}>
+                            <a href="{% url 'pkgs.views.index' %}"><i class="fa fa-edit fa-fw"></i> Packages</a>
+                        </li>
+                        {% endif %}
                         {% if perms.inventory.can_view_inventory %}
                         <li {% if page == 'inventory' %} class="active" {% endif %}>
                             <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
