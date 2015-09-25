@@ -25,7 +25,7 @@ def index(request):
         catalog_name = PROD_CATALOG
     elif 'testing' in catalog_list:
         catalog_name = 'testing'
-    return render_to_response('packages/index.html',
+    return render_to_response('pkgs/index.html',
                               {'user': request.user,
                                'all_catalog_items': all_catalog_items,
                                'catalog_list': catalog_list,
@@ -45,7 +45,7 @@ def confirm(request):
         c = {'user': request.user,
              'dest_catalog': dest_catalog,
              'items_to_move': items_to_move}
-        return render_to_response('packages/confirm.html', c)
+        return render_to_response('pkgs/confirm.html', c)
     else:
         return HttpResponse("No form submitted.\n")
 
@@ -63,6 +63,6 @@ def done(request):
         context = {'user': request.user,
                    'final_items_to_move': final_items_to_move,
                    'done': 'Done'}
-        return render_to_response('packages/done.html', context)
+        return render_to_response('pkgs/done.html', context)
     else:
         return HttpResponse("No form submitted.\n")
