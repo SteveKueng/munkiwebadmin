@@ -6,8 +6,8 @@ import plistlib
 import optparse
 import fnmatch
 
-
 from django.conf import settings
+from django.db import models
 
 #DEFAULT_MAKECATALOGS = "/usr/local/munki/makecatalogs"
 DEFAULT_MAKECATALOGS = "/munki-tools/code/client/makecatalogs"
@@ -91,3 +91,7 @@ class Packages(object):
     @classmethod
     def makecatalogs(self):
         task = execute([MAKECATALOGS, REPO_DIR])
+
+class Pkgs(models.Model):
+    class Meta:
+            permissions = (("can_view_packages", "Can view packages"),)
