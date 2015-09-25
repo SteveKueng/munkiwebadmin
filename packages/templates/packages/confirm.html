@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Confirm move packages</h3>
+
+{% if items_to_move %}
+
+	{# Drop-down list for moving to a catalog #}
+<form id='done' action='/packages/done/' method='post'>
+	<div class='well form-horizontal'>
+		<input class='btn' type='submit' value='Confirm Move' />
+	</div>
+
+	<p/>
+	<table class='pkglist table table-striped table-condensed'>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Version</th>
+				<th>Origin Catalog</th>
+				<th>Destination Catalog</th>
+			</tr>
+		</thead>
+		<tbody>
+	{% for package, version, orig_catalog in items_to_move %}
+		{% if orig_catalog != dest_catalog %}
+			<tr>
+				<td class='item-name'>
+				<input type='hidden' name='final_items_to_move[]' value='{{ package }}___{{ version }}___{{ dest_catalog }}' />
+				{{ package }}</td>
+				<td class='version'>{{ version }}</td>
+				<td class='orig_catalog'>{{ orig_catalog }}</td>
+				<td class='dest_catalog'>{{ dest_catalog }}</td>
+			</tr>
+		{% endif %}
+	{% endfor %}
+		</tbody>
+	</table>
+</form>
+{% else %}
+	<p><i>No Packages to move.</i></p>
+{% endif %}
+{% endblock content %}

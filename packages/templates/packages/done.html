@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Package catalogs have been updated</h3>
+
+{% if done %}
+	<p><i>Makecatalogs has updated the catalogs.</i></p>
+{% else %}
+	<p><i>No Packages to move.</i></p>
+{% endif %}
+{% endblock content %}
