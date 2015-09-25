@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
+<!-- page title -->
+{% block page_title %}<a href="{% url 'pkgs.views.pkgs_view' %}" class="navbar-brand" >Packages</a>{% endblock %}
+
+{% block navbar-default_extensions %}
+Confirm Add Package
+{% endblock %}
+
 {% block content %}
-<h3>Confirm move packages</h3>
 
 {% if items_to_move %}
 

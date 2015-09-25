@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
+<!-- page title -->
+{% block page_title %}<a href="{% url 'pkgs.views.pkgs_view' %}" class="navbar-brand" >Packages</a>{% endblock %}
+
+{% block navbar-default_extensions %}
+Catalog changes have been made
+{% endblock %}
+
 {% block content %}
-<h3>Package catalogs have been updated</h3>
 
 {% if done %}
 	<p><i>Makecatalogs has updated the catalogs.</i></p>
