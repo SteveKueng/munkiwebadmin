@@ -92,8 +92,8 @@ class Packages(object):
         popen = subprocess.Popen(command, stdout=subprocess.PIPE)
         lines_iterator = iter(popen.stdout.readline, b"")
         for line in lines_iterator:
-        print(line) # yield line
+            print(line) # yield line
 
 class Pkgs(models.Model):
     class Meta:
-            permissions = (("can_view_pkgs", "Can view pkgs"),)
+        permissions = (("can_view_pkgs", "Can view pkgs"),)
