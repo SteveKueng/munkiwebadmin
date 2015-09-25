@@ -8,6 +8,7 @@ import fnmatch
 
 from django.conf import settings
 from django.db import models
+from reports.models import Machine
 
 #DEFAULT_MAKECATALOGS = "/usr/local/munki/makecatalogs"
 DEFAULT_MAKECATALOGS = "/munki-tools/code/client/makecatalogs"
