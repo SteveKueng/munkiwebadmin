@@ -13,7 +13,15 @@ from django.db import models
 DEFAULT_MAKECATALOGS = "/munki-tools/code/client/makecatalogs"
 REPO_DIR = settings.MUNKI_REPO_DIR
 
-MAKECATALOGS = opts.makecatalogs
+def fail(message):
+    sys.stderr.write(message)
+    sys.exit(1)
+
+def execute(command):    
+    popen = subprocess.Popen(command, stdout=subprocess.PIPE)
+    lines_iterator = iter(popen.stdout.readline, b"")
+    for line in lines_iterator:
+        print(line) # yield line
 
 usage = "%prog [options]"
 o = optparse.OptionParser(usage=usage)
@@ -23,6 +31,8 @@ o.add_option("--makecatalogs", default=DEFAULT_MAKECATALOGS,
               % DEFAULT_MAKECATALOGS))
 
 opts, args = o.parse_args()
+
+MAKECATALOGS = opts.makecatalogs
 
 # Read contents of all pkginfo files. You should be able to do this by reading the contents of catalogs/all
 
@@ -82,18 +92,6 @@ class Packages(object):
     def makecatalogs(self):
         task = execute([MAKECATALOGS, REPO_DIR])
 
-    @classmethod
-    def fail(message):
-        sys.stderr.write(message)
-        sys.exit(1)
-
-    @classmethod
-    def execute(command):    
-        popen = subprocess.Popen(command, stdout=subprocess.PIPE)
-        lines_iterator = iter(popen.stdout.readline, b"")
-        for line in lines_iterator:
-            print(line) # yield line
-
 class Pkgs(models.Model):
     class Meta:
-        permissions = (("can_view_pkgs", "Can view pkgs"),)
+        permissions = (("can_view_pkgs", "Can view packages"),)
