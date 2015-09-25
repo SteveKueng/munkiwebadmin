@@ -5,7 +5,7 @@
 
 	{# Filter packages #}
 
-<form id='move' action='/packages/' method='get'>
+<form id='move' action='/pkgs/' method='get'>
 	<div class='well form-horizontal'>
 		<input class='span2' type='text' name='findtext' value='{{ findtext }}' />
 		<input class='btn' type='submit' name='filter' value='Filter' />
@@ -17,7 +17,7 @@
 
 	{# Drop-down list for moving to a catalog #}
 
-<form id='move' action='/packages/confirm/' method='post'>
+<form id='move' action='/pkgs/confirm/' method='post'>
 	<div class='well form-horizontal'>
 		<label for='section'>Move selected packages to catalog:</label>
 		<select class='span2' id='section' name='dest_catalog'>
