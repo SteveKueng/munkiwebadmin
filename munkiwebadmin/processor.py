@@ -16,13 +16,14 @@ from django.contrib.auth.models import User, Group
 PROJECT_DIR = settings.PROJECT_DIR
 
 
-#def index(request):
+def index(request):
 	#business_units = BusinessUnit.objects.all()
 	#business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
 
-	#hanlde=open(PROJECT_DIR+"/../version", 'r+')
-	#version=hanlde.read()
+	handle=open(PROJECT_DIR+"/../version", 'r+')
+	version=handle.read()
 
-	#return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
-	#		'business_units': business_units,
-	#		'webadmin_version': version}
+	return {
+			#'business_units_enabled': BUSINESS_UNITS_ENABLED,
+			#'business_units': business_units,
+			'webadmin_version': version}
