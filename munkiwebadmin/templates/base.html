@@ -120,39 +120,7 @@
                     	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
 	                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
 	                	</li>
-                        {% if perms.reports.can_view_reports %}
-                        {% if business_units_enabled %}
-                        <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a><i class="fa fa-building-o fa-fw"></i> Business Units <i class="fa fa-fw fa-caret-down"></i></a>
-	                        <ul id="computers" class="collapse in">
-	                            {% for business_unit in business_units %}
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
-	                            </li>
-	                            {% endfor %}
-	                        </ul>
-                        </li>
-                        {% else %}
-                        <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
-	                        <ul id="computers" class="collapse in">
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop fa-fw"></i> Mac</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-fw"></i> Virtual Machine</a>
-	                            </li>
-	                        </ul>
-                        </li>
-                        {% endif %}
-                        {% endif %}
-                        {% if perms.catalogs.can_view_catalogs %}
+                       {% if perms.catalogs.can_view_catalogs %}
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
                             <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
                         </li>
