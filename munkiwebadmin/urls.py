@@ -17,14 +17,11 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'django.contrib.auth.views.logout_then_login', name='logout'),
     url(r'^manifest/', include('manifests.urls')),
     url(r'^catalog/', include('catalogs.urls')),
-    url(r'^inventory/', include('inventory.urls')),
-    url(r'^licenses/', include('licenses.urls')),
-    url(r'^computer/', include('reports.urls')),
+    url(r'^pkgs/', include('pkgs.urls')),
+    url(r'^computer/', include('catalogs.urls')),
     
     # for compatibility with MunkiReport scripts    
-    url(r'^$', include('reports.urls')),
-    url(r'^lookup/', include('reports.urls')),
-    url(r'^update/', include('reports.urls')),
+    url(r'^$', include('catalogs.urls')),
     (r'', include('tokenapi.urls')),
 )
 # comment out the following if you are serving

@@ -217,6 +217,7 @@ INSTALLED_APPS = (
     'reports',
     'catalogs',
     'manifests',
+    'pkgs',
     'inventory',
     'licenses',
 )

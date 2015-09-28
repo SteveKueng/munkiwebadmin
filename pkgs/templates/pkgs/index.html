@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load url from future %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'pkgs.views.index' %}" class="navbar-brand" >Packages</a>{% endblock %}
+
+{% block content %}
+	{# Filter packages #}
+
+<form id='move' action='/pkgs/' method='get'>
+	<div class='well form-horizontal'>
+		<input class='form-control-main form-control dropdown-toggle' type='text' name='findtext' value='{{ findtext }}' />
+		<input class='btn' type='submit' name='filter' value='Filter' />
+		<span class='muted'> Hint: you can use shell-style wildcards in searches for 'fuzzy' matches.</span>
+	</div>
+</form>
+
+{% if all_catalog_items %}
+
+	{# Drop-down list for moving to a catalog #}
+
+<form id='move' action='/pkgs/confirm/' method='post'>
+	<div class='well form-horizontal'>
+		<label for='section'>Move selected packages to catalog:</label>
+		<select class='form-control-main form-control dropdown-toggle' id='section' name='dest_catalog'>
+			{% for item in catalog_list %}
+				<option value='{{ item }}' {% if item == catalog_name %} selected='selected' {% endif %}>{{ item }}</option>
+			{% endfor %}
+		</select>
+		<div class='btn-group'>
+			<input class='btn' type='submit' name='move' value='Move' />
+			<input class='btn btn-danger disabled' type='submit' name='delete' value='Delete' />
+		</div>
+	</div>
+
+	<p/>
+	<table class='pkglist table table-striped table-condensed'>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Version</th>
+				<th>Catalog</th>
+				<th class='td-right'>Check to select</th>
+			</tr>
+		</thead>
+		<tbody>
+	{% for pkg in all_catalog_items %}
+			<tr>
+				<td class='item-name'>{{ pkg.name }}</td>
+				<td class='version'>{{ pkg.version }}</td>
+				<td class='catalog'>
+		{% for catalog in pkg.catalogs %}
+					{{ catalog }} <br />
+		{% endfor %}
+				</td>
+				<td class='td-right'>
+		{% for catalog in pkg.catalogs %}
+					<input type='checkbox' name='items_to_move[]' value='{{ pkg.name }}___{{ pkg.version }}___{{ catalog }}' /><br />
+		{% endfor %}
+				</td>
+			</tr>
+	{% endfor %}
+		</tbody>
+	</table>
+</form>
+{% else %}
+	<p><i>No Packages.</i></p>
+{% endif %}
+{% endblock content %}
