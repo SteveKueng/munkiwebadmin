@@ -71,7 +71,7 @@
     {% block body_tag %}
     <body>{% endblock %}
 		<div id="wrapper">
-			 {% block main_menu %}
+			{% block main_menu %}
 			<!-- Navigation -->
 			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 	            <div class="navbar-header">
@@ -120,21 +120,16 @@
                     	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
 	                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
 	                	</li>
-                       {% if perms.catalogs.can_view_catalogs %}
                         <li {% if page == 'catalogs' %} class="active" {% endif %}>
                             <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
                         </li>
-                        {% endif %}
                         {% if perms.manifests.can_view_manifests %}
                         <li {% if page == 'manifests' %} class="active" {% endif %}>
                             <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
                         </li>
-                        {% endif %}
-                        {% if perms.pkgs.can_view_pkgs %}
                         <li {% if page == 'pkgs' %} class="active" {% endif %}>
                             <a href="{% url 'pkgs.views.index' %}"><i class="fa fa-gift fa-fw"></i> Packages</a>
                         </li>
-                        {% endif %}
                     </ul>
 	            </div>
 	        </nav>
