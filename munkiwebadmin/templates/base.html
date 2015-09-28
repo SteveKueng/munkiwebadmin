@@ -176,16 +176,6 @@
                             <a href="{% url 'pkgs.views.index' %}"><i class="fa fa-gift fa-fw"></i> Packages</a>
                         </li>
                         {% endif %}
-                        {% if perms.inventory.can_view_inventory %}
-                        <li {% if page == 'inventory' %} class="active" {% endif %}>
-                            <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.licenses.can_view_licenses %}
-                        <li {% if page == 'licenses' %} class="active" {% endif %}>
-                            <a href="{% url 'licenses.views.index' %}"><i class="fa fa-file-text-o fa-fw"></i> Licenses</a>
-                        </li>
-                        {% endif %}
                     </ul>
 	            </div>
 	        </nav>
