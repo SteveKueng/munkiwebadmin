@@ -81,11 +81,7 @@
 	                    <span class="icon-bar"></span>
 	                    <span class="icon-bar"></span>
 	                </button>
-	                {% if perms.reports.can_view_dashboard %}
-	                <a class="navbar-brand" href="{% url 'reports.views.dashboard' %}" style=" padding-right:0px;">
-                    {% else %}
-	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;">
-                    {% endif %}
+	                <a class="navbar-brand" href="/catalog" style=" padding-right:0px;">
                     <img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
 	                {% block page_title %}{% endblock %}
 		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
@@ -124,11 +120,6 @@
                     	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
 	                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
 	                	</li>
-	                	{% if perms.reports.can_view_dashboard %}
-						<li {% if page == 'dashboard' %} class="active" {% endif %} >
-                            <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard fa-fw"></i> Dashboard</a>
-                        </li>
-                        {% endif %}
                         {% if perms.reports.can_view_reports %}
                         {% if business_units_enabled %}
                         <li {% if page == 'reports' %} class="active" {% endif %}>
