@@ -40,7 +40,7 @@
 				<th>Name</th>
 				<th>Version</th>
 				<th>Catalog</th>
-				<th>Check to select</th>
+				<th class='td-right'>Check to select</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -53,7 +53,7 @@
 					{{ catalog }} <br />
 		{% endfor %}
 				</td>
-				<td class='checked'>
+				<td class='td-right'>
 		{% for catalog in pkg.catalogs %}
 					<input type='checkbox' name='items_to_move[]' value='{{ pkg.name }}___{{ pkg.version }}___{{ catalog }}' /><br />
 		{% endfor %}
