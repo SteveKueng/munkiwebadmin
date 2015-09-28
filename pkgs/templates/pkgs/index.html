@@ -9,7 +9,7 @@
 
 <form id='move' action='/pkgs/' method='get'>
 	<div class='well form-horizontal'>
-		<input class='form-control dropdown-toggle' type='text' name='findtext' value='{{ findtext }}' />
+		<input class='form-control dropdown-toggle col-md-2' type='text' name='findtext' value='{{ findtext }}' />
 		<input class='btn' type='submit' name='filter' value='Filter' />
 		<span class='muted'> Hint: you can use shell-style wildcards in searches for 'fuzzy' matches.</span>
 	</div>
@@ -22,7 +22,7 @@
 <form id='move' action='/pkgs/confirm/' method='post'>
 	<div class='well form-horizontal'>
 		<label for='section'>Move selected packages to catalog:</label>
-		<select class='form-control dropdown-toggle' id='section' name='dest_catalog'>
+		<select class='form-control dropdown-toggle col-md-2' id='section' name='dest_catalog'>
 			{% for item in catalog_list %}
 				<option value='{{ item }}' {% if item == catalog_name %} selected='selected' {% endif %}>{{ item }}</option>
 			{% endfor %}
