@@ -2387,7 +2387,8 @@ output {
 .form-control[disabled],
 .form-control[readonly],
 .form-control-main {
-  width: 75%;
+  display: inline;
+  width: 25%;
 }
 fieldset[disabled] .form-control {
   cursor: not-allowed;
