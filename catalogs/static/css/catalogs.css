@@ -5,3 +5,34 @@ td.code {
   font-family: Andale Mono, monospace;
   font-size: 9pt;
 }
+.gridelement {
+	list-style-type: none;
+	cursor:pointer;
+	text-align: center;
+	padding: 0px 4px 0px 4px;
+}
+.gridfont {
+	font-size:16px;
+}
+.thumbnail:hover {
+	background-color:#eeeeee;
+}
+.thumbnail {
+	margin-bottom:8px;
+	background-color: #f8f8f8;
+	height:125px;
+}
+.dataTables_filter {
+   display: none;
+}
+.grid {
+	margin-left:-4px;
+	margin-right:-4px;
+}
+#gridview {
+	margin-top:-19px;
+}
+.lineiteminput {
+	font-size:16px;
+	border: 0px;
+}

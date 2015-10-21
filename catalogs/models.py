@@ -4,6 +4,7 @@ import plistlib
 
 from django.conf import settings
 from django.db import models
+from itertools import groupby
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 STATIC_URL = settings.STATIC_URL
@@ -29,8 +30,8 @@ class Catalog(object):
             else:
                 catalogs.append(name)
         return catalogs
-            
-    
+
+
     @classmethod
     def detail(self, catalog_name):
         '''Gets the contents of a catalog, which is a list
@@ -44,13 +45,15 @@ class Catalog(object):
                 for item in catalog_items:
                     item['index'] = index
                     index += 1
+
+                print catalog_items
                 return catalog_items
             except Exception, errmsg:
                 return None
         else:
             return None
-                    
-    
+
+
     @classmethod
     def item_detail(self, catalog_name, item_index):
         '''Returns detail for a single catalog item'''
@@ -64,7 +67,6 @@ class Catalog(object):
                 return None
         else:
             return None
-
 
     @classmethod
     def getValidInstallItems(self, catalog_list):

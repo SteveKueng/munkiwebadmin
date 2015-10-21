@@ -15,6 +15,15 @@
 {% block data-source %}{{ catalog_items }}{% endblock %}
 {% block data-source-mobile %}{{ catalog_items }}{% endblock %}
 
+{% block navbar-top_extensions %}
+<li id="list" class="sidebar-search hidden-xs">
+    <a href="#" id="list"><span class="glyphicon glyphicon-th-list"></span> List</a>
+</li>
+<li id="grid" class="sidebar-search hidden-xs">
+    <a href="#" id="grid"><span class="glyphicon glyphicon-th"></span> Grid</a>
+</li>
+{% endblock %}
+
 <!-- page title -->
 {% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
 
@@ -45,47 +54,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-	<div class="col-md-4">
-	{% if catalog_name %}
-		{% if catalog %}
-		<div>
-			<div id="listbig" class="list-group">    
-				{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
+{% if catalog_name %}
+	{% if catalog %}
+	<div id="gridview" class="">
+		<ul id="products" class="grid list-group">
+			{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
+			{% for item_name in catalog_items %}
+				{% with item_name.list|dictsortreversed:'version' as item_list %}
+				<li class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1" data-state="all" onclick="document.location = '{% url 'catalogs.views.item_detail' catalog_name item_list.0.index %}';">
+		            <div class="thumbnail">
+		                <img src='{{ item_list.0.icon_name }}' width="40" class="group list-group-image" style="padding-top:15px;" />
+		                <div class="caption">
+		                    <h4 class="gridfont list-group-item-heading">
+		 	                  	{{ item_list.0.display_name }}<br>
+		 	                  	{{ item_list.0.version }}
+		                      </h4>
+		                </div>
+		            </div>
+		        </li>
+		        {% endwith %}
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div id="listview" class="table-responsive hidden">
+		<table class="table table-condensed table-hover" id="dataTables-clients">
+			<thead>
+				<tr>
+					<th class="text-center"></th>
+					<th>Name</th>
+					<th>Version</th>
+					<th class="visible-md visible-lg"></th>
+					<th class="visible-lg"></th>
+				</tr>
+			</thead>
+			<tbody>
+		        {% regroup catalog|dictsort:'display_name' by name as catalog_items %}
 				{% for item_name in catalog_items %}
 					{% with item_name.list|dictsortreversed:'version' as item_list %}
-					<a class='list-group-item' data-state="all" id='{{ item_name.grouper }}' href='#' onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
-						<img src='{{ item_list.0.icon_name }}' width="16" style="padding-bottom:4px;" />   {{ item_list.0.display_name }}
-					</a>
-					{% endwith %}
+		            <tr onclick="document.location = '{% url 'catalogs.views.item_detail' catalog_name item_list.0.index %}';" style="cursor: pointer">
+                    <td class="text-center">
+		                	<img src='{{ item_list.0.icon_name }}' width="20" />
+		                </td>
+		                <td>
+		                  {{ item_list.0.display_name }}
+		                </td>
+		                <td>{{ item_list.0.version }}</td>
+		                <td class='visible-md visible-lg'></td>
+		                <td class="visible-lg"></td>
+		            </tr>
+		            {% endwith %}
 				{% endfor %}
-			</div>
-		</div>
-		{% else %}
-		  <p>Catalog {{ catalog_name }} is empty.</p>
-		{% endif %}
+			</tbody>
+		</table>
+	</div>
+	{% else %}
+	<p>Catalog {{ catalog_name }} is empty.</p>
 	{% endif %}
-	</div>
-	<div class='col-md-8'>
-		<div id="catalog_item_detail">
-			{% for item_name in catalog_items %}
-			{% with item_name.list|dictsortreversed:'version' as item_list %}
-			<div class='softwareversion hidden' id='{{ item_name.grouper }}'>
-				<h3><img src='{{ item_list.0.icon_name }}' width="30" style="padding-bottom:5px;" /> {{ item_list.0.display_name }}</h3>
-				<div>
-					<ul class="nav nav-tabs" role="tablist">
-			  			{% for item in item_name.list|dictsortreversed:'version' %}
-							<li class="activetabs" id="{{ item.version }}"><a href="#" onClick="getCatalogItem('{{ catalog_name }}', '{{ item.index }}', '{{ item_name.grouper }}', '{{ item.version }}')">{{ item.version|wrappable }}</a></li>
-						{% endfor %}
-					</ul>
-				</div>
-			</div>
-			{% endwith %}
-			{% endfor %}
-			<div id='item_detail' class='item_detail'>
-			</div>
-			
-		</div>
-	</div>
-</div>
+{% endif %}
 {% endblock content %}
