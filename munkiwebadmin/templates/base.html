@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
     <head>
-        <meta content="text/html; charset=UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta content="text/html; charset=UTF-8" />
+		  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        {% load static %}
-		<!-- Bootstrap Core CSS -->
+      {% load static %}
+		  <!-- Bootstrap Core CSS -->
 	    <link href="{% get_static_prefix %}css/bootstrap.css" rel="stylesheet">
 	    <!-- BootstrapXL CSS -->
 	    <link href="{% get_static_prefix %}css/bootstrapxl.css" rel="stylesheet">
@@ -25,7 +25,7 @@
 	    <!-- Custom Fonts -->
 	    <link href="{% get_static_prefix %}font-awesome-4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-        {% block extra_style %}{% endblock %}
+      {% block extra_style %}{% endblock %}
 
 	    <!-- jQuery Version 1.11.0 -->
 	    <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
@@ -42,11 +42,11 @@
 	    <script src="{% get_static_prefix %}js/plugins/dataTables/dataTables.bootstrap.js"></script>
 	    <!-- Custom Theme JavaScript -->
 	    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
-		<!-- Typeahead fix -->
-        <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
-		<!-- Morris -->
-		<script src="{% get_static_prefix %}js/plugins/morris/morris.min.js"></script>
-		<script src="{% get_static_prefix %}js/plugins/morris/raphael.min.js"></script>
+		  <!-- Typeahead fix -->
+      <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
+		  <!-- Morris -->
+	    <script src="{% get_static_prefix %}js/plugins/morris/morris.min.js"></script>
+		  <script src="{% get_static_prefix %}js/plugins/morris/raphael.min.js"></script>
 	    <!-- Flot Charts JavaScript -->
 	    <script src="{% get_static_prefix %}js/plugins/flot/excanvas.min.js"></script>
 	    <script src="{% get_static_prefix %}js/plugins/flot/jquery.flot.js"></script>
@@ -60,155 +60,157 @@
 	    <script src="{% get_static_prefix %}js/webadmin.js"></script>
 
 	    <link rel="shortcut icon" href="{% get_static_prefix %}img/favicon.ico" />
-        <title>MunkiWebAdmin</title>
+      <title>MunkiWebAdmin</title>
 	    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	    <!--[if lt IE 9]>
 	        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 	        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 	    <![endif]-->
-    </head>
-    {% block body_tag %}
-    <body>{% endblock %}
-		<div id="wrapper">
-			 {% block main_menu %}
-			<!-- Navigation -->
-			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-	            <div class="navbar-header">
-	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-	                    <span class="sr-only">Toggle navigation</span>
-	                    <span class="icon-bar"></span>
-	                    <span class="icon-bar"></span>
-	                    <span class="icon-bar"></span>
-	                </button>
-	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;"><img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
-	                {% block page_title %}{% endblock %}
-		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
-						<li style="padding-top:7px;">
-	                		<i id="imgProgress" class="fa fa-spinner fa-pulse fa-lg" style="display: none; color:#777;"></i>
-	                	</li>
-	                	<li style="margin-top:-10px;">
-	                		{% block navbar-default_extensions %}{% endblock %}
-	                	</li>
-		            </ul>
-	            </div>
+      </head>
 
-	            <ul class="nav navbar-right top-nav">
-	            	{% block navbar-top_extensions %}{% endblock %}
-	                <li class="dropdown">
-	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
-	                        <i class="glyphicon glyphicon-user"></i> {{ user.username }}  <i class="fa fa-caret-down"></i>
-	                    </a>
-	                    <ul class="dropdown-menu" id="userpanel">
-	                    	{% if user.is_staff %}
-	                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
-	                        <li class="divider"></li>
-	                        {% endif %}
-	                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>logout</a></li>
-                          <li class="divider"></li>
-                          <li><a>{{ webadmin_version }}</a></li>
-	                    </ul>
-	                </li>
-	                <li class="sidebar-search hidden-sm hidden-md hidden-lg" style="padding-top:8px;">
-		            	<input type="text" class="form-control dropdown-toggle" id="SearchFieldMobile" autocomplete="off" data-provide="typeahead" data-source='{% block data-source-mobile %}{% endblock %}' data-items="4" placeholder="Search...">
-		            </li>
-	            </ul>
+      {% block body_tag %}
+      <body>
+      {% endblock %}
+		      <div id="wrapper">
+			    {% block main_menu %}
+			       <!-- Navigation -->
+             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  	            <div class="navbar-header">
+  	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+  	                    <span class="sr-only">Toggle navigation</span>
+  	                    <span class="icon-bar"></span>
+  	                    <span class="icon-bar"></span>
+  	                    <span class="icon-bar"></span>
+  	                </button>
+  	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;"><img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
+  	                {% block page_title %}{% endblock %}
+    		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
+          						<li style="padding-top:7px;">
+    	                		<i id="imgProgress" class="fa fa-spinner fa-pulse fa-lg" style="display: none; color:#777;"></i>
+  	                	</li>
+  	                	<li style="margin-top:-10px;">
+    	                		{% block navbar-default_extensions %}{% endblock %}
+  	                	</li>
+    		            </ul>
+                  </div>
 
-	            <div class="collapse navbar-collapse navbar-ex1-collapse" role="navigation">
+                  <ul class="nav navbar-right top-nav">
+                    {% block navbar-top_extensions %}{% endblock %}
+                    <li class="dropdown">
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
+                        <i class="glyphicon glyphicon-user"></i> {{ user.username }}  <i class="fa fa-caret-down"></i>
+                      </a>
+                      <ul class="dropdown-menu" id="userpanel">
+                        {% if user.is_staff %}
+                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+                        <li class="divider"></li>
+                        {% endif %}
+                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>logout</a></li>
+                        <li class="divider"></li>
+                        <li><a>{{ webadmin_version }}</a></li>
+                      </ul>
+                    </li>
+                    <li class="sidebar-search hidden-sm hidden-md hidden-lg" style="padding-top:8px;">
+                    	<input type="text" class="form-control dropdown-toggle" id="SearchFieldMobile" autocomplete="off" data-provide="typeahead" data-source='{% block data-source-mobile %}{% endblock %}' data-items="4" placeholder="Search...">
+                    </li>
+                  </ul>
+
+    	            <div class="collapse navbar-collapse navbar-ex1-collapse" role="navigation">
                     <ul class="nav navbar-nav side-nav" id="side-menu">
-                    	<li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
-	                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
-	                	</li>
-	                	{% if perms.reports.can_view_dashboard %}
-						<li {% if page == 'dashboard' %} class="active" {% endif %} >
-                            <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard fa-fw"></i> Dashboard</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.reports.can_view_reports %}
-                        {% if business_units_enabled %}
-                        <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a><i class="fa fa-building-o fa-fw"></i> Business Units <i class="fa fa-fw fa-caret-down"></i></a>
-	                        <ul id="computers" class="collapse in">
-	                            {% for business_unit in business_units %}
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
-	                            </li>
-	                            {% endfor %}
-	                        </ul>
-                        </li>
-                        {% else %}
-                        <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
-	                        <ul id="computers" class="collapse in">
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop fa-fw"></i> Mac</a>
-	                            </li>
-	                            <li>
-	                                <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-fw"></i> Virtual Machine</a>
-	                            </li>
-	                        </ul>
-                        </li>
-                        {% endif %}
-                        {% endif %}
-                        {% if perms.catalogs.can_view_catalogs %}
-                        <li {% if page == 'catalogs' %} class="active" {% endif %}>
-                            <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.manifests.can_view_manifests %}
-                        <li {% if page == 'manifests' %} class="active" {% endif %}>
-                            <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.inventory.can_view_inventory %}
-                        <li {% if page == 'inventory' %} class="active" {% endif %}>
-                            <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
-                        </li>
-                        {% endif %}
-                        {% if perms.licenses.can_view_licenses %}
-                        <li {% if page == 'licenses' %} class="active" {% endif %}>
-                            <a href="{% url 'licenses.views.index' %}"><i class="fa fa-file-text-o fa-fw"></i> Licenses</a>
-                        </li>
-                        {% endif %}
+                      <li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
+                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
+                      </li>
+  	                	{% if perms.reports.can_view_dashboard %}
+                      <li {% if page == 'dashboard' %} class="active" {% endif %} >
+                        <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard fa-fw"></i> Dashboard</a>
+                      </li>
+                      {% endif %}
+                      {% if perms.reports.can_view_reports %}
+                      {% if business_units_enabled %}
+                      <li {% if page == 'reports' %} class="active" {% endif %}>
+                        <a><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span><i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="computers" class="collapse in">
+                          {% for business_unit in business_units %}
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                      </li>
+                      {% else %}
+                      <li {% if page == 'reports' %} class="active" {% endif %}>
+                        <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="computers" class="collapse in">
+                          <li>
+                            <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop fa-fw"></i> Mac</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-fw"></i> Virtual Machine</a>
+                          </li>
+                        </ul>
+                      </li>
+                      {% endif %}
+                      {% endif %}
+                      {% if perms.catalogs.can_view_catalogs %}
+                      <li {% if page == 'catalogs' %} class="active" {% endif %}>
+                        <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
+                      </li>
+                      {% endif %}
+                      {% if perms.manifests.can_view_manifests %}
+                      <li {% if page == 'manifests' %} class="active" {% endif %}>
+                        <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
+                      </li>
+                      {% endif %}
+                      {% if perms.inventory.can_view_inventory %}
+                      <li {% if page == 'inventory' %} class="active" {% endif %}>
+                        <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
+                      </li>
+                      {% endif %}
+                      {% if perms.licenses.can_view_licenses %}
+                      <li {% if page == 'licenses' %} class="active" {% endif %}>
+                        <a href="{% url 'licenses.views.index' %}"><i class="fa fa-file-text-o fa-fw"></i> Licenses</a>
+                      </li>
+                      {% endif %}
                     </ul>
-	            </div>
-	        </nav>
-        	{% endblock %}
+                  </div>
+                </nav>
+                {% endblock %}
 
-			<!-- Page Content -->
-        	<div id="page-wrapper">
-        		<div class="container-fluid">
-            	{% block content %}{% endblock %}
-            	</div>
-        	</div>
+                <!-- Page Content -->
+                <div id="page-wrapper">
+                  <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                  </div>
+                </div>
 
-        	<div style="position:absolute; top:10px; right:0px; z-index:2000;">
-	        	<ul class="dropdown-menu">
-		            <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
-		            <li class="divider"></li>
-		            <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
-	        	</ul>
-       		</div>
-        	<div id="footer">
-            	<div class="clearingdiv"></div>
-        	</div>
-		</div>
-		<script>
-		window.onload = function() {
-			windowload();
-		};
-		</script>
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		  <div class="modal-dialog modal-sm">
-		    <div class="modal-content">
-		    </div>
-		  </div>
-		</div>
-    </body>
+                <div style="position:absolute; top:10px; right:0px; z-index:2000;">
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
+                  </ul>
+                </div>
+                <div id="footer">
+                  <div class="clearingdiv"></div>
+                </div>
+              </div>
+              <script>
+                  window.onload = function() {
+                    windowload();
+                  };
+              </script>
+              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                  <div class="modal-content">
+                  </div>
+                </div>
+              </div>
+      </body>
 </html>
