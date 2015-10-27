@@ -10,6 +10,7 @@ import fnmatch
 
 from django.conf import settings
 from django.db import models
+from itertools import groupby
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 STATIC_URL = settings.STATIC_URL
@@ -52,6 +53,8 @@ class Catalog(object):
                 for item in catalog_items:
                     item['index'] = index
                     index += 1
+
+                print catalog_items
                 return catalog_items
             except Exception, errmsg:
                 return None
@@ -72,7 +75,6 @@ class Catalog(object):
                 return None
         else:
             return None
-
 
     @classmethod
     def getValidInstallItems(self, catalog_list):
@@ -105,6 +107,7 @@ class Catalog(object):
 class Catalogs(models.Model):
     class Meta:
             permissions = (("can_view_catalogs", "Can view catalogs"),)
+<<<<<<< HEAD
 
 #--------------------------
 
@@ -408,3 +411,5 @@ class Packages(object):
 class Pkgs(models.Model):
     class Meta:
         permissions = (("can_view_pkgs", "Can view packages"),)
+=======
+>>>>>>> origin/master
