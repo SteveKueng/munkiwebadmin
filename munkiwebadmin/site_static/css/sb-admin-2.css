@@ -291,3 +291,7 @@ ul.alert-dropdown {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+#computers>li {
+  border-top: 1px solid #e7e7e7;
+}

@@ -29,8 +29,8 @@ def nameAndVersion(aString):
                 return (name, vers)
 
     return (aString, '')
-    
-    
+
+
 def trimVersionString(version_string):
     ### from munkilib.updatecheck
     """Trims all lone trailing zeros in the version string after major/minor.
@@ -51,12 +51,12 @@ def trimVersionString(version_string):
 
 
 @login_required
-@permission_required('catalogs.can_view_catalogs', login_url='/login/')                             
+@permission_required('catalogs.can_view_catalogs', login_url='/login/')
 def item_detail(request, catalog_name, item_index):
     catalog_item = Catalog.item_detail(catalog_name, item_index)
-    featured_keys = ['name', 'version', 'display_name', 
+    featured_keys = ['name', 'version', 'display_name',
                      'description', 'catalogs', 'icon_name']
-    
+
     # get icon
     if not "icon_name" in catalog_item:
         catalog_item["icon_name"] = ""
@@ -76,7 +76,6 @@ def item_detail(request, catalog_name, item_index):
     c = RequestContext(request,{'catalog_item': sorted_dict})
     c.update(csrf(request))
     return render_to_response('catalogs/item_detail.html', c)
-                              
 
 @login_required
 @permission_required('catalogs.can_view_catalogs', login_url='/login/')
@@ -97,7 +96,7 @@ def catalog_view(request, catalog_name=None, item_index=None):
         if 'display_name' not in item:
             item['display_name'] = item['name']
         if item.display_name not in catalog_items:
-            catalog_items.append(item.display_name) 
+            catalog_items.append(item.display_name)
     catalog_items_json = json.dumps(catalog_items)
 
     if item_index:

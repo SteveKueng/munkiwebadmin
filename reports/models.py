@@ -10,9 +10,9 @@ from django.contrib.auth.models import User, Group
 class BusinessUnit(models.Model):
     hash = models.CharField(max_length=36, default=uuid4, primary_key=True, unique=True)
     name = models.CharField(max_length=30, unique=True)
-    
+
     class Meta:
-        permissions = (("can_view_businessunit", "Can view business unit"),)   
+        permissions = (("can_view_businessunit", "Can view business unit"),)
 
     def machines(self):
         return Machine.objects.filter(businessunit=self).count()
@@ -53,19 +53,19 @@ class MunkiReport(models.Model):
         ordering = ['machine']
         permissions = (("can_view_reports", "Can view reports"),
                        ("can_view_dashboard", "Can view dashboard"),)
-        
+
     def hostname(self):
         return self.machine.hostname
-        
+
     def mac(self):
         return self.machine.mac
-    
+
     def encode(self, plist):
         string = plistlib.writePlistToString(plist)
         bz2data = bz2.compress(string)
         b64data = base64.b64encode(bz2data)
         return b64data
-        
+
     def decode(self, data):
         # this has some sucky workarounds for odd handling
         # of UTF-8 data in sqlite3
@@ -81,7 +81,7 @@ class MunkiReport(models.Model):
                     return self.b64bz_decode(data)
                 except:
                     return dict()
-        
+
     def b64bz_decode(self, data):
         try:
             bz2data = base64.b64decode(data)
@@ -90,13 +90,13 @@ class MunkiReport(models.Model):
             return plist
         except Exception:
             return {}
-        
+
     def get_report(self):
         return self.decode(self.report)
-        
+
     def get_activity(self):
         return self.decode(self.activity)
-        
+
     def update_report(self, base64bz2report):
         # Save report.
         try:
@@ -114,7 +114,7 @@ class MunkiReport(models.Model):
             self.warnings = 0
             self.console_user = "<None>"
             return
-        
+
         # Check activity.
         activity = dict()
         for section in ("ItemsToInstall",
@@ -129,18 +129,18 @@ class MunkiReport(models.Model):
             self.activity = plistlib.writePlistToString(activity)
         else:
             self.activity = None
-        
+
         # Check errors and warnings.
         if "Errors" in plist:
             self.errors = len(plist["Errors"])
         else:
             self.errors = 0
-        
+
         if "Warnings" in plist:
             self.warnings = len(plist["Warnings"])
         else:
             self.warnings = 0
-        
+
         # Check console user.
         self.console_user = "unknown"
         if "ConsoleUser" in plist:

@@ -15,7 +15,9 @@ REPO_DIR = settings.MUNKI_REPO_DIR
 STATIC_URL = settings.STATIC_URL
 MEDIA_URL = settings.MEDIA_URL
 ICONS_DIR = settings.ICONS_DIR
-
+APPNAME = settings.APPNAME
+#DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
+DEFAULT_MAKECATALOGS=""
 class Catalog(object):
     @classmethod
     def list(self):
@@ -104,17 +106,9 @@ class Catalogs(models.Model):
     class Meta:
             permissions = (("can_view_catalogs", "Can view catalogs"),)
 
+#--------------------------
 
 
-
-
-
-
-logger = logging.getLogger(__name__)
-
-APPNAME = settings.APPNAME
-DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
-REPO_DIR = settings.MUNKI_REPO_DIR
 
 def fail(message):
     sys.stderr.write(message)
