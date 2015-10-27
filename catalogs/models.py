@@ -107,7 +107,6 @@ class Catalog(object):
 class Catalogs(models.Model):
     class Meta:
             permissions = (("can_view_catalogs", "Can view catalogs"),)
-<<<<<<< HEAD
 
 #--------------------------
 
@@ -411,5 +410,3 @@ class Packages(object):
 class Pkgs(models.Model):
     class Meta:
         permissions = (("can_view_pkgs", "Can view packages"),)
-=======
->>>>>>> origin/master
