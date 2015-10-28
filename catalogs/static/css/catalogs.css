@@ -43,3 +43,44 @@ td.code {
 .table > tbody > tr:first-child > th {
     border: none;
 }
+
+.item_input {
+  width: 100%;
+  border: none;
+}
+
+.block {
+  color: #000;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  background: inherit;
+  position: relative;
+}
+
+.block:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    -webkit-filter: blur(10px) saturate(2);
+}
+
+.title {
+    font-size: 1.4em;
+    font-weight: 300;
+    color: #222;
+    padding: 8px;
+    background: rgba(235,235,235,0.85);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.content {
+    padding: 8px;
+    background: rgba(255,255,255,0.66);
+}

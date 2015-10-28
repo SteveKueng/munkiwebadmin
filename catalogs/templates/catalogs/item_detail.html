@@ -8,6 +8,18 @@
             {# list of dicts #}
             <tr><th scope="row">{{ key }}</th>
             <td>{% include "catalogs/dict_list.html" with dict_list=value only %}</td></tr>
+        {% elif 'catalogs' in key %}
+          {# list of strings #}
+          <tr><th scope="row">{{ key }}</th>
+          <td>
+              {% for item in catalogs %}
+                    <label class="checkbox-inline">
+                      <input type="checkbox" value="" {% if item in value %}checked{% endif %}>
+                      {{ item }}
+                    </label>
+                  {% if not forloop.last %}<br />{% endif %}
+              {% endfor %}
+          </td></tr>
         {% else %}
             {# list of strings #}
             <tr><th scope="row">{{ key }}</th>
@@ -24,10 +36,23 @@
     {% elif '_script' in key %}
         {# special case: show scripts in monospaced font #}
         <tr><th scope="row">{{ key }}</th><td class="code">{{ value }}</td></tr>
-    {% elif 'icon_path' in key %}
+
+
+    {% elif 'description' in key %}
+      {# textarea for description #}
+      <tr><th scope="row">{{ key }}</th><td><textarea class="item_input" rows="3">{{ value }}</textarea></td></tr>
+
     {% else %}
-        {# regular scalar value #}
-        <tr><th scope="row">{{ key }}</th><td>{{ value }}</td></tr>
+      {# regular scalar value #}
+        <tr><th scope="row">{{ key }}</th><td>
+        {% if value == True %}
+        <input type="checkbox" value="" checked>
+        {% elif value == False %}
+        <input type="checkbox" value="">
+        {% else %}
+        {% if key in editable %}<input class="item_input" value="{{ value }}"></input>{% else %}{{ value }}{% endif %}
+        {% endif %}
+        </td></tr>
     {% endif %}
 {% endfor %}
 

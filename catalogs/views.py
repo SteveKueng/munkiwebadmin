@@ -57,6 +57,9 @@ def item_detail(request, catalog_name, item_index):
     featured_keys = ['name', 'version', 'display_name',
                      'description', 'catalogs', 'icon_name']
 
+    catalog_list = Catalog.list()[1:]
+    editable =['version', 'display_name','category', 'developer', 'catalogs', 'icon_name']
+
     # get icon
     if not "icon_name" in catalog_item:
         catalog_item["icon_name"] = ""
@@ -73,7 +76,9 @@ def item_detail(request, catalog_name, item_index):
         if key not in featured_keys:
             sorted_dict[key] = catalog_item[key]
 
-    c = RequestContext(request,{'catalog_item': sorted_dict})
+    c = RequestContext(request,{'catalog_item': sorted_dict,
+                                'editable': editable,
+                                'catalogs': catalog_list})
     c.update(csrf(request))
     return render_to_response('catalogs/item_detail.html', c)
 

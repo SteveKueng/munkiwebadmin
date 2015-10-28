@@ -109,11 +109,6 @@ class Catalogs(models.Model):
 #--------------------------
 
 
-
-def fail(message):
-    sys.stderr.write(message)
-    sys.exit(1)
-
 def execute(command):
     popen = subprocess.Popen(command, stdout=subprocess.PIPE)
     lines_iterator = iter(popen.stdout.readline, b"")
@@ -228,9 +223,9 @@ class MunkiPkgGit:
         """Commits a file to the Git repo."""
         self.__chdirToMatchPath(aPath)
         self.runGit(['add', aPath])
-#         We don't really need to commit each file individually, except during debugging
-#         if self.results['returncode'] == 0:
-#             self.commitFileAtPathForCommitter(aPath, aCommitter)
+        #         We don't really need to commit each file individually, except during debugging
+        #         if self.results['returncode'] == 0:
+        #             self.commitFileAtPathForCommitter(aPath, aCommitter)
 
     def addMakeCatalogsForCommitter(self, aCommitter):
         """Commits the updated catalogs to the Git repo."""
@@ -251,7 +246,7 @@ class MunkiPkgGit:
 
 
 
-# Read contents of all pkginfo files. This is done by reading the contents of catalogs/all
+        # Read contents of all pkginfo files. This is done by reading the contents of catalogs/all
 
 class Packages(object):
     @classmethod
