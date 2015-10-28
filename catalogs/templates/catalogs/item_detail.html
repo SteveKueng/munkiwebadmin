@@ -1,12 +1,7 @@
-{% extends 'base.html' %}
 {% load catalog_extras %}
 
-<!-- page title -->
-{% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
-
-{% block content %}
-
 <table class='table table-condensed'>
+
 {% for key, value in catalog_item.items %}
     {% if value|type_is:'array' %}
         {% if value.0|type_is:'dictionary' %}
@@ -35,5 +30,5 @@
         <tr><th scope="row">{{ key }}</th><td>{{ value }}</td></tr>
     {% endif %}
 {% endfor %}
+
 </table>
-{% endblock content %}
