@@ -91,7 +91,7 @@ function getCatalogItem(catalog_name, catalog_index, item_name, item_version)   
 
 		$('#lgModal').children().children().append($('.modal-footer').detach())
 		$('.modal-footer').removeClass('hidden');
-
+		CKEDITOR.replace( 'editor1' );
 		// launch modal / backdrop dosn't close on klick
 		$('#lgModal').modal({ backdrop: "static" })
 }

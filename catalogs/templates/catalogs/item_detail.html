@@ -40,7 +40,7 @@
 
     {% elif 'description' in key %}
       {# textarea for description #}
-      <tr><th scope="row">{{ key }}</th><td><textarea class="item_input" rows="3">{{ value }}</textarea></td></tr>
+      <tr><th scope="row">{{ key }}</th><td><textarea class="item_input" name="editor1" id="editor1" rows="3">{{ value }}</textarea></td></tr>
 
     {% else %}
       {# regular scalar value #}
