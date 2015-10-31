@@ -7,3 +7,4 @@ unused_*
 *.db
 *.pkg
 *.bak
+munkiwebadmin/static
