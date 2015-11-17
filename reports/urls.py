@@ -9,9 +9,10 @@ urlpatterns = patterns('reports.views',
     url(r'^detailmachine/(?P<serial>[^/]+)$', 'machine_detail'),
     url(r'^appleupdate/(?P<serial>[^/]+)$', 'appleupdate'),
     url(r'^raw/(?P<serial>[^/]+)$', 'raw'),
+    url(r'^name/(?P<serial>[^/]+)$', 'getname'),
     url(r'^submit/(?P<submission_type>[^/]+)$', 'submit'),
     url(r'^warranty/(?P<serial>[^/]+)$', 'warranty'),
-   
+
     # for compatibilty with MunkiReport scripts
     url(r'^ip$', 'lookup_ip'),
     url(r'^(?P<submission_type>[^/]+)$', 'submit'),

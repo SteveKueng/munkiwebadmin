@@ -55,14 +55,23 @@ def trimVersionString(version_string):
 def item_detail(request, catalog_name, item_index):
     catalog_item = Catalog.item_detail(catalog_name, item_index)
     featured_keys = ['name', 'version', 'display_name',
-                     'description', 'catalogs', 'icon_name']
+                     'description', 'catalogs', 'icon_name',
+                     'category', 'developer', 'installcheck_script',
+                     'preinstall_script', 'postinstall_script',
+                     'preuninstall_script', 'postuninstall_script',
+                     'uninstalll_script']
 
     catalog_list = Catalog.list()[1:]
-    editable =['version', 'display_name','category', 'developer', 'catalogs', 'icon_name']
+    editable =['version', 'display_name','category', 'developer',
+                'catalogs', 'icon_name', 'installcheck_script',
+                'preinstall_script', 'postinstall_script',
+                'preuninstall_script', 'postuninstall_script',
+                'uninstalll_script']
 
-    # get icon
-    if not "icon_name" in catalog_item:
-        catalog_item["icon_name"] = ""
+
+    for item in featured_keys:
+        if not item in catalog_item:
+            catalog_item[item] = ""
 
     # sort the item by key so keys are displayed
     # in expected order
@@ -127,3 +136,14 @@ def catalog_view(request, catalog_name=None, item_index=None):
                                 'page': 'catalogs'})
     c.update(csrf(request))
     return render_to_response('catalogs/catalog.html', c)
+
+@login_required
+def save_pkginfo(request):
+    if request.method == 'POST': # If the form has been submitted...
+        pkg_info = request.body # get pkginfo from post
+        pkg_info = json.loads(pkg_info) # convert to python dict
+        if Catalog.save_pkginfo(pkg_info['name'], pkg_info['version'], pkg_info, ""):
+            return HttpResponse("OK!")
+        else:
+            return HttpResponse("Error!")
+    return HttpResponse("No form submitted.\n")

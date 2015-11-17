@@ -18,6 +18,7 @@ ICONS_DIR = settings.ICONS_DIR
 APPNAME = settings.APPNAME
 #DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
 DEFAULT_MAKECATALOGS=""
+
 class Catalog(object):
     @classmethod
     def list(self):
@@ -102,9 +103,170 @@ class Catalog(object):
         else:
             return default_icon
 
+    @classmethod
+    def makecatalogs(self, committer):
+        task = execute([MAKECATALOGS, REPO_DIR])
+        if GIT:
+            git = MunkiPkgGit()
+            git.addMakeCatalogsForCommitter(committer)
+
+
+    @classmethod
+    def move_pkg(self, pkg_name, pkg_version, pkg_catalog, committer):
+        '''Rewrites the catalog of the selected pkginfo files. Adapted from grahamgilbert/munki-trello'''
+        done = False
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
+            for name in files:
+                # Try, because it's conceivable there's a broken / non plist
+                plist = None
+                try:
+                    plist = plistlib.readPlist(os.path.join(root, name))
+                except:
+                    pass
+                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
+                    plist['catalogs'] = [pkg_catalog]
+                    plistlib.writePlist(plist, os.path.join(root, name))
+                    if GIT:
+                        git = MunkiPkgGit()
+                        git.addFileAtPathForCommitter(os.path.join(root, name), committer)
+                    done = True
+                    break
+            if done:
+                break
+
+    @classmethod
+    def add_catalog(self, pkg_name, pkg_version, pkg_orig, pkg_catalog, committer):
+        '''Appends the catalog of the selected pkginfo files.'''
+        done = False
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
+            for name in files:
+                plist = None
+                # Try, because it's conceivable there's a broken / non plist
+                try:
+                    plist = plistlib.readPlist(os.path.join(root, name))
+                except:
+                    pass
+                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
+                    # Check that the catalog is not already in this plist
+                    if pkg_catalog not in plist['catalogs']:
+                        plist['catalogs'].append(pkg_catalog)
+                        plistlib.writePlist(plist, os.path.join(root, name))
+                        if GIT:
+                            git = MunkiPkgGit()
+                            git.addFileAtPathForCommitter(os.path.join(root, name), committer)
+                    done = True
+                    break
+            if done:
+                break
+
+    @classmethod
+    def remove_catalog(self, pkg_name, pkg_version, pkg_orig, committer):
+        '''Removes the selected catalog from the pkginfo files.'''
+        done = False
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
+            for name in files:
+                # Try, because it's conceivable there's a broken / non plist
+                plist = None
+                try:
+                    plist = plistlib.readPlist(os.path.join(root, name))
+                except:
+                    pass
+                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
+                    current_catalogs = plist['catalogs']
+                    # Try to remove this catalog from the array if it exists
+                    try:
+                        plist['catalogs'].remove(pkg_orig)
+                    except:
+                        pass
+                    plistlib.writePlist(plist, os.path.join(root, name))
+                    if GIT:
+                        git = MunkiPkgGit()
+                        git.addFileAtPathForCommitter(os.path.join(root, name), committer)
+                    done = True
+                    break
+            if done:
+                break
+
+    @classmethod
+    def delete_pkgs(self, pkg_name, pkg_version, committer):
+        '''Deletes a package and its associated pkginfo file, then induces makecatalogs'''
+        logger.info("pkg_name: %s; pkg_version: %s" % (pkg_name, pkg_version))
+        done_delete = False
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
+            for name in files:
+                # Try, because it's conceivable there's a broken / non plist
+                plist = None
+                try:
+                    plist = plistlib.readPlist(os.path.join(root, name))
+                except:
+                    pass
+                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
+                    pkg_to_delete = plist['installer_item_location']
+                    if not GIT:
+                        try:
+                            os.remove(os.path.join(root, name))
+                        except OSError as e:
+                            logger.info("This failed to delete: %s" % (name))
+                        try:
+                            os.remove(os.path.join(REPO_DIR,'pkgs',pkg_to_delete))
+                        except OSError as e:
+                            logger.info("This failed to delete: %s" % (name))
+                    else:
+                        git = MunkiPkgGit()
+                        git.deleteFileAtPathForCommitter(
+                                os.path.join(root, name), committer)
+                        if settings.GIT_IGNORE_PKGS:
+                            try:
+                                os.remove(os.path.join(REPO_DIR,'pkgs',pkg_to_delete))
+                            except OSError as e:
+                                logger.info("This failed to delete: %s" % (name))
+                        else:
+                            git.deleteFileAtPathForCommitter(
+                                    os.path.join(REPO_DIR,'pkgs',pkg_to_delete), committer)
+                    done_delete = True
+                    break
+            if done_delete:
+                break
+
+    @classmethod
+    def save_pkginfo(self, pkg_name, pkg_version, pkg_info, committer):
+        '''writes pkginfo'''
+        done = False
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
+            for name in files:
+                plist = None
+                # Try, because it's conceivable there's a broken / non plist
+                try:
+                    plist = plistlib.readPlist(os.path.join(root, name))
+                except:
+                    pass
+                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
+                    for key in pkg_info:
+                        if pkg_info[key]:
+                            plist[key] = pkg_info[key]
+                        else:
+                            try:
+                                del plist[key]
+                            except KeyError:
+                                pass
+
+                    plistlib.writePlist(plist, os.path.join(root, name))
+                    if GIT:
+                        git = MunkiPkgGit()
+                        git.addFileAtPathForCommitter(os.path.join(root, name), committer)
+
+                    done = True
+                    break
+            if done:
+                break
+        return done
+
 class Catalogs(models.Model):
     class Meta:
             permissions = (("can_view_catalogs", "Can view catalogs"),)
+
+
+
 
 #--------------------------
 
@@ -247,159 +409,3 @@ class MunkiPkgGit:
 
 
         # Read contents of all pkginfo files. This is done by reading the contents of catalogs/all
-
-class Packages(object):
-    @classmethod
-    def detail(self, findtext):
-        '''Returns a list of available pkgs, which is a list
-        of pkg names (strings)'''
-        all_catalog_path = os.path.join(REPO_DIR, 'catalogs/all')
-        if os.path.exists(all_catalog_path):
-            try:
-                all_catalog_items = plistlib.readPlist(all_catalog_path)
-                all_catalog_items = sorted(all_catalog_items, key=lambda x: (x['name'].lower(), x['version']))
-                index = 0
-                for item in all_catalog_items:
-                    item['index'] = index
-                    index += 1
-                if findtext:
-                    filtered_list = []
-                    for item in all_catalog_items:
-                        if fnmatch.fnmatch(item['name'].lower(), findtext.lower()):
-                            filtered_list.append(item)
-                    return filtered_list
-                else:
-                    return all_catalog_items
-            except Exception, errmsg:
-                return None
-        else:
-            return None
-
-    @classmethod
-    def move(self, pkg_name, pkg_version, pkg_catalog, committer):
-        '''Rewrites the catalog of the selected pkginfo files. Adapted from grahamgilbert/munki-trello'''
-        done = False
-        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
-            for name in files:
-                # Try, because it's conceivable there's a broken / non plist
-                plist = None
-                try:
-                    plist = plistlib.readPlist(os.path.join(root, name))
-                except:
-                    pass
-                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
-                    plist['catalogs'] = [pkg_catalog]
-                    plistlib.writePlist(plist, os.path.join(root, name))
-                    if GIT:
-                        git = MunkiPkgGit()
-                        git.addFileAtPathForCommitter(os.path.join(root, name), committer)
-                    done = True
-                    break
-            if done:
-                break
-
-    @classmethod
-    def add(self, pkg_name, pkg_version, pkg_orig, pkg_catalog, committer):
-        '''Appends the catalog of the selected pkginfo files.'''
-        done = False
-        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
-            for name in files:
-                plist = None
-                # Try, because it's conceivable there's a broken / non plist
-                try:
-                    plist = plistlib.readPlist(os.path.join(root, name))
-                except:
-                    pass
-                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
-                    # Check that the catalog is not already in this plist
-                    if pkg_catalog not in plist['catalogs']:
-                        plist['catalogs'].append(pkg_catalog)
-                        plistlib.writePlist(plist, os.path.join(root, name))
-                        if GIT:
-                            git = MunkiPkgGit()
-                            git.addFileAtPathForCommitter(os.path.join(root, name), committer)
-                    done = True
-                    break
-            if done:
-                break
-
-    @classmethod
-    def remove(self, pkg_name, pkg_version, pkg_orig, committer):
-        '''Removes the selected catalog from the pkginfo files.'''
-        done = False
-        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
-            for name in files:
-                # Try, because it's conceivable there's a broken / non plist
-                plist = None
-                try:
-                    plist = plistlib.readPlist(os.path.join(root, name))
-                except:
-                    pass
-                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
-                    current_catalogs = plist['catalogs']
-                    # Try to remove this catalog from the array if it exists
-                    try:
-                        plist['catalogs'].remove(pkg_orig)
-                    except:
-                        pass
-                    plistlib.writePlist(plist, os.path.join(root, name))
-                    if GIT:
-                        git = MunkiPkgGit()
-                        git.addFileAtPathForCommitter(os.path.join(root, name), committer)
-                    done = True
-                    break
-            if done:
-                break
-
-    @classmethod
-    def delete_pkgs(self, pkg_name, pkg_version, committer):
-        '''Deletes a package and its associated pkginfo file, then induces makecatalogs'''
-        logger.info("pkg_name: %s; pkg_version: %s" % (pkg_name, pkg_version))
-        done_delete = False
-        for root, dirs, files in os.walk(os.path.join(REPO_DIR,'pkgsinfo'), topdown=False):
-            for name in files:
-                # Try, because it's conceivable there's a broken / non plist
-                plist = None
-                try:
-                    plist = plistlib.readPlist(os.path.join(root, name))
-                except:
-                    pass
-                if plist and plist['name'] == pkg_name and plist['version'] == pkg_version:
-                    pkg_to_delete = plist['installer_item_location']
-                    if not GIT:
-                        try:
-                            os.remove(os.path.join(root, name))
-                        except OSError as e:
-                            logger.info("This failed to delete: %s" % (name))
-                        try:
-                            os.remove(os.path.join(REPO_DIR,'pkgs',pkg_to_delete))
-                        except OSError as e:
-                            logger.info("This failed to delete: %s" % (name))
-                    else:
-                        git = MunkiPkgGit()
-                        git.deleteFileAtPathForCommitter(
-                                os.path.join(root, name), committer)
-                        if settings.GIT_IGNORE_PKGS:
-                            try:
-                                os.remove(os.path.join(REPO_DIR,'pkgs',pkg_to_delete))
-                            except OSError as e:
-                                logger.info("This failed to delete: %s" % (name))
-                        else:
-                            git.deleteFileAtPathForCommitter(
-                                    os.path.join(REPO_DIR,'pkgs',pkg_to_delete), committer)
-                    done_delete = True
-                    break
-            if done_delete:
-                break
-
-    @classmethod
-    def makecatalogs(self, committer):
-        task = execute([MAKECATALOGS, REPO_DIR])
-        if GIT:
-            git = MunkiPkgGit()
-            git.addMakeCatalogsForCommitter(committer)
-
-
-class Pkgs(models.Model):
-    class Meta:
-        permissions = (("can_view_pkgs", "Can view packages"),)

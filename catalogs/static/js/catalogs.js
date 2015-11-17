@@ -52,6 +52,7 @@ $(document).ready(function() {
 	});
 });
 
+// functions
 function sideSecific() {
 }
 
@@ -70,7 +71,7 @@ function setview(view) {
 	$('#' + view2).removeClass('open');
 }
 
-function getCatalogItem(catalog_name, catalog_index, item_name, item_version)     {
+function getCatalogItem(catalog_name, catalog_index, item_name, item_version) {
     var catalogItemURL = '/catalog/' + catalog_name + '/' + catalog_index + '/';
     $.get(catalogItemURL, function(data) {
         $('#item_detail').html(data);
@@ -85,13 +86,51 @@ function getCatalogItem(catalog_name, catalog_index, item_name, item_version)   
 		$('.activetabs[id!="' + item_version + '"]').removeClass('active');
 		$('.nav-tabs').tabdrop('layout');
 
-		$('#lgModal').children().children().append($('.modal-body').detach())
+		$('#lgModal').children().children().append($('.modal-body').detach());
 		$('.list-group-item[id="' + item_name + '"]').addClass('active');
     $('.list-group-item[id!="' + item_name + '"]').removeClass('active');
 
-		$('#lgModal').children().children().append($('.modal-footer').detach())
+		$('#lgModal').children().children().append($('.modal-footer').detach());
 		$('.modal-footer').removeClass('hidden');
-		CKEDITOR.replace( 'editor1' );
+
 		// launch modal / backdrop dosn't close on klick
-		$('#lgModal').modal({ backdrop: "static" })
+		$('#lgModal').modal({ backdrop: "static" });
+}
+
+function savePkgInfo() {
+	//alert("test");
+	var obj = new Object();
+	$( ".pkginfo_strings" ).each(function() {
+		key = $(this).attr('id');
+		value = $(this).val();
+		obj[key] = value;
+	});
+
+	obj['catalogs'] = []
+	$( ".pkginfo_catalogs" ).each(function() {
+		if ( $(this).prop('checked') ) {
+		 value = $(this).val();
+		 obj['catalogs'].push(value)
+	 }
+ 	});
+
+	var pkginfo = JSON.stringify(obj);
+	//alert(pkginfo)
+	$.ajax({
+	    type: 'POST',
+	    url: "/catalog/save",
+	    data: pkginfo,
+	    success: function(data) { alert('data: ' + data); },
+	    contentType: "application/json",
+	    dataType: 'json'
+	});
+
+	$('#lgModal').modal('hide')
+}
+
+function check(element) {
+	$(element).parent().click(function(e) {
+        e.stopPropagation();
+   });
+	alert(element);
 }

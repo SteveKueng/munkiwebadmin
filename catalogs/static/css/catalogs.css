@@ -84,3 +84,13 @@ td.code {
     padding: 8px;
     background: rgba(255,255,255,0.66);
 }
+
+.check {
+  width: 0px; height: 0px;
+  position: absolute;
+  top: 0px; right: 4px;
+  border: 25px solid transparent;
+  border-top-color: gray;
+  border-right-color: gray;
+  border-top-right-radius: 4px;
+}

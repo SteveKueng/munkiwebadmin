@@ -43,23 +43,23 @@ function getCookie(cname) {
 }
 
 function windowload() {
-	// load stuff form secific side  
+	// load stuff form secific side
   sideSecific();
 
   //cookie for searchfield
 	var searchcontent = getCookie("searchcontent");
 	document.getElementById("SearchField").value = searchcontent;
   document.getElementById("SearchField").select();
-	
+
 	//press Enter to apply search
 	applySearch();
-  
+
  	//load cookie for grid/list view
   	var view = getCookie("view");
  	  if(! view) {
 	 	 view = "grid"
   	}
-  	setview(view); 
+  	setview(view);
 }
 
 $(document).ready(function() {

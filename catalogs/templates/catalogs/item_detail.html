@@ -14,7 +14,7 @@
           <td>
               {% for item in catalogs %}
                     <label class="checkbox-inline">
-                      <input type="checkbox" value="" {% if item in value %}checked{% endif %}>
+                      <input class="pkginfo_catalogs" type="checkbox" id="{{ key }}" value="{{ item }}" {% if item in value %}checked{% endif %}>
                       {{ item }}
                     </label>
                   {% if not forloop.last %}<br />{% endif %}
@@ -35,13 +35,10 @@
         <td>{% include "catalogs/generic_dict.html" with generic_dict=value only %}</td></tr>
     {% elif '_script' in key %}
         {# special case: show scripts in monospaced font #}
-        <tr><th scope="row">{{ key }}</th><td class="code">{{ value }}</td></tr>
-
-
+        <tr><th scope="row">{{ key }}</th><td><textarea class="item_input pkginfo_strings code" id="{{ key }}" rows="5">{{ value }}</textarea></td></tr>
     {% elif 'description' in key %}
       {# textarea for description #}
-      <tr><th scope="row">{{ key }}</th><td><textarea class="item_input" name="editor1" id="editor1" rows="3">{{ value }}</textarea></td></tr>
-
+      <tr><th scope="row">{{ key }}</th><td><textarea class="item_input pkginfo_strings" id="{{ key }}" rows="3">{{ value }}</textarea></td></tr>
     {% else %}
       {# regular scalar value #}
         <tr><th scope="row">{{ key }}</th><td>
@@ -50,7 +47,7 @@
         {% elif value == False %}
         <input type="checkbox" value="">
         {% else %}
-        {% if key in editable %}<input class="item_input" value="{{ value }}"></input>{% else %}{{ value }}{% endif %}
+        <input class="item_input pkginfo_strings" value="{{ value }}" id="{{ key }}" {% if key not in editable %}disabled{% endif %}></input>
         {% endif %}
         </td></tr>
     {% endif %}

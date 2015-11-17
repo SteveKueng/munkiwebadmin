@@ -685,6 +685,21 @@ def raw(request, serial):
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
+@token_required
+def getname(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            return HttpResponse("none",
+                content_type='text/plain')
+    else:
+        raise Http404
+
+    return HttpResponse(machine['hostname'],
+        content_type='text/plain')
+
 def lookup_ip(request):
     return HttpResponse(request.META['REMOTE_ADDR'], content_type='text/plain')
 
