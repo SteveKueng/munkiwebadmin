@@ -130,7 +130,16 @@ function savePkgInfo() {
 
 function check(element) {
 	$(element).parent().click(function(e) {
+			e.stopPropagation();
+   });
+	$(element).addClass('hidden');
+	$(element).next().removeClass('hidden');
+}
+
+function uncheck(element) {
+	$(element).parent().click(function(e) {
         e.stopPropagation();
    });
-	alert(element);
+	$(element).addClass('hidden');
+	$(element).prev().removeClass('hidden');
 }

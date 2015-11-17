@@ -90,7 +90,17 @@ td.code {
   position: absolute;
   top: 0px; right: 4px;
   border: 25px solid transparent;
-  border-top-color: gray;
-  border-right-color: gray;
+  border-top-color: #d9d9d9;
+  border-right-color: #d9d9d9;
+  border-top-right-radius: 4px;
+}
+
+.uncheck {
+  width: 0px; height: 0px;
+  position: absolute;
+  top: 0px; right: 4px;
+  border: 25px solid transparent;
+  border-top-color: blue;
+  border-right-color: blue;
   border-top-right-radius: 4px;
 }
