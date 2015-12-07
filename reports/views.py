@@ -616,10 +616,14 @@ def staging(request, serial):
 
     error = None
     workflows = {}
+    imagr_config_plist = ""
     if IMAGR_CONFIG_URL:
-        config = urllib.urlopen(IMAGR_CONFIG_URL)
-        imagr_config_plist = config.read()
-        imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
+        try:
+            config = urllib.urlopen(IMAGR_CONFIG_URL)
+            imagr_config_plist = config.read()
+            imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
+        except:
+            error = "Can't reach server!"
     else:
         error = "Imagr URL not defined!"
 

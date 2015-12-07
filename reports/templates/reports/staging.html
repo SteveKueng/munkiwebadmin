@@ -9,6 +9,8 @@
   {% if error %}
     <div class="alert alert-danger" role="alert">{{ error }}</div>
   {% endif %}
+
+  {% if imagr_config_plist %}
   <select class="form-control">
     {% for workflow in imagr_config_plist.workflows %}
     <option>{{ workflow.name }}</option>
@@ -16,4 +18,5 @@
   </select>
   <br>
   <button class="btn btn-default pull-right" type="submit">Deploy</button>
+  {% endif %}
 </div>
