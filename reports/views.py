@@ -617,6 +617,7 @@ def staging(request, serial):
     error = None
     workflows = {}
     imagr_config_plist = ""
+
     if IMAGR_CONFIG_URL:
         try:
             config = urllib.urlopen(IMAGR_CONFIG_URL)
