@@ -85,22 +85,10 @@ td.code {
     background: rgba(255,255,255,0.66);
 }
 
-.check {
-  width: 0px; height: 0px;
-  position: absolute;
-  top: 0px; right: 4px;
-  border: 25px solid transparent;
-  border-top-color: #d9d9d9;
-  border-right-color: #d9d9d9;
-  border-top-right-radius: 4px;
-}
-
-.uncheck {
-  width: 0px; height: 0px;
-  position: absolute;
-  top: 0px; right: 4px;
-  border: 25px solid transparent;
-  border-top-color: blue;
-  border-right-color: blue;
+.hovered {
+  background-color: #ddd;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }

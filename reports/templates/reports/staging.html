@@ -1,0 +1,19 @@
+{% load report_extras %}
+{% load static %}
+<br>
+<div class"row">
+  <!--<div class="alert alert-success" role="alert">...</div>-->
+  <div class="alert alert-info" role="alert">Workflow <strong>{{ imagr_workflow }}</strong> is set for this client!</div>
+  <!--<div class="alert alert-warning" role="alert">...</div> -->
+
+  {% if error %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+  <select class="form-control">
+    {% for workflow in imagr_config_plist.workflows %}
+    <option>{{ workflow.name }}</option>
+    {% endfor %}
+  </select>
+  <br>
+  <button class="btn btn-default pull-right" type="submit">Deploy</button>
+</div>

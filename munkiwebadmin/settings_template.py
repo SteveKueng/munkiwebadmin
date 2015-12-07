@@ -47,12 +47,15 @@ BUSINESS_UNITS_ENABLED = False
 
 # if MunkiWebAdmin is behind a proxy, and WARRANTY_LOOKUP_ENABLED or
 # MODEL_LOOKUP_ENABLED are enabled, enter the details for the proxy server in
-# the format user:password@example.com:port (user:password@ and :port are 
+# the format user:password@example.com:port (user:password@ and :port are
 # optional), otherwise leave blank
 PROXY_ADDRESS = ""
 
 # needed for productive mode
 ALLOWED_HOSTS = ['*']
+
+# imagr config / needed for staging tab in reports
+IMAGR_CONFIG_URL = ""
 
 TOKEN_TIMEOUT_DAYS = 1
 
@@ -64,7 +67,7 @@ USE_LDAP = False
 if USE_LDAP:
     import ldap
     from django_auth_ldap.config import LDAPSearch, PosixGroupType
-    
+
     # LDAP settings
     AUTH_LDAP_SERVER_URI = "ldap://foo.example.com"
     AUTH_LDAP_BIND_DN = ""
@@ -77,7 +80,7 @@ if USE_LDAP:
         ldap.SCOPE_SUBTREE, "(objectClass=posixGroup)")
     AUTH_LDAP_GROUP_TYPE = PosixGroupType()
     AUTH_LDAP_FIND_GROUP_PERMS = True
-    AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName", 
+    AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName",
                                "last_name": "sn",
                                "email": "mail"}
     # Cache group memberships for an hour to minimize LDAP traffic
@@ -109,7 +112,7 @@ DATABASES = {
 # mysql example
 #DATABASES = {
 #    'default': {
-#        'ENGINE': 'django.db.backends.mysql', 
+#        'ENGINE': 'django.db.backends.mysql',
 #        'NAME': 'munkiweb',
 #        'USER': 'munkiwebuser',
 #        'PASSWORD': 'munkiwebuserpasswd',

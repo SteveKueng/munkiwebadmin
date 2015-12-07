@@ -27,33 +27,20 @@
 <!-- page title -->
 {% block page_title %}<a href="{% url 'catalogs.views.catalog_view' %}" class="navbar-brand" >Catalogs</a>{% endblock %}
 
-{% block navbar-default_extensions %}
-<span class='dropdown' style="margin-left:45px;">
-  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#catalogdropdown').height())">
-	{% if catalog_name == 'all' %}
-		All items
-	{% else %}
-		{{ catalog_name }}
-	{% endif %}
-	<b class="caret"></b>
-  </a>
-  <ul class="dropdown-menu" id="catalogdropdown">
-	{% for item in catalog_list %}
-	  <li>
-	  	<a href="/catalog/{{ item }}">
-	  	{% if item == 'all' %}
-			All items
-		{% else %}
-			{{ item }}
-		{% endif %}
-	  	</a>
-	  </li>
-	{% endfor %}
-  </ul>
-</span>
-{% endblock %}
-
 {% block content %}
+<ul class="nav nav-pills" style="padding-bottom:20px;">
+{% for item in catalog_list %}
+  <li id="{{ item }}" role="catalogs" class="{% if not item == 'all' and not catalog_name == item %}droppable{% endif %} {% if catalog_name == item %}active{% endif %}">
+    <a href="/catalog/{{ item }}">
+    {% if item == 'all' %}
+    All items
+  {% else %}
+    {{ item }}
+  {% endif %}
+    </a>
+  </li>
+{% endfor %}
+</ul>
 {% if catalog_name %}
 	{% if catalog %}
 	<div id="gridview">
@@ -61,7 +48,7 @@
 			{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
 			{% for item_name in catalog_items %}
 				{% with item_name.list|dictsortreversed:'version' as item_list %}
-				<li class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1" data-state="all" onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
+				<li id="{{ item_name.grouper }}:{{ item_list.0.version }}" class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1 draggable" data-state="all" onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
 		            <div class="thumbnail">
 		                <img src='{{ item_list.0.icon_name }}' width="40" class="group list-group-image" style="padding-top:15px;" />
 		                <div class="caption">
@@ -70,12 +57,6 @@
 		 	                  	{{ item_list.0.version }}
 		                      </h4>
 		                </div>
-                    <div class="check" onclick="check(this);">
-                      <i class="fa fa-check" style="position: absolute; color: #f8f8f8; margin-top:-15px;"></i>
-                    </div>
-                    <div class="uncheck hidden" onclick="uncheck(this);">
-                      <i class="fa fa-check" style="position: absolute; color: #f8f8f8; margin-top:-15px;"></i>
-                    </div>
 		            </div>
 		        </li>
 		        {% endwith %}

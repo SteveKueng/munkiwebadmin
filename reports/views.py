@@ -43,6 +43,11 @@ try:
 except:
     BUSINESS_UNITS_ENABLED = False
 
+try:
+    IMAGR_CONFIG_URL = settings.IMAGR_CONFIG_URL
+except:
+    IMAGR_CONFIG_URL = ""
+
 proxies = {
     "http":  PROXY_ADDRESS,
     "https": PROXY_ADDRESS
@@ -595,6 +600,39 @@ def appleupdate(request, serial):
     c.update(csrf(request))
     return render_to_response('reports/appleupdates.html', c)
 
+@login_required
+def staging(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+
+    imagr_workflow = machine.imagr_workflow
+    #imagr_target = machine.imagr_target
+
+    error = None
+    workflows = {}
+    if IMAGR_CONFIG_URL:
+        config = urllib.urlopen(IMAGR_CONFIG_URL)
+        imagr_config_plist = config.read()
+        imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
+    else:
+        error = "Imagr URL not defined!"
+
+    c = RequestContext(request,{'imagr_workflow': imagr_workflow,
+                               #'imagr_target': imagr_target,
+                               'workflows': workflows,
+                               'error': error,
+                               'imagr_config_plist': imagr_config_plist,
+                               'page': 'reports'})
+
+    c.update(csrf(request))
+    return render_to_response('reports/staging.html', c)
+
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
@@ -683,6 +721,24 @@ def raw(request, serial):
             pass
 
     return HttpResponse(plistlib.writePlistToString(report_plist),
+        content_type='text/plain')
+
+def imagr(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+
+    imagr_infos = {}
+    imagr_infos["workflow"] = machine.imagr_workflow
+    imagr_infos["target"] = "firstDisk"
+    #imagr_infos["target"] = machine.imagr_target
+
+    return HttpResponse(plistlib.writePlistToString(imagr_infos),
         content_type='text/plain')
 
 @token_required

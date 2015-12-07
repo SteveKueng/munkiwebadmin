@@ -46,6 +46,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
       {% if perms.inventory.can_view_inventory %}
       <a href='#' onclick="getDetail('Inventory', '{{ machine.serial_number }}');" id="Inventory" class="btn btn-default buttons">Inventory</a>
       {% endif %}
+			<a href='#' onclick="getDetail('Staging', '{{ machine.serial_number }}');" id="Staging" class="btn btn-default buttons">Staging</a>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm hidden-print" style="text-align: right">

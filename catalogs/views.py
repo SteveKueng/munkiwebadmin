@@ -140,8 +140,11 @@ def catalog_view(request, catalog_name=None, item_index=None):
 @login_required
 def save_pkginfo(request):
     if request.method == 'POST': # If the form has been submitted...
-        pkg_info = request.body # get pkginfo from post
-        pkg_info = json.loads(pkg_info) # convert to python dict
+        submit = request.body # get pkginfo from post
+
+        print submit.get('type')
+
+        pkg_info = json.loads(submit) # convert to python dict
         if Catalog.save_pkginfo(pkg_info['name'], pkg_info['version'], pkg_info, ""):
             return HttpResponse("OK!")
         else:

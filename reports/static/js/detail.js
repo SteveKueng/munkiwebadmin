@@ -33,7 +33,7 @@ function makeEditableItems(manifest_name, serial) {
     $('.catalogs_section').sortable();
     $('.included_manifests_section').sortable();
     $('.section').sortable({connectWith: '.section'});
-    
+
     //replace <a> links with 'editable' divs
     $('.entrys').children($('a')).each(function(){
         var item = "<div class='editable'>" + $(this).parent().attr('id') + "</div>";
@@ -46,8 +46,8 @@ function makeEditableItems(manifest_name, serial) {
     });
 
     $('.manifest_section').on('click', '.lineitem_delete', function() {
-      if ($(this).parent().attr('id')) { 
-        element = $(this).parent();   
+      if ($(this).parent().attr('id')) {
+        element = $(this).parent();
         bootbox.dialog({
           message: "Really delete <b>" + $(this).parent().attr('id') + "</b> from <b>" + $(this).parent().parent().attr('id') + "</b>?",
           title: "Delete",
@@ -74,7 +74,7 @@ function makeEditableItems(manifest_name, serial) {
 
     $('.manifest_section').on('click', '.sw_delete', function() {
       element = $(this).parent().parent();
-      if (element.attr('id')) {       
+      if (element.attr('id')) {
         bootbox.dialog({
           message: "Really delete <b>" + element.attr('id') + "</b> from <b>" + element.parent().attr('id') + "</b>?",
           title: "Delete",
@@ -101,7 +101,7 @@ function makeEditableItems(manifest_name, serial) {
     $('.section_label').append("<a class='btn btn-success btn-mini add_item pull-right' style='margin-top:-20px;'></a>");
     $('.add_item').click(function() {
         var list_item = $("<li class='list-group-item entrys'><span class='btn btn-danger btn-mini lineitem_delete pull-right' style='margin-top:4px;'></span><div class='editable'></div></li>");
-        $(this).parent().siblings($('ul')).append(list_item);   
+        $(this).parent().siblings($('ul')).append(list_item);
         makeEditableItem(manifest_name, autocomplete_data, list_item.children(".editable"));
     });
 
@@ -131,13 +131,13 @@ function removeItem(item) {
                 $("#managed_uninstalls").append(item);
             } else {
                 item.remove();
-            } 
+            }
         } else {
             item.remove();
-        } 
+        }
     } else {
         item.remove();
-    } 
+    }
 }
 
 function updateLineItem(item) {
@@ -225,8 +225,8 @@ function getManifestSectionArray(section_name) {
         });
     } else {
         $(section_name).children($('li')).each(function(){
-            var item = $(this).attr('id'); 
-            alert   
+            var item = $(this).attr('id');
+            alert
             if (item) { the_array.push(item); };
         });
     }
@@ -238,14 +238,14 @@ function getManifestDetailFromDOMAndSave() {
     // describing the manifest post-edit
     // then POSTs to server
     $("#imgProgress").show();
-    
+
     //unbind beforeunload
     inEditMode = false;
     $(window).unbind("beforeunload");
-    
+
     // commit any existing active lineiteminput
     $('.lineiteminput').each(function(){updateLineItem($(this))});
-    
+
     var manifest = {};
     var manifest_name = $('.manifest_name').attr('id');
     $('#manifest_detail').children($('manifest_section')).children($('ul')).each(function() {
@@ -326,6 +326,11 @@ function getDetail(type, serial, manifest_name) {
         case "AppleUpdates":
             diableSearch();
             var manifestURL = '/update/appleupdate/' + serial;
+            break;
+
+        case "Staging":
+            diableSearch();
+            var manifestURL = '/update/staging/' + serial;
             break;
     }
     $("#imgProgress").show();

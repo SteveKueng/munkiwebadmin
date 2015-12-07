@@ -52,6 +52,9 @@ $(document).ready(function() {
 	});
 });
 
+$( drag );
+$( drop );
+
 // functions
 function sideSecific() {
 }
@@ -114,6 +117,7 @@ function savePkgInfo() {
 	 }
  	});
 
+	obj["type"] = "test";
 	var pkginfo = JSON.stringify(obj);
 	//alert(pkginfo)
 	$.ajax({
@@ -128,18 +132,26 @@ function savePkgInfo() {
 	$('#lgModal').modal('hide')
 }
 
-function check(element) {
-	$(element).parent().click(function(e) {
-			e.stopPropagation();
-   });
-	$(element).addClass('hidden');
-	$(element).next().removeClass('hidden');
+function drag() {
+	$('.draggable').draggable({
+	  cursor: "move",
+		revert: "invalid",
+	  opacity: 0.4,
+	  snap: ".droppable",
+	});
 }
 
-function uncheck(element) {
-	$(element).parent().click(function(e) {
-        e.stopPropagation();
-   });
-	$(element).addClass('hidden');
-	$(element).prev().removeClass('hidden');
+function drop() {
+	$('.droppable').droppable({
+	  accept: ".draggable",
+	  hoverClass: 'hovered',
+	  drop: move_pkg
+	});
+}
+
+function move_pkg(event, ui) {
+	$(ui.draggable).remove();
+	var draggableId = ui.draggable.attr("id");
+  var droppableId = $(this).attr("id");
+
 }

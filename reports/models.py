@@ -29,11 +29,13 @@ class Machine(models.Model):
     cpu_type = models.CharField(max_length=64, blank=True)
     cpu_speed = models.CharField(max_length=32, blank=True)
     cpu_arch = models.CharField(max_length=32, blank=True)
+    imagr_workflow = models.CharField(max_length=128, blank=True)
+    #imagr_target = models.CharField(max_length=128, blank=True)
     ram = models.CharField(max_length=16)
     os_version = models.CharField(max_length=16)
     available_disk_space = models.IntegerField(default=0)
-    mac = models.CharField(max_length=17)
-    last_munki_update = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
+    mac = models.CharField(max_length=17, blank=True)
+    last_munki_update = models.DateTimeField(default=datetime(1, 1, 1, 0, 0), blank=True)
     last_inventory_update = models.DateTimeField(
         default=datetime(1, 1, 1, 0, 0))
     class Meta:
