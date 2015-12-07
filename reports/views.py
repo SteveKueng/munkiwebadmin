@@ -602,41 +602,46 @@ def appleupdate(request, serial):
 
 @login_required
 def staging(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
+    if request.method == 'POST':
+        submit = request.POST
+        workflow = submit.get('workflow')
+        
+    else:
+        machine = None
+        if serial:
+            try:
+                machine = Machine.objects.get(serial_number=serial)
+            except Machine.DoesNotExist:
+                raise Http404
+        else:
             raise Http404
-    else:
-        raise Http404
 
-    imagr_workflow = machine.imagr_workflow
-    #imagr_target = machine.imagr_target
+        imagr_workflow = machine.imagr_workflow
+        #imagr_target = machine.imagr_target
 
-    error = None
-    workflows = {}
-    imagr_config_plist = ""
+        error = None
+        workflows = {}
+        imagr_config_plist = ""
 
-    if IMAGR_CONFIG_URL:
-        try:
-            config = urllib.urlopen(IMAGR_CONFIG_URL)
-            imagr_config_plist = config.read()
-            imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
-        except:
-            error = "Can't reach server!"
-    else:
-        error = "Imagr URL not defined!"
+        if IMAGR_CONFIG_URL:
+            try:
+                config = urllib.urlopen(IMAGR_CONFIG_URL)
+                imagr_config_plist = config.read()
+                imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
+            except:
+                error = "Can't reach server!"
+        else:
+            error = "Imagr URL not defined!"
 
-    c = RequestContext(request,{'imagr_workflow': imagr_workflow,
-                               #'imagr_target': imagr_target,
-                               'workflows': workflows,
-                               'error': error,
-                               'imagr_config_plist': imagr_config_plist,
-                               'page': 'reports'})
+        c = RequestContext(request,{'imagr_workflow': imagr_workflow,
+                                   #'imagr_target': imagr_target,
+                                   'workflows': workflows,
+                                   'error': error,
+                                   'imagr_config_plist': imagr_config_plist,
+                                   'page': 'reports'})
 
-    c.update(csrf(request))
-    return render_to_response('reports/staging.html', c)
+        c.update(csrf(request))
+        return render_to_response('reports/staging.html', c)
 
 
 @login_required
