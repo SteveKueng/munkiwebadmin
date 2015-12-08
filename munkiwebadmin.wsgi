@@ -1,7 +1,7 @@
 import os, sys
 import site
 
-MUNKIWEBADMIN_ENV_DIR = '/var/www/html/munkiwebadmin'
+MUNKIWEBADMIN_ENV_DIR = '/var/www/html/munkiwebadmin_test'
 
 # Use site to load the site-packages directory of our virtualenv
 site.addsitedir(os.path.join(MUNKIWEBADMIN_ENV_DIR, 'lib/python2.6/site-packages'))
