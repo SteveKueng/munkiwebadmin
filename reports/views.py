@@ -605,7 +605,7 @@ def staging(request, serial):
     if request.method == 'POST':
         submit = request.POST
         workflow = submit.get('workflow')
-        
+
     else:
         machine = None
         if serial:
@@ -744,7 +744,8 @@ def imagr(request, serial):
         raise Http404
 
     imagr_infos = {}
-    imagr_infos["workflow"] = machine.imagr_workflow
+    if machine.imagr_workflow:
+        imagr_infos["workflow"] = machine.imagr_workflow
     imagr_infos["target"] = "firstDisk"
     #imagr_infos["target"] = machine.imagr_target
 
