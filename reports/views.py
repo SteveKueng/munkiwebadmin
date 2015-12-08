@@ -95,6 +95,9 @@ def submit(request, submission_type):
             unit = BusinessUnit.objects.get(hash=submit.get('unit'))
             machine.businessunit = unit
 
+        if submission_type == 'reportimagr':
+            print "test"
+
         if submission_type == 'postflight':
             report.runstate = u"done"
             if 'base64bz2report' in submit:
