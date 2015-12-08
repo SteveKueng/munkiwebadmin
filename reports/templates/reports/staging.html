@@ -1,13 +1,12 @@
 {% load report_extras %}
 {% load static %}
-<br>
 <div class"row">
   <!--<div class="alert alert-success" role="alert">...</div>-->
   <!--<div class="alert alert-warning" role="alert">...</div> -->
 
   {% if imagr_config_plist %}
   <div class="col-md-4">
-    <h3>Workflows</h3>
+    <h4>Workflows</h4>
     <form>
       <select class="form-control">
         {% for workflow in imagr_config_plist.workflows %}
@@ -21,7 +20,7 @@
   {% endif %}
 
   <div class="col-md-8">
-    <h3>Info</h3>
+    <h4>Info</h4>
     {% if imagr_workflow %}
     <div class="alert alert-info" role="alert">Workflow <strong>{{ imagr_workflow }}</strong> is set for this client!</div>
     {% else %}
@@ -35,7 +34,7 @@
 
 
   <div class="col-md-4">
-    <h3>Status</h3>
+    <h4>Status</h4>
     <div class="progress">
       <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
         <span class="sr-only">100% Complete</span>

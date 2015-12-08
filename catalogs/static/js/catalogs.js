@@ -128,7 +128,6 @@ function savePkgInfo() {
 	    contentType: "application/json",
 	    dataType: 'json'
 	});
-
 	$('#lgModal').modal('hide')
 }
 
