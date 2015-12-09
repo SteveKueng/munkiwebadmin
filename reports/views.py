@@ -96,7 +96,15 @@ def submit(request, submission_type):
             machine.businessunit = unit
 
         if submission_type == 'reportimagr':
-            print "test"
+            if submit.get('status'):
+                machine.imagr_status = submit.get('status')
+            if submit.get('message'):
+                machine.imagr_message = submit.get('message')
+
+            machine.save()
+            return HttpResponse(
+                "Imagr report submmitted for %s.\n" %
+                 submit.get('serial'))
 
         if submission_type == 'postflight':
             report.runstate = u"done"
@@ -607,7 +615,6 @@ def appleupdate(request, serial):
 def staging(request, serial):
     if request.method == 'POST':
         submit = request.POST
-        print submit
         workflow = submit.get('workflow')
 
         if serial:
@@ -616,10 +623,8 @@ def staging(request, serial):
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial)
 
-            print workflow
             machine.imagr_workflow = workflow
             machine.save()
-            return HttpResponse("OK!")
     else:
         machine = None
         if serial:
@@ -631,6 +636,8 @@ def staging(request, serial):
             raise Http404
 
         imagr_workflow = machine.imagr_workflow
+        imagr_status = machine.imagr_status
+        imagr_message = machine.imagr_message
         #imagr_target = machine.imagr_target
 
         error = None
@@ -648,11 +655,12 @@ def staging(request, serial):
             error = "Imagr URL not defined!"
 
         c = RequestContext(request,{'imagr_workflow': imagr_workflow,
+                                    'imagr_status': imagr_status,
+                                    'imagr_message': imagr_message,
                                    #'imagr_target': imagr_target,
                                    'workflows': workflows,
                                    'error': error,
                                    'imagr_config_plist': imagr_config_plist,
-                                   'machine_serial': serial,
                                    'page': 'reports'})
 
         c.update(csrf(request))
