@@ -371,4 +371,17 @@ function showTable(element, button) {
     $('#' + button).attr("onclick","hideTable('" + element + "', this.id)");
     $('#' + button).html("<span class=\"glyphicon glyphicon-collapse-down\" aria-hidden=\"true\"></span>");
 }
+
+function saveWorkflow(serial, workflow) {
+    alert(serial);
+    alert(workflow);
+    $.ajax({
+        type: 'POST',
+        url: "/update/staging/"+serial,
+        data: {'workflow': workflow},
+        success: function(data) { alert('data: ' + data); },
+        contentType: "application/json",
+        dataType: 'json'
+    });
+}
 // ---------------------------------------------------------------------------

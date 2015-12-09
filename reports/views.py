@@ -609,6 +609,14 @@ def staging(request, serial):
         submit = request.POST
         workflow = submit.get('workflow')
 
+        if serial:
+            try:
+                machine = Machine.objects.get(serial_number=serial)
+            except Machine.DoesNotExist:
+                machine = Machine(serial_number=serial)
+
+            machine.imagr_workflow = workflow
+            machine.save()
     else:
         machine = None
         if serial:
