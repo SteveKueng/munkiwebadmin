@@ -83,7 +83,7 @@ def submit(request, submission_type):
         if 'mac' in submit:
             mac = submit.get('mac')
 
-        machine.remote_ip = request.META['REMOTE_ADDR']i
+        machine.remote_ip = request.META['REMOTE_ADDR']
         if 'name' in submit:
             machine.hostname = submit.get('name', '<NO NAME>')
         if 'username' in submit:
