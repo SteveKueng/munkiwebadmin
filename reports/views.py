@@ -66,7 +66,7 @@ def submit(request, submission_type):
 
     submit = request.POST
     serial = submit.get('serial')
-    mac = submit.get('mac')
+
     client = None
     if serial:
         try:
@@ -80,9 +80,12 @@ def submit(request, submission_type):
             report = MunkiReport(machine=machine)
 
     if machine and report:
-        machine.hostname = submit.get('name', '<NO NAME>')
-        machine.remote_ip = request.META['REMOTE_ADDR']
-        machine.last_munki_update = datetime.now()
+        if 'mac' in submit:
+            mac = submit.get('mac')
+
+        machine.remote_ip = request.META['REMOTE_ADDR']i
+        if 'name' in submit:
+            machine.hostname = submit.get('name', '<NO NAME>')
         if 'username' in submit:
             machine.username = submit.get('username')
         if 'location' in submit:
@@ -106,6 +109,8 @@ def submit(request, submission_type):
                 "Imagr report submmitted for %s.\n" %
                  submit.get('serial'))
 
+
+        machine.last_munki_update = datetime.now()
         if submission_type == 'postflight':
             report.runstate = u"done"
             if 'base64bz2report' in submit:
@@ -625,6 +630,7 @@ def staging(request, serial):
 
             machine.imagr_workflow = workflow
             machine.save()
+            return HttpResponse("OK!")
     else:
         machine = None
         if serial:
@@ -661,6 +667,7 @@ def staging(request, serial):
                                    'workflows': workflows,
                                    'error': error,
                                    'imagr_config_plist': imagr_config_plist,
+                                   'machine_serial': serial,
                                    'page': 'reports'})
 
         c.update(csrf(request))
