@@ -8,13 +8,13 @@
   <div class="col-md-4">
     <h4>Workflows</h4>
     <form>
-      <select class="form-control">
+      <select class="form-control" id="workflow_selection">
         {% for workflow in imagr_config_plist.workflows %}
-        <option>{{ workflow.name }}</option>
+        <option {% if workflow.name == imagr_workflow %}selected{% endif %}>{{ workflow.name }}</option>
         {% endfor %}
       </select>
       <br>
-      <button class="btn btn-default pull-right" onclick="saveWorkflow('C02NMGFFG3QD', 'test')">Deploy</button>
+      <button class="btn btn-default pull-right" onclick="saveWorkflow('{{ machine_serial }}')">Deploy</button>
     </form>
   </div>
   {% endif %}

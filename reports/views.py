@@ -607,6 +607,7 @@ def appleupdate(request, serial):
 def staging(request, serial):
     if request.method == 'POST':
         submit = request.POST
+        print submit
         workflow = submit.get('workflow')
 
         if serial:
@@ -615,8 +616,10 @@ def staging(request, serial):
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial)
 
+            print workflow
             machine.imagr_workflow = workflow
             machine.save()
+            return HttpResponse("OK!")
     else:
         machine = None
         if serial:
@@ -649,6 +652,7 @@ def staging(request, serial):
                                    'workflows': workflows,
                                    'error': error,
                                    'imagr_config_plist': imagr_config_plist,
+                                   'machine_serial': serial,
                                    'page': 'reports'})
 
         c.update(csrf(request))
