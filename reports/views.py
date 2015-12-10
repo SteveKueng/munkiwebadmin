@@ -109,6 +109,8 @@ def submit(request, submission_type):
                 "Imagr report submmitted for %s.\n" %
                  submit.get('serial'))
 
+        if submission_type != 'reportimagr':
+            machine.imagr_workflow = ""
 
         machine.last_munki_update = datetime.now()
         if submission_type == 'postflight':
@@ -621,16 +623,34 @@ def staging(request, serial):
     if request.method == 'POST':
         submit = request.POST
         workflow = submit.get('workflow')
+        runtype = submit.get('type')
 
         if serial:
             try:
                 machine = Machine.objects.get(serial_number=serial)
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial)
+        else:
+            raise Http404
 
-            machine.imagr_workflow = workflow
+        if runtype == "save":
+            if workflow == "no workflow":
+                machine.imagr_workflow = ""
+                machine.imagr_status = ""
+                machine.imagr_message = "" 
+            else:
+                machine.imagr_workflow = workflow
             machine.save()
             return HttpResponse("OK!")
+        elif runtype == "load":
+            imagr_status = machine.imagr_status
+            imagr_message = machine.imagr_message
+
+            c = RequestContext(request,{'imagr_status': imagr_status,
+                                        'imagr_message': imagr_message
+                                        })
+            c.update(csrf(request))
+            return render_to_response('reports/staging_status.html', c)
     else:
         machine = None
         if serial:
@@ -642,8 +662,6 @@ def staging(request, serial):
             raise Http404
 
         imagr_workflow = machine.imagr_workflow
-        imagr_status = machine.imagr_status
-        imagr_message = machine.imagr_message
         #imagr_target = machine.imagr_target
 
         error = None
@@ -661,8 +679,6 @@ def staging(request, serial):
             error = "Imagr URL not defined!"
 
         c = RequestContext(request,{'imagr_workflow': imagr_workflow,
-                                    'imagr_status': imagr_status,
-                                    'imagr_message': imagr_message,
                                    #'imagr_target': imagr_target,
                                    'workflows': workflows,
                                    'error': error,
@@ -794,7 +810,7 @@ def getname(request, serial):
     else:
         raise Http404
 
-    return HttpResponse(machine['hostname'],
+    return HttpResponse(machine.hostname,
         content_type='text/plain')
 
 def lookup_ip(request):

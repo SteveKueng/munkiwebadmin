@@ -7,15 +7,14 @@
   {% if imagr_config_plist %}
   <div class="col-md-4">
     <h4>Workflows</h4>
-    <form>
       <select class="form-control" id="workflow_selection">
+        <option>no workflow</option>
         {% for workflow in imagr_config_plist.workflows %}
         <option {% if workflow.name == imagr_workflow %}selected{% endif %}>{{ workflow.name }}</option>
         {% endfor %}
       </select>
       <br>
       <button class="btn btn-default pull-right" onclick="saveWorkflow('{{ machine_serial }}')">Deploy</button>
-    </form>
   </div>
   {% endif %}
 
@@ -32,15 +31,12 @@
     <br>
   </div>
 
-
-  <div class="col-md-4">
-    <h4>Status</h4>
-    {{ imagr_status }}
-    {{ imagr_message }}
-    <div class="progress">
-      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-        <span class="sr-only">100% Complete</span>
-      </div>
-    </div>
+  <div class="col-md-4" id="stating_status">
+    <script>loadImagrStatus("{{ machine_serial }}");</script>
   </div>
+  <script>
+  setInterval(function(){
+    loadImagrStatus("{{ machine_serial }}"); // this will run after every 5 seconds
+  }, 5000);
+  </script>
 </div>

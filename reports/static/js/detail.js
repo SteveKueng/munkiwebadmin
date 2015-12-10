@@ -374,12 +374,23 @@ function showTable(element, button) {
 
 function saveWorkflow(serial) {
     var workflow = $('#workflow_selection :selected').text();
-    var data = {workflow:workflow};
+    var type = "save"
+    var data = {workflow:workflow, type:type};
     //alert(workflow);
     //alert(JSON.stringify(data));
     $.post("/update/staging/"+serial, data).done(function() {
       getDetail('Staging', serial);
     });;
 
+}
+
+function loadImagrStatus(serial) {
+    var type = "load"
+    var data = {type:type};
+    $.post("/update/staging/"+serial,
+                data,
+                function(data){
+                    $("#stating_status").html(data);
+                });
 }
 // ---------------------------------------------------------------------------

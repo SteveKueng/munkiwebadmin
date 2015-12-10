@@ -1,0 +1,18 @@
+{% if imagr_status %}
+    <h4>Status</h4>
+    {% if imagr_status == "in_progress" %}
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+        {% if imagr_message %}
+          {{ imagr_message }}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    {% if imagr_status == "error" %}
+    <div class="alert alert-danger" role="alert">{{ imagr_message }}</div>
+    {% endif %}
+    {% if imagr_status == "success" %}
+    <div class="alert alert-success" role="alert">{{ imagr_message }}</div>
+    {% endif %}
+{% endif %}
