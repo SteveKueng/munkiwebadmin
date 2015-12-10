@@ -85,7 +85,10 @@ def submit(request, submission_type):
 
         machine.remote_ip = request.META['REMOTE_ADDR']
         if 'name' in submit:
-            machine.hostname = submit.get('name', '<NO NAME>')
+            machine.hostname = submit.get('name')
+        elif machine.hostname == '':
+            machine.hostname = '<NO NAME>'
+
         if 'username' in submit:
             machine.username = submit.get('username')
         if 'location' in submit:
@@ -181,10 +184,14 @@ def index(request):
     nameFilter = request.GET.get('nameFilter')
     typeFilter = request.GET.get('typeFilter')
     businessunit = request.GET.get('businessunit')
+    unknown = request.GET.get('unknown')
 
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-        reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
+        if unknown:
+            reports = MunkiReport.objects.filter(machine__businessunit__exact='')
+        else:
+            reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
     else:
         reports = MunkiReport.objects.all()
 
@@ -637,7 +644,7 @@ def staging(request, serial):
             if workflow == "no workflow":
                 machine.imagr_workflow = ""
                 machine.imagr_status = ""
-                machine.imagr_message = "" 
+                machine.imagr_message = ""
             else:
                 machine.imagr_workflow = workflow
             machine.save()
