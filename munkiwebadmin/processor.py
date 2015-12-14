@@ -20,7 +20,7 @@ def index(request):
     SumClients = 0
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-
+        sumUnkown = Machine.objects.filter(businessunit__isnull=True).count()
         try:
             for business_unit in business_units:
                 SumClients = SumClients + business_unit.machines()
@@ -35,4 +35,5 @@ def index(request):
     return {'business_units_enabled': BUSINESS_UNITS_ENABLED,
 			'business_units': business_units,
             'SumClients': SumClients,
+            'sumUnkown': sumUnkown,
 			'webadmin_version': version}

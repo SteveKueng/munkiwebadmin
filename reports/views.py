@@ -108,6 +108,7 @@ def submit(request, submission_type):
                 machine.imagr_message = submit.get('message')
 
             machine.save()
+            report.save()
             return HttpResponse(
                 "Imagr report submmitted for %s.\n" %
                  submit.get('serial'))
@@ -186,16 +187,17 @@ def index(request):
     businessunit = request.GET.get('businessunit')
     unknown = request.GET.get('unknown')
 
+    subpage = ""
+
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
         if unknown:
-            reports = MunkiReport.objects.filter(machine__businessunit__exact='')
+            reports = MunkiReport.objects.filter(machine__businessunit__isnull=True)
+            subpage = "unknown"
         else:
             reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
     else:
         reports = MunkiReport.objects.all()
-
-    subpage = ""
 
     if show is not None:
         now = datetime.now()
@@ -239,7 +241,8 @@ def index(request):
         elif show == 'vm':
             reports = reports.filter(machine__machine_model__startswith="VMware")
             subpage = "vm"
-    else:
+
+    if not subpage:
         subpage = "reports"
 
     if os_version is not None:

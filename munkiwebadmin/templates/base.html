@@ -136,9 +136,11 @@
                             <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
                           </li>
                           {% endfor %}
+                          {% if sumUnkown != 0 %}
                           <li>
-                            <a href="{% url 'reports.views.index' %}?unknown=true" {% if subpage == business_unit.hash %} class="active" {% endif %}>Unknown<span class="badge pull-right"></span></a>
+                            <a href="{% url 'reports.views.index' %}?unknown=true" {% if subpage == "unknown" %} class="active" {% endif %}>Unknown<span class="badge pull-right">{{ sumUnkown }}</span></a>
                           </li>
+                          {% endif %}
                         </ul>
                       </li>
                       {% else %}
