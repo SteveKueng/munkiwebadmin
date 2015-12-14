@@ -16,10 +16,10 @@
 {% block data-source-mobile %}{{ catalog_items }}{% endblock %}
 
 {% block navbar-top_extensions %}
-<li id="list" class="sidebar-search hidden-xs">
+<li id="list" class="sidebar-search hidden-xs {% if view == 'list' %}open{% endif %}">
     <a href="#" id="list"><span class="glyphicon glyphicon-th-list"></span> List</a>
 </li>
-<li id="grid" class="sidebar-search hidden-xs">
+<li id="grid" class="sidebar-search hidden-xs {% if view == 'grid' %}open{% endif %}">
     <a href="#" id="grid"><span class="glyphicon glyphicon-th"></span> Grid</a>
 </li>
 {% endblock %}
@@ -43,58 +43,61 @@
 </ul>
 {% if catalog_name %}
 	{% if catalog %}
-	<div id="gridview">
-		<ul id="products" class="grid list-group">
-			{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
-			{% for item_name in catalog_items %}
-				{% with item_name.list|dictsortreversed:'version' as item_list %}
-				<li id="{{ item_name.grouper }}:{{ item_list.0.version }}" class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1 draggable" data-state="all" onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
-		            <div class="thumbnail">
-		                <img src='{{ item_list.0.icon_name }}' width="40" height="50" class="group list-group-image" style="padding-top:15px;" />
-		                <div class="caption">
-		                    <h5 class="list-group-item-heading">
-		 	                  	{{ item_list.0.display_name }}<br>
-		 	                  	<small>{{ item_list.0.version }}</small>
-                        </h5>
-		                </div>
-		            </div>
-		        </li>
-		        {% endwith %}
-			{% endfor %}
-		</ul>
-	</div>
-
-	<div id="listview" class="table-responsive hidden">
-		<table class="table table-condensed table-hover" id="dataTables-clients">
-			<thead>
-				<tr>
-					<th class="text-center"></th>
-					<th>Name</th>
-					<th>Version</th>
-					<th class="visible-md visible-lg"></th>
-					<th class="visible-lg"></th>
-				</tr>
-			</thead>
-			<tbody>
-		        {% regroup catalog|dictsort:'display_name' by name as catalog_items %}
-				{% for item_name in catalog_items %}
-					{% with item_name.list|dictsortreversed:'version' as item_list %}
-		            <tr onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')" style="cursor: pointer">
-                    <td class="text-center">
-		                	<img src='{{ item_list.0.icon_name }}' width="20" />
-		                </td>
-		                <td>
-		                  {{ item_list.0.display_name }}
-		                </td>
-		                <td>{{ item_list.0.version }}</td>
-		                <td class='visible-md visible-lg'></td>
-		                <td class="visible-lg"></td>
-		            </tr>
-		            {% endwith %}
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+    {% if view == "grid" %}
+  	<div id="gridview">
+  		<ul id="products" class="grid list-group">
+  			{% regroup catalog|dictsort:'display_name' by name as catalog_items %}
+  			{% for item_name in catalog_items %}
+  				{% with item_name.list|dictsortreversed:'version' as item_list %}
+  				<li id="{{ item_name.grouper }}:{{ item_list.0.version }}" class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1 draggable" data-state="all" onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')">
+  		            <div class="thumbnail">
+  		                <img src='{{ item_list.0.icon_name }}' width="40" height="50" class="group list-group-image" style="padding-top:15px;" />
+  		                <div class="caption">
+  		                    <h5 class="list-group-item-heading">
+  		 	                  	{{ item_list.0.display_name }}<br>
+  		 	                  	<small>{{ item_list.0.version }}</small>
+                          </h5>
+  		                </div>
+  		            </div>
+  		        </li>
+  		        {% endwith %}
+  			{% endfor %}
+  		</ul>
+  	</div>
+    {% endif %}
+    {% if view == "list" %}
+  	<div id="listview" class="table-responsive">
+  		<table class="table table-condensed table-hover" id="dataTables-clients">
+  			<thead>
+  				<tr>
+  					<th class="text-center"></th>
+  					<th>Name</th>
+  					<th>Version</th>
+  					<th class="visible-md visible-lg"></th>
+  					<th class="visible-lg"></th>
+  				</tr>
+  			</thead>
+  			<tbody>
+  		        {% regroup catalog|dictsort:'display_name' by name as catalog_items %}
+  				{% for item_name in catalog_items %}
+  					{% with item_name.list|dictsortreversed:'version' as item_list %}
+  		            <tr onClick="getCatalogItem('{{ catalog_name }}', '{{ item_list.0.index }}', '{{ item_name.grouper }}', '{{ item_list.0.version }}')" style="cursor: pointer">
+                      <td class="text-center">
+  		                	<img src='{{ item_list.0.icon_name }}' width="20" />
+  		                </td>
+  		                <td>
+  		                  {{ item_list.0.display_name }}
+  		                </td>
+  		                <td>{{ item_list.0.version }}</td>
+  		                <td class='visible-md visible-lg'></td>
+  		                <td class="visible-lg"></td>
+  		            </tr>
+  		            {% endwith %}
+  				{% endfor %}
+  			</tbody>
+  		</table>
+  	</div>
+    {% endif %}
 	{% else %}
 	<p>Catalog {{ catalog_name }} is empty.</p>
 	{% endif %}

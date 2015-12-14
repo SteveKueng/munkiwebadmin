@@ -186,6 +186,10 @@ def index(request):
     typeFilter = request.GET.get('typeFilter')
     businessunit = request.GET.get('businessunit')
     unknown = request.GET.get('unknown')
+    view = request.COOKIES.get('view')
+
+    if not view:
+        view = "grid"
 
     subpage = ""
 
@@ -271,6 +275,7 @@ def index(request):
                                 'hostnames': hostnames_json,
                                 'page': 'reports',
                                 'subpage': subpage,
+                                'view': view,
                                 })
     c.update(csrf(request))
     return render_to_response('reports/index.html', c)

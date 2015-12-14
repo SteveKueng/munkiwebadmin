@@ -94,6 +94,10 @@ def item_detail(request, catalog_name, item_index):
 @login_required
 @permission_required('catalogs.can_view_catalogs', login_url='/login/')
 def catalog_view(request, catalog_name=None, item_index=None):
+    view = request.COOKIES.get('view_catalogs')
+    if not view:
+        view = "grid"
+
     catalog_list = Catalog.list()
     if request.is_ajax():
         return HttpResponse(json.dumps(catalog_list),
@@ -133,6 +137,7 @@ def catalog_view(request, catalog_name=None, item_index=None):
                                 'catalog_item': catalog_item,
                                 'catalog_items': catalog_items_json,
                                 'user': request.user,
+                                'view': view,
                                 'page': 'catalogs'})
     c.update(csrf(request))
     return render_to_response('catalogs/catalog.html', c)

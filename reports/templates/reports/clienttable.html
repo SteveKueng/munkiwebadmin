@@ -1,10 +1,8 @@
 {% load url from future %}
-<script>
-	$("#imgProgress").show();
-</script>
 
 {% if report_list|length %}
-<div id="gridview" class="hidden">
+{% if view == "grid" %}
+<div id="gridview">
 	<ul id="products" class="grid list-group">
 		{% for report in report_list %}
 		<li class="gridelement col-xs-4 col-md-3 col-lg-2 col-xl-1" data-state="all" onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';">
@@ -24,8 +22,10 @@
 		{% endfor %}
 	</ul>
 </div>
+{% endif %}
 
-<div id="listview" class="table-responsive hidden">
+{% if view == "list" %}
+<div id="listview" class="table-responsive">
 	<table class="table table-condensed table-hover" id="dataTables-clients">
 		<thead>
 			<tr>
@@ -90,6 +90,6 @@
 		</tbody>
 	</table>
 </div>
-
+{% endif %}
 
 {% endif %}

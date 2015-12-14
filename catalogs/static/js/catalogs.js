@@ -34,13 +34,13 @@ $(document).ready(function() {
 
 	$('#list').click(function(event){
 		event.preventDefault();
-		setview("list");
-		setCookie("view", "list", 7);
+		setCookie("view_catalogs", "list", 7);
+		window.location.reload();
 	});
 	$('#grid').click(function(event){
 		event.preventDefault();
-		setview("grid");
-		setCookie("view", "grid", 7);
+		setCookie("view_catalogs", "grid", 7);
+		window.location.reload();
 	});
 
 	$('#SearchField').change(function(){
@@ -57,21 +57,6 @@ $( drop );
 
 // functions
 function sideSecific() {
-}
-
-function setview(view) {
-	if(view == "grid"){
-		var view1 = "grid";
-		var view2 = "list";
-	} else if(view == "list"){
-		var view1 = "list";
-		var view2 = "grid";
-	}
-	$("#imgProgress").hide();
-	$('#' + view1 + 'view').removeClass('hidden');
-	$('#' + view2 + 'view').addClass('hidden');
-	$('#' + view1).addClass('open');
-	$('#' + view2).removeClass('open');
 }
 
 function getCatalogItem(catalog_name, catalog_index, item_name, item_version) {

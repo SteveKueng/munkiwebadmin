@@ -13,10 +13,10 @@
 {% block page_title %}<a href="{% url 'reports.views.index' %}" class="navbar-brand" >Computers</a>{% endblock %}
 
 {% block navbar-top_extensions %}
-<li id="list" class="sidebar-search hidden-xs">
+<li id="list" class="sidebar-search hidden-xs {% if view == 'list' %}open{% endif %}">
     <a href="#" id="list"><span class="glyphicon glyphicon-th-list"></span> List</a>
 </li>
-<li id="grid" class="sidebar-search hidden-xs">
+<li id="grid" class="sidebar-search hidden-xs {% if view == 'grid' %}open{% endif %}">
     <a href="#" id="grid"><span class="glyphicon glyphicon-th"></span> Grid</a>
 </li>
 {% endblock %}
