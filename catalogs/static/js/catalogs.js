@@ -5,7 +5,7 @@ $(document).ready(function() {
 		var filter = $(this).val();
 		var regExPattern = "gi";
 		var regEx = new RegExp(filter, regExPattern);
-		$('#listbig a').each(function(){
+		$('#products li').each(function(){
 			if (
 				$(this).text().search(new RegExp(filter, "i")) < 0 &&
 				$(this).data('state').search(regEx) < 0
@@ -20,7 +20,7 @@ $(document).ready(function() {
 		var filter = $(this).val();
 		var regExPattern = "gi";
 		var regEx = new RegExp(filter, regExPattern);
-		$('#listbig a').each(function(){
+		$('#products li').each(function(){
 			if (
 				$(this).text().search(new RegExp(filter, "i")) < 0 &&
 				$(this).data('state').search(regEx) < 0

@@ -255,22 +255,29 @@ $('#SearchField').prop('disabled', true);
             <div class="panel-heading">
                 <h3 class="panel-title">OS breakdown</h3>
             </div>
-            <table class="table table-striped table-condensed table-bordered">
-            {% for item in os_info|dictsort:'os_version' %}
-                <tr>
-                    <td>
-                        {% if perms.reports.can_view_reports %}
-                        <a href='{% url 'reports.views.index' %}?os_version={{ item.os_version|urlencode }}'>
-                        {% endif %}
-                        {{ item.os_version }}
-                        <span class="badge pull-right">{{ item.count }}</span>
-                        {% if perms.reports.can_view_reports %}
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </table>
+						<div id="osbreakdown" style="height: 300px; cursor: pointer;"></div>
+						<script>
+						new Morris.Donut({
+						  // ID of the element in which to draw the chart.
+						  element: 'osbreakdown',
+						  // Chart data records -- each entry in this array corresponds to a point on
+						  // the chart.
+						  data: [
+								{% for item in os_info|dictsort:'os_version' %}
+						    { label: '{{ item.os_version }}', value: {{ item.count }} },
+								{% endfor %}
+						  ],
+							colors: [
+						    '#428bca',
+						    '#5191CA',
+						    '#5E97C9'
+						  ],
+						}).on('click', function(i, row){
+							{% if perms.reports.can_view_reports %}
+							window.location.href = "{% url 'reports.views.index' %}?os_version="+row.label;
+							{% endif %}
+						});
+						</script>
         </div>
     </div>
     <div class="col-md-4">
@@ -278,22 +285,29 @@ $('#SearchField').prop('disabled', true);
             <div class="panel-heading">
                 <h3 class="panel-title">Hardware breakdown</h3>
             </div>
-        <table class="table table-striped table-condensed table-bordered">
-        {% for item in machine_info|dictsort:'machine_model' %}
-            <tr>
-                <td>
-                    {% if perms.reports.can_view_reports %}
-                    <a href='{% url 'reports.views.index' %}?model={{ item.machine_model|urlencode }}'>
-                    {% endif %}
-                    {{ item.machine_model }}
-                    <span class="badge pull-right">{{ item.count }}</span>
-                    {% if perms.reports.can_view_reports %}
-                    </a>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </table>
+						<div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
+						<script>
+						new Morris.Donut({
+						  // ID of the element in which to draw the chart.
+						  element: 'hardwarebreakdown',
+						  // Chart data records -- each entry in this array corresponds to a point on
+						  // the chart.
+						  data: [
+								{% for item in machine_info|dictsort:'machine_model' %}
+						    { label: '{{ item.machine_model }}', value: {{ item.count }} },
+								{% endfor %}
+						  ],
+							colors: [
+						    '#CE5412',
+						    '#E6C72E',
+						    '#6D6C68'
+						  ],
+						}).on('click', function(i, row){
+							{% if perms.reports.can_view_reports %}
+							window.location.href = "{% url 'reports.views.index' %}?model="+row.label;
+							{% endif %}
+						});
+						</script>
         </div>
     </div>
     <div class="col-md-4">

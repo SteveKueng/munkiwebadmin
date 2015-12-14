@@ -10,12 +10,12 @@ $(document).ready(function() {
 		$('#products li').each(function(){	 
 			if (
 				$(this).text().search(new RegExp(filter, "i")) < 0 &&
-				$(this).data('state').search(regEx) < 0 
+				$(this).data('state').search(regEx) < 0
 				){
 					$(this).hide();
 				} else {
 					$(this).show();
-				}		 
+				}
 		});
 	});
 	$('#SearchFieldMobile').keyup(function(){
@@ -23,15 +23,15 @@ $(document).ready(function() {
 		var filter = $(this).val();
 		var regExPattern = "gi";
 		var regEx = new RegExp(filter, regExPattern);
-		$('#products li').each(function(){	 
+		$('#products li').each(function(){
 			if (
 				$(this).text().search(new RegExp(filter, "i")) < 0 &&
-				$(this).data('state').search(regEx) < 0 
+				$(this).data('state').search(regEx) < 0
 				){
 					$(this).hide();
 				} else {
 					$(this).show();
-				}		 
+				}
 		});
 	});
 
@@ -52,7 +52,7 @@ $(document).ready(function() {
 		event.preventDefault();
 		setview("grid");
 		setCookie("view", "grid", 7);
-	});  
+	});
 });
 
 function setview(view) {
@@ -70,5 +70,5 @@ function setview(view) {
 	$('#' + view2).removeClass('open');
 }
 
-function sideSecific() { 
+function sideSecific() {
 }
