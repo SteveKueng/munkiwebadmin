@@ -59,6 +59,7 @@ $(document).ready(function() {
 	});
 
 	$('#lgModal').on('hidden.bs.modal', function () {
+		$('#item_detail').empty();
     $("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
 })
 });
@@ -126,6 +127,7 @@ function savePkgInfo() {
 	    dataType: 'json'
 	});
 	$('#lgModal').modal('hide');
+	$('#item_detail').empty();
 	$("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
 }
 
