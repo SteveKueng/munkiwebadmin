@@ -57,11 +57,6 @@ $(document).ready(function() {
 	$('#SearchFieldMobile').change(function(){
 		$('#SearchFieldMobile').keyup();
 	});
-
-	$('#lgModal').on('hidden.bs.modal', function () {
-	$('#item_detail').empty();
-  $("#item_detail").append('<div class="loading_modal"><div class="text-center" style="padding-top:10px;"><i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i></div></div>');
-})
 });
 
 $( drag );
@@ -72,6 +67,9 @@ function sideSecific() {
 }
 
 function getCatalogItem(catalog_name, catalog_index, item_name, item_version) {
+		$('#item_detail').empty();
+		$("#item_detail").append('<div class="loading_modal"><div class="text-center" style="padding-top:10px;"><i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i></div></div>');
+
     var catalogItemURL = '/catalog/' + catalog_name + '/' + catalog_index + '/';
     $.get(catalogItemURL, function(data) {
         $('#item_detail').html(data);
@@ -127,8 +125,6 @@ function savePkgInfo() {
 	    dataType: 'json'
 	});
 	$('#lgModal').modal('hide');
-	$('#item_detail').empty();
-	$("#item_detail").append('<div class="loading_modal"><div class="text-center" style="padding-top:10px;"><i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i></div></div>');
 }
 
 function drag() {
