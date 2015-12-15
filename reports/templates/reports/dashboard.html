@@ -282,21 +282,19 @@ $('#SearchField').prop('disabled', true);
             </div>
 						<div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
 						<script>
-						new Morris.Donut({
+						new Morris.Bar({
 						  // ID of the element in which to draw the chart.
 						  element: 'hardwarebreakdown',
 						  // Chart data records -- each entry in this array corresponds to a point on
 						  // the chart.
 						  data: [
 								{% for item in machine_info|dictsort:'machine_model' %}
-						    { label: '{{ item.machine_model }}', value: {{ item.count }} },
+						    { y: '{{ item.machine_model }}', model: {{ item.count }} },
 								{% endfor %}
 						  ],
-							colors: [
-						    '#CE5412',
-						    '#E6C72E',
-						    '#6D6C68'
-						  ],
+							xkey: 'y',
+							ykeys: ['model'],
+  						labels: ['Amount']
 						}).on('click', function(i, row){
 							{% if perms.reports.can_view_reports %}
 							window.location.href = "{% url 'reports.views.index' %}?model="+row.label;
