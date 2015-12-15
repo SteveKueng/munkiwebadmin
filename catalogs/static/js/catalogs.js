@@ -57,6 +57,10 @@ $(document).ready(function() {
 	$('#SearchFieldMobile').change(function(){
 		$('#SearchFieldMobile').keyup();
 	});
+
+	$('#lgModal').on('hidden.bs.modal', function () {
+    $('#item_detail').empty();
+})
 });
 
 $( drag );
@@ -111,7 +115,7 @@ function savePkgInfo() {
 
 	obj["type"] = "test";
 	var pkginfo = JSON.stringify(obj);
-	//alert(pkginfo)
+	alert(pkginfo)
 	$.ajax({
 	    type: 'POST',
 	    url: "/catalog/save",
@@ -120,7 +124,8 @@ function savePkgInfo() {
 	    contentType: "application/json",
 	    dataType: 'json'
 	});
-	$('#lgModal').modal('hide')
+	$('#lgModal').modal('hide');
+	$('#item_detail').empty();
 }
 
 function drag() {
