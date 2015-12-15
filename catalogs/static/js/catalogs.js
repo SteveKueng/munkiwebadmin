@@ -59,7 +59,7 @@ $(document).ready(function() {
 	});
 
 	$('#lgModal').on('hidden.bs.modal', function () {
-    $('#item_detail').empty();
+    $("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
 })
 });
 
@@ -90,6 +90,7 @@ function getCatalogItem(catalog_name, catalog_index, item_name, item_version) {
     $('.list-group-item[id!="' + item_name + '"]').removeClass('active');
 
 		$('#lgModal').children().children().append($('.modal-footer').detach());
+		$('.modal-body').removeClass('hidden');
 		$('.modal-footer').removeClass('hidden');
 
 		// launch modal / backdrop dosn't close on klick
@@ -125,7 +126,7 @@ function savePkgInfo() {
 	    dataType: 'json'
 	});
 	$('#lgModal').modal('hide');
-	$('#item_detail').empty();
+	$("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
 }
 
 function drag() {

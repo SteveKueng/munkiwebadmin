@@ -113,8 +113,10 @@
       </div>
 			{% endwith %}
 			{% endfor %}
-      <div class="modal-body" style="padding-top: 0px !important; margin-top: -1px !important;">
-			     <div id='item_detail' class='item_detail'></div>
+      <div class="modal-body hidden" style="padding-top: 0px !important; margin-top: -1px !important;">
+			     <div id='item_detail' class='item_detail'>
+                 <i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>
+          </div>
       </div>
       <div class="modal-footer hidden">
        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
