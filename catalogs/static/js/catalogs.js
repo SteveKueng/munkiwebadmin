@@ -128,7 +128,7 @@ function savePkgInfo() {
 	});
 	$('#lgModal').modal('hide');
 	$('#item_detail').empty();
-	$("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
+	$("#item_detail").append('<div id="item_detail" class="item_detail"><div class="loading_modal"><div class="text-center" style="padding-top:10px;"><i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i></div></div></div>');
 }
 
 function drag() {
