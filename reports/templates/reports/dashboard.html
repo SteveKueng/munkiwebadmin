@@ -267,11 +267,6 @@ $('#SearchField').prop('disabled', true);
 						    { label: '{{ item.os_version }}', value: {{ item.count }} },
 								{% endfor %}
 						  ],
-							colors: [
-						    '#428bca',
-						    '#5191CA',
-						    '#5E97C9'
-						  ],
 						}).on('click', function(i, row){
 							{% if perms.reports.can_view_reports %}
 							window.location.href = "{% url 'reports.views.index' %}?os_version="+row.label;
