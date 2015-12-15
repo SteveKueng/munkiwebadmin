@@ -1,7 +1,13 @@
-// Search fields
-// Main Search
 $(document).ready(function() {
+	oTable = $('#dataTables-clients').dataTable({
+		"paging":false,
+		"aoColumns": [
+      { "bSortable": false },
+      null,
+      null
+    ]});
 	$('#SearchField').keyup(function(){
+		oTable.fnFilter( $(this).val() );
 		var filter = $(this).val();
 		var regExPattern = "gi";
 		var regEx = new RegExp(filter, regExPattern);
@@ -17,6 +23,7 @@ $(document).ready(function() {
 		});
 	});
 	$('#SearchFieldMobile').keyup(function(){
+		oTable.fnFilter( $(this).val() );
 		var filter = $(this).val();
 		var regExPattern = "gi";
 		var regEx = new RegExp(filter, regExPattern);
