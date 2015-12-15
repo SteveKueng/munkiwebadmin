@@ -295,7 +295,7 @@ $('#SearchField').prop('disabled', true);
 							stacked: true,
 							gridTextSize: 10,
 							resize: true,
-							xLabelAngle: 55,
+							xLabelAngle: 40,
 							xkey: 'y',
 							ykeys: ['model'],
   						labels: ['Amount']
@@ -307,6 +307,7 @@ $('#SearchField').prop('disabled', true);
 						</script>
         </div>
     </div>
+		{% if low_disk_machines %}
     <div class="col-md-4">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -332,6 +333,7 @@ $('#SearchField').prop('disabled', true);
             </table>
         </div>
     </div>
+		{% endif %}
 </div><!-- /row -->
 
 {% endblock %}
