@@ -292,6 +292,9 @@ $('#SearchField').prop('disabled', true);
 						    { y: '{{ item.machine_model }}', model: {{ item.count }} },
 								{% endfor %}
 						  ],
+							stacked: true,
+							gridTextSize: 10,
+							resize: true,
 							xkey: 'y',
 							ykeys: ['model'],
   						labels: ['Amount']
