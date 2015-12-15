@@ -59,8 +59,8 @@ $(document).ready(function() {
 	});
 
 	$('#lgModal').on('hidden.bs.modal', function () {
-		$('#item_detail').empty();
-    $("#item_detail").append('<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>');
+	$('#item_detail').empty();
+  $("#item_detail").append('<div class="loading_modal"><div class="text-center" style="padding-top:10px;"><i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i></div></div>');
 })
 });
 
