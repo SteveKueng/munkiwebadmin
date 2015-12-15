@@ -86,8 +86,6 @@ def submit(request, submission_type):
         machine.remote_ip = request.META['REMOTE_ADDR']
         if 'name' in submit:
             machine.hostname = submit.get('name')
-        elif machine.hostname == '':
-            machine.hostname = '<NO NAME>'
 
         if 'username' in submit:
             machine.username = submit.get('username')
@@ -107,6 +105,7 @@ def submit(request, submission_type):
             if submit.get('message'):
                 machine.imagr_message = submit.get('message')
 
+            report.runstate = u"imagr"
             machine.save()
             report.save()
             return HttpResponse(

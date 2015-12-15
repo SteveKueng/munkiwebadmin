@@ -28,7 +28,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
   	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{machine.serial_number|slice:"8:" }}&size=240x240' width="130" />
 	</div>
   <div class="col-md-6">
-    <h2>{{ machine.hostname }}</h2>
+    <h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}</h2>
     <h4><small>
     {% if model_lookup_enabled and additional_info.model_description|length > 1 %}
       {{ additional_info.model_description }}
