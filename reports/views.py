@@ -622,8 +622,6 @@ def appleupdate(request, serial):
                 for profile in report_plist['MachineInfo']['SystemProfile']:
                     if profile['_dataType'] == 'SPInstallHistoryDataType':
                         history = profile._items
-                    if profile['_dataType'] == 'SPNetworkDataType':
-                        network = profile._items[1]
 
     c = RequestContext(request,{'history': history,
                                'AppleUpdates': AppleUpdates,
