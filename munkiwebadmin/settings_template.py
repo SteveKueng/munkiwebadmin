@@ -16,6 +16,9 @@ ICONS_DIR = 'icons'
 # or commit
 GIT_PATH = ''
 
+#makecatalogs "/usr/local/munki/makecatalogs"
+DEFAULT_MAKECATALOGS = '/usr/local/munki/makecatalogs'
+
 # name of the key in a manifest file that names the user or dept
 MANIFEST_USERNAME_KEY = 'user'
 # set MANIFEST_USERNAME_IS_EDITABLE to allow edits to the displayed username
