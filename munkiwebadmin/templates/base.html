@@ -75,7 +75,7 @@
                     {% block navbar-top_extensions %}{% endblock %}
                     <li class="dropdown">
                       <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
-                        <i class="glyphicon glyphicon-user"></i> {{ user.username }}  <i class="fa fa-caret-down"></i>
+                        {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fa fa-caret-down"></i>
                       </a>
                       <ul class="dropdown-menu" id="userpanel">
                         {% if user.is_staff %}
