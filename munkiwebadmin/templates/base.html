@@ -27,31 +27,13 @@
 
       {% block extra_style %}{% endblock %}
 
-	    <!-- jQuery Version 1.11.0 -->
-	    <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
-	    <!-- jQueryUI -->
-	    <script src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
-	    <!-- Bootstrap Core JavaScript -->
-	    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
-	    <!-- bootbox JavaScript -->
-	    <script src="{% get_static_prefix %}js/bootbox.min.js"></script>
-	    <!-- Metis Menu Plugin JavaScript -->
-	    <script src="{% get_static_prefix %}js/plugins/metisMenu/metisMenu.min.js"></script>
-	    <!-- DataTables JavaScript -->
-	    <script src="{% get_static_prefix %}js/plugins/dataTables/jquery.dataTables.js"></script>
-	    <script src="{% get_static_prefix %}js/plugins/dataTables/dataTables.bootstrap.js"></script>
-	    <!-- Custom Theme JavaScript -->
-	    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
-		  <!-- Typeahead fix -->
-      <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
-		  <!-- Morris -->
-	    <script src="{% get_static_prefix %}js/plugins/morris/morris.min.js"></script>
-      <script src="{% get_static_prefix %}js/plugins/morris/raphael-min.js"></script>
+      <!-- jQuery Version 1.11.0 -->
+      <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
 
-	    {% block java_script %}{% endblock %}
+      <!-- webadmin.js -->
+      <script src="{% get_static_prefix %}js/webadmin.js"></script>
 
-	    <!-- webadmin.js -->
-	    <script src="{% get_static_prefix %}js/webadmin.js"></script>
+      {% block java_script %}{% endblock %}
 
 	    <link rel="shortcut icon" href="{% get_static_prefix %}img/favicon.ico" />
       <title>MunkiWebAdmin</title>
@@ -217,5 +199,20 @@
                   </div>
                 </div>
               </div>
+
+
+        	    <!-- jQueryUI -->
+        	    <script src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
+        	    <!-- Bootstrap Core JavaScript -->
+        	    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+        	    <!-- bootbox JavaScript -->
+        	    <script src="{% get_static_prefix %}js/bootbox.min.js"></script>
+        	    <!-- DataTables JavaScript -->
+        	    <script src="{% get_static_prefix %}js/plugins/dataTables/jquery.dataTables.js"></script>
+        	    <script src="{% get_static_prefix %}js/plugins/dataTables/dataTables.bootstrap.js"></script>
+        	    <!-- Custom Theme JavaScript -->
+        	    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
+        		  <!-- Typeahead fix -->
+              <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
       </body>
 </html>

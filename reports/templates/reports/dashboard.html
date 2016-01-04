@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
 {% block java_script %}
-{% load static %}
-
+	{% load static %}
+	<!-- Morris -->
+	<script src="{% get_static_prefix %}js/plugins/morris/morris.min.js"></script>
+	<script src="{% get_static_prefix %}js/plugins/morris/raphael-min.js"></script>
 {% endblock %}
 
 {% block page_title %}<a href="{% url 'reports.views.dashboard' %}" class="navbar-brand" >Dashboard</a>{% endblock %}
@@ -96,7 +98,7 @@ $('#SearchField').prop('disabled', true);
     {% endif %}
 </div>
 <div class="row">
-    <div class='col-md-4'>
+<!--    <div class='col-md-4'>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Status</h3>
@@ -146,7 +148,7 @@ $('#SearchField').prop('disabled', true);
                 </tr>
             </table>
         </div>
-    </div>
+    </div> -->
     <div class='col-md-4'>
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -334,6 +336,7 @@ $('#SearchField').prop('disabled', true);
         </div>
     </div>
 		{% endif %}
+
 </div><!-- /row -->
 
 {% endblock %}
