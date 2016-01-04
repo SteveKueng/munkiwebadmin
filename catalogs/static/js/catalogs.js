@@ -113,16 +113,13 @@ function savePkgInfo() {
 	 }
  	});
 
-	obj["type"] = "test";
+	obj["saveType"] = "pkginfo";
 	var pkginfo = JSON.stringify(obj);
-	alert(pkginfo)
-	$.ajax({
-	    type: 'POST',
-	    url: "/catalog/save",
-	    data: pkginfo,
-	    success: function(data) { alert('data: ' + data); },
-	    contentType: "application/json",
-	    dataType: 'json'
+
+	$.post("/catalog/save",
+		pkginfo,
+		function(data){
+			//alert("success meldung");
 	});
 	$('#lgModal').modal('hide');
 }
@@ -145,8 +142,26 @@ function drop() {
 }
 
 function move_pkg(event, ui) {
+	var obj = new Object();
+
 	$(ui.draggable).remove();
 	var draggableId = ui.draggable.attr("id");
   var droppableId = $(this).attr("id");
+	var nameVersion = draggableId.split(':');
+	var name = nameVersion[0];
+	var version = nameVersion[1];
+	var catalog = droppableId;
 
+	obj["name"] = name;
+	obj["version"] = version;
+	obj["catalog"] = catalog;
+	obj["saveType"] = "movePkg";
+	var pkginfo = JSON.stringify(obj);
+
+	$.post("/catalog/save",
+		pkginfo,
+		function(data){
+			//alert("success meldung");
+			location.reload();
+	});
 }

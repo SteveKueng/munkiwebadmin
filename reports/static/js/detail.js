@@ -388,9 +388,9 @@ function loadImagrStatus(serial) {
     var type = "load"
     var data = {type:type};
     $.post("/update/staging/"+serial,
-                data,
-                function(data){
-                    $("#stating_status").html(data);
-                });
+      data,
+      function(data){
+        $("#stating_status").html(data);
+    });
 }
 // ---------------------------------------------------------------------------

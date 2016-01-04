@@ -145,13 +145,20 @@ def catalog_view(request, catalog_name=None, item_index=None):
 @login_required
 def save_pkginfo(request):
     if request.method == 'POST': # If the form has been submitted...
-        submit = request.POST
-        print submit.get('type')
-        print submit
+        submit = request.body
+         # convert to python dict
+        data = json.loads(submit)
 
-        pkg_info = json.loads(submit) # convert to python dict
-        if Catalog.save_pkginfo(pkg_info['name'], pkg_info['version'], pkg_info, ""):
-            return HttpResponse("OK!")
-        else:
-            return HttpResponse("Error!")
+        if data["saveType"] == "pkginfo":
+            pkg_info = data
+            del pkg_info["saveType"]
+            Catalog.save_pkginfo(pkg_info['name'], pkg_info['version'], pkg_info, "")
+            Catalog.makecatalogs("")
+
+        if data["saveType"] == "movePkg":
+            pkg_info = data
+            del pkg_info["saveType"]
+            Catalog.move_pkg(pkg_info['name'], pkg_info['version'], pkg_info['catalog'], "")
+            Catalog.makecatalogs("")
+
     return HttpResponse("No form submitted.\n")

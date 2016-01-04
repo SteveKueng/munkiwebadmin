@@ -283,7 +283,6 @@ def index(request):
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
-
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
         reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)

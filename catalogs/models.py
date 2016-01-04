@@ -16,8 +16,26 @@ STATIC_URL = settings.STATIC_URL
 MEDIA_URL = settings.MEDIA_URL
 ICONS_DIR = settings.ICONS_DIR
 APPNAME = settings.APPNAME
-#DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
-DEFAULT_MAKECATALOGS=""
+DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
+GIT = settings.GIT_PATH
+
+
+def execute(command):
+    popen = subprocess.Popen(command, stdout=subprocess.PIPE)
+    lines_iterator = iter(popen.stdout.readline, b"")
+    for line in lines_iterator:
+        print(line) # yield line
+
+usage = "%prog [options]"
+o = optparse.OptionParser(usage=usage)
+
+o.add_option("--makecatalogs", default=DEFAULT_MAKECATALOGS,
+    help=("Path to makecatalogs. Defaults to '%s'. "
+              % DEFAULT_MAKECATALOGS))
+
+opts, args = o.parse_args()
+
+MAKECATALOGS = opts.makecatalogs
 
 class Catalog(object):
     @classmethod
@@ -269,29 +287,6 @@ class Catalogs(models.Model):
 
 
 #--------------------------
-
-
-def execute(command):
-    popen = subprocess.Popen(command, stdout=subprocess.PIPE)
-    lines_iterator = iter(popen.stdout.readline, b"")
-    for line in lines_iterator:
-        print(line) # yield line
-
-usage = "%prog [options]"
-o = optparse.OptionParser(usage=usage)
-
-o.add_option("--makecatalogs", default=DEFAULT_MAKECATALOGS,
-    help=("Path to makecatalogs. Defaults to '%s'. "
-              % DEFAULT_MAKECATALOGS))
-
-opts, args = o.parse_args()
-
-MAKECATALOGS = opts.makecatalogs
-
-try:
-    GIT = settings.GIT_PATH
-except:
-    GIT = None
 
 class MunkiPkgGit:
     """A simple interface for some common interactions with the git binary"""
