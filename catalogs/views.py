@@ -148,17 +148,19 @@ def save_pkginfo(request):
         submit = request.body
          # convert to python dict
         data = json.loads(submit)
-
         if data["saveType"] == "pkginfo":
-            pkg_info = data
+            pkg_info = data.copy()
             del pkg_info["saveType"]
             Catalog.save_pkginfo(pkg_info['name'], pkg_info['version'], pkg_info, "")
-            Catalog.makecatalogs("")
 
         if data["saveType"] == "movePkg":
-            pkg_info = data
+            pkg_info = data.copy()
             del pkg_info["saveType"]
             Catalog.move_pkg(pkg_info['name'], pkg_info['version'], pkg_info['catalog'], "")
-            Catalog.makecatalogs("")
 
     return HttpResponse("No form submitted.\n")
+
+@login_required
+def makecatalogs(request):
+    Catalog.makecatalogs("")
+    return HttpResponse("OK\n")

@@ -119,17 +119,20 @@ function savePkgInfo() {
 	$.post("/catalog/save",
 		pkginfo,
 		function(data){
-			//alert("success meldung");
+			alert("success meldung");
+			makecatalogs();
 	});
 	$('#lgModal').modal('hide');
 }
 
 function drag() {
 	$('.draggable').draggable({
-	  cursor: "move",
+	  cursor: "auto",
 		revert: "invalid",
 	  opacity: 0.4,
-	  snap: ".droppable",
+	  //snap: ".droppable",
+		helper: 'clone',
+		stack: '.draggable',
 	});
 }
 
@@ -160,6 +163,16 @@ function move_pkg(event, ui) {
 
 	$.post("/catalog/save",
 		pkginfo,
+		function(data){
+			//alert("success meldung");
+			//location.reload();
+			makecatalogs();
+	});
+}
+
+function makecatalogs() {
+	//$('.').removeClass('hidden');
+	$.get("/catalog/makecatalogs",
 		function(data){
 			//alert("success meldung");
 			location.reload();

@@ -19,23 +19,20 @@ APPNAME = settings.APPNAME
 DEFAULT_MAKECATALOGS = settings.DEFAULT_MAKECATALOGS
 GIT = settings.GIT_PATH
 
+usage = "%prog [options]"
+o = optparse.OptionParser(usage=usage)
+o.add_option("--makecatalogs", default=DEFAULT_MAKECATALOGS,
+    help=("Path to makecatalogs. Defaults to '%s'. "
+              % DEFAULT_MAKECATALOGS))
+
+opts, args = o.parse_args()
+MAKECATALOGS = opts.makecatalogs
 
 def execute(command):
     popen = subprocess.Popen(command, stdout=subprocess.PIPE)
     lines_iterator = iter(popen.stdout.readline, b"")
     for line in lines_iterator:
         print(line) # yield line
-
-usage = "%prog [options]"
-o = optparse.OptionParser(usage=usage)
-
-o.add_option("--makecatalogs", default=DEFAULT_MAKECATALOGS,
-    help=("Path to makecatalogs. Defaults to '%s'. "
-              % DEFAULT_MAKECATALOGS))
-
-opts, args = o.parse_args()
-
-MAKECATALOGS = opts.makecatalogs
 
 class Catalog(object):
     @classmethod
@@ -127,6 +124,7 @@ class Catalog(object):
         if GIT:
             git = MunkiPkgGit()
             git.addMakeCatalogsForCommitter(committer)
+        return True
 
 
     @classmethod
@@ -151,6 +149,7 @@ class Catalog(object):
                     break
             if done:
                 break
+        return done
 
     @classmethod
     def add_catalog(self, pkg_name, pkg_version, pkg_orig, pkg_catalog, committer):
@@ -277,7 +276,6 @@ class Catalog(object):
                     break
             if done:
                 break
-        return done
 
 class Catalogs(models.Model):
     class Meta:
@@ -400,7 +398,3 @@ class MunkiPkgGit:
         # We don't really need to commit each file individually, except during debugging
         # if self.results['returncode'] == 0:
         #     self.commitFileAtPathForCommitter(aPath, aCommitter)
-
-
-
-        # Read contents of all pkginfo files. This is done by reading the contents of catalogs/all
