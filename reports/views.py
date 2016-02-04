@@ -62,7 +62,8 @@ if PROXY_ADDRESS:
 @token_required
 def submit(request, submission_type):
     if request.method != 'POST':
-        raise Http404
+        return HttpResponse("No report submitted.\n")
+        #raise Http404
 
     submit = request.POST
     serial = submit.get('serial')
@@ -92,7 +93,7 @@ def submit(request, submission_type):
         if 'location' in submit:
             machine.location = submit.get('location')
 
-        report.runtype = submit.get('runtype')
+        report.runtype = submit.get('runtype', 'UNKNOWN')
         report.timestamp = datetime.now()
 
         if submit.get('unit'):
