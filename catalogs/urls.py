@@ -9,6 +9,8 @@ urlpatterns = patterns('catalogs.views',
     url(r'^(?P<catalog_name>[^/]+)/$', 'catalog_view'),
     url(r'^(?P<catalog_name>[^/]+)/(?P<item_index>\d+)/$', 'item_detail'),
     url(r'^save$', 'save_pkginfo'),
+    url(r'^makecatalogs$', 'makecatalogs'),
     #url(r'^(?P<catalog_name>[^/]+)/(?P<item_name>[^/]+)/$', 'test_index'),
     #url(r'^(?P<catalog_name>[^/]+)/edit/$', 'edit'),
+
 )
