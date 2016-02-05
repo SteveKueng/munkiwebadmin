@@ -28,7 +28,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
   	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{machine.serial_number|slice:"8:" }}&size=240x240' width="130" />
 	</div>
   <div class="col-md-6">
-    <h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}</h2>
+    <h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</h2>
     <h4><small>
     {% if model_lookup_enabled and additional_info.model_description|length > 1 %}
       {{ additional_info.model_description }}
@@ -36,7 +36,8 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
       {{ machine.machine_model }}
     {% endif %}
     {% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
-    <a data-toggle="modal" href="/manifest/delete/{{ manifest_name }}" data-target="#myModal"><span class="glyphicon glyphicon-trash"></span></a>
+    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}');"><span class="glyphicon glyphicon-trash"></span></a>
+
     {% endif %}
     </small></h4>
     <div class="btn-group" role="group" aria-label="...">

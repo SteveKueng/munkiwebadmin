@@ -105,7 +105,7 @@
                       {% if perms.reports.can_view_reports %}
                       {% if business_units_enabled %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
-                        <a href="{% url 'reports.views.index' %}"><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span></a>
+                        <a id="comp" href="{% url 'reports.views.index' %}"><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span></a>
                         <ul id="computers" class="collapse in">
                           {% for business_unit in business_units %}
                           <li>
@@ -124,7 +124,7 @@
                         <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
                         <ul id="computers" class="collapse in">
                           <li>
-                            <a href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
+                            <a id="comp" href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
                           </li>
                           <li>
                             <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>

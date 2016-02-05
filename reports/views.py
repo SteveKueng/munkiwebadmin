@@ -791,6 +791,7 @@ def raw(request, serial):
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
+@token_required
 def imagr(request, serial):
     machine = None
     if serial:
@@ -950,3 +951,25 @@ def model_description_lookup(serial):
         return et.findtext("configCode").decode("utf-8")
     except:
         return ''
+
+@login_required
+@permission_required('reports.delete_machine')
+def delete_machine(request, serial):
+    machine = None
+    if serial:
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+
+    if machine:
+        try:
+            report = MunkiReport.objects.get(machine=machine)
+            report.delete()
+        except MunkiReport.DoesNotExist:
+            pass
+
+    machine.delete()
+    return HttpResponse("Machine deleted\n")
