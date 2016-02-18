@@ -791,7 +791,7 @@ def raw(request, serial):
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
-@token_required
+#@token_required
 def imagr(request, serial):
     machine = None
     if serial:

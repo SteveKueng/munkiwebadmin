@@ -394,11 +394,18 @@ function loadImagrStatus(serial) {
     });
 }
 
-function delete_machine_modal(name, serial) {
+function delete_machine_modal(name, serial, manifest) {
     $('#myModal').children().children().empty();
 		$('#myModal').children().children().append('<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Delete</h4></div>');
-    $('#myModal').children().children().append('<div class="modal-body"><form name="delete_form"><h4>Really delete client <b>'+name+'</b>?</h4><br><input class="btn btn-danger pull-right" type="button" value="Delete" onclick=\'delete_machine("'+serial+'")\' /><input type="reset" class="btn btn-default" data-dismiss="modal" value="Close"/></div>');
+    $('#myModal').children().children().append('<div class="modal-body"><form name="delete_form"><h4>Really delete client <b>'+name+'</b>?</h4><br><input class="btn btn-danger pull-right" type="button" value="Delete" onclick=\'delete_manifest("'+manifest+'"); delete_machine("'+serial+'")\' /><input type="reset" class="btn btn-default" data-dismiss="modal" value="Close"/></div>');
     $('#myModal').modal();
+}
+
+function delete_manifest(manifest) {
+  $.post("/manifest/delete/"+manifest, function() {
+    alert( "success" );
+  });
+  //alert(manifest);
 }
 
 function delete_machine(serial) {

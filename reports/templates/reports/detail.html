@@ -36,7 +36,7 @@ getDetail('Manifest', "{{ machine.serial_number }}", '{{manifest_name}}');
       {{ machine.machine_model }}
     {% endif %}
     {% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
-    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}');"><span class="glyphicon glyphicon-trash"></span></a>
+    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}', '{{manifest_name}}');"><span class="glyphicon glyphicon-trash"></span></a>
 
     {% endif %}
     </small></h4>
