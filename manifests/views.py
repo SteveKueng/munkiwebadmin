@@ -193,4 +193,4 @@ def copymanifest(request):
 
     Manifest.copy(manifest_name, manifest_copy)
 
-    return HttpResponse("No report submitted.\n")
+    return HttpResponse("")
