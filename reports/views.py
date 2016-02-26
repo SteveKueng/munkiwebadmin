@@ -106,15 +106,16 @@ def submit(request, submission_type):
             if submit.get('message'):
                 machine.imagr_message = submit.get('message')
 
+            # delete pending workflow if successful ended
+            if submit.get('status') == 'success':
+                machine.imagr_workflow = ""
+
             report.runstate = u"imagr"
             machine.save()
             report.save()
             return HttpResponse(
                 "Imagr report submmitted for %s.\n" %
                  submit.get('serial'))
-
-        if submission_type != 'reportimagr':
-            machine.imagr_workflow = ""
 
         machine.last_munki_update = datetime.now()
         if submission_type == 'postflight':
