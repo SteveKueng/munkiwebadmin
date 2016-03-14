@@ -28,6 +28,7 @@ def index(request):
             pass
     else:
         business_units = ""
+        sumUnkown = 0
 
     hanlde=open(PROJECT_DIR+"/../version", 'r+')
     version=hanlde.read()
