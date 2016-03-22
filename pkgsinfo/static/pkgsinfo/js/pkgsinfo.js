@@ -34,7 +34,7 @@ $(document).ready(function() {
             }
         }
     });
-    
+
 } );
 
 
@@ -280,7 +280,7 @@ function constructBasics() {
 function constructDetail() {
     if (js_obj != null) {
         $('#detail').html('')
-        $('#detail').plistEditor(js_obj, 
+        $('#detail').plistEditor(js_obj,
             { change: updatePlistAndBasics,
               keytypes: keys_and_types,
               validator: validator});
@@ -322,7 +322,7 @@ function plistChanged() {
     var val = editor.getValue();
     if (val) {
         try { js_obj = PlistParser.parse(val); }
-        catch (e) { 
+        catch (e) {
             //alert('Error in parsing plist. ' + e);
             js_obj = null;
         }
@@ -358,7 +358,7 @@ function getPkginfoItem(pathname) {
             $('#pkginfo_item_detail').html(data);
             val = $('#plist').text();
             try { js_obj = PlistParser.parse(val); }
-            catch (e) { 
+            catch (e) {
                 //alert('Error in parsing plist. ' + e);
                 js_obj = null;
             }
@@ -419,10 +419,10 @@ var selected_tab_viewname = "#basicstab";
 
 // these should be moved into their own file maybe so they can be edited
 // seperately
-var key_list = {'name': 'Name', 
-                'version': 'Version', 
-                'display_name': 'Display name', 
-                'description': 'Description', 
+var key_list = {'name': 'Name',
+                'version': 'Version',
+                'display_name': 'Display name',
+                'description': 'Description',
                 'catalogs': 'Catalogs',
                 'category': 'Category',
                 'developer': 'Developer',
@@ -466,15 +466,15 @@ var keys_and_types = {'apple_item': true,
                       'uninstallcheck_script': '',
                       'postinstall_script': '#!/bin/sh\nexit 0',
                       'postuninstall_script': '#!/bin/sh\nexit 0',
-                      'preinstall_alert': {'alert_title': 'Preinstall Alert', 
+                      'preinstall_alert': {'alert_title': 'Preinstall Alert',
                                            'alert_detail': 'Some important information',
                                            'ok_label': 'Install',
                                            'cancel_label': 'Cancel'},
-                      'preuninstall_alert': {'alert_title': 'Preuninstall Alert', 
+                      'preuninstall_alert': {'alert_title': 'Preuninstall Alert',
                                              'alert_detail': 'Some important information',
                                              'ok_label': 'Uninstall',
                                              'cancel_label': 'Cancel'},
-                      'preupgrade_alert': {'alert_title': 'Preupgrade Alert', 
+                      'preupgrade_alert': {'alert_title': 'Preupgrade Alert',
                                            'alert_detail': 'Some important information',
                                            'ok_label': 'Install',
                                            'cancel_label': 'Cancel'},
@@ -597,7 +597,7 @@ function savePkginfoItem() {
     $.ajax({
         type: 'POST',
         url: pkginfoItemURL,
-        headers: {'X_METHODOVERRIDE': 'PUT',
+        headers: {'X-METHODOVERRIDE': 'PUT',
                   'Content-Type': 'application/xml',
                   'Accept': 'application/xml'},
         data: plist_data,
@@ -634,7 +634,7 @@ function showDeleteConfirmationModal() {
         // we need to check to see how many pkginfo items reference this
         // installer item path; if more than one we should not offer to
         // delete the installer_item as well
-        // most items should have a single reference, so we'll start 
+        // most items should have a single reference, so we'll start
         // with the checkbox visible, but disabled
         // (checkbox is hidden by default so it's not shown when an item
         //  doesn't have an associated installer_item, like
@@ -715,7 +715,7 @@ function deletePkginfoList() {
         url: '/pkgsinfo/',
         data: JSON.stringify({'pkginfo_list': pkginfo_list,
                               'deletePkg': deletePkg}),
-        headers: {'X_METHODOVERRIDE': 'DELETE'},
+        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             rebuildCatalogs();
             window.location.hash = '';
@@ -746,7 +746,7 @@ function deleteInstallerItem(installer_item_path) {
         $.ajax({
             type: 'POST',
             url: the_url,
-            headers: {'X_METHODOVERRIDE': 'DELETE'},
+            headers: {'X-METHODOVERRIDE': 'DELETE'},
             success: function(data) {
                 // do nothing
             },
@@ -779,7 +779,7 @@ function deletePkginfoItem() {
     $.ajax({
         type: 'POST',
         url: pkginfoItemURL,
-        headers: {'X_METHODOVERRIDE': 'DELETE'},
+        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             if (delete_pkg) {
                 deleteInstallerItem(installer_item_path);

@@ -18,7 +18,7 @@ $(document).ready(function() {
     getCatalogData();
     $('#listSearchField').focus();
     do_resize();
-    
+
     $('#manifest_search_btn').click( function(){
         searchManifests();
     });
@@ -31,7 +31,7 @@ $(document).ready(function() {
         searchManifests();
       }
     });
-    
+
     // Submit the new manifest form when the user clicks the Create button...
     $('[data-new="manifest"]').click( function(){
         newManifestItem();
@@ -70,7 +70,7 @@ $(document).ready(function() {
     $(document).on('shown.bs.modal', '.modal', function(event){
         $(event.currentTarget).find('input').select();
     });
-    
+
     // make included manifests link buttons clickable
     //$(document).on('click', 'span.row_link_btn', function(event){
     //    linkToIncludedManifest($(event.currentTarget));
@@ -590,7 +590,7 @@ function saveManifestItem() {
     $.ajax({
         method: 'POST',
         url: manifestItemURL,
-        headers: {'X_METHODOVERRIDE': 'PUT',
+        headers: {'X-METHODOVERRIDE': 'PUT',
                   'Content-Type': 'application/xml',
                   'Accept': 'application/xml'},
         data: plist_data,
@@ -685,7 +685,7 @@ function deleteManifestItem() {
     $.ajax({
         method: 'POST',
         url: manifestItemURL,
-        headers: {'X_METHODOVERRIDE': 'DELETE'},
+        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             window.location.hash = '';
             $('#manifest_detail').html('');
