@@ -56,6 +56,7 @@ def process_file(pkginfo_path):
     except (ExpatError, IOError):
         return ()
     return (pkginfo.get('name', 'NO_NAME'),
+            pkginfo.get('display_name', 'NO_DISPLAY_NAME'),
             pkginfo.get('version', 'NO_VERSION'),
             pkginfo.get('catalogs', []),
             pkginfo_path)
@@ -114,8 +115,8 @@ class Pkginfo(Plist):
             # to speed things up a bit since we wait a lot for I/O
             pool = ThreadPool(processes=4)
             tuples = pool.map(process_file, files)
-            for name, version, catalogs, pathname in tuples:
-                pkginfo_dict[name].append((version, catalogs, pathname))
+            for name, display_name, version, catalogs, pathname in tuples:
+                pkginfo_dict[name].append((version, catalogs, pathname, display_name))
         else:
             LOGGER.debug("using faster approach")
             # use the data in the all catalog; one file read instead

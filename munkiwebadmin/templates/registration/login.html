@@ -23,11 +23,12 @@ $(document).ready(function() {
 Bootstrap modal
 -->
 <div class="modal fade" data-hide="false" data-backdrop="static" id="loginModal">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <form method="post" action="{% url "login" %}">
       <div class="modal-header">
-        <h3 class="modal-title text-primary">Please log in.</h3>
+        <img src="{% get_static_prefix %}img/Munki.png" width="100" style="margin-left: 75px">
+        <!--<h3 class="modal-title text-primary">Please log in.</h3>-->
       </div>
       <div class="modal-body">
           {% if form.errors %}
@@ -37,17 +38,23 @@ Bootstrap modal
           {% endif %}
           {% csrf_token %}
           <div class="form-group" id='login_username_field'>
-              {{ form.username.label_tag }}
+            <!--  {{ form.username.label_tag }} -->
               {{ form.username|addcss:'form-control' }}
           </div>
-          <div class="form-group">
-              {{ form.password.label_tag }}
+          <div class="form-group" style="margin-bottom: 0px !important;">
+            <!--  {{ form.password.label_tag }} -->
               {{ form.password|addcss:'form-control' }}
           </div>
+          <script type="text/javascript" >
+    $(document).ready(function(){
+        $("#id_username").attr('placeholder', '{{form.username.label}}');
+        $("#id_password").attr('placeholder', '{{form.password.label}}');
+    });
+</script>
           <input type="hidden" name="next" value="{{ next }}" />
       </div>
       <div class="modal-footer">
-          <input type="submit" class="btn btn-primary" value="Log in" />
+          <input type="submit" class="btn btn-primary btn-block" value="Log in" />
       </div>
       </form>
     </div><!-- /.modal-content -->

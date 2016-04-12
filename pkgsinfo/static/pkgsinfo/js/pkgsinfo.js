@@ -1,12 +1,27 @@
 function do_resize() {
-    $('#item_editor').height($(window).height() - 180);
+    $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 180);
-    $('#item_list').height($(window).height() - 100);
-    $('.dataTables_scrollBody').height($(window).height() - 180);
+    $('#plist').height($(window).height() - 240);
+    //$('#item_list').height($(window).height() - 90);
+    //$('.dataTables_scrollBody').height($(window).height() - 170);
 }
 
 $(window).resize(do_resize);
+
+// reset url on modal close
+$(document).on('hide.bs.modal','#pkginfoItem', function () {
+  // check for unsaved changes
+  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+      $('#pkginfoItem').data('bs.modal').isShown = false;
+      $("#saveOrCancelConfirmationModal").modal("show");
+      event.preventDefault();
+      return;
+  } else {
+    $('#pkginfoItem').data('bs.modal').isShown = true;
+    window.location.hash = '';
+    current_pathname = "";
+  }
+});
 
 $(document).ready(function() {
     initPkginfoTable();
@@ -21,6 +36,7 @@ $(document).ready(function() {
     $('#catalog_dropdown_list').on('custom.update', function () {
         update_catalog_dropdown_list();
     })
+
     $('#mass_delete').on('click', confirmMassDelete);
     $('#massaction_dropdown').on('click', enableMassActionMenuItems);
     $('#mass_edit_catalogs').on('click', openMassEditModal);
@@ -34,7 +50,6 @@ $(document).ready(function() {
             }
         }
     });
-
 } );
 
 
@@ -175,19 +190,18 @@ var openMassEditModal = function() {
 
 
 var render_versions = function(data, type, row, meta) {
-    var html = '<ul class="list">\n';
+    var html = '<div class="list-group" style="margin-bottom: 0px;">\n';
     var catalog_filter = $('#catalog_dropdown').data('value');
     for(var i = 0; i < data.length; i++) {
         if (catalog_filter == 'all' || data[i][1].indexOf(catalog_filter) != -1) {
-            html += '<li class="pkginfo_items" data-path=\'' + data[i][2] + '\'>';
-            html += '<a href="#' + data[i][2];
+            html += '<a href="#' + data[i][2] + '" class="pkginfo_items list-group-item" data-path=\'' + data[i][2] + '\'>';
             //html += '" onClick="getPkginfoItem(\'' + data[i][2] + '\')">';
-            html += '">';
+            html += '<input type="checkbox" class="pull-right"/>\n';
             html += data[i][0] + '</a>';
-            html += '<input type="checkbox" class="pull-right"/></li>\n';
+
         }
     }
-    html += '</ul>\n';
+    html += '</div>\n';
     return html
 }
 
@@ -213,7 +227,7 @@ function initPkginfoTable() {
         },
         columnDefs: [
          { "targets": 0,
-            //"width": "60%",
+            "width": "40%",
             "render": render_name,
          },
          {
@@ -224,9 +238,10 @@ function initPkginfoTable() {
           },],
          "sDom": "<t>",
          "bPaginate": false,
-         "scrollY": "80vh",
+         //"scrollY": "100vh",
          "bInfo": false,
          "bFilter": true,
+         "autoWidth": true,
          "bStateSave": false,
          "aaSorting": [[0,'asc']]
      });
@@ -244,9 +259,10 @@ function initPkginfoTable() {
 
 function cancelEdit() {
     //$('#cancelEditConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
     hideSaveOrCancelBtns();
-    getPkginfoItem(current_pathname);
+    $("#pkginfoItem").modal("hide");
+    //$('.modal-backdrop').remove();
+    //getPkginfoItem(current_pathname);
 }
 
 
@@ -377,6 +393,11 @@ function getPkginfoItem(pathname) {
             do_resize();
             window.history.replaceState({'pkginfo_detail': data}, pkginfoItemURL, '/pkgsinfo/');
             window.location.hash = pathname;
+
+            if (!$('#pkginfoItem').hasClass('in')){
+              //alert("test")
+              $("#pkginfoItem").modal("show");
+            }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#pkginfo_item_detail').html("")
@@ -591,7 +612,7 @@ function monitor_pkgsinfo_list() {
 
 function savePkginfoItem() {
     // save pkginfo item back to the repo
-    $('.modal-backdrop').remove();
+    //$('.modal-backdrop').remove();
     var plist_data = editor.getValue();
     var pkginfoItemURL = '/api/pkgsinfo/' + current_pathname;
     $.ajax({
@@ -605,6 +626,7 @@ function savePkginfoItem() {
         success: function(data) {
             hideSaveOrCancelBtns();
             rebuildCatalogs();
+            $("#pkginfoItem").modal("hide");
             if (requested_pathname.length) {
                 getPkginfoItem(requested_pathname);
             }
