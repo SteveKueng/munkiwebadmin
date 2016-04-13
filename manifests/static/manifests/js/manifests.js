@@ -1,13 +1,28 @@
 function do_resize() {
-    $('#item_editor').height($(window).height() - 180);
+    $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 180);
-    $('#item_list').height($(window).height() - 100);
-    $('.dataTables_scrollBody').height($(window).height() - 180);
+    $('#plist').height($(window).height() - 240);
+    //$('#item_list').height($(window).height() - 100);
+    //$('.dataTables_scrollBody').height($(window).height() - 180);
     //$('#list_items').DataTable().draw();
 }
 
 $(window).resize(do_resize);
+
+// reset url on modal close
+$(document).on('hide.bs.modal','#manifestItems', function () {
+  // check for unsaved changes
+  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+      $('#manifestItems').data('bs.modal').isShown = false;
+      $("#saveOrCancelConfirmationModal").modal("show");
+      event.preventDefault();
+      return;
+  } else {
+    $('#manifestItems').data('bs.modal').isShown = true;
+    window.location.hash = '';
+    current_pathname = "";
+  }
+});
 
 $(document).ready(function() {
     initManifestsTable();
@@ -173,9 +188,10 @@ function monitor_manifest_list() {
 
 function cancelEdit() {
     //$('#cancelEditConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
+    $("#manifestItems").modal("hide");
+    //$('.modal-backdrop').remove();
     hideSaveOrCancelBtns();
-    getManifestItem(current_pathname);
+    //getManifestItem(current_pathname);
 }
 
 
@@ -508,6 +524,11 @@ function getManifestItem(pathname) {
             do_resize();
             window.history.replaceState({'manifest_detail': data}, manifestItemURL, '/manifests/');
             window.location.hash = pathname;
+
+            if (!$('#manifestItems').hasClass('in')){
+              //alert("test")
+              $("#manifestItems").modal("show");
+            }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#manifest_detail').html("")

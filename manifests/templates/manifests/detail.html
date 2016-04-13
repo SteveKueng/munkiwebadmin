@@ -1,54 +1,64 @@
-<h4>{{ pathname }}</h4>
-<div class='pull-right' id='delete_btn'>
-{% if perms.manifests.delete_manifestfile %}
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Delete</button>
-{% endif %}
-{% if perms.manifests.change_manifestfile %}
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#copyManifestModal">Duplicate</button>
-{% endif %}
-</div>
-{% if perms.manifests.change_manifestfile %}
-<div class='pull-right hidden' id='save_and_cancel'>
-  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
-  <button type="button" class="btn btn-success" onClick="saveManifestItem()">Save</button>
-</div>
-{% else %}
-<div class='pull-right hidden' id='save_and_cancel'>
-  <span class="bg-danger">You don't have permissions to make changes here.</span>
-  <button type="button" class="btn" onClick="cancelEdit()">Cancel</button>
-</div>
-{% endif %}
-<div role="tabpanel">
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist" id="editortabs">
-    <li role="presentation" class="active">
-      <a href="#basicstab" aria-controls="basicstab" role="tab" data-toggle="tab">Basics</a>
-    </li>
-    <li role="presentation">
-      <a href="#detailtab" aria-controls="editortab" role="tab" data-toggle="tab">Details</a>
-    </li>
-    <li role="presentation">
-      <a href="#plisttab" aria-controls="plisttab" role="tab" data-toggle="tab">plist</a>
-    </li>
-  </ul>
-  <!-- Tab panes -->
-  <div class="tab-content" id="item_editor">
-    <div role="tabpanel" class="tab-pane active" id="basicstab">
-        <div id="basics" class="plist-editor"></div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="detailtab">
-        <div id="detail" class="plist-editor"></div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="plisttab">
-        <!--<textarea id="p l i s t" rows=30></textarea>-->
-        <div id='plist'>{{ plist_text }}</div>
-    </div>
-   </div>
-</div>
+<div class="modal fade" id="manifestItems">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>{{ pathname }}</h4>
+        <div class='pull-right' id='delete_btn' style="margin-top:-40px;">
+        {% if perms.manifests.delete_manifestfile %}
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Delete</button>
+        {% endif %}
+        {% if perms.manifests.change_manifestfile %}
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#copyManifestModal">Duplicate</button>
+        {% endif %}
+        </div>
+      </div>
+      <div role="tabpanel" class="modal-body" style="padding:0px;">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist" id="editortabs">
+          <li role="presentation" class="active">
+            <a href="#basicstab" aria-controls="basicstab" role="tab" data-toggle="tab">Basics</a>
+          </li>
+          <li role="presentation">
+            <a href="#detailtab" aria-controls="editortab" role="tab" data-toggle="tab">Details</a>
+          </li>
+          <li role="presentation">
+            <a href="#plisttab" aria-controls="plisttab" role="tab" data-toggle="tab">plist</a>
+          </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content" id="item_editor">
+          <div role="tabpanel" class="tab-pane active" id="basicstab">
+              <div id="basics" class="plist-editor"></div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="detailtab">
+              <div id="detail" class="plist-editor"></div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="plisttab">
+              <!--<textarea id="p l i s t" rows=30></textarea>-->
+              <div id='plist'>{{ plist_text }}</div>
+          </div>
+         </div>
+      </div>
+      <div class="modal-footer">
+        {% if perms.manifests.change_manifestfile %}
+        <div class='pull-right hidden' id='save_and_cancel'>
+          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
+          <button type="button" class="btn btn-success" onClick="saveManifestItem()">Save</button>
+        </div>
+        {% endif %}
+        <div class='pull-right' id='cancel'>
+          {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
+          <button type="button" class="btn" onClick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <!--
 Bootstrap modal for confirming manifest deletion
 -->
-<div class="modal fade" id="deleteConfirmationModal">
+<div class="modal fade" id="deleteConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -69,7 +79,7 @@ Bootstrap modal for confirming manifest deletion
 <!--
 Bootstrap modal for confirming canceling editing
 -->
-<div class="modal fade" id="cancelEditConfirmationModal">
+<div class="modal fade" id="cancelEditConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -88,7 +98,7 @@ Bootstrap modal for confirming canceling editing
 <!--
 Bootstrap modal for saving or canceling when loading a different manifest
 -->
-<div class="modal fade" id="saveOrCancelConfirmationModal">
+<div class="modal fade" id="saveOrCancelConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -108,7 +118,7 @@ Bootstrap modal for saving or canceling when loading a different manifest
 <!--
 Bootstrap modal for duplicating a manifest
 -->
-<div class="modal fade" data-backdrop="static" id="copyManifestModal">
+<div class="modal fade" id="copyManifestModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
