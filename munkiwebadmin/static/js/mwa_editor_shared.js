@@ -121,12 +121,14 @@ function update_status(from_url) {
 
 
 function showSaveOrCancelBtns() {
-    $('#delete_btn').addClass('hidden');
+    //$('#delete_btn').addClass('hidden');
+    $('#cancel').addClass('hidden');
     $('#save_and_cancel').removeClass('hidden');
 }
 
 
 function hideSaveOrCancelBtns() {
     $('#save_and_cancel').addClass('hidden');
-    $('#delete_btn').removeClass('hidden');
+    $('#cancel').removeClass('hidden');
+    //$('#delete_btn').removeClass('hidden');
 }
