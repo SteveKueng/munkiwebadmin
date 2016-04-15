@@ -29,27 +29,3 @@
     font-family: Courier, monospace;
     font-size: 12px;
 }
-
-/* display magnifying glass icon inside the search field*/
-.left-inner-addon {
-    position: relative;
-}
-.left-inner-addon input {
-    padding-left: 30px;
-}
-.left-inner-addon span.icon-addon {
-    position: absolute;
-    padding: 10px 10px;
-    pointer-events: none;
-    color: #666;
-}
-
-.pkginfo-icon {
-    position: absolute;
-    top: -1px;
-}
-
-#pathname {
-    position: relative;
-    left: 40px;
-}

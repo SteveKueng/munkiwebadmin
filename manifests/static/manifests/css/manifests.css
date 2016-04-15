@@ -25,20 +25,6 @@ tbody.connectable {
     background-color: inherit;
 }
 
-/* display magnifying glass icon inside the search field*/
-.left-inner-addon {
-    position: relative;
-}
-.left-inner-addon input {
-    padding-left: 30px;
-}
-.left-inner-addon span.icon-addon {
-    position: absolute;
-    padding: 10px 10px;
-    pointer-events: none;
-    color: #666;
-}
-
 .plist-editor tr[data-path="included_manifests"] tr:hover td.row-controls span.row_link_btn {
     visibility: visible;
     color: gray;

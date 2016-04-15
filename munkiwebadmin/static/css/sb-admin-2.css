@@ -357,3 +357,17 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
+
+/* display magnifying glass icon inside the search field*/
+.left-inner-addon {
+    position: relative;
+}
+.left-inner-addon input {
+    padding-left: 30px;
+}
+.left-inner-addon span.icon-addon {
+    position: absolute;
+    padding:9px 10px;
+    pointer-events: none;
+    color: #666;
+}
