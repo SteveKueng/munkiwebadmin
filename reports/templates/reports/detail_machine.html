@@ -1,0 +1,154 @@
+{% load report_extras %}
+{% load static %}
+
+<!-- Machine info -->
+<div class="row">
+  <div class="col-md-6">
+    <h4>Machine</h4>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Model:</th>
+          <td>
+            {{ machine.machine_model }}
+            {{ machine.cpu_type }}
+            {{ machine.cpu_speed }}
+          </td>
+        </tr>
+        <tr>
+          <th>RAM:</th>
+          <td>{{ machine.ram }}</td>
+        </tr>
+        <tr>
+          <th>Serial:</th>
+          <td>{{ machine.serial_number }}</td>
+        </tr>
+        <tr>
+          <th>MAC:</th>
+          <td>{{ machine.mac }}</td>
+        </tr>
+        <tr>
+          <th>Remote IP:</th>
+          <td>{{ machine.remote_ip }}</td>
+        </tr>
+        {% if 'MachineInfo' in report %}
+        <tr>
+          <th>Hostname:</th>
+          <td>{{ report.MachineInfo.hostname }}</td>
+        </tr>
+        <tr>
+          <th>OS version:</th>
+          <td>{{ report.MachineInfo.os_vers }}
+              {{ report.MachineInfo.arch }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Free disk space:</th>
+          <td>{{ report.AvailableDiskSpace|humanreadablesize  }}</td>
+        </tr>
+        <tr>
+          <th>Console user:</th>
+          <td>{{ report.ConsoleUser }}</td>
+        </tr>
+        <tr>
+          <th>Uptime:</th>
+          <td>{{ SoftwareData.uptime }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class='col-md-6'>
+    <h4>Munki</h4>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Version:</th>
+          <td>{{ report.ManagedInstallVersion }}</td>
+        </tr>
+        {% if 'ManifestName' in report %}
+        <tr>
+          <th>Manifest:</th>
+          <td>
+            {% if perms.manifests.can_view_manifests %}
+            <a href='{% url "manifests.views.view" report.ManifestNameLink %}'>
+            {% endif %}
+            {{ report.ManifestName }}
+            {% if perms.manifests.can_view_manifests %}
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Run Type:</th>
+          <td>{{ report.RunType }}</td>
+        </tr>
+        <tr>
+          <th>Start:</th>
+          <td>{{ report.StartTime }}</td>
+        </tr>
+        <tr>
+          <th>End:</th>
+          <td>{{ report.EndTime }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if warranty_lookup_enabled %}
+    <h4>Warranty Information</h4>
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>Warranty status:</th>
+          <td>
+            <col-md- id='warranty_status_checking' style='display: none;'>
+              Checking warranty status
+              <i id="imgProgress" class="fa fa-spinner fa-pulse"></i>
+            </col-md->
+            <col-md- id='warranty_status'>
+              <a href='javascript:void(0)' onclick="get_warranty_status('{{ machine.serial_number }}')">Check status</a>
+            </col-md->
+          </td>
+        </tr>
+        <tr>
+          <th>Manufacture date:</th>
+          <td>{{ additional_info.manufacture_date }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  <div class='col-md-6'>
+  <h4>Storage</h4>
+  {% for disk in SPStorageDataType %}
+    <table class="client_info table table-condensed">
+      <tbody>
+        <tr>
+          <th>{{ disk|get:"_name" }}</th>
+          <td>
+            <table class="client_info table table-condensed">
+              <tbody>
+                <tr>
+                  <th>Mount point</th>
+                  <td>{{ disk.mount_point }}</td>
+                </tr>
+                <tr>
+                  <th>Disk name</th>
+                  <td>{{ disk.bsd_name }}</td>
+                </tr>
+                <tr>
+                  <th>Ignore ownership</th>
+                  <td>{{ disk.ignore_ownership }}</td>
+                </tr>
+                <tr>
+                  <th>File system</th>
+                  <td>{{ disk.file_system }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  {% endfor %}
+  </div>
+</div>

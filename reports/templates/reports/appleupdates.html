@@ -1,0 +1,59 @@
+{% load report_extras %}
+{% load static %}
+
+{% if AppleUpdates %}
+<div class"row">
+  <div class="col-md-12">
+    <table class="table table-condensed">
+    <tbody>
+      {% for item in AppleUpdates|dictsort:"display_name" %}
+      <tr>
+        <td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+        <td>
+          {% if item.display_name|length %}
+            {{ item.display_name }}
+          {% else %}
+            {{ item.name }}
+          {% endif %}
+        </td>
+        <td class="visible-md visible-lg">
+          {{ item.version_to_install }}
+          {{ item.installed_version }}
+        </td>
+        <td class="text-right">
+          {% if 'install_result' in item %}
+            {{ item.install_result }}
+          {% else %}
+            {% if item.installed %}
+              <span class='label label-primary'>installed</span>
+            {% else %}
+              <span class='label label-danger'>not installed</span>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endif%}
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-condensed" id="dataTables-clients">
+      <tbody>
+        {% for item in history|dictsortreversed:'install_date' %}
+        {% ifequal item.package_source "package_source_apple" %}
+          <tr>
+            <td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+            <td>{{ item|get:"_name" }}</td>
+            <td>{{ item.install_version }}</td>
+            <td class="text-right visible-md visible-lg">{{ item.install_date|date:"d. F Y" }}</td>
+          </tr>
+        {% endifequal %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

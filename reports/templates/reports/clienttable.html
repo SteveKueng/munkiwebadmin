@@ -1,0 +1,91 @@
+{% if report_list|length %}
+<div class="button">
+        <button class="grid">Grid View</button>
+        <button class="list">List View</button>
+    </div>
+<div class="row-fluid">
+		<ul id="deviceList" class="list">
+			{% for report in report_list %}
+			<li class="col-xs-4 col-md-3 col-lg-2 col-xl-1" data-state="all" onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';">
+			  <img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.machine.serial_number|slice:"8:"  }}&size=120x120' alt="" width="72" />
+  			{% if report.machine.hostname %}
+				<h4>
+			  	{{ report.machine.hostname }}
+			  </h4>
+				{% endif %}
+				<h4 class="detail">
+			    {{ report.machine.serial_number }}
+			  </h4>
+		  </li>
+			{% endfor %}
+		</ul>
+</div>
+<!--
+<div id="listview" class="table-responsive">
+	<table class="table table-condensed table-hover" id="dataTables-clients">
+		<thead>
+			<tr>
+				<th class="text-center"></th>
+				<th>Machine</th>
+				<th class="visible-md visible-lg">Serialnumber</th>
+				<th>User</th>
+				<th class="visible-md visible-lg">IP</th>
+				<th class="visible-lg">Latest Run</th>
+				<th class="visible-md visible-lg">Info</th>
+			</tr>
+		</thead>
+		<tbody>
+	        {% for report in report_list %}
+	            <tr onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';" style="cursor: pointer">
+	                <td class="text-center">
+	                	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.machine.serial_number|slice:"8:"  }}&size=72x72' width="20" />
+	                </td>
+	                <td>
+	                  {% if report.machine.hostname %}
+	                      {{ report.machine.hostname }}
+	                  {% else %}
+	                      {{ report.machine.serial_number }}
+	                  {% endif %}
+	                </td>
+									<td class="visible-md visible-lg">
+	                  {{ report.machine.serial_number }}
+	                </td>
+	                <td>{{ report.console_user }}</td>
+	                <td class='visible-md visible-lg'>{{ report.machine.remote_ip }}</td>
+	                <td class="visible-lg">
+	                    {{ report.timestamp|date:"Y-m-d H:i" }}
+	                </td>
+	                <td class="visible-md visible-lg">
+	                    {% if report.updating %}
+	                      {{ report.runtype }} run in progress
+	                    {% else %}
+	                      {{ report.runtype }}
+	                    {% endif %}
+	                    {{ report.runstate }}
+	                    {% if report.errors %}
+	                      {{ report.errors }} error{{ report.errors|pluralize }}
+	                    {% endif %}
+	                    {% if report.warnings %}
+	                      {{ report.warnings }} warning{{ report.warnings|pluralize }}
+	                    {% endif %}
+	                    {% if report.pending_installs %}
+	                      {{ report.pending_installs }} pending install{{ report.pending_installs|pluralize }}
+	                    {% endif %}
+	                    {% if report.install_results %}
+	                      {{ report.install_results }} package{{ report.install_results|pluralize }} installed
+	                    {% endif %}
+	                    {% if report.pending_removals %}
+	                      {{ report.pending_removals }} pending removal{{ report.pending_removals|pluralize }}
+	                    {% endif %}
+	                    {% if report.removal_results %}
+	                      {{ report.removal_results }} package{{ report.removal_results|pluralize }} removed
+	                    {% endif %}
+	                </td>
+	            </tr>
+	        {% endfor %}
+		</tbody>
+	</table>
+</div>
+-->
+
+{% endif %}

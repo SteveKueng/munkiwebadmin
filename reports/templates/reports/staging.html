@@ -1,0 +1,42 @@
+{% load report_extras %}
+{% load static %}
+<div class"row">
+  <!--<div class="alert alert-success" role="alert">...</div>-->
+  <!--<div class="alert alert-warning" role="alert">...</div> -->
+
+  {% if imagr_config_plist %}
+  <div class="col-md-4">
+    <h4>Workflows</h4>
+      <select class="form-control" id="workflow_selection">
+        <option>no workflow</option>
+        {% for workflow in imagr_config_plist.workflows %}
+        <option {% if workflow.name == imagr_workflow %}selected{% endif %}>{{ workflow.name }}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <button class="btn btn-default pull-right" onclick="saveWorkflow('{{ machine_serial }}')">Deploy</button>
+  </div>
+  {% endif %}
+
+  <div class="col-md-8">
+    <h4>Info</h4>
+    {% if imagr_workflow %}
+    <div class="alert alert-info" role="alert">Workflow <strong>{{ imagr_workflow }}</strong> is set for this client!</div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">No workflow defined for this client.</div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
+    <br>
+  </div>
+
+  <div class="col-md-4" id="stating_status">
+    <script>loadImagrStatus("{{ machine_serial }}");</script>
+  </div>
+  <script>
+  setInterval(function(){
+    loadImagrStatus("{{ machine_serial }}"); // this will run after every 5 seconds
+  }, 5000);
+  </script>
+</div>

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+<!-- page title -->
+{% block page_title %}<a href="{% url 'inventory.views.items' %}" class="navbar-brand" >Inventory</a>{% endblock %}
+
+{% block content %}
+{% with inventory_items=item_detail.instances list_title='Machines' %}
+  {% include 'inventory/iteminstancetable.html' %}
+{% endwith %}
+{% endblock %}

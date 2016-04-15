@@ -1,0 +1,5 @@
+{% load url from future %}
+
+{% with inventory_items=inventory_items list_title='Application inventory' %}
+  {% include 'inventory/inventorytable.html' %}
+{% endwith %}

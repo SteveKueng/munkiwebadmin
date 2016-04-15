@@ -1,0 +1,181 @@
+{% load report_extras %}
+<div class="row text-right" style="position:absolute; top:110px; right:40px;">
+  <div id='save_and_cancel' class="hidden-print btn-group">
+    {% if perms.manifests.change_manifests %}
+    <input type='button' class='edit btn btn-primary' value='Edit'></input>
+    {% endif %}
+  </div>
+</div>    
+
+{% if report.Errors|length or report.Warnings|length %}
+<!-- Error / Warnings -->
+<div class="row">
+  <div class="col-md-12">
+    <a name="errors">&nbsp;</a>
+    {% if report.Errors|length %}
+      <h4>Errors</h4>
+      <pre class="alert alert-danger">{{ report.Errors|join:'<br>' }}</pre>
+    {% endif %}
+    {% if report.Warnings|length %}
+    <h4>Warnings</h4>
+    <pre class="alert alert-warning">{{ report.Warnings|join:'<br>' }}</pre>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Manifests / Catalog -->
+<div class="row" id="manifest_detail">
+  <!-- Manifests -->
+  <div class='col-md-6 manifest_section'>
+    <div class="section_label"><h4>Included Manifests</h4></div>
+      <ul id='included_manifests' class='included_manifests_section list-group unstyled'>
+        {% for item in manifest.included_manifests %}
+          <li id='{{ item }}'class='list-group-item entrys 
+          {% if item not in valid_manifest_names %}
+            list-group-item-danger'>
+                <div class='editable'>{{ item }}</div>
+          {% else %}
+            list-group-item-info'>
+            {% if perms.manifests.can_view_manifests %}
+            <a href='{% url "manifests.views.view" item %}'>
+            {% endif %}
+                <div class='editable'>{{ item }}</div>
+            {% if perms.manifests.can_view_manifests %}
+            </a>
+            {% endif %}
+          {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+  </div>
+
+  <!-- Catalogs -->
+  <div class='col-md-6 manifest_section'>
+    <div class="section_label"><h4>Catalogs</h4></div>
+      <ul id='catalogs' class='catalogs_section list-group unstyled'>
+
+        {% for item in manifest.catalogs %}
+            <li id='{{ item }}' class='list-group-item entrys 
+            {% if item not in valid_catalogs %}
+            list-group-item-danger'>
+                <div class='editable'>{{ item }}</div>
+            {% else %}
+            list-group-item-info'>
+              <a href='/catalog/{{ item }}/'>
+                  <div class='editable'>{{ item }}</div>
+              </a>
+            {% endif %}
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Software -->
+{% for name, install in installs.items %}
+<div class="row">
+  <div class="col-md-12 manifest_section">
+    <div class="section_label_software">
+      <h4>
+        <div class="btn-group">
+          <button type="button" id="{{ name }}_btn" onclick="{% if name == 'optional_installs' %}showTable{% else %}hideTable{% endif %}('{{ name }}', this.id);" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-{% if name == 'optional_installs' %}expand{% else %}collapse-down{% endif %}" aria-hidden="true"></span></button>
+        </div> 
+        {{ name|replace }}
+      </h4>
+    </div>
+    <table class="{{ name }} client_info table table-condensed {% if name == 'optional_installs' %} hidden{% endif %}">
+      {% for manifestname, manifest_detail in install.items  %}
+      <tbody {% if manifest_name == manifestname %} id="{{ name }}" class="catalogs_section" {% endif %}>
+        {% for sw_name, sw_detail in manifest_detail.items  %}
+          <tr {% if not sw_name in update_requires %}id='{{ sw_name }}'{% endif %} class="{% if manifest_name != manifestname or sw_name in update_requires %}active{% endif %} {% if sw_detail.incatalog == 'False' %}danger{% endif %} ">
+            <td class="text-center" style="width:25px;">
+              <img src='{{ sw_detail.icon_name }}' width="20"/>
+            </td>
+            <td>
+              {% if sw_detail.display_name %}
+                {{ sw_detail.display_name }}
+              {% else %}
+                {{ sw_name }}
+              {% endif %}
+            </td>
+            <td>
+              {% if sw_detail.installed_version %}
+                {{ sw_detail.installed_version }}
+              {% else %}  
+                {{ sw_detail.version }}
+              {% endif %}
+            </td>
+            <td class="visible-md visible-lg">
+              {% if manifest_name != manifestname %}
+                {% if perms.manifests.can_view_manifests %}
+                <a href='{% url "manifests.views.view" manifestname %}'>
+                {% endif %}
+                {{ manifestname }}
+                {% if perms.manifests.can_view_manifests %}
+                </a>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td class="{% if manifest_name == manifestname %}sw_entrys {% endif %}text-right">
+              {% if 'install_result' in sw_detail %}
+                  <span id='installed' class='label label-warning'>{{ sw_detail.install_result }}</span>
+              {% else %}
+                {% if sw_detail.installed %}
+                  <span id='installed' class='label label-primary'>installed</span>
+                {% else %}
+                  <span id='notinstalled' class='label label-danger'>not installed</span>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      {% endfor %}
+      {% if name == 'managed_installs' %}
+        <tbody>
+        {% for sw_name, sw_detail in required.items %}
+              <tr class="active {% if sw_detail.incatalog == 'False' %}danger{% endif %}">
+                <td class="text-center" style="width:25px;">
+                  <img src='{{ sw_detail.icon_name }}' width="20"/>
+                </td>
+                <td>
+                  {% if sw_detail.display_name %}
+                    {{ sw_detail.display_name }}
+                  {% else %}
+                    {{ sw_name }}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if sw_detail.installed_version %}
+                    {{ sw_detail.installed_version }}
+                  {% else %}  
+                    {{ sw_detail.version_to_install }}
+                  {% endif %}
+                </td>
+                <td class="visible-md visible-lg">
+                  <p>required</p>
+                </td>
+                <td class="text-right">
+                  {% if 'install_result' in sw_detail %}
+                      <span id='installed' class='label label-warning'>{{ sw_detail.install_result }}</span>
+                  {% else %}
+                    {% if sw_detail.installed %}
+                      <span id='installed' class='label label-primary'>installed</span>
+                    {% else %}
+                      <span id='notinstalled' class='label label-danger'>not installed</span>
+                    {% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+        {% endfor %}
+        </tbody>
+      {% endif %}
+    </table>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div id="data_storage" data-autocomplete_data='{{ autocomplete_data }}' />

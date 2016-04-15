@@ -37,9 +37,6 @@
     <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
     <script type='text/javascript' src='{% get_static_prefix %}js/dataTables.bootstrap.min.js'></script>
 
-  <!--  <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap-modal.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap-modalmanager.js'></script>-->
-
     {% block java_script %}{% endblock %}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -260,9 +257,9 @@
               </li>
               <!-- /.dropdown -->
               <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                      <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                  </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
+                  Hello, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fa fa-caret-down"></i>
+                </a>
                   <ul class="dropdown-menu dropdown-user">
                       <li id="admin" class="loginlogout"><a href="/admin/"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
                       <li class="divider"></li>
@@ -293,9 +290,44 @@
 
                           <!-- /input-group -->
                       </li>
-                      <li>
-                          <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                      <li {% if page == 'dashboard' %} class="active" {% endif %}>
+                          <a href="/reports/dashboard/"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                       </li>
+                      {% if perms.reports.can_view_reports %}
+                      {% if business_units_enabled %}
+                      <li {% if page == 'reports' %} class="active" {% endif %}>
+                        <a id="comp" href="{% url 'reports.views.index' %}"><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span></a>
+                        <ul id="computers" class="collapse in">
+                          {% for business_unit in business_units %}
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
+                          </li>
+                          {% endfor %}
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?unknown=true" {% if subpage == "unknown" %} class="active" {% endif %}>Unknown<span class="badge pull-right">{{ sumUnkown }}</span></a>
+                          </li>
+                        </ul>
+                      </li>
+                      {% else %}
+                      <li {% if page == 'reports' %} class="active" {% endif %}>
+                        <a><i class="fa fa-desktop fa-fw"></i> Computer <span class="fa arrow"></span></a>
+                        <ul id="computers" class="nav nav-second-level in">
+                          <li>
+                            <a id="comp" href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=macbook" {% if subpage == 'macbook' %} class="active" {% endif %}><i class="fa fa-laptop fa-fw"></i> MacBook</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=mac" {% if subpage == 'mac' %} class="active" {% endif %}><i class="fa fa-desktop fa-fw"></i> Mac</a>
+                          </li>
+                          <li>
+                            <a href="{% url 'reports.views.index' %}?show=vm" {% if subpage == 'vm' %} class="active" {% endif %}><i class="fa fa-spinner fa-fw"></i> Virtual Machine</a>
+                          </li>
+                        </ul>
+                      </li>
+                      {% endif %}
+                      {% endif %}
                       <li>
                           <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
                           <ul class="nav nav-second-level">
