@@ -6,7 +6,7 @@
 <div class="row-fluid">
 		<ul id="deviceList" class="list">
 			{% for report in report_list %}
-			<li class="col-xs-4 col-md-3 col-lg-2 col-xl-1" data-state="all" onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';">
+			<li class="col-xs-4 col-md-4 col-lg-3 col-xl-1" data-state="all" onclick="document.location = '{% url 'reports.views.detail' report.machine.serial_number %}';">
 			  <img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.machine.serial_number|slice:"8:"  }}&size=120x120' alt="" width="72" />
   			{% if report.machine.hostname %}
 				<h4>
