@@ -5,11 +5,10 @@ class BusinessUnitAdmin(admin.ModelAdmin):
     list_display = ('hash', 'name')
 
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('hostname', 'mac', 'username', 'last_munki_update',
-                    'last_inventory_update')
+    list_display = ('hostname', 'username')
 
 class MunkiReportAdmin(admin.ModelAdmin):
-    list_display = ('hostname', 'mac', 'timestamp', 'errors', 'warnings')
+    list_display = ('hostname', 'timestamp', 'errors', 'warnings')
 
 admin.site.register(BusinessUnit, BusinessUnitAdmin)
 admin.site.register(Machine, MachineAdmin)

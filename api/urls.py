@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^(?P<kind>icons)/(?P<filepath>.*$)', api.views.file_api),
     url(r'^(?P<kind>pkgs$)', api.views.file_api),
     url(r'^(?P<kind>pkgs)/(?P<filepath>.*$)', api.views.file_api),
+    url(r'^(?P<kind>report$)', api.views.db_api),
+    url(r'^(?P<kind>report)/(?P<serial_number>.*$)', api.views.db_api),
 ]

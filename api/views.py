@@ -4,16 +4,17 @@ api/views.py
 from django.http import HttpResponse
 from django.http import QueryDict
 from django.http import FileResponse
+from django.core import serializers
 #from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
-
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
+from reports.models import Machine, MunkiReport
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 import datetime
@@ -502,3 +503,103 @@ def file_api(request, kind, filepath=None):
         else:
             # success
             return HttpResponse(status=204)
+
+@csrf_exempt
+@logged_in_or_basicauth()
+def db_api(request, kind, serial_number=None):
+    if kind not in ['report', 'inventory']:
+        return HttpResponse(status=404)
+    if request.method == 'GET':
+        LOGGER.debug("Got API GET request for %s", kind)
+        if serial_number:
+            try:
+                response = serializers.serialize('json', Machine.objects.filter(serial_number=serial_number))
+                return HttpResponse(response, content_type='application/json')
+            except Machine.DoesNotExist:
+                return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'MachineDoesNotExist',
+                                'detail': '%s does not exist' % serial_number}),
+                    content_type='application/json', status=404)
+        else:
+            response = serializers.serialize('json', Machine.objects.all())
+            return HttpResponse(response, content_type='application/json')
+
+    if request.method == 'POST':
+        submit = json.loads(request.body)
+        submission_type = submit.get('submission_type')
+        if serial_number:
+            try:
+                machine = Machine.objects.get(serial_number=serial_number)
+            except Machine.DoesNotExist:
+                machine = Machine(serial_number=serial_number)
+            try:
+                report = MunkiReport.objects.get(machine=machine)
+            except MunkiReport.DoesNotExist:
+                report = MunkiReport(machine=machine)
+
+            if machine and report:
+                machine.remote_ip = request.META['REMOTE_ADDR']
+                if 'name' in submit:
+                    machine.hostname = submit.get('name')
+                if 'username' in submit:
+                    machine.username = submit.get('username')
+                if 'unit' in submit:
+                    unit = BusinessUnit.objects.get(hash=submit.get('unit'))
+                    machine.businessunit = unit
+
+                if 'base64bz2report' in submit:
+                    #print submit.get('base64bz2report')
+                    report.update_report(submit.get('base64bz2report'))
+
+                # extract machine data from the report
+                report_data = report.get_report()
+                if 'MachineInfo' in report_data:
+                    machine.os_version = report_data['MachineInfo'].get('os_vers', machine.os_version)
+                    machine.cpu_arch = report_data['MachineInfo'].get('arch', machine.cpu_arch)
+
+                hwinfo = {}
+                if 'SystemProfile' in report_data.get('MachineInfo', []):
+                    if 'SPSoftwareDataType' in report_data['MachineInfo'].keys():
+                        hwinfo = profile['SPSoftwareDataType']
+
+                if hwinfo:
+                    machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
+                    machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
+                    machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
+                    machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
+
+                if submission_type == 'reportimagr':
+                    if submit.get('status'):
+                        machine.imagr_status = submit.get('status')
+                    if submit.get('message'):
+                        machine.imagr_message = submit.get('message')
+
+                    # delete pending workflow if successful ended
+                    if submit.get('status') == 'success':
+                        machine.imagr_workflow = ""
+                    report.runstate = u"imagr"
+                    machine.save()
+                    report.save()
+                    return HttpResponse(status=204)
+
+                    report.runtype = submit.get('runtype', 'UNKNOWN')
+                    report.timestamp = datetime.now()
+
+                if submission_type == 'postflight':
+                    report.runstate = u"done"
+
+                if submission_type == 'preflight':
+                    report.runstate = u"in progress"
+                    report.activity = report.encode({"Updating": "preflight"})
+
+                if submission_type == 'report_broken_client':
+                    report.runstate = u"broken client"
+                    #report.report = None
+                    report.errors = 1
+                    report.warnings = 0
+
+                machine.save()
+                report.save()
+                return HttpResponse(status=204)
+        return HttpResponse(status=404)

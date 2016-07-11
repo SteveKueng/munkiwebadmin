@@ -1,13 +1,11 @@
 #!/bin/bash
 source "`dirname "${0}"`/../munkiwebadmin-config"
-SUBMITURL="${MWA_HOST}/reports"
+SUBMITURL="${MWA_HOST}/api/report"
 LOOKUPURL="${MWA_HOST}/lookup/ip"
 
 RUNTYPE="$1"
-MAC=`ifconfig en0 | awk '$1=="ether" {print $2}'`
 SERIAL=`ioreg -c IOPlatformExpertDevice | grep IOPlatformSerialNumber | awk '{print $4}' | tr -d '"' | tr -d + | tr -d /`
 NAME=`/usr/sbin/scutil --get ComputerName`
-
 
 if [ "$RUNTYPE" == "custom" -o "$RUNTYPE" == "auto" ]; then
     if [ ! -z "$MWA_ALLOWED_NETWORKS" ]; then
@@ -44,12 +42,10 @@ if [ "$RUNTYPE" == "custom" -o "$RUNTYPE" == "auto" ]; then
     fi
 fi
 
-mwa_curl --max-time 5 \
-    -d runtype="$RUNTYPE" \
-    -d mac="$MAC" \
-    -d serial="$SERIAL" \
-    -d unit="$businessunit" \
-    -d name=\""$NAME"\" \
-    "$SUBMITURL/preflight"
+curl -H "Authorization: Basic YWRtaW46QWRtaW4xMjM=" \
+     -H "Content-Type: application/json" \
+     -X POST \
+     --data "{\"runtype\": \"$RUNTYPE\", \"submission_type\": \"preflight\", \"name\": \"$NAME\"}" \
+     http://localhost:8080/api/report/$SERIAL
 
 exit 0

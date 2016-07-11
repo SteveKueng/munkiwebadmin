@@ -1,6 +1,25 @@
 #!/bin/bash
+function clearPlist {
+PYTHON_ARG="$1" python - <<END
+import os
+import plistlib
+plist = os.environ['PYTHON_ARG']
+plistDict = plistlib.readPlist(plist)
+keys = ['_properties', '_detailLevel', '_parentDataType', '_dataType', '_versionInfo', '_SPCommandLineArguments', '_SPCompletionInterval', '_timeStamp', '_SPResponseTime']
+
+newPlistDict = dict()
+
+for dict in plistDict:
+  newPlistDict[dict['_dataType']] = dict['_items']
+
+del plistDict[:]
+plistDict.append(newPlistDict)
+plistlib.writePlist(plistDict, plist)
+END
+}
+
 source "`dirname "${0}"`/../munkiwebadmin-config"
-REPORTSUBMITURL="${MWA_HOST}/reports"
+REPORTSUBMITURL="${MWA_HOST}/api/report"
 #INVENTORYHASHURL="${MWA_HOST}/inventory/hash"
 #INVENTORYSUBMITURL="${MWA_HOST}/inventory/submit"
 
@@ -19,26 +38,23 @@ cp "$REPORTPATH" "$TMPPLIST"
 
 # Generate a system_profiler report.
 PROFILEPLIST=/tmp/`head -c10 /dev/urandom | md5`.plist
-/usr/sbin/system_profiler -xml SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType SPStorageDataType SPPrintersDataType SPNetworkVolumeDataType SPThunderboltDataType > "$PROFILEPLIST"
+/usr/sbin/system_profiler -xml SPSoftwareDataType SPNetworkDataType SPHardwareDataType SPInstallHistoryDataType SPDisplaysDataType SPStorageDataType SPPrintersDataType SPNetworkVolumeDataType SPThunderboltDataType > "$PROFILEPLIST"
+clearPlist "$PROFILEPLIST"
 
 # Merge system profiler report with munki report.
 $PLISTBUDDY -c "Add :MachineInfo:SystemProfile array" "$TMPPLIST"
 $PLISTBUDDY -c "Merge $PROFILEPLIST :MachineInfo:SystemProfile" "$TMPPLIST"
 
 # Compress and encode report.
-REPORTTMP=`mktemp -t postflight`
-echo -n "base64bz2report=" > "$REPORTTMP"
-bzip2 --best < "$TMPPLIST" | openssl base64 >> "$REPORTTMP"
+#REPORTTMP=`mktemp -t postflight`
+REPORTTMP="$(bzip2 --best < "$TMPPLIST" | openssl base64 | tr "\n" "-")"
 
 # Submit Munki report to server.
-mwa_curl --max-time 30 \
-    -d runtype="$RUNTYPE" \
-    -d mac="$MAC" \
-    -d serial="$SERIAL" \
-    -d name=\""$NAME"\" \
-    -d unit="$businessunit" \
-    -d "@$REPORTTMP" \
-    "$REPORTSUBMITURL/postflight"
+curl -H "Authorization: Basic YWRtaW46QWRtaW4xMjM=" \
+     -H "Content-Type: application/json" \
+     -X POST \
+     -d "{\"runtype\": \"$RUNTYPE\", \"submission_type\": \"postflight\", \"name\": \"$NAME\", \"base64bz2report\":\"$REPORTTMP\"}" \
+     $REPORTSUBMITURL/$SERIAL
 
 if [ -e "$INVENTORYPATH" ] ; then
     #INVENTORY_CHECKSUM=`cat /Library/Managed\ Installs/ApplicationInventory.plist | openssl dgst -sha256`
@@ -65,5 +81,6 @@ if [ -e "$INVENTORYPATH" ] ; then
 fi
 
 # Clean up and exit
-rm -f "$REPORTTMP" "$TMPPLIST" "$PROFILEPLIST"
+rm -f "$TMPPLIST"
+rm -f "$PROFILEPLIST"
 exit 0

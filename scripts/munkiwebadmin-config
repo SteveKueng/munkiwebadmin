@@ -4,6 +4,7 @@
 # EXAMPLE: https://example.com
 #MWA_HOST="http://munkiwebadmin.media.int"
 MWA_HOST="http://localhost:8080"
+authHeader="Authorization: Basic YWRtaW46QWRtaW4xMjM="
 
 # add the businessunit hash if you use business units. Otherways leaf it empty
 #businessunit="bc25feb2-5f23-4dda-9588-776257848463"
@@ -25,7 +26,7 @@ MWA_ALLOWED_NETWORKS=()
 # flag.
 function mwa_curl {
         # production mode
-        paramList=" --silent"
+        paramList=" --silent -H $authHeader -H \"Content-Type: application/json\" -X POST"
 
         if [ ! -z "${MWA_SSL_CERTIFICATE}" ]
         then

@@ -53,3 +53,23 @@
 .grid li .detail {
   display:none;
 }
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs {
+    text-align:center;
+}
+
+.table th, .table td {
+     border-top: none !important;
+ }
+
+.tabDetail {
+    overflow:auto;
+    height:100%;
+}
