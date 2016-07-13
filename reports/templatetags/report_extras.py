@@ -9,7 +9,7 @@ def humanreadablesize(kbytes):
         kbytes = float(kbytes)
     except (TypeError, ValueError, UnicodeDecodeError):
         return "unknown"
-        
+
     units = [(" KB", 2**10), (" MB", 2**20), (" GB", 2**30), (" TB", 2**40)]
     for suffix, limit in units:
         if kbytes > limit:
@@ -27,3 +27,11 @@ def replace(value):
 @register.filter(name='get')
 def get(d, k):
     return d.get(k, None)
+
+@register.filter()
+def loopDict(dict):
+    for item in dict:
+        table = "<br>" + item
+        #for subItem in dict[item]:
+        #    table += "<br>" + loopDict(subItem)
+    return table

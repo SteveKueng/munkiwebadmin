@@ -12,12 +12,13 @@
 
 {% block content %}
 {% if reports|length %}
-<div>
-  <button class="grid grid_list">Grid View</button>
-  <button class="list grid_list">List View</button>
+<div class="btn-group" role="group">
+  <button class="grid grid_list btn btn-default active"><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></button>
+  <button class="list grid_list btn btn-default"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span></button>
 </div>
+
 <div class="row-fluid">
-		<ul id="deviceList" class="list">
+		<ul id="deviceList" class="grid">
 			{% for report in reports %}
 			<li onClick="window.location.hash = '#{{ report.serial_number }}'" class="col-xs-4 col-md-4 col-lg-3 col-xl-1" data-state="all">
 			  <img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.serial_number|slice:"8:"  }}&size=120x120' alt="" width="72" />

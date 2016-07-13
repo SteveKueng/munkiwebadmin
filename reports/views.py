@@ -65,15 +65,26 @@ if PROXY_ADDRESS:
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
-CATALOG_ALL = Catalog.catalog_info()
+CATALOG_REQUIRED = Catalog.get_required()
 def getRequired(item):
+    """retruns array with required software"""
+    required = dict()
 
+    if CATALOG_REQUIRED:
+        if item in CATALOG_REQUIRED:
+            #required = CATALOG_REQUIRED[item]
+            if "requires" in CATALOG_REQUIRED[item]:
+                for require in CATALOG_REQUIRED[item]["requires"]:
+                    required["requires"] = {require : getRequired(require)}
+
+            if "updates" in CATALOG_REQUIRED[item]:
+                for update in CATALOG_REQUIRED[item]["updates"]:
+                    required["updates"] = {update : getRequired(update)}
     return required
 
-
+CLIENT = dict()
+KEYS = ['managed_installs', 'managed_uninstalls', 'optional_installs']
 def getSoftware(manifest_name):
-    CLIENT = dict()
-    KEYS = ['managed_installs', 'managed_uninstalls', 'optional_installs']
     manifest_path = MUNKI_REPO_DIR+"/manifests/"+manifest_name
     try:
         plist = Plist.read('manifests', manifest_path)
@@ -84,12 +95,16 @@ def getSoftware(manifest_name):
     if plist:
         for key in KEYS:
             if key in plist:
-                for plist_key in plist[key]:
-                    item = {'name': plist_key, 'manifest':manifest_name}
+                for element in plist[key]:
+                    item = {'name': element, 'manifest':manifest_name}
                     if key in CLIENT:
                         CLIENT[key].append(item)
                     else:
                         CLIENT[key] = [item]
+
+                    required = getRequired(element)
+                    if required:
+                        CLIENT[key][-1].update(required)
 
         for manifest in plist.included_manifests:
             getSoftware(manifest)
@@ -143,10 +158,9 @@ def index(request, computer_serial=None):
                 pass
             #for key, value in report_plist["MachineInfo"]["SystemProfile"][0].iteritems():
             #    print key
-
-            #CLIENT.clear()
+            CLIENT.clear()
             plist = getSoftware(manifest_name)
-            print CATALOG_ALL["production"]
+            print plist
 
             context = {'machine': machine,
                        'plist_text': plist,
