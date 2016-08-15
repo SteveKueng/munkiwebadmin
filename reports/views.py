@@ -67,12 +67,10 @@ if PROXY_ADDRESS:
 
 CATALOG_REQUIRED = Catalog.get_required()
 def getRequired(item):
-    """retruns array with required software"""
+    """Retruns array with required / update catalog items"""
     required = dict()
-
     if CATALOG_REQUIRED:
         if item in CATALOG_REQUIRED:
-            #required = CATALOG_REQUIRED[item]
             if "requires" in CATALOG_REQUIRED[item]:
                 for require in CATALOG_REQUIRED[item]["requires"]:
                     required["requires"] = {require : getRequired(require)}
@@ -82,9 +80,12 @@ def getRequired(item):
                     required["updates"] = {update : getRequired(update)}
     return required
 
+#CLIENT dict
 CLIENT = dict()
+#manifest key with will be showed
 KEYS = ['managed_installs', 'managed_uninstalls', 'optional_installs']
 def getSoftware(manifest_name):
+    """Returns manifest item"""
     manifest_path = MUNKI_REPO_DIR+"/manifests/"+manifest_name
     try:
         plist = Plist.read('manifests', manifest_path)

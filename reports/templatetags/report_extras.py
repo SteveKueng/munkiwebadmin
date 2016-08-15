@@ -29,9 +29,17 @@ def get(d, k):
     return d.get(k, None)
 
 @register.filter()
-def loopDict(dict):
-    for item in dict:
-        table = "<br>" + item
-        #for subItem in dict[item]:
-        #    table += "<br>" + loopDict(subItem)
+def loopDict(itemDict, parent):
+    table = None
+    for key, item in itemDict.iteritems():
+        table = '<a href="#" class="list-group-item">'+key+'<small class="text-muted pull-right">'+parent+'</small></a>'
+        if 'requires' or 'updates' in item:
+            table += '<div class="list-group" style="padding-left:20px;">'
+        if "requires" in item:
+            table += loopDict(item["requires"], "required from "+key)
+        if "updates" in item:
+            table += loopDict(item["updates"], "update for "+key)
+        if 'requires' or 'updates' in item:
+            table += '</div>'
+
     return table

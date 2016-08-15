@@ -60,8 +60,10 @@
 													<div class="list-group">
     												<a href="#" class="list-group-item">{{ software.name }} <small class="text-muted pull-right">{{ software.manifest}}</small></a>
 														{% if software.requires %}
-														<div class="list-group">
-															{% autoescape off %}{{ software.requires|loopDict }}{% endautoescape %}
+														<div class="list-group" style="padding-left:20px;">
+															{% with "required from "|add:software.name as softwareRequires %}
+															{% autoescape off %}{{ software.requires|loopDict:softwareRequires }}{% endautoescape %}
+															{% endwith %}
 												<!--			{% for key, require in software.requires.items %}
 												      <a href="#" class="list-group-item">{{ key }}<small class="text-muted pull-right">{{ software.name }} requires</small></a>
 
@@ -69,10 +71,10 @@
 												    </div>
 														{% endif %}
 														{% if software.updates %}
-														<div class="list-group">
-															{% for require in software.updates %}
-												      <a href="#" class="list-group-item">{{ require }}<small class="text-muted pull-right">update for {{ software.name }}</small></a>
-															{% endfor %}
+														<div class="list-group" style="padding-left:20px;">
+															{% with "update for "|add:software.name as softwareUpdateFor %}
+															{% autoescape off %}{{ software.updates|loopDict:softwareUpdateFor }}{% endautoescape %}
+															{% endwith %}
 												    </div>
 														{% endif %}
 													</div>

@@ -2,13 +2,14 @@
 function do_resize() {
     $('#detail_content').height($(window).height() - 340);
 }
+
 $(window).resize(do_resize);
 
 $(document).on('click','.grid_list', function (e) {
     $(".grid_list").removeClass('active')
 	    if($(this).hasClass('list')) {
 	        $('#deviceList').removeClass('grid').addClass('list');
-          $(this).addClass('active');  
+          $(this).addClass('active');
 	    }
 	    else if ($(this).hasClass('grid')) {
 	        $('#deviceList').removeClass('list').addClass('grid');
