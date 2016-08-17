@@ -1,16 +1,12 @@
-<div class="modal fade" id="manifestItems">
+<div class="modal fade" id="pkginfoItem">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4>{{ pathname }}</h4>
-        <div class='pull-right' id='delete_btn' style="margin-top:-40px;">
-        {% if perms.manifests.delete_manifestfile %}
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Delete</button>
-        {% endif %}
-        {% if perms.manifests.change_manifestfile %}
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#copyManifestModal">Duplicate</button>
-        {% endif %}
-        </div>
+          <img src="{{ icon_url }}" class='pkginfo-icon pull-left' height='32' style="margin-top:17px;"/>
+          <h4 id='pathname' data-installer-item-path='{{ installer_item_path }}'>{{ pathname }}</h4>
+          {% if perms.pkgsinfo.delete_pkginfofile %}
+          <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()" style="margin-top:-40px;">Delete</button>
+          {% endif %}
       </div>
       <div role="tabpanel" class="modal-body" style="padding:0px;">
         <!-- Nav tabs -->
@@ -34,43 +30,51 @@
               <div id="detail" class="plist-editor"></div>
           </div>
           <div role="tabpanel" class="tab-pane" id="plisttab">
-              <!--<textarea id="p l i s t" rows=30></textarea>-->
               <div id='plist'>{{ plist_text }}</div>
           </div>
          </div>
       </div>
       <div class="modal-footer">
-        {% if perms.manifests.change_manifestfile %}
+        {% if perms.pkgsinfo.change_pkginfofile %}
         <div class='pull-right hidden' id='save_and_cancel'>
           <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
-          <button type="button" class="btn btn-success" onClick="saveManifestItem()">Save</button>
+          <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
         </div>
         {% endif %}
         <div class='pull-right' id='cancel'>
-          {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-          <button type="button" class="btn" onClick="cancelEdit()">Cancel</button>
+        {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
+          <button type="button" class="btn" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
         </div>
+
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 <!--
-Bootstrap modal for confirming manifest deletion
+Bootstrap modal for confirming pkginfo deletion
 -->
 <div class="modal fade" id="deleteConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Delete manifest?</h4>
+        <h4 class="modal-title">Delete pkginfo?</h4>
       </div>
       <div class="modal-body">
         <p>Really delete <strong>{{ pathname }}</strong>?</p>
         <p>This action cannot be undone.</p>
-        <br>
+        <div id="deleteConfirmationModalInstallerItem" class='hidden'>
+            <div class="checkbox pull-right">
+                <label>
+                    <input type="checkbox" id="delete_pkg">
+                    Also delete installer item
+                </label>
+            </div>
+            <br>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="deleteManifestItem()">Delete</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="deletePkginfoItem()">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
@@ -96,7 +100,7 @@ Bootstrap modal for confirming canceling editing
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <!--
-Bootstrap modal for saving or canceling when loading a different manifest
+Bootstrap modal for saving or canceling when loading a different pkginfo
 -->
 <div class="modal fade" id="saveOrCancelConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
@@ -109,33 +113,9 @@ Bootstrap modal for saving or canceling when loading a different manifest
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="discardChangesAndLoadNext()">Discard Changes</button>
-        <button type="button" class="btn btn-success" data-dismiss="modal" onClick="saveChangesAndLoadNext()">Save Changes</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="cancelEdit()">Discard Changes</button>
+        <button type="button" class="btn btn-success" data-dismiss="modal" onClick="savePkginfoItem()">Save Changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-<!--
-Bootstrap modal for duplicating a manifest
--->
-<div class="modal fade" id="copyManifestModal" data-backdrop="false">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Duplicate manifest</h4>
-      </div>
-      <div class="modal-body">
-        <form id="manifest-duplicate-form">
-          <div class="form-group">
-            <label for="recipient-name" class="control-label">New manifest name:</label>
-            <input type="text" class="form-control" id="manifest-copy-name">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" data-copy="manifest" class="btn btn-primary">Duplicate</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div>

@@ -1,0 +1,75 @@
+#deviceList {
+  list-style: none;
+  margin-left: -40px;
+}
+
+.list li {
+  width: 100%;
+  border-top: 1px solid #CCC;
+  border-left: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+}
+
+.list li:nth-child(odd) {
+  background-color:#f9f9f9;
+}
+
+.list li:first-child  {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.list li:last-child  {
+  border-bottom: 1px solid #CCC;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.list li img {
+  width: 32px;
+}
+
+.list li h4 {
+   font-size: 10pt;
+}
+
+.list li img, .list li h4 {
+  margin-right: 20px;
+  float: left;
+}
+
+.grid li {
+  float: left;
+  border: 2px solid #fff;
+  padding: 20px;
+  background-color: #f8f8f8;
+  text-align: center;
+}
+
+.grid li:hover, .list li:hover {
+  background-color: #f1f1f1;
+}
+
+.grid li .detail {
+  display:none;
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs {
+    text-align:center;
+}
+
+.table th, .table td {
+     border-top: none !important;
+ }
+
+.tabDetail {
+    overflow:auto;
+    height:100%;
+}

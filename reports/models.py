@@ -6,6 +6,7 @@ import base64
 import bz2
 from uuid import uuid4
 from django.contrib.auth.models import User, Group
+import django
 
 class BusinessUnit(models.Model):
     hash = models.CharField(max_length=36, default=uuid4, primary_key=True, unique=True)
@@ -20,32 +21,34 @@ class BusinessUnit(models.Model):
 class Machine(models.Model):
     serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
     hostname = models.CharField(max_length=64)
-    username = models.CharField(max_length=256)
-    location = models.CharField(max_length=256)
-    remote_ip = models.CharField(max_length=15)
+    username = models.CharField(max_length=256, blank=True, default="unknown")
+    remote_ip = models.CharField(max_length=15, blank=True)
     businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None)
-    machine_model = models.CharField(
-        max_length=64, blank=True, default="virtual-machine")
+    machine_model = models.CharField(max_length=64, blank=True, default="virtual-machine")
     cpu_type = models.CharField(max_length=64, blank=True)
     cpu_speed = models.CharField(max_length=32, blank=True)
     cpu_arch = models.CharField(max_length=32, blank=True)
+    ram = models.CharField(max_length=16, blank=True)
+    os_version = models.CharField(max_length=16, blank=True)
     imagr_workflow = models.CharField(max_length=128, blank=True)
     imagr_status = models.CharField(max_length=128, blank=True)
     imagr_message = models.CharField(max_length=256, blank=True)
     #imagr_target = models.CharField(max_length=128, blank=True)
-    ram = models.CharField(max_length=16)
-    os_version = models.CharField(max_length=16)
-    available_disk_space = models.IntegerField(default=0)
-    mac = models.CharField(max_length=17, blank=True)
-    last_munki_update = models.DateTimeField(default=datetime(1, 1, 1, 0, 0), blank=True)
-    last_inventory_update = models.DateTimeField(
-        default=datetime(1, 1, 1, 0, 0))
+
+    def console_user(self):
+        obj = MunkiReport.objects.get(machine=self)
+        return obj.console_user
+
+    def report_time(self):
+        obj = MunkiReport.objects.get(machine=self)
+        return obj.timestamp
+
     class Meta:
         ordering = ['hostname']
 
 class MunkiReport(models.Model):
     machine = models.ForeignKey(Machine)
-    timestamp = models.DateTimeField(default=datetime.now())
+    timestamp = models.DateTimeField(default=django.utils.timezone.now)
     runtype = models.CharField(max_length=64)
     runstate = models.CharField(max_length=16)
     console_user = models.CharField(max_length=64)
@@ -60,9 +63,6 @@ class MunkiReport(models.Model):
 
     def hostname(self):
         return self.machine.hostname
-
-    def mac(self):
-        return self.machine.mac
 
     def encode(self, plist):
         string = plistlib.writePlistToString(plist)
@@ -104,6 +104,7 @@ class MunkiReport(models.Model):
     def update_report(self, base64bz2report):
         # Save report.
         try:
+            base64bz2report = base64bz2report.replace("-", "\n")
             base64bz2report = base64bz2report.replace(" ", "+")
             plist = self.b64bz_decode(base64bz2report)
             #self.report = base64bz2report
@@ -114,9 +115,6 @@ class MunkiReport(models.Model):
 
         if plist is None:
             self.activity = None
-            self.errors = 0
-            self.warnings = 0
-            self.console_user = "<None>"
             return
 
         # Check activity.

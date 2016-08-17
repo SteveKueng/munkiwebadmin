@@ -1,11 +1,8 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import url
+import manifests.views
 
-urlpatterns = patterns('manifests.views',
-    url(r'^$', 'index'),
-    url(r'^new$', 'new'),
-    url(r'^copymanifest$', 'copymanifest'),
-    url(r'^delete/(?P<manifest_name>[^/]+)/$', 'delete'),
-    url(r'^#(?P<manifest_name>.+)/$', 'index'),
-    url(r'^view/(?P<manifest_name>[^/]+)/$', 'view'),
-    url(r'^detail/(?P<manifest_name>[^/]+)$', 'detail'),
-)
+urlpatterns = [
+    url(r'^$', manifests.views.index, name='manifests'),
+    url(r'^__get_manifest_list_status$', manifests.views.status),
+    url(r'^(?P<manifest_path>.*$)', manifests.views.index)
+]
