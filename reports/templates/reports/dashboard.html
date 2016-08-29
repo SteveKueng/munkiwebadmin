@@ -20,7 +20,7 @@ $('#SearchField').prop('disabled', true);
 <div class="row">
 	{% if munki.errors %}
     <div class="col-md-4">
-        <div class="panel panel-red">
+        <div class="panel panel-danger">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-3">
@@ -46,7 +46,7 @@ $('#SearchField').prop('disabled', true);
 	{% endif %}
 	{% if munki.warnings %}
     <div class="col-md-4">
-        <div class="panel panel-yellow">
+        <div class="panel panel-warning">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-3">
@@ -72,7 +72,7 @@ $('#SearchField').prop('disabled', true);
 	{% endif %}
     {% if munki.activity %}
     <div class="col-md-4">
-        <div class="panel panel-primary">
+        <div class="panel panel-info">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-xs-3">
