@@ -1,298 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+    <head>
+      <meta content="text/html; charset=UTF-8" />
+		  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>MunkiWebAdmin2</title>
+      {% load static %}
+		  <!-- Bootstrap Core CSS -->
+	    <link href="{% get_static_prefix %}css/bootstrap.css" rel="stylesheet">
+	    <!-- BootstrapXL CSS -->
+	    <link href="{% get_static_prefix %}css/bootstrapxl.css" rel="stylesheet">
+	    <!-- MetisMenu CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/metisMenu/metisMenu.min.css" rel="stylesheet">
+	    <!-- DataTables CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+	    <!-- Timeline CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/timeline.css" rel="stylesheet">
+	    <!-- Custom CSS -->
+	    <link href="{% get_static_prefix %}css/sb-admin-2.css" rel="stylesheet">
+	    <!-- Morris Charts CSS -->
+	    <link href="{% get_static_prefix %}css/plugins/morris.css" rel="stylesheet">
+	    <!-- jQueryUI CSS -->
+	    <link href="{% get_static_prefix %}css/smoothness/jquery-ui.min.css" rel="stylesheet">
+	    <!-- Custom Fonts -->
+	    <link href="{% get_static_prefix %}font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-    {% load static %}
-    <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
+      {% block extra_style %}{% endblock %}
 
-    <!-- MetisMenu CSS -->
-    <link href="{% get_static_prefix %}bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+      <!-- jQuery Version 1.11.0 -->
+      <script src="{% get_static_prefix %}js/jquery-1.11.0.js"></script>
 
-    <!-- Custom CSS -->
-    <link href="{% get_static_prefix %}css/sb-admin-2.css" rel="stylesheet">
+      <!-- webadmin.js -->
+      <script src="{% get_static_prefix %}js/webadmin.js"></script>
 
-    <!-- Custom Fonts -->
-    <link href="{% get_static_prefix %}bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+      {% block java_script %}{% endblock %}
 
-    <link rel="stylesheet" href='{% get_static_prefix %}css/dataTables.bootstrap.min.css' type="text/css" media="all" />
-    <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
+	    <link rel="shortcut icon" href="{% get_static_prefix %}img/favicon.ico" />
+      <title>MunkiWebAdmin</title>
+	    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	    <!--[if lt IE 9]>
+	        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+      </head>
 
-    {% block extra_style %}{% endblock %}
+      {% block body_tag %}
+      <body>
+      {% endblock %}
+		      <div id="wrapper">
+			    {% block main_menu %}
+			       <!-- Navigation -->
+             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  	            <div class="navbar-header">
+  	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+  	                    <span class="sr-only">Toggle navigation</span>
+  	                    <span class="icon-bar"></span>
+  	                    <span class="icon-bar"></span>
+  	                    <span class="icon-bar"></span>
+  	                </button>
+  	                <a class="navbar-brand" href="/computer" style=" padding-right:0px;"><img src="{% get_static_prefix %}img/Munki.png" style="max-width:160px; max-height:40px; margin-top:-10px;"></a>
+  	                {% block page_title %}{% endblock %}
+    		            <ul class="nav navbar-top-links navbar-left" style="padding-top:8px;">
+          						<li style="padding-top:7px;">
+    	                		<i id="imgProgress" class="fa fa-spinner fa-pulse fa-lg" style="display: none; color:#777;"></i>
+  	                	</li>
+  	                	<li style="margin-top:-10px;">
+    	                		{% block navbar-default_extensions %}{% endblock %}
+  	                	</li>
+    		            </ul>
+                  </div>
 
-    <!-- jQuery -->
-    <script type='text/javascript' src="{% get_static_prefix %}bower_components/jquery/dist/jquery.min.js"></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui.min.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/jquery.dataTables.min.js'></script>
-    <!-- Bootstrap Core JavaScript -->
-    <script type='text/javascript' src="{% get_static_prefix %}bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/dataTables.bootstrap.min.js'></script>
-
-    {% block java_script %}{% endblock %}
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-
-  {% block body_tag %}
-  <body>
-  {% endblock %}
-    <div id="wrapper">
-      {% block main_menu %}
-      <!-- Navigation -->
-      <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
-          <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="index.html">MunkiWebAdmin2</a>
-          </div>
-          <!-- /.navbar-header -->
-
-          <ul class="nav navbar-top-links navbar-right">
-              <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                      <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                  </a>
-                  <ul class="dropdown-menu dropdown-messages">
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <strong>John Smith</strong>
-                                  <span class="pull-right text-muted">
-                                      <em>Yesterday</em>
-                                  </span>
-                              </div>
-                              <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <strong>John Smith</strong>
-                                  <span class="pull-right text-muted">
-                                      <em>Yesterday</em>
-                                  </span>
-                              </div>
-                              <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <strong>John Smith</strong>
-                                  <span class="pull-right text-muted">
-                                      <em>Yesterday</em>
-                                  </span>
-                              </div>
-                              <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a class="text-center" href="#">
-                              <strong>Read All Messages</strong>
-                              <i class="fa fa-angle-right"></i>
-                          </a>
-                      </li>
-                  </ul>
-                  <!-- /.dropdown-messages -->
-              </li>
-              <!-- /.dropdown -->
-              <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                      <i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                  </a>
-                  <ul class="dropdown-menu dropdown-tasks">
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <p>
-                                      <strong>Task 1</strong>
-                                      <span class="pull-right text-muted">40% Complete</span>
-                                  </p>
-                                  <div class="progress progress-striped active">
-                                      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                          <span class="sr-only">40% Complete (success)</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <p>
-                                      <strong>Task 2</strong>
-                                      <span class="pull-right text-muted">20% Complete</span>
-                                  </p>
-                                  <div class="progress progress-striped active">
-                                      <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
-                                          <span class="sr-only">20% Complete</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <p>
-                                      <strong>Task 3</strong>
-                                      <span class="pull-right text-muted">60% Complete</span>
-                                  </p>
-                                  <div class="progress progress-striped active">
-                                      <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                          <span class="sr-only">60% Complete (warning)</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <p>
-                                      <strong>Task 4</strong>
-                                      <span class="pull-right text-muted">80% Complete</span>
-                                  </p>
-                                  <div class="progress progress-striped active">
-                                      <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">
-                                          <span class="sr-only">80% Complete (danger)</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a class="text-center" href="#">
-                              <strong>See All Tasks</strong>
-                              <i class="fa fa-angle-right"></i>
-                          </a>
-                      </li>
-                  </ul>
-                  <!-- /.dropdown-tasks -->
-              </li>
-              <!-- /.dropdown -->
-              <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                      <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                  </a>
-                  <ul class="dropdown-menu dropdown-alerts">
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <i class="fa fa-comment fa-fw"></i> New Comment
-                                  <span class="pull-right text-muted small">4 minutes ago</span>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                  <span class="pull-right text-muted small">12 minutes ago</span>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <i class="fa fa-envelope fa-fw"></i> Message Sent
-                                  <span class="pull-right text-muted small">4 minutes ago</span>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <i class="fa fa-tasks fa-fw"></i> New Task
-                                  <span class="pull-right text-muted small">4 minutes ago</span>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a href="#">
-                              <div>
-                                  <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                  <span class="pull-right text-muted small">4 minutes ago</span>
-                              </div>
-                          </a>
-                      </li>
-                      <li class="divider"></li>
-                      <li>
-                          <a class="text-center" href="#">
-                              <strong>See All Alerts</strong>
-                              <i class="fa fa-angle-right"></i>
-                          </a>
-                      </li>
-                  </ul>
-                  <!-- /.dropdown-alerts -->
-              </li>
-              <!-- /.dropdown -->
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
-                  Hello, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fa fa-caret-down"></i>
-                </a>
-                  <ul class="dropdown-menu dropdown-user">
-                      <li id="admin" class="loginlogout"><a href="/admin/"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
-                      <li class="divider"></li>
-                      <li id="login" class="loginlogout">
-                        {% if user.is_authenticated %}
-                          <a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> Logout {{ user.username }}</a>
-                        {% else %}
-                          <a href="/login/">Login</a>
+                  <ul class="nav navbar-right top-nav">
+                    {% block navbar-top_extensions %}{% endblock %}
+                    <li class="dropdown">
+                      <a class="dropdown-toggle" data-toggle="dropdown" href="#" onblur="removeWrapperMargin()" onfocus="addWrapperMargin($('#userpanel').height())">
+                        Hello, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fa fa-caret-down"></i>
+                      </a>
+                      <ul class="dropdown-menu" id="userpanel">
+                        {% if user.is_staff %}
+                        <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+                        <li class="divider"></li>
                         {% endif %}
-                      </li>
+                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>logout</a></li>
+                        <li class="divider"></li>
+                        <li><a>{{ webadmin_version }}</a></li>
+                      </ul>
+                    </li>
+                    <li class="sidebar-search hidden-sm hidden-md hidden-lg" style="padding-top:8px;">
+                    	<input type="text" class="form-control dropdown-toggle" id="SearchFieldMobile" autocomplete="off" data-provide="typeahead" data-source='{% block data-source-mobile %}{% endblock %}' data-items="4" placeholder="Search...">
+                    </li>
                   </ul>
-                  <!-- /.dropdown-user -->
-              </li>
-              <!-- /.dropdown -->
-          </ul>
-          <!-- /.navbar-top-links -->
 
-          <div class="navbar-default sidebar" role="navigation">
-              <div class="sidebar-nav navbar-collapse">
-                  <ul class="nav" id="side-menu">
-                      <li class="sidebar-search">
-                        <div class="left-inner-addon">
-                            <span class="icon-addon">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </span>
-                            <input type="search" class="form-control" id="listSearchField" placeholder="Search" value="{{search}}">
-                        </div>
-
-                          <!-- /input-group -->
+    	            <div class="collapse navbar-collapse navbar-ex1-collapse" role="navigation">
+                    <ul class="nav navbar-nav side-nav" id="side-menu">
+                      <li class="hidden-xs" style="padding-left:10px; padding-top: 10px; padding-bottom: 10px;">
+                        <input type="text" class="form-control dropdown-toggle" id="SearchField" autocomplete="off" data-provide="typeahead" data-source='{% block data-source %}{% endblock %}' data-items="7" placeholder="Search...">
                       </li>
-                      <li {% if page == 'dashboard' %} class="active" {% endif %}>
-                          <a href="/reports/dashboard/"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+  	                	{% if perms.reports.can_view_dashboard %}
+                      <li {% if page == 'dashboard' %} class="active" {% endif %} >
+                        <a href="{% url 'reports.views.dashboard' %}"><i class="glyphicon glyphicon-dashboard fa-fw"></i> Dashboard</a>
                       </li>
+                      {% endif %}
                       {% if perms.reports.can_view_reports %}
                       {% if business_units_enabled %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
@@ -310,8 +119,8 @@
                       </li>
                       {% else %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
-                        <a><i class="fa fa-desktop fa-fw"></i> Computer <span class="fa arrow"></span></a>
-                        <ul id="computers" class="nav nav-second-level in">
+                        <a><i class="fa fa-desktop fa-fw"></i> Computer <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="computers" class="collapse in">
                           <li>
                             <a id="comp" href="{% url 'reports.views.index' %}" {% if subpage == 'reports' %} class="active" {% endif %}><i class="fa fa-apple fa-fw"></i> All</a>
                           </li>
@@ -328,42 +137,80 @@
                       </li>
                       {% endif %}
                       {% endif %}
-                      <li>
-                          <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
-                          <ul class="nav nav-second-level">
-                              <li>
-                                  <a href="flot.html">Flot Charts</a>
-                              </li>
-                              <li>
-                                  <a href="morris.html">Morris.js Charts</a>
-                              </li>
-                          </ul>
-                          <!-- /.nav-second-level -->
+                      {% if perms.catalogs.can_view_catalogs %}
+                      <li {% if page == 'catalogs' %} class="active" {% endif %}>
+                        <a href="{% url 'catalogs.views.catalog_view' %}"><i class="fa fa-list-alt fa-fw"></i> Catalogs</a>
                       </li>
+                      {% endif %}
+                      {% if perms.manifests.can_view_manifests %}
                       <li {% if page == 'manifests' %} class="active" {% endif %}>
-                        <a href="/manifests/">Manifests</a>
+                        <a href="{% url 'manifests.views.index' %}"><i class="fa fa-edit fa-fw"></i> Manifests</a>
                       </li>
-                      <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
-                        <a href="/pkgsinfo/">Package Info</a>
+                      {% endif %}
+                      {% if perms.inventory.can_view_inventory %}
+                      <li {% if page == 'inventory' %} class="active" {% endif %}>
+                        <a href="{% url 'inventory.views.items' %}"><i class="fa fa-sitemap fa-fw"></i> Inventory</a>
                       </li>
+                      {% endif %}
+                      {% if perms.licenses.can_view_licenses %}
+                      <li {% if page == 'licenses' %} class="active" {% endif %}>
+                        <a href="{% url 'licenses.views.index' %}"><i class="fa fa-file-text-o fa-fw"></i> Licenses</a>
+                      </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                </nav>
+                {% endblock %}
+
+                <!-- Page Content -->
+                <div id="page-wrapper">
+                  <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                  </div>
+                </div>
+
+                <div style="position:absolute; top:10px; right:0px; z-index:2000;">
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'admin:index' %}" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i>{{ user.username }}</a></li>
                   </ul>
+                </div>
+                <div id="footer">
+                  <div class="clearingdiv"></div>
+                </div>
               </div>
-              <!-- /.sidebar-collapse -->
-          </div>
-          <!-- /.navbar-static-side -->
-      </nav>
-      {% endblock %}
+              <script>
+                  window.onload = function() {
+                    windowload();
+                  };
+              </script>
+              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                  <div class="modal-content">
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="lgModal" >
+                <div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                  </div>
+                </div>
+              </div>
 
-      <!-- Page Content -->
-      <div id="page-wrapper">
-        {% block content %}{% endblock %}
-        <div class="clearingdiv"></div>
-    </div>
 
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="{% get_static_prefix %}bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
-  </body>
+        	    <!-- jQueryUI -->
+        	    <script src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
+        	    <!-- Bootstrap Core JavaScript -->
+        	    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+        	    <!-- bootbox JavaScript -->
+        	    <script src="{% get_static_prefix %}js/bootbox.min.js"></script>
+        	    <!-- DataTables JavaScript -->
+        	    <script src="{% get_static_prefix %}js/plugins/dataTables/jquery.dataTables.js"></script>
+        	    <script src="{% get_static_prefix %}js/plugins/dataTables/dataTables.bootstrap.js"></script>
+        	    <!-- Custom Theme JavaScript -->
+        	    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
+        		  <!-- Typeahead fix -->
+              <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
+      </body>
 </html>
