@@ -136,26 +136,3 @@ class Catalog(object):
                        if item.get('installer_item_location') == pkg_path]
             matching_count = len(matches)
         return matching_count
-
-    @classmethod
-    def get_required(cls):
-        """ Retruns all catalog items with updates and requres in dict """
-        requiredDict = dict()
-        catalog_items = Catalog.detail('all')
-        if catalog_items:
-            # run get every catalog item
-            for item in catalog_items:
-                # if item has requres add them to requiredDict
-                if "requires" in item:
-                    requiredDict[item.name] = {'requires': item.requires}
-                # if item has update for, add it to the right item in requiredDict
-                if "update_for" in item:
-                    for update in item.update_for:
-                        if update in requiredDict:
-                            if "updates" in requiredDict[update]:
-                                requiredDict[update]["updates"].append(item.name)
-                            else:
-                                requiredDict[update]["updates"] = [item.name]
-                        else:
-                            requiredDict[update] = {'updates':[item.name]}
-        return requiredDict

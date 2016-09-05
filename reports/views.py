@@ -65,7 +65,29 @@ if PROXY_ADDRESS:
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
-CATALOG_REQUIRED = Catalog.get_required()
+
+def get_required():
+    """ Retruns all catalog items with updates and requres in dict """
+    requiredDict = dict()
+    catalog_items = Catalog.detail('all')
+    if catalog_items:
+        # run get every catalog item
+        for item in catalog_items:
+            # if item has requres add them to requiredDict
+            if "requires" in item:
+                requiredDict[item.name] = {'requires': item.requires}
+            # if item has update for, add it to the right item in requiredDict
+            if "update_for" in item:
+                for update in item.update_for:
+                    if update in requiredDict:
+                        if "updates" in requiredDict[update]:
+                            requiredDict[update]["updates"].append(item.name)
+                        else:
+                            requiredDict[update]["updates"] = [item.name]
+                    else:
+                        requiredDict[update] = {'updates':[item.name]}
+    return requiredDict
+CATALOG_REQUIRED = get_required()
 def getRequired(item):
     """Retruns array with required / update catalog items"""
     required = dict()
