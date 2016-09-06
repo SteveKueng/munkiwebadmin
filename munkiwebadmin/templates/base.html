@@ -14,28 +14,27 @@
     <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
 
     <!-- MetisMenu CSS -->
-    <link href="{% get_static_prefix %}bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+    <link href="{% get_static_prefix %}css/metisMenu/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="{% get_static_prefix %}css/sb-admin-2.css" rel="stylesheet">
+    <link href="{% get_static_prefix %}css/sb-admin-2/sb-admin-2.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="{% get_static_prefix %}bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" href='{% get_static_prefix %}css/dataTables.bootstrap.min.css' type="text/css" media="all" />
+    <link href="{% get_static_prefix %}fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href='{% get_static_prefix %}css/dataTables/dataTables.bootstrap.min.css' type="text/css" media="all" />
     <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
 
     {% block extra_style %}{% endblock %}
 
     <!-- jQuery -->
-    <script type='text/javascript' src="{% get_static_prefix %}bower_components/jquery/dist/jquery.min.js"></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui.min.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/jquery.dataTables.min.js'></script>
+    <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui/jquery-ui.min.js'></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/jqueryDataTables/jquery.dataTables.min.js'></script>
     <!-- Bootstrap Core JavaScript -->
-    <script type='text/javascript' src="{% get_static_prefix %}bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type='text/javascript' src="{% get_static_prefix %}js/bootstrap.min.js"></script>
 
-    <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap3-typeahead.min.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/dataTables.bootstrap.min.js'></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/typeahead/bootstrap3-typeahead.min.js'></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/dataTables/dataTables.bootstrap.min.js'></script>
 
     {% block java_script %}{% endblock %}
 
@@ -361,9 +360,9 @@
     </div>
 
     <!-- Metis Menu Plugin JavaScript -->
-    <script src="{% get_static_prefix %}bower_components/metisMenu/dist/metisMenu.min.js"></script>
+    <script src="{% get_static_prefix %}js/metisMenu/metisMenu.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
-    <script src="{% get_static_prefix %}js/sb-admin-2.js"></script>
+    <script src="{% get_static_prefix %}js/sb-admin-2/sb-admin-2.js"></script>
   </body>
 </html>
