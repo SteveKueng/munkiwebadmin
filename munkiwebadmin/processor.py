@@ -10,5 +10,4 @@ except:
     STYLE = 'default'
 
 def index(request):
-    print STYLE
     return {'style': STYLE}
