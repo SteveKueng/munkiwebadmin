@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'pkgsinfo',
     'manifests',
     'process',
+    'reports',
     # Uncomment the next line if you've installed django_wsgiserver
     # and want to serve this Django app using it
     'django_wsgiserver',
