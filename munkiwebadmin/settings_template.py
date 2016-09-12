@@ -249,6 +249,7 @@ MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
 # or commit
 #GIT_PATH = '/usr/bin/git'
 
-#Define your style from styles-folder located in static
+MODEL_LOOKUP_ENABLED = True
 
+#Define your style from styles-folder located in static
 STYLE = 'default'
