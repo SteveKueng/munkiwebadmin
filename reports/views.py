@@ -185,10 +185,17 @@ def index(request, computer_serial=None):
             plist = getSoftware(manifest_name)
             print plist
 
+            time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
+
+            time = time[3:].split(':')
+
+
+
             context = {'machine': machine,
                        'plist_text': plist,
                        'report_plist': report_plist,
-                       'additional_info': additional_info,}
+                       'additional_info': additional_info,
+                       'time': time,}
             return render(request, 'reports/detail.html', context=context)
 
         if request.method == 'POST':
