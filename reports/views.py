@@ -183,19 +183,53 @@ def index(request, computer_serial=None):
             #    print key
             CLIENT.clear()
             plist = getSoftware(manifest_name)
-            print plist
+            #print plist
 
             time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
 
             time = time[3:].split(':')
 
+            devicesDict = {}
+
+            for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
+                partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                #print report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                #print deviceName
+                devicesDict[deviceName] = {}
+
+            #print devicesDict
+            partitionsDict = {}
+            partitionsContentDict = {}
+            for i in devicesDict:
+                for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                    deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
+                    partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                    if deviceName == i:
+                        partitionsContentDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
+                        print 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                        partitionsContentDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                        partitionsDict[partitionName] = partitionsContentDict
+                        devicesDict[i] = partitionsDict
+                partitionsDict = {}
+
+            print devicesDict
+
+
+            #for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+
+
+
+            #print drives
 
 
             context = {'machine': machine,
                        'plist_text': plist,
                        'report_plist': report_plist,
                        'additional_info': additional_info,
-                       'time': time,}
+                       'devicesDict': devicesDict,
+                       'time': time,
+                       }
             return render(request, 'reports/detail.html', context=context)
 
         if request.method == 'POST':
