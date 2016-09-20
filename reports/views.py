@@ -189,7 +189,7 @@ def index(request, computer_serial=None):
 
             time = time[3:].split(':')
 
-            devicesDict = {}
+            devicesDict = []
 
             for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
                 deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
