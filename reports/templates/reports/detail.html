@@ -138,41 +138,55 @@
 									</div>
 								</div>
 
-							<h3>Internal Drives</h3>
+							<h3>Drives</h3>
 							<ul class="list-group">
-									{% for device, devicecontent in devicesDict.items %}
+									{% for device in disksList %}
 		  					<li class="list-group-item">
 									<div class="row">
-										<div class="col-lg-2">
+										<div class="col-lg-2" style="" >
 											<div class="row">
-												<div class="col-lg-12 text-center">
+												<div class="col-lg-12 text-center" >
 													<i class="fa fa-hdd-o" aria-hidden="true" style="font-size: 50px"></i>
+													{% if device.physicalDisk.is_internal_disk == 'no' %}
+															<div style="margin-left: 65px; margin-top: -28px"><i class="fa fa-plug" aria-hidden="true" style="font-size: 20px;"></i></div>
+													{% endif %}
 												</div>
 											</div>
 											<div class="row">
-												<div class="col-lg-12 text-center">{{ device }}</div>
+												<div class="col-lg-12 text-center">{{ device.diskName }}</div>
 											</div>
-										</div>
-										{% for partition, partitioncontent in devicecontent.items %}
-										<div class=col-lg-10>
-											<div class="row">
-												<div class="col-lg-12">
-														<div>{{ partition }}<span class="pull-right">{{ partitioncontent.free_space_in_bytes|filesizeformat }} / {{ partitioncontent.size_in_bytes|filesizeformat }}</span></div>
-													<div class="progress">
-									  				<div class="progress-bar progress-bar-primary" style="width: {{ partitioncontent.percentFull }}%">
-									    				<span class="sr-only">40% System-partition (warning)</span>
-									  				</div>
 
+										</div>
+										<div class="col-lg-10" >
+
+											<div class="row" style="border-left: 1px solid #ddd">
+													<div class="col-lg-12">
+														<h5 style="margin-top: 0px">Basic</h5>
+														<div class="btn-group" role="group" aria-label="...">
+
+		  											<button type="button" class="btn btn-default">{{device.diskSize|filesizeformat}}</button>
+		  											<button type="button" class="btn btn-default"> {{device.physicalDisk.protocol}}</button>
+														<button type="button" class="btn btn-default"> {% if device.physicalDisk.is_internal_disk == 'yes' %} internal {% else %} external {% endif %}</button>
+														</div>
 													</div>
 												</div>
+											{% for partition in device.partitions %}
+											<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+												<div class="col-lg-12">
+													<span class="pull-right">{{ partition.partitionAtributes.free_space_in_bytes|filesizeformat }} / {{partition.partitionAtributes.size_in_bytes|filesizeformat}}</span>
+													<h5 style="margin-top: 0px">{{ partition.partitionName }}</h5>
+													<div class="progress" style="margin-bottom: 0px;">
+  												<div class="progress-bar" role="progressbar" aria-valuenow="{{partition.partitionAtributes.percentFull}}" aria-valuemin="0" aria-valuemax="100" style="width: {{partition.partitionAtributes.percentFull}}%; ">
+    										<span class="sr-only">60% Complete</span>
+  												</div>
+												</div>
+												</div>
 											</div>
-										</div>
-										{% endfor %}
+											{% endfor %}
+												</div>
 									</div>
 								</li>
 								{% endfor %}
-		  					<li class="list-group-item">{{ report_plist }}</li>
-		  					<li class="list-group-item">Disk 3</li>
 							</ul>
 							<h3>Screens</h3>
 							<div class="row">
