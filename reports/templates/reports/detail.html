@@ -188,21 +188,53 @@
 								</li>
 								{% endfor %}
 							</ul>
-							<h3>Screens</h3>
-							<div class="row">
-								<div class="col-lg-6">
+							<h3>Graphics</h3>
+							<ul class="list-group">
+									{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
+		  					<li class="list-group-item">
 									<div class="row">
-										<div class="col-lg-12"><i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i></div>
+										<div class="col-lg-2" style="" >
+											<div class="row">
+												<div class="col-lg-12 text-center" >
+													<i class="fa fa-indent" aria-hidden="true" style="font-size: 50px"></i>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12 text-center">{{ card.sppci_model }}</div>
+											</div>
+
+										</div>
+										<div class="col-lg-10" >
+
+											<div class="row" style="border-left: 1px solid #ddd">
+													<div class="col-lg-12">
+														<h5 style="margin-top: 0px">Basic</h5>
+														<div class="btn-group" role="group" aria-label="...">
+
+		  											<button type="button" class="btn btn-default">{{device._spdisplays_vram|filesizeformat}}</button>
+		  											<button type="button" class="btn btn-default"> {{device.physicalDisk.protocol}}</button>
+														<button type="button" class="btn btn-default"> {% if device.physicalDisk.is_internal_disk == 'yes' %} internal {% else %} external {% endif %}</button>
+														</div>
+													</div>
+												</div>
+											{% for partition in device.partitions %}
+											<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+												<div class="col-lg-12">
+													<span class="pull-right">{{ partition.partitionAtributes.free_space_in_bytes|filesizeformat }} / {{partition.partitionAtributes.size_in_bytes|filesizeformat}}</span>
+													<h5 style="margin-top: 0px">{{ partition.partitionName }}</h5>
+													<div class="progress" style="margin-bottom: 0px;">
+  												<div class="progress-bar" role="progressbar" aria-valuenow="{{partition.partitionAtributes.percentFull}}" aria-valuemin="0" aria-valuemax="100" style="width: {{partition.partitionAtributes.percentFull}}%; ">
+    										<span class="sr-only">60% Complete</span>
+  												</div>
+												</div>
+												</div>
+											</div>
+											{% endfor %}
+												</div>
 									</div>
-									<div class="row">
-										<div class="col-lg-12">Apple Cinema Display</div>
-									</div>
-									<div class="row">
-										<div class="col-lg-12">1400 x 70</div>
-									</div>
-								</div>
-								<div class="col-lg-6"></div>
-							</div>
+								</li>
+								{% endfor %}
+							</ul>
 						</div>
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
