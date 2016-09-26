@@ -196,6 +196,7 @@ def index(request, computer_serial=None):
             for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
                 deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
                 partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
                 for p in disksPreList:
                     if p == deviceName:
                         counter = counter + 1
@@ -216,7 +217,7 @@ def index(request, computer_serial=None):
                     # Reading Name of disk inside the partition-information
                     diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
                     partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                    # If diskName is equal to the actual iteration of disksPreList
+                    # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
                     if diskName == i:
                         # Reading partition information from system_profiler
                         partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
@@ -226,6 +227,7 @@ def index(request, computer_serial=None):
                         partitionDict['partitionAtributes'] = partitionsAttributesDict
                         partitionsList.append(partitionDict)
                         partitionDict = {}
+                        # Calculate the diskSize by adding every parttion-size to diskSize
                         diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
                         diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive
                 diskInfoDict['partitions'] = partitionsList
@@ -236,17 +238,6 @@ def index(request, computer_serial=None):
                 diskSize = 0
                 partitionsDict = {}
                 diskInfoDict = {}
-
-
-            print disksList
-
-
-            #for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-
-
-
-            #print drives
-
 
             context = {'machine': machine,
                        'plist_text': plist,
