@@ -211,7 +211,7 @@
 														<h5 style="margin-top: 0px">Basic</h5>
 														<div class="btn-group" role="group" aria-label="...">
 
-		  											<button type="button" class="btn btn-default">{{device._spdisplays_vram|filesizeformat}}</button>
+		  											<button type="button" class="btn btn-default">{% if card.spdisplays_vram  %}{{ card.spdisplays_vram }}{% else %}{{ card|get:"_spdisplays_vram" }}{% endif %}</button>
 		  											<button type="button" class="btn btn-default"> {{device.physicalDisk.protocol}}</button>
 														<button type="button" class="btn btn-default"> {% if device.physicalDisk.is_internal_disk == 'yes' %} internal {% else %} external {% endif %}</button>
 														</div>
