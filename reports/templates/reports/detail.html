@@ -98,45 +98,26 @@
 							<h3>Basic</h3>
 							<div class="row">
 								<div class="col-lg-6">
-									<div class="panel panel-default">
-										 <div class="panel-heading">Software</div>
-											<div class="panel-body">
-									<dl class="dl-horizontal">
+									<ul class="list-group">
+										<li class="list-group-item"><b>Last-User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
+										<li class="list-group-item"><b>Munki-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
+										<li class="list-group-item"><b>OS-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
+										<li class="list-group-item"><b>Boot-Volume</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
+										<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
 										<script>
 											$('#osversion').popover();
 										</script>
-  									<dt>Last-User</dt>
-  									<dd>{{ report_plist.ConsoleUser }}</dd>
-  									<dt>Munki-Version</dt>
-  									<dd>{{ report_plist.MachineInfo.munki_version }}</dd>
-										<dt>OS-Version</dt>
-  									<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }} <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></dd>
-										<dt>Boot-Volume</dt>
-  									<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</dd>
-										<dt>Uptime</dt>
-  									<dd>{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %} </dd>
-									</dl>
+									</ul>
 								</div>
-							</div>
-							</div>
 								<div class="col-lg-6">
-									<div class="panel panel-default">
-										 <div class="panel-heading">Hardware</div>
-											<div class="panel-body">
-												<dl class="dl-horizontal">
-  												<dt>Hardware-Type</dt>
-  												<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</dd>
-													<dt>Serial-No</dt>
-  												<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</dd>
-													<dt>Processor</dt>
-  												<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</dd>
-													<dt>Physical-Memory</dt>
-  												<dd>{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</dd>
-												</dl>
+									<ul class="list-group">
+										<li class="list-group-item"><b>Hardware-Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
+										<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
+										<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
+										<li class="list-group-item"><b>Physical-Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
+									</ul>
 											</div>
 										</div>
-									</div>
-								</div>
 
 							<h3>Drives</h3>
 							<ul class="list-group">
@@ -207,26 +188,47 @@
 										<div class="col-lg-10" >
 
 											<div class="row" style="border-left: 1px solid #ddd">
-													<div class="col-lg-12">
-														<h5 style="margin-top: 0px">Basic</h5>
-														<div class="btn-group" role="group" aria-label="...">
+												<div class="col-lg-12">
 
-		  											<button type="button" class="btn btn-default">{% if card.spdisplays_vram  %}{{ card.spdisplays_vram }}{% else %}{{ card|get:"_spdisplays_vram" }}{% endif %}</button>
-		  											<button type="button" class="btn btn-default"> {{device.physicalDisk.protocol}}</button>
-														<button type="button" class="btn btn-default"> {% if device.physicalDisk.is_internal_disk == 'yes' %} internal {% else %} external {% endif %}</button>
-														</div>
+												<div class="row">
+													<div class="col-lg-6">
+														<ul class="list-group">
+															<li class="list-group-item"><b>Video-RAM:</b><span class="pull-right">{% if card.spdisplays_vram  %}{{ card.spdisplays_vram }}{% else %}{{ card|get:"_spdisplays_vram" }}{% endif %}</span></li>
+														</ul>
+													</div>
+													<div class="col-lg-6">
+														<ul class="list-group">
+		  												<li class="list-group-item"><b>Card-Type:</b><span class="pull-right">{{ card.sppci_bus|slice:"11:"|replace }}</span></li>
+														</ul>
+													</div>
 													</div>
 												</div>
-											{% for partition in device.partitions %}
+											</div>
+
+											{% for screen in card.spdisplays_ndrvs %}
 											<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
-												<div class="col-lg-12">
-													<span class="pull-right">{{ partition.partitionAtributes.free_space_in_bytes|filesizeformat }} / {{partition.partitionAtributes.size_in_bytes|filesizeformat}}</span>
-													<h5 style="margin-top: 0px">{{ partition.partitionName }}</h5>
-													<div class="progress" style="margin-bottom: 0px;">
-  												<div class="progress-bar" role="progressbar" aria-valuenow="{{partition.partitionAtributes.percentFull}}" aria-valuemin="0" aria-valuemax="100" style="width: {{partition.partitionAtributes.percentFull}}%; ">
-    										<span class="sr-only">60% Complete</span>
-  												</div>
+												<div class="col-lg-2">
+													{% if screen.spdisplays_builtin == "spdisplays_yes" %}
+														<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+													{% else %}
+														<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
+													{% endif %}
 												</div>
+												<div class="col-lg-5">
+													<ul class="list-group">
+  													<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
+  													<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
+														<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
+  													<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
+													</ul>
+												</div>
+												<div class="col-lg-5">
+													<ul class="list-group">
+														<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
+														<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
+														<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+														<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+													</ul>
 												</div>
 											</div>
 											{% endfor %}
