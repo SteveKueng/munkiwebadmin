@@ -21,15 +21,6 @@
 
 				    {% endif %}
 				    </small></h4>
-<!--				    <div class="btn-group" role="group" aria-label="...">
-				      <a href='#' id="Manifest" class="btn btn-default buttons" onclick="getDetail('Manifest', '{{ machine.serial_number }}', '{{manifest_name}}');">Software</a>
-				      <a href='#' id="AppleUpdates" class="btn btn-default buttons" onclick="getDetail('AppleUpdates', '{{ machine.serial_number }}');">Apple Updates</a>
-				      <a href='#' id="Machine" class="btn btn-default buttons" onclick="getDetail('Machine', '{{ machine.serial_number }}');">System</a>
-				      {% if perms.inventory.can_view_inventory %}
-				      <a href='#' onclick="getDetail('Inventory', '{{ machine.serial_number }}');" id="Inventory" class="btn btn-default buttons">Inventory</a>
-				      {% endif %}
-							<a href='#' onclick="getDetail('Staging', '{{ machine.serial_number }}');" id="Staging" class="btn btn-default buttons">Staging</a>
-				    </div> -->
 				  </div>
 				  <!-- <div class="col-md-3 hidden-xs hidden-sm hidden-print" style="text-align: right">
 				    <a href="vnc://{{ user.username }}@{{ machine.hostname }}" class="btn btn-default">Screen Sharing</a>
@@ -50,35 +41,8 @@
 				  <!-- Tab panes -->
 				  <div class="tab-content" id="detail_content">
 						<div role="tabpaneln" class="tab-pane tabDetail active" id="Software" style="overflow:auto; height:100%;">
-							      <!--<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>-->
-											{% for key, item in plist_text.items %}
-											<div class="list-group list-group-root well">
-													<a href="#" class="list-group-item">{{ key|replace }}</a>
-													{% for software in item %}
-													<div class="list-group">
-    												<a href="#" class="list-group-item">{{ software.name }} <small class="text-muted pull-right">{{ software.manifest}}</small></a>
-														{% if software.requires %}
-														<div class="list-group" style="padding-left:20px;">
-															{% with "required from "|add:software.name as softwareRequires %}
-															{% autoescape off %}{{ software.requires|loopDict:softwareRequires }}{% endautoescape %}
-															{% endwith %}
-												<!--			{% for key, require in software.requires.items %}
-												      <a href="#" class="list-group-item">{{ key }}<small class="text-muted pull-right">{{ software.name }} requires</small></a>
-
-															{% endfor %}-->
-												    </div>
-														{% endif %}
-														{% if software.updates %}
-														<div class="list-group" style="padding-left:20px;">
-															{% with "update for "|add:software.name as softwareUpdateFor %}
-															{% autoescape off %}{{ software.updates|loopDict:softwareUpdateFor }}{% endautoescape %}
-															{% endwith %}
-												    </div>
-														{% endif %}
-													</div>
-												{% endfor %}
-											</div>
-											{% endfor %}
+							<!--<i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>-->
+							
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
 							<table class="table table-striped">
@@ -96,7 +60,6 @@
 				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
 						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">Staging</div>
 				  </div>
-
 				</div>
 
 

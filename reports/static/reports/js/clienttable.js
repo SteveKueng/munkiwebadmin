@@ -51,7 +51,6 @@ $(document).ready(function() {
     }
 
     //$('#listSearchField').focus();
-
     // When a modal is shown, and it contains an <input>, make sure it's
     // selected when the modal is shown.
     $(document).on('shown.bs.modal', '.modal', function(event){
@@ -63,6 +62,7 @@ $(document).ready(function() {
         if (hash.length > 1) {
             if (hash.slice(1) != current_pathname) {
                 getComputerItem(hash.slice(1));
+                
             }
         }
     });
@@ -70,7 +70,6 @@ $(document).ready(function() {
 } );
 
 var current_pathname = "";
-
 function getComputerItem(pathname) {
     if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
         requested_pathname = pathname;
@@ -86,7 +85,7 @@ function getComputerItem(pathname) {
         timeout: 10000,
         cache: false,
         success: function(data) {
-						$('#computer_detail').html(data);
+            $('#computer_detail').html(data);
           	//  hideSaveOrCancelBtns();
           	//  detectUnsavedChanges();
             current_pathname = pathname;
@@ -96,10 +95,11 @@ function getComputerItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#computerDetails').hasClass('in')){
-							do_resize()
-              $("#computerDetails").modal("show");
+                do_resize();
+                getSoftwareList();
+                $("#computerDetails").modal("show");
             }
-						$("#loadingModal").modal("hide");
+            $("#loadingModal").modal("hide");
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -129,4 +129,11 @@ function cancelEdit() {
     //$('.modal-backdrop').remove();
     hideSaveOrCancelBtns();
     //getManifestItem(current_pathname);
+}
+
+var catalogData = ""
+function getSoftwareList() {
+    $.getJSON( "/reports/_catalogJson", function( json ) {
+    catalogData = json;
+ });
 }

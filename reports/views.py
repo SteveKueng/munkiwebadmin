@@ -66,72 +66,49 @@ if PROXY_ADDRESS:
     urllib2.install_opener(opener)
 
 
-def get_required():
-    """ Retruns all catalog items with updates and requres in dict """
-    requiredDict = dict()
-    catalog_items = Catalog.detail('all')
-    if catalog_items:
-        # run get every catalog item
+def getSoftwareList(catalogs):
+    """return a dict with all catalogs consolidated"""
+    swDict = dict()
+    for catalog in catalogs:
+        catalog_items = Catalog.detail(catalog)
         for item in catalog_items:
-            # if item has requres add them to requiredDict
-            if "requires" in item:
-                requiredDict[item.name] = {'requires': item.requires}
-            # if item has update for, add it to the right item in requiredDict
-            if "update_for" in item:
-                for update in item.update_for:
-                    if update in requiredDict:
-                        if "updates" in requiredDict[update]:
-                            requiredDict[update]["updates"].append(item.name)
-                        else:
-                            requiredDict[update]["updates"] = [item.name]
+            if item.name in swDict:
+                if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
+                    swDict[item.name] = item
+            else:
+                swDict[item.name] = item
+    return swDict
+
+@login_required
+def createRequired(request):
+    """ returns catalog as json """
+    softwareList = getSoftwareList(["production", "development", 'UA'])
+    requiredDict = dict()
+    for software in softwareList:
+        software = softwareList[software]
+        if software.name in requiredDict:
+            requiredDict[software.name]['version'] = software.version
+        else:
+            requiredDict[software.name] = {'version': software.version}
+        if "icon" in software:
+            requiredDict[software.name]['icon'] = software.icon
+        if "display_name" in software:
+            requiredDict[software.name]['display_name'] = software.display_name
+        # if software has requres add them to requiredDict
+        if "requires" in software:
+            requiredDict[software.name]['requires'] = software.requires
+        # if software has update for, add it to the right software in requiredDict
+        if "update_for" in software:
+            for update in software.update_for:
+                if update in requiredDict:
+                    if "updates" in requiredDict[update]:
+                        requiredDict[update]["updates"].append(software.name)
                     else:
-                        requiredDict[update] = {'updates':[item.name]}
-    return requiredDict
-CATALOG_REQUIRED = get_required()
-def getRequired(item):
-    """Retruns array with required / update catalog items"""
-    required = dict()
-    if CATALOG_REQUIRED:
-        if item in CATALOG_REQUIRED:
-            if "requires" in CATALOG_REQUIRED[item]:
-                for require in CATALOG_REQUIRED[item]["requires"]:
-                    required["requires"] = {require : getRequired(require)}
-
-            if "updates" in CATALOG_REQUIRED[item]:
-                for update in CATALOG_REQUIRED[item]["updates"]:
-                    required["updates"] = {update : getRequired(update)}
-    return required
-
-#CLIENT dict
-CLIENT = dict()
-#manifest key with will be showed
-KEYS = ['managed_installs', 'managed_uninstalls', 'optional_installs']
-def getSoftware(manifest_name):
-    """Returns manifest item"""
-    manifest_path = MUNKI_REPO_DIR+"/manifests/"+manifest_name
-    try:
-        plist = Plist.read('manifests', manifest_path)
-    except (FileDoesNotExistError, FileReadError), err:
-        plist = None
-        pass
-
-    if plist:
-        for key in KEYS:
-            if key in plist:
-                for element in plist[key]:
-                    item = {'name': element, 'manifest':manifest_name}
-                    if key in CLIENT:
-                        CLIENT[key].append(item)
-                    else:
-                        CLIENT[key] = [item]
-
-                    required = getRequired(element)
-                    if required:
-                        CLIENT[key][-1].update(required)
-
-        for manifest in plist.included_manifests:
-            getSoftware(manifest)
-    return CLIENT
+                        requiredDict[update]["updates"] = [software.name]
+                else:
+                    requiredDict[update] = {'updates':[software.name]}
+    return HttpResponse(json.dumps(requiredDict),
+                        content_type='application/json')
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
@@ -179,14 +156,8 @@ def index(request, computer_serial=None):
                     manifest_name = machine.hostname
             except:
                 pass
-            #for key, value in report_plist["MachineInfo"]["SystemProfile"][0].iteritems():
-            #    print key
-            CLIENT.clear()
-            plist = getSoftware(manifest_name)
-            print plist
 
             context = {'machine': machine,
-                       'plist_text': plist,
                        'report_plist': report_plist,
                        'additional_info': additional_info,}
             return render(request, 'reports/detail.html', context=context)
