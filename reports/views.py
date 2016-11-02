@@ -65,51 +65,6 @@ if PROXY_ADDRESS:
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
-
-def getSoftwareList(catalogs):
-    """return a dict with all catalogs consolidated"""
-    swDict = dict()
-    for catalog in catalogs:
-        catalog_items = Catalog.detail(catalog)
-        for item in catalog_items:
-            if item.name in swDict:
-                if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
-                    swDict[item.name] = item
-            else:
-                swDict[item.name] = item
-    return swDict
-
-@login_required
-def createRequired(request):
-    """ returns catalog as json """
-    softwareList = getSoftwareList(["production", "development", 'UA'])
-    requiredDict = dict()
-    for software in softwareList:
-        software = softwareList[software]
-        if software.name in requiredDict:
-            requiredDict[software.name]['version'] = software.version
-        else:
-            requiredDict[software.name] = {'version': software.version}
-        if "icon" in software:
-            requiredDict[software.name]['icon'] = software.icon
-        if "display_name" in software:
-            requiredDict[software.name]['display_name'] = software.display_name
-        # if software has requres add them to requiredDict
-        if "requires" in software:
-            requiredDict[software.name]['requires'] = software.requires
-        # if software has update for, add it to the right software in requiredDict
-        if "update_for" in software:
-            for update in software.update_for:
-                if update in requiredDict:
-                    if "updates" in requiredDict[update]:
-                        requiredDict[update]["updates"].append(software.name)
-                    else:
-                        requiredDict[update]["updates"] = [software.name]
-                else:
-                    requiredDict[update] = {'updates':[software.name]}
-    return HttpResponse(json.dumps(requiredDict),
-                        content_type='application/json')
-
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
 def index(request, computer_serial=None):
@@ -118,7 +73,6 @@ def index(request, computer_serial=None):
         # return manifest detail
         if request.method == 'GET':
             LOGGER.debug("Got read request for %s", computer_serial)
-
             machine = None
             try:
                 machine = Machine.objects.get(serial_number=computer_serial)
@@ -136,6 +90,7 @@ def index(request, computer_serial=None):
                 except MunkiReport.DoesNotExist:
                     report_plist = None
                     pass
+
             # determine if the model description information should be shown
             try:
                 MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
@@ -148,14 +103,6 @@ def index(request, computer_serial=None):
             if MODEL_LOOKUP_ENABLED and machine.serial_number:
                 additional_info['model_description'] = \
                     model_description_lookup(machine.serial_number)
-
-            # -- get CLIENT_MANIFEST option --
-            manifest_name = machine.serial_number
-            try:
-                if settings.CLIENT_MANIFEST == "hostname":
-                    manifest_name = machine.hostname
-            except:
-                pass
 
             context = {'machine': machine,
                        'report_plist': report_plist,
@@ -260,7 +207,6 @@ def index(request, computer_serial=None):
                 'subpage': subpage,}
     return render(request, 'reports/clienttable.html', context=context)
 
-
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
@@ -317,226 +263,36 @@ def dashboard(request):
     c.update(csrf(request))
     return render_to_response('reports/dashboard.html', c)
 
-
 @login_required
-@permission_required('reports.can_view_reports', login_url='/login/')
-def detail_pkg(request, serial, manifest_name):
-    machine = None
-    manifest = None
-    install_items = None
-
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-
-    report_plist = {}
-    if machine:
-        try:
-            report = MunkiReport.objects.get(machine=machine)
-            report_plist = report.get_report()
-        except MunkiReport.DoesNotExist:
-            pass
-
-    # get autocomplete data
-    install_items = Manifest.getInstallItemNames(manifest_name)
-    valid_install_items = (install_items['suggested'] +
-                           install_items['updates'] +
-                            install_items['with_version'])
-    suggested_install_items = install_items['suggested']
-    valid_catalogs = Catalog.list()
-    valid_manifest_names = Manifest.list()
-    autocomplete_data = json.dumps({
-        'items': install_items['suggested'],
-        'catalogs': valid_catalogs,
-        'manifests': valid_manifest_names
-    })
-
-    # loop trought includet manifests as long as it have one
-    includetManifests = dict()
-    def get_addition_manifests(manifest):
-        detailManifest = Manifest.read(manifest)
-        includetManifests.update({manifest:detailManifest})
-        if "included_manifests" in detailManifest:
-            for includetManifest in detailManifest.included_manifests:
-                get_addition_manifests(includetManifest)
-
-    manifest = Manifest.read(manifest_name)
-    sorted_Manifests = OrderedDict()
-    sorted_Manifests[manifest_name] = manifest
-    if "included_manifests" in manifest:
-        for includetManifest in manifest.included_manifests:
-            get_addition_manifests(includetManifest)
-        sort_list = manifest.included_manifests
-
-        for key in sort_list:
-            sorted_Manifests[key] = includetManifests[key]
-
-        key_list = includetManifests.keys()
-        key_list.sort()
-        for key in key_list:
-            if key not in sorted_Manifests:
-                sorted_Manifests[key] = includetManifests[key]
-
-    # item_details -> list with software and details
-    # true_items for check if a software is in catalog or not
-    item_details = {}
-    true_items = list()
-    if "catalogs" in manifest:
-        for catalog in manifest.catalogs:
-            catalog_detail = Catalog.detail(catalog)
-            if catalog_detail:
-                for detail in reversed(catalog_detail):
-                    if not detail.name in item_details:
-                        item_details[detail.name] = detail
-                        true_items.append(detail.name)
-                        if "icon_name" in item_details[detail.name]:
-                            icon = Catalog.get_icon(item_details[detail.name].icon_name)
-                        else:
-                            icon = Catalog.get_icon(detail.name)
-                        item_details[detail.name].icon_name = icon
-
-    ManagedInstallsDetail = OrderedDict()
-    if report_plist.has_key("ManagedInstalls"):
-        for item in report_plist.ManagedInstalls:
-            ManagedInstallsDetail[item.name] = item
-
-
-    # installs
-    installs = OrderedDict()
-    listed = list()
-    installsTypes = ["managed_installs", "managed_uninstalls", "optional_installs"]
-    for installsType in installsTypes:
-        installs[installsType] = OrderedDict()
-
-        for number, manifests in enumerate(sorted_Manifests):
-            installs[installsType][manifests] = OrderedDict()
-
-            if manifest:
-                for index, item in enumerate(sorted_Manifests[manifests][installsType]):
-                    listed.append(item)
-                    if ManagedInstallsDetail.has_key(item):
-                        installs[installsType][manifests][item] = ManagedInstallsDetail[item]
-
-                    if item in true_items:
-                        if installs[installsType].get(manifests, {}).has_key(item):
-                            installs[installsType][manifests][item].update(item_details[item])
-                        else:
-                            installs[installsType][manifests][item] = item_details[item]
-
-                        installs[installsType][manifests][item].update({"incatalog" : "True"})
-                    else:
-                        if installs[installsType].get(manifests, {}).has_key(item):
-                            installs[installsType][manifests][item].update({"incatalog" : "False"})
-                        else:
-                            installs[installsType][manifests][item] = {'name' : item, "incatalog" : "False"}
-
-
-    required = OrderedDict()
-    for item in sorted(ManagedInstallsDetail.items(),key=lambda x: x[1]['display_name']):
-        if not item[0] in listed:
-            if item_details.has_key(item[0]):
-                ManagedInstallsDetail[item[0]].icon_name = item_details[item[0]].icon_name
-            else:
-                ManagedInstallsDetail[item[0]].icon_name = "/static/img/PackageIcon.png"
-
-            required[item[0]] = ManagedInstallsDetail[item[0]]
-
-
-    # handle items that were installed during the most recent run
-    install_results = {}
-    for result in report_plist.get('InstallResults', []):
-        nameAndVers = result['name'] + '-' + result['version']
-        if result['status'] == 0:
-            install_results[nameAndVers] = "installed"
+def createRequired(request):
+    """ returns catalog as json """
+    softwareList = getSoftwareList(["production", "development", 'UA'])
+    requiredDict = dict()
+    for software in softwareList:
+        software = softwareList[software]
+        if software.name in requiredDict:
+            requiredDict[software.name]['version'] = software.version
         else:
-            install_results[nameAndVers] = 'error'
-
-    if install_results:
-        for item in report_plist.get('ItemsToInstall', []):
-            name = item.get('display_name', item['name'])
-            nameAndVers = ('%s-%s'
-                % (name, item['version_to_install']))
-            item['install_result'] = install_results.get(
-                nameAndVers, 'pending')
-
-        for item in report_plist.get('ManagedInstalls', []):
-            if 'version_to_install' in item:
-                name = item.get('display_name', item['name'])
-                nameAndVers = ('%s-%s'
-                    % (name, item['version_to_install']))
-                if install_results.get(nameAndVers) == 'installed':
-                    item['installed'] = True
-
-    # handle items that were removed during the most recent run
-    # this is crappy. We should fix it in Munki.
-    removal_results = {}
-
-    if removal_results:
-        for item in report_plist.get('ItemsToRemove', []):
-            name = item.get('display_name', item['name'])
-            item['install_result'] = removal_results.get(
-                name, 'pending')
-            if item['install_result'] == 'removed':
-                if not 'RemovedItems' in report_plist:
-                    report_plist['RemovedItems'] = [item['name']]
-                elif not name in report_plist['RemovedItems']:
-                    report_plist['RemovedItems'].append(item['name'])
-
-    c = RequestContext(request,{'manifest_name': manifest_name,
-                                'manifest': manifest,
-                               'report': report_plist,
-                               'installs': installs,
-                               'autocomplete_data': autocomplete_data,
-                               'required': required,
-                               'valid_manifest_names': valid_manifest_names,
-                               'valid_catalogs': valid_catalogs,
-                               })
-    c.update(csrf(request))
-    return render_to_response('reports/detail_pkg.html',c)
-
-
-@login_required
-@permission_required('reports.can_view_reports', login_url='/login/')
-def appleupdate(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-
-    report_plist = {}
-    if machine:
-        try:
-            report = MunkiReport.objects.get(machine=machine)
-            report_plist = report.get_report()
-        except MunkiReport.DoesNotExist:
-            pass
-
-    try:
-        AppleUpdates = report_plist.AppleUpdates
-    except:
-        AppleUpdates = {}
-
-    history = {}
-    if 'SystemProfile' in report_plist.get('MachineInfo', []):
-                for profile in report_plist['MachineInfo']['SystemProfile']:
-                    if profile['_dataType'] == 'SPInstallHistoryDataType':
-                        history = profile._items
-
-    c = RequestContext(request,{'history': history,
-                               'AppleUpdates': AppleUpdates,
-                               'page': 'reports'})
-
-    c.update(csrf(request))
-    return render_to_response('reports/appleupdates.html', c)
-
+            requiredDict[software.name] = {'version': software.version}
+        if "icon" in software:
+            requiredDict[software.name]['icon'] = software.icon
+        if "display_name" in software:
+            requiredDict[software.name]['display_name'] = software.display_name
+        # if software has requres add them to requiredDict
+        if "requires" in software:
+            requiredDict[software.name]['requires'] = software.requires
+        # if software has update for, add it to the right software in requiredDict
+        if "update_for" in software:
+            for update in software.update_for:
+                if update in requiredDict:
+                    if "updates" in requiredDict[update]:
+                        requiredDict[update]["updates"].append(software.name)
+                    else:
+                        requiredDict[update]["updates"] = [software.name]
+                else:
+                    requiredDict[update] = {'updates':[software.name]}
+    return HttpResponse(json.dumps(requiredDict),
+                        content_type='application/json')
 
 @login_required
 def staging(request, serial):
@@ -608,73 +364,6 @@ def staging(request, serial):
 
         c.update(csrf(request))
         return render_to_response('reports/staging.html', c)
-
-
-@login_required
-@permission_required('reports.can_view_reports', login_url='/login/')
-def machine_detail(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-
-    report_plist = {}
-    if machine:
-        try:
-            report = MunkiReport.objects.get(machine=machine)
-            report_plist = report.get_report()
-        except MunkiReport.DoesNotExist:
-            pass
-
-
-    SoftwareData = ""
-    DisplaysData = ""
-    NetworkData = ""
-    SPStorageDataType = ""
-
-    for profile in report_plist['MachineInfo']['SystemProfile']:
-        if profile['_dataType'] == 'SPSoftwareDataType':
-            SoftwareData = profile._items
-        elif profile['_dataType'] == 'SPDisplaysDataType':
-            DisplaysData = profile._items
-        elif profile['_dataType'] == 'SPNetworkDataType':
-            NetworkData = profile._items
-        elif profile['_dataType'] == 'SPStorageDataType':
-            SPStorageDataType = profile._items
-
-
-    # convert forward slashes in manifest names to colons
-    if 'ManifestName' in report_plist:
-        report_plist['ManifestNameLink'] = report_plist['ManifestName'].replace('/', ':')
-
-    # determine if the warranty lookup information should be shown
-    try:
-        WARRANTY_LOOKUP_ENABLED = settings.WARRANTY_LOOKUP_ENABLED
-    except:
-        WARRANTY_LOOKUP_ENABLED = False
-
-    # Determine Manufacture Date
-    additional_info = {}
-    if WARRANTY_LOOKUP_ENABLED and machine.serial_number:
-        additional_info['manufacture_date'] = \
-            estimate_manufactured_date(machine.serial_number)
-
-
-    return render_to_response('reports/detail_machine.html',
-                              {'machine': machine,
-                               'report': report_plist,
-                               'user': request.user,
-                               'SoftwareData': SoftwareData,
-                               'DisplaysData': DisplaysData,
-                               'NetworkData': NetworkData,
-                               'SPStorageDataType': SPStorageDataType,
-                               'additional_info': additional_info,
-                               'warranty_lookup_enabled': WARRANTY_LOOKUP_ENABLED,
-                               'page': 'reports'})
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
@@ -855,24 +544,15 @@ def model_description_lookup(serial):
     except:
         return ''
 
-@login_required
-@permission_required('reports.delete_machine')
-def delete_machine(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-
-    if machine:
-        try:
-            report = MunkiReport.objects.get(machine=machine)
-            report.delete()
-        except MunkiReport.DoesNotExist:
-            pass
-
-    machine.delete()
-    return HttpResponse("Machine deleted\n")
+def getSoftwareList(catalogs):
+    """return a dict with all catalogs consolidated"""
+    swDict = dict()
+    for catalog in catalogs:
+        catalog_items = Catalog.detail(catalog)
+        for item in catalog_items:
+            if item.name in swDict:
+                if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
+                    swDict[item.name] = item
+            else:
+                swDict[item.name] = item
+    return swDict

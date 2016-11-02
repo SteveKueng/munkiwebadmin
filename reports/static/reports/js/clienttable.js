@@ -95,8 +95,7 @@ function getComputerItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#computerDetails').hasClass('in')){
-                do_resize();
-                getSoftwareList();
+                do_resize();              
                 $("#computerDetails").modal("show");
             }
             $("#loadingModal").modal("hide");
@@ -135,5 +134,6 @@ var catalogData = ""
 function getSoftwareList() {
     $.getJSON( "/reports/_catalogJson", function( json ) {
     catalogData = json;
+    alert(json);
  });
 }

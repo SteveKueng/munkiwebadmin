@@ -9,7 +9,6 @@ urlpatterns = [
     
     url(r'^dashboard/*$', reports.views.dashboard),
 
-    url(r'^delete/(?P<serial>[^/]+)$', reports.views.delete_machine),
     url(r'^staging/(?P<serial>[^/]+)$', reports.views.staging),
     url(r'^raw/(?P<serial>[^/]+)$', reports.views.raw),
     url(r'^name/(?P<serial>[^/]+)$', reports.views.getname),
