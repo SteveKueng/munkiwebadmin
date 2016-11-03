@@ -1,3 +1,33 @@
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 // resize modal content to max windows height
 function do_resize() {
     $('#detail_content').height($(window).height() - 340);
@@ -86,6 +116,7 @@ function getComputerItem(pathname) {
         cache: false,
         success: function(data) {
             $('#computer_detail').html(data);
+            getManifest(pathname);
           	//  hideSaveOrCancelBtns();
           	//  detectUnsavedChanges();
             current_pathname = pathname;
@@ -131,9 +162,54 @@ function cancelEdit() {
 }
 
 var catalogData = ""
-function getSoftwareList() {
-    $.getJSON( "/reports/_catalogJson", function( json ) {
-    catalogData = json;
-    alert(json);
- });
+function getSoftwareList(catalogList) {
+    $.ajax({
+        type:"POST",
+        async: false,
+        url:"/reports/_catalogJson",
+        data: {catalogList},
+        dataType: 'json',
+        success: function(data){
+            catalogData = data;
+        }
+    }); 
+}
+
+function getManifest(manifest) {
+    $.ajax({
+        method: 'GET',
+        url: "/reports/_getManifest/"+manifest,
+        timeout: 10000,
+        cache: false,
+        success: function(data) {
+            $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
+                createSoftwareElements(JSON.parse(data).managed_installs),
+                createSoftwareElements(JSON.parse(data).managed_uninstalls)
+            )
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("manifest read error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+        },
+        dataType: 'html'
+    });
+}
+
+function createSoftwareElements(elements) {
+    //alert(JSON.stringify(catalogData))
+    $.each(elements, function( index, value ) {
+        //alert( index + ": " + value );
+        $( "#Software" ).append( "<p>"+catalogData[value].display_name+" "+catalogData[value].version+"</p>" );
+    });
 }

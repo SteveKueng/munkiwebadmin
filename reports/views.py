@@ -264,9 +264,26 @@ def dashboard(request):
     return render_to_response('reports/dashboard.html', c)
 
 @login_required
+def getManifest(request, manifest_path):
+    """ returns json manifest """
+    LOGGER.debug("Got read request for %s", manifest_path)
+    try:
+        plist = Plist.read('manifests', manifest_path)
+    except (FileDoesNotExistError, FileReadError), err:
+        return HttpResponse(
+            json.dumps({'result': 'failed',
+                        'exception_type': str(type(err)),
+                        'detail': str(err)}),
+            content_type='application/json', status=404)
+    
+    return HttpResponse(json.dumps(plist),
+                        content_type='application/json')
+
+@login_required
 def createRequired(request):
     """ returns catalog as json """
-    softwareList = getSoftwareList(["production", "development", 'UA'])
+    catalogList = request.POST.getlist('catalogList[]')
+    softwareList = getSoftwareList(catalogList)
     requiredDict = dict()
     for software in softwareList:
         software = softwareList[software]
