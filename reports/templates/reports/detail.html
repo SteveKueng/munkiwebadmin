@@ -1,5 +1,5 @@
 {% load report_extras %}
-{% load static %}
+{% load staticfiles %}
 <div class="modal fade" id="computerDetails">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -86,7 +86,7 @@
     						<tbody>
 									{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
 										{% if item.package_source == "package_source_apple"%}
-										<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+										<tr><td class="text-center" style="width:25px;"><img src='{% static "img/appleupdate.png" %}' width="20"/></td>
 										<td>{{ item|get:"_name" }}</td><td>{{ item.install_version }}</td><td>{{ item.install_date|date:"d. F Y" }}</td></tr>
 										{% endif %}
 									{% endfor %}
@@ -118,8 +118,8 @@
 									</ul>
 											</div>
 										</div>
-
-							<h3>Drives</h3>
+								<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h3><i class="fa fa-caret-right" aria-hidden="true"></i></a>Drives</h3>
+							<div class="collapse" id="collapseExample">
 							<ul class="list-group">
 									{% for device in disksList %}
 		  					<li class="list-group-item">
@@ -139,17 +139,24 @@
 
 										</div>
 										<div class="col-lg-10" >
-
 											<div class="row" style="border-left: 1px solid #ddd">
 													<div class="col-lg-12">
 														<h5 style="margin-top: 0px">Basic</h5>
-														<div class="btn-group" role="group" aria-label="...">
+															<div class="row">
+																<div class="col-lg-6">
 
-		  											<button type="button" class="btn btn-default">{{device.diskSize|filesizeformat}}</button>
-		  											<button type="button" class="btn btn-default"> {{device.physicalDisk.protocol}}</button>
-														<button type="button" class="btn btn-default"> {% if device.physicalDisk.is_internal_disk == 'yes' %} internal {% else %} external {% endif %}</button>
+																	<ul class="list-group">
+	  																<li class="list-group-item"><b>Disk-Size:</b><span class="pull-right">{{device.diskSize|filesizeformat}}</span></li>
+	  																<li class="list-group-item"><b>Protocol:</b><span class="pull-right">{{device.physicalDisk.protocol}}</span></li>
+																	</ul>
+																</div>
+																<div class="col-lg-6">
+																	<ul class="list-group">
+																		<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if device.physicalDisk.is_internal_disk == 'yes' %} <i class="fa fa-check" aria-hidden="true"></i> {% else %} <i class="fa fa-times" aria-hidden="true"></i> {% endif %}</span></li>
+																	</ul>
+																</div>
+															</div>
 														</div>
-													</div>
 												</div>
 											{% for partition in device.partitions %}
 											<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
@@ -169,6 +176,7 @@
 								</li>
 								{% endfor %}
 							</ul>
+								</div>
 							<h3>Graphics</h3>
 							<ul class="list-group">
 									{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
@@ -177,10 +185,18 @@
 										<div class="col-lg-2" style="" >
 											<div class="row">
 												<div class="col-lg-12 text-center" >
-													<i class="fa fa-indent" aria-hidden="true" style="font-size: 50px"></i>
+													{% if "Intel" in card.sppci_model %}
+													<img style="width: 70px;" src="{% static "img/Intel.gif" %}" />
+													{% elif "NVIDIA" in card.sppci_model %}
+													<img style="width: 70px;" src="{% static "img/nvidia.gif" %}" />
+													{% elif "amd" in card.sppci_model %}
+													<img style="width: 70px;" src="{% static "img/AMD.gif" %}" />
+													{% else %}
+													<img style="width: 70px;" src="{% static "img/Graphic-card-icon.png" %}" />
+													{% endif %}
 												</div>
 											</div>
-											<div class="row">
+											<div class="row" style="margin-top: 5px">
 												<div class="col-lg-12 text-center">{{ card.sppci_model }}</div>
 											</div>
 
