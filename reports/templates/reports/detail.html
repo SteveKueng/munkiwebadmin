@@ -40,8 +40,35 @@
 
 				  <!-- Tab panes -->
 				  <div class="tab-content" id="detail_content">
-						<div role="tabpanel" class="tab-pane tabDetail active" id="Software" style="overflow:auto; height:100%;">
+						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="overflow-x:auto; height:100%;">
 							<!-- <i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>-->
+							<div class="container-fluid">
+								<!-- Manifests / Catalog -->
+								<div class="row">
+									<!-- Manifests -->
+									<div class='col-md-6'>
+										<div class="section_label"><h4>Included Manifests</h4></div>
+										<ul id='included_manifests' class='included_manifests_section list-group unstyled'>
+										</ul>
+									</div>
+
+									<!-- Catalogs -->
+									<div class='col-md-6'>
+										<div class="section_label"><h4>Catalogs</h4></div>
+										<ul id='catalogs' class='list-group unstyled'>
+										</ul>
+									</div>
+								</div>
+
+								<!-- Software -->
+								<div class="row">
+									<div class='col-md-12'>
+										<div class="section_label"><h4>Software</h4></div>
+											<div class="list-group list-group-root well" id='SoftwareList'>
+											</div>
+									</div>
+								</div>
+							</div>
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
 							<table class="table table-striped">

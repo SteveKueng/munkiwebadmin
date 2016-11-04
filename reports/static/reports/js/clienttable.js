@@ -183,8 +183,11 @@ function getManifest(manifest) {
         cache: false,
         success: function(data) {
             $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
+                createListElements(JSON.parse(data).included_manifests, "included_manifests"),
+                createListElements(JSON.parse(data).catalogs, "catalogs"),
                 createSoftwareElements(JSON.parse(data).managed_installs),
-                createSoftwareElements(JSON.parse(data).managed_uninstalls)
+                createSoftwareElements(JSON.parse(data).managed_uninstalls),
+
             )
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -207,9 +210,22 @@ function getManifest(manifest) {
 }
 
 function createSoftwareElements(elements) {
+    alert(JSON.stringify(catalogData))
+    $.each(elements, function( index, value ) {
+        //alert( index + ": " + value );
+        $( "#SoftwareList" ).append( "<a href='#' class='list-group-item' id="+value+">"+catalogData[value].display_name+" "+catalogData[value].version+"</a>" );
+        if (typeof catalogData[value].requires !== 'undefined') {
+            $.each(catalogData[value].requires, function( index, value_requires ) {
+                $( "#"+value ).append( "<a href='#' class='list-group-item' id="+value_requires+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+"</a>" );
+            });
+        }
+    });
+}
+
+function createListElements(elements, listid) {
     //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
-        $( "#Software" ).append( "<p>"+catalogData[value].display_name+" "+catalogData[value].version+"</p>" );
+        $( "#"+listid ).append( "<li class='list-group-item'>"+value+"</li>" );
     });
 }

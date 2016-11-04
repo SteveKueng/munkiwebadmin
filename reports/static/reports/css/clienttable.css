@@ -108,7 +108,7 @@
 }
 
 .list-group.list-group-root > .list-group-item:first-child {
-  border-top-width: 0;
+  /*border-top-width: 0;*/
 }
 
 .list-group.list-group-root > .list-group > .list-group-item {
