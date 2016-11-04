@@ -210,13 +210,13 @@ function getManifest(manifest) {
 }
 
 function createSoftwareElements(elements) {
-    alert(JSON.stringify(catalogData))
+    //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
         $( "#SoftwareList" ).append( "<a href='#' class='list-group-item' id="+value+">"+catalogData[value].display_name+" "+catalogData[value].version+"</a>" );
         if (typeof catalogData[value].requires !== 'undefined') {
             $.each(catalogData[value].requires, function( index, value_requires ) {
-                $( "#"+value ).append( "<a href='#' class='list-group-item' id="+value_requires+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+"</a>" );
+                $( "#"+value ).append( "<a href='#' class='list-group-item' id="+value_requires+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+" "+catalogData[value].display_name+" requires</a>" );
             });
         }
     });
