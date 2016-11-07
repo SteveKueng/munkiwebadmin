@@ -214,11 +214,18 @@ function createSoftwareElements(elements) {
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
         $( "#SoftwareList" ).append( "<a href='#' class='list-group-item' id="+value+">"+catalogData[value].display_name+" "+catalogData[value].version+"</a>" );
+        $( "#"+value ).append('<div class="list-group" id="'+value+'_group"></div>');
         if (typeof catalogData[value].requires !== 'undefined') {
             $.each(catalogData[value].requires, function( index, value_requires ) {
-                $( "#"+value ).append( "<a href='#' class='list-group-item' id="+value_requires+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+" "+catalogData[value].display_name+" requires</a>" );
+                $( "#"+value+"_group" ).append( "<a href='#' class='list-group-item' id="+value_requires+'_requires'+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+" "+catalogData[value].display_name+" requires</a>" );
             });
         }
+        if (typeof catalogData[value].updates !== 'undefined') {
+            $.each(catalogData[value].updates, function( index, value_updates ) {
+                $( "#"+value+"_group" ).append( "<a href='#' class='list-group-item' id="+value_updates+'_requires'+">"+catalogData[value_updates].display_name+" "+catalogData[value_updates].version+" update for "+catalogData[value].display_name+"</a>" );
+            });
+        }
+        
     });
 }
 
