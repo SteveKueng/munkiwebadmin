@@ -1,3 +1,14 @@
+// resize modal content to max windows height
+function do_resize() {
+    if ($(window).width() < 768) {
+        $('#detail_content').height($(window).height() - 270);
+        $('#clientTab').tabdrop();
+    } else {
+        $('#detail_content').height($(window).height() - 220);
+    }
+}
+$(window).resize(do_resize);
+
 // using jQuery
 function getCookie(name) {
     var cookieValue = null;
@@ -28,18 +39,7 @@ $.ajaxSetup({
     }
 });
 
-// resize modal content to max windows height
-function do_resize() {
-    if ($(window).width() < 768) {
-        $('#detail_content').height($(window).height() - 270);
-        $('#clientTab').tabdrop();
-    } else {
-        $('#detail_content').height($(window).height() - 220);
-    }
-}
-
-$(window).resize(do_resize);
-
+// grid/list view
 $(document).on('click','.grid_list', function (e) {
     $(".grid_list").removeClass('active')
 	    if($(this).hasClass('list')) {
@@ -52,6 +52,7 @@ $(document).on('click','.grid_list', function (e) {
 	    }
 });
 
+// search field
 $(document).on('keyup','#listSearchField', function () {
 	filter = $(this).val();
 	$("#deviceList li").each(function() {
@@ -77,7 +78,6 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
     current_pathname = "";
   }
 });
-
 
 $(document).ready(function() {
     hash = window.location.hash;
@@ -256,11 +256,17 @@ function createSoftwareElement(element, addTo, require_update) {
         if (typeof catalogData[element] === 'undefined') {
             var display_name = element
             var version = ""
+            var icon = ""
             additionalClass = "list-group-item-danger"
         } else {
             var display_name = catalogData[element].display_name
             var version = catalogData[element].version
+            if (typeof catalogData[element].icon !== 'undefined') {
+                var icon = catalogData[element].icon
+            }
         }
+
+<img src="pic_mountain.jpg"/>
 
         $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');

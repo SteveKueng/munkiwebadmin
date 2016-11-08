@@ -26,6 +26,12 @@
 
     {% block extra_style %}{% endblock %}
 
+    <!-- static/media url for js -->
+    <script>
+        var static_url = "{% get_static_prefix %}";
+        var media_url = "{% get_media_prefix %}";
+    </script>
+
     <!-- jQuery -->
     <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
     <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui/jquery-ui.min.js'></script>
