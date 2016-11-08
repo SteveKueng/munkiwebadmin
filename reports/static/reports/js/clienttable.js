@@ -263,7 +263,7 @@ function createSoftwareElement(element, addTo, require_update) {
         }
 
         $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
-        $( "#"+itemID ).append('<div class="list-group" id="'+listGroupID+'"></div>');
+        $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
 
         if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].requires !== 'undefined') {
             $.each(catalogData[element].requires, function( index, element_requires ) {
