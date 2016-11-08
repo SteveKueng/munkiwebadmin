@@ -187,8 +187,41 @@ function getManifest(manifest) {
                 createListElements(JSON.parse(data).catalogs, "catalogs"),
                 loopElement(JSON.parse(data).managed_installs, "managed_installs"),
                 loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls"),
-
+                loopElement(JSON.parse(data).optional_installs, "optional_installs"),
+                loopManifests(JSON.parse(data).included_manifests),
             )
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("manifest read error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+             $("#included_manifests"+manifest).addClass("error")
+        },
+        dataType: 'html'
+    });
+}
+
+function getIncludedManifest(manifest) {
+    $.ajax({
+        method: 'GET',
+        url: "/reports/_getManifest/"+manifest,
+        timeout: 10000,
+        cache: false,
+        success: function(data) {
+            loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
+            loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls", manifest),
+            loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
+            loopManifests(JSON.parse(data).included_manifests)
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $("#errorModalTitleText").text("manifest read error");
@@ -213,16 +246,18 @@ function createListElements(elements, listid) {
     //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
-        $( "#"+listid ).append( "<li class='list-group-item'>"+value+"</li>" );
+        $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
     });
 }
 
-function loopElement(elements, listid) {
+function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
-    $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"></div>' );
+    if ($("#"+listid ).length < 1){
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"></div>' );
+    }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
-        createSoftwareElement(value, listid);
+        createSoftwareElement(value, listid, require_update);
     });
 }
 
@@ -233,20 +268,34 @@ function createSoftwareElement(element, addTo, require_update) {
         if (typeof require_update === 'undefined') {
             require_update = ""
         }
-        
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item' id="+itemID+">"+catalogData[element].display_name+" "+catalogData[element].version+" <small class='pull-right'>"+require_update+"</small></a>" );
+        if (typeof catalogData[element] === 'undefined') {
+            var display_name = element
+            var version = ""
+        } else {
+            var display_name = catalogData[element].display_name
+            var version = catalogData[element].version
+        }
+
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
         $( "#"+itemID ).append('<div class="list-group" id="'+listGroupID+'"></div>');
 
-        if (typeof catalogData[element].requires !== 'undefined') {
+        if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].requires !== 'undefined') {
             $.each(catalogData[element].requires, function( index, element_requires ) {
                 createSoftwareElement(element_requires, listGroupID, catalogData[element].display_name+" requires");
             });
         }
 
-       if (typeof catalogData[element].updates !== 'undefined') {
+       if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].updates !== 'undefined') {
            $.each(catalogData[element].updates, function( index, element_updates ) {
                createSoftwareElement(element_updates, listGroupID, "update for "+catalogData[element].display_name);
            });
         }
       softwareElementCount++;
+}
+
+function loopManifests(manifests) {
+    $.each(manifests, function( index, manifest ) {
+        //alert(manifest);
+        getIncludedManifest(manifest);
+    });
 }
