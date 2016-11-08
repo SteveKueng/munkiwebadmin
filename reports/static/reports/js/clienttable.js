@@ -266,8 +266,6 @@ function createSoftwareElement(element, addTo, require_update) {
             }
         }
 
-<img src="pic_mountain.jpg"/>
-
         $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
 
