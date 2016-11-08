@@ -27,7 +27,6 @@ import re
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
     if isinstance(value, (int, float, bool, basestring, dict)):
