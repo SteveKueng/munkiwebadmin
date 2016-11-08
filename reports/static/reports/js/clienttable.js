@@ -185,8 +185,8 @@ function getManifest(manifest) {
             $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
                 createListElements(JSON.parse(data).included_manifests, "included_manifests"),
                 createListElements(JSON.parse(data).catalogs, "catalogs"),
-                createSoftwareElements(JSON.parse(data).managed_installs),
-                createSoftwareElements(JSON.parse(data).managed_uninstalls),
+                loopElement(JSON.parse(data).managed_installs, "managed_installs"),
+                loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls"),
 
             )
         },
@@ -209,30 +209,44 @@ function getManifest(manifest) {
     });
 }
 
-function createSoftwareElements(elements) {
-    //alert(JSON.stringify(catalogData))
-    $.each(elements, function( index, value ) {
-        //alert( index + ": " + value );
-        $( "#SoftwareList" ).append( "<a href='#' class='list-group-item' id="+value+">"+catalogData[value].display_name+" "+catalogData[value].version+"</a>" );
-        $( "#"+value ).append('<div class="list-group" id="'+value+'_group"></div>');
-        if (typeof catalogData[value].requires !== 'undefined') {
-            $.each(catalogData[value].requires, function( index, value_requires ) {
-                $( "#"+value+"_group" ).append( "<a href='#' class='list-group-item' id="+value_requires+'_requires'+">"+catalogData[value_requires].display_name+" "+catalogData[value_requires].version+" "+catalogData[value].display_name+" requires</a>" );
-            });
-        }
-        if (typeof catalogData[value].updates !== 'undefined') {
-            $.each(catalogData[value].updates, function( index, value_updates ) {
-                $( "#"+value+"_group" ).append( "<a href='#' class='list-group-item' id="+value_updates+'_requires'+">"+catalogData[value_updates].display_name+" "+catalogData[value_updates].version+" update for "+catalogData[value].display_name+"</a>" );
-            });
-        }
-        
-    });
-}
-
 function createListElements(elements, listid) {
     //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<li class='list-group-item'>"+value+"</li>" );
     });
+}
+
+function loopElement(elements, listid) {
+    //alert(JSON.stringify(catalogData))
+    $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"></div>' );
+    $.each(elements, function( index, value ) {
+        //alert( index + ": " + value );
+        createSoftwareElement(value, listid);
+    });
+}
+
+var softwareElementCount = 0
+function createSoftwareElement(element, addTo, require_update) {
+        var itemID = element + "_" + softwareElementCount
+        var listGroupID = element + "_" + softwareElementCount + "_" + addTo
+        if (typeof require_update === 'undefined') {
+            require_update = ""
+        }
+        
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item' id="+itemID+">"+catalogData[element].display_name+" "+catalogData[element].version+" <small class='pull-right'>"+require_update+"</small></a>" );
+        $( "#"+itemID ).append('<div class="list-group" id="'+listGroupID+'"></div>');
+
+        if (typeof catalogData[element].requires !== 'undefined') {
+            $.each(catalogData[element].requires, function( index, element_requires ) {
+                createSoftwareElement(element_requires, listGroupID, catalogData[element].display_name+" requires");
+            });
+        }
+
+       if (typeof catalogData[element].updates !== 'undefined') {
+           $.each(catalogData[element].updates, function( index, element_updates ) {
+               createSoftwareElement(element_updates, listGroupID, "update for "+catalogData[element].display_name);
+           });
+        }
+      softwareElementCount++;
 }
