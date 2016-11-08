@@ -30,7 +30,7 @@ $.ajaxSetup({
 
 // resize modal content to max windows height
 function do_resize() {
-    $('#detail_content').height($(window).height() - 340);
+    $('#detail_content').height($(window).height() - 220);
 }
 
 $(window).resize(do_resize);
@@ -189,23 +189,12 @@ function getManifest(manifest) {
                 loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls"),
                 loopElement(JSON.parse(data).optional_installs, "optional_installs"),
                 loopManifests(JSON.parse(data).included_manifests),
-            )
+            );
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $("#errorModalTitleText").text("manifest read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
-             $("#included_manifests"+manifest).addClass("error")
+            //display error when manifest is not readable
+            $("#SoftwareView").empty();
+            $("#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
         },
         dataType: 'html'
     });
@@ -223,20 +212,8 @@ function getIncludedManifest(manifest) {
             loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
             loopManifests(JSON.parse(data).included_manifests)
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $("#errorModalTitleText").text("manifest read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
+        error: function() {
+            $("#included_manifests_"+manifest).addClass("list-group-item-danger");
         },
         dataType: 'html'
     });
@@ -265,18 +242,20 @@ var softwareElementCount = 0
 function createSoftwareElement(element, addTo, require_update) {
         var itemID = element + "_" + softwareElementCount
         var listGroupID = element + "_" + softwareElementCount + "_" + addTo
+        var additionalClass = ""
         if (typeof require_update === 'undefined') {
             require_update = ""
         }
         if (typeof catalogData[element] === 'undefined') {
             var display_name = element
             var version = ""
+            additionalClass = "list-group-item-danger"
         } else {
             var display_name = catalogData[element].display_name
             var version = catalogData[element].version
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
         $( "#"+itemID ).append('<div class="list-group" id="'+listGroupID+'"></div>');
 
         if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].requires !== 'undefined') {
