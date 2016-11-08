@@ -30,7 +30,12 @@ $.ajaxSetup({
 
 // resize modal content to max windows height
 function do_resize() {
-    $('#detail_content').height($(window).height() - 220);
+    if ($(window).width() < 768) {
+        $('#detail_content').height($(window).height() - 270);
+        $('#clientTab').tabdrop();
+    } else {
+        $('#detail_content').height($(window).height() - 220);
+    }
 }
 
 $(window).resize(do_resize);

@@ -4,10 +4,10 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 				<div class="modal-header">
-					<div class="col-md-3 text-center">
+					<div class="col-sm-3 text-center">
 				  	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{machine.serial_number|slice:"8:" }}&size=240x240' width="100" />
 					</div>
-				  <div class="col-md-6">
+				  <div class="col-sm-6">
 				    <h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</h2>
 				    <h4><small>
 				    {% if additional_info.model_description|length > 1 %}
@@ -28,7 +28,7 @@
 				</div>
 				<div role="tabpanel" class="modal-body" style="padding:0px;">
 				  <!-- Nav tabs -->
-				  <ul class="nav nav-tabs" role="tablist">
+				  <ul id="clientTab" class="nav nav-tabs" role="tablist">
 				    <li role="presentation" class="active"><a href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
 				    <li role="presentation"><a href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 				    <li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System</a></li>
