@@ -78,10 +78,11 @@
   padding: 0;
   overflow: hidden;
   border-top: 0px;
+  pointer-events:none;
 }
 
 .list-group.list-group-root > a:hover{
-  background-color: #fff;
+  background-color: transparent;
 }
 
 .list-group.list-group-root > a {
@@ -111,4 +112,8 @@
 
 .list-group.list-group-root > .list-group > .list-group-item {
   padding-left: 20px;
+}
+
+.manifestObjects {
+  background-color: #f8f8f8;
 }

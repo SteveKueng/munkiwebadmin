@@ -250,6 +250,8 @@ function createSoftwareElement(element, addTo, require_update) {
         var additionalClass = ""
         if (typeof require_update === 'undefined') {
             require_update = ""
+        } else {
+            additionalClass = "manifestObjects"
         }
         if (typeof catalogData[element] === 'undefined') {
             var display_name = element
