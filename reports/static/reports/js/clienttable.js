@@ -103,6 +103,16 @@ $(document).ready(function() {
     });
 });
 
+function getDeviceIcon(serial, iconid) {
+    var image_url = "https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
+    var $image = $("#"+serial+iconid);
+    var $downloadingImage = $("<img>");
+    $downloadingImage.load(function(){
+        $image.attr("src", $(this).attr("src"));	
+    });
+    $downloadingImage.attr("src", image_url);   
+}
+
 var current_pathname = "";
 function getComputerItem(pathname) {
     if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {

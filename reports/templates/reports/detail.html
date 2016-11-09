@@ -4,8 +4,12 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 				<div class="modal-header">
+					 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<div class="col-sm-3 text-center">
-				  	<img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{machine.serial_number|slice:"8:" }}&size=240x240' width="100" />
+					  <img id="{{ machine.serial_number }}_iconDetail" src='{% get_static_prefix %}img/apple.png' alt="" width="100" />
+						<script type='text/javascript'>
+							getDeviceIcon("{{machine.serial_number}}", "_iconDetail");
+						</script>
 					</div>
 				  <div class="col-sm-6">
 				    <h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</h2>
@@ -17,7 +21,6 @@
 				    {% endif %}
 				    {% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
 				    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}', '{{manifest_name}}');"><span class="glyphicon glyphicon-trash"></span></a>
-
 				    {% endif %}
 				    </small></h4>
 				  </div>

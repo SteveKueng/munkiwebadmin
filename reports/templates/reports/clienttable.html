@@ -21,7 +21,10 @@
 		<ul id="deviceList" class="grid">
 			{% for report in reports %}
 			<li onClick="window.location.hash = '#{{ report.serial_number }}'" class="col-xs-4 col-md-4 col-lg-2 col-xl-1" data-state="all">
-			  <img src='https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode={{report.serial_number|slice:"8:"  }}&size=120x120' alt="" width="72" />
+			  <img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
+        <script type='text/javascript'>
+          getDeviceIcon("{{report.serial_number}}", "_icon");
+        </script>
   			{% if report.hostname %}
 				<h4>{{ report.hostname }}</h4>
 				{% endif %}

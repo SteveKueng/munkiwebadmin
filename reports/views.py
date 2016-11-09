@@ -100,9 +100,9 @@ def index(request, computer_serial=None):
             # additional_info
             additional_info = {}
             # If enabled lookup the model description
-            if MODEL_LOOKUP_ENABLED and machine.serial_number:
-                additional_info['model_description'] = \
-                    model_description_lookup(machine.serial_number)
+         #   if MODEL_LOOKUP_ENABLED and machine.serial_number:
+          #      additional_info['model_description'] = \
+           #         model_description_lookup(machine.serial_number)
 
             context = {'machine': machine,
                        'report_plist': report_plist,
