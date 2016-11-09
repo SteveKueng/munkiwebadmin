@@ -248,26 +248,37 @@ function createSoftwareElement(element, addTo, require_update) {
         var itemID = element + "_" + softwareElementCount
         var listGroupID = element + "_" + softwareElementCount + "_" + addTo
         var additionalClass = ""
+
+        //item infos
+        var display_name = element
+        var version = ""
+        var icon = element + ".png"
+
         if (typeof require_update === 'undefined') {
             require_update = ""
         } else {
             additionalClass = "manifestObjects"
         }
         if (typeof catalogData[element] === 'undefined') {
-            var display_name = element
-            var version = ""
-            var icon = ""
             additionalClass = "list-group-item-danger"
         } else {
-            var display_name = catalogData[element].display_name
-            var version = catalogData[element].version
+            display_name = catalogData[element].display_name
+            version = catalogData[element].version
             if (typeof catalogData[element].icon !== 'undefined') {
                 var icon = catalogData[element].icon
             }
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+">"+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
+
+        //icon
+        var image_url = media_url + icon
+        $.get(image_url).done(function() { 
+            document.getElementById(itemID+'_icon').src = image_url;
+        }).fail(function() { 
+            // Image doesn't exist
+        })
 
         if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].requires !== 'undefined') {
             $.each(catalogData[element].requires, function( index, element_requires ) {
