@@ -101,8 +101,7 @@ $(document).ready(function() {
             }
         }
     });
-
-} );
+});
 
 var current_pathname = "";
 function getComputerItem(pathname) {
@@ -158,14 +157,7 @@ function getComputerItem(pathname) {
     })
 }
 
-function cancelEdit() {
-    //$('#cancelEditConfirmationModal').modal('hide');
-    $("#computerDetails").modal("hide");
-    //$('.modal-backdrop').remove();
-    hideSaveOrCancelBtns();
-    //getManifestItem(current_pathname);
-}
-
+//create software list
 var catalogData = ""
 function getSoftwareList(catalogList) {
     $.ajax({
@@ -300,3 +292,8 @@ function loopManifests(manifests) {
         getIncludedManifest(manifest);
     });
 }
+
+
+
+
+//edit software
