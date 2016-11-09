@@ -70,7 +70,7 @@
     						<tbody>
 									{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
 										{% if item.package_source == "package_source_apple"%}
-										<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}/img/appleupdate.png' width="20"/></td>
+										<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}img/appleupdate.png' width="20"/></td>
 										<td>{{ item|get:"_name" }}</td><td>{{ item.install_version }}</td><td>{{ item.install_date|date:"d. F Y" }}</td></tr>
 										{% endif %}
 									{% endfor %}
