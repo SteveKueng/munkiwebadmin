@@ -83,7 +83,6 @@
   padding: 0;
   overflow: hidden;
   border-top: 0px;
-  pointer-events:none;
 }
 
 .list-group.list-group-root > a:hover{
@@ -121,4 +120,9 @@
 
 .manifestObjects {
   background-color: #f8f8f8;
+}
+
+.newElementInput {
+  /*border: none;*/
+ /* width: 100%;*/
 }

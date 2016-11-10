@@ -42,7 +42,7 @@
 				  <!-- Tab panes -->
 				  <div class="tab-content" id="detail_content">
 						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="overflow-x:auto; height:100%;">
-							<!-- <i id="imgProgress" class="fa fa-spinner fa-pulse fa-4x"></i>-->
+							
 							<div class="container-fluid" id="SoftwareView">
 								<!-- Manifests / Catalog -->
 								<div class="row">
@@ -50,7 +50,6 @@
 									<div class='col-md-6'>
 										<div class="section_label"><h4>Included Manifests</h4></div>
 										<ul id='included_manifests' class='included_manifests_section list-group unstyled'>
-											<li class='list-group-item' id='addItem'>ddd</li>
 										</ul>
 									</div>
 
@@ -81,7 +80,24 @@
 								</tbody>
 							</table>
 						</div>
-				    <div role="tabpanel" class="tab-pane tabDetail" id="System">System</div>
+				    <div role="tabpanel" class="tab-pane tabDetail" id="System">
+							<p>InstalledItems</p>
+							{{report_plist.InstalledItems}}
+							<p>InstallResults</p>
+							{{report_plist.InstallResults}}
+							<p>ItemsToInstall</p>
+							{{report_plist.ItemsToInstall}}
+							<p>ProblemInstalls</p>
+							{{report_plist.ProblemInstalls}}
+							<hr>
+							<p>RemovedItems</p>
+							{{report_plist.RemovedItems}}
+							<p>RemovalResults</p>
+							{{report_plist.RemovalResults}}
+							<p>ItemsToRemove</p>
+							{{report_plist.ItemsToRemove}}
+							
+						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
 						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">Staging</div>
 				  </div>

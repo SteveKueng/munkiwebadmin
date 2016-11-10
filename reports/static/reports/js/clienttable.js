@@ -201,7 +201,7 @@ function getManifest(manifest) {
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
             $("#SoftwareView").empty();
-            $("#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
+            $(  "#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
         },
         dataType: 'html'
     });
@@ -232,12 +232,13 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
     });
+    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' class='newElementInput' name='new'></li>" );
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"></div>' );
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" class="newElementInput" name="newSoftware"></p></div>' );
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -268,11 +269,15 @@ function createSoftwareElement(element, addTo, require_update) {
             version = catalogData[element].version
             if (typeof catalogData[element].icon !== 'undefined') {
                 var icon = catalogData[element].icon
+                alert(icon)
             }
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small><span class='label label-default pull-right status'>set</span></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
+        
+        var serial = getSerial();
+        getStatus(element, serial, itemID);
 
         //icon
         var image_url = media_url + icon
@@ -303,7 +308,40 @@ function loopManifests(manifests) {
     });
 }
 
+function getStatus(item, serial, id) {
+    $.ajax({
+        type:"POST",
+        async: false,
+        url:"/reports/_status",
+        data: {item : item, serial: serial},
+        dataType: 'json',
+        success: function(data){
+            $('#'+id).find('.status').text(data);
+        }
+    }); 
+}
 
+function loadStatus() {
+    $('.status').each(function(i, obj) {
+        //get id
+        var id = $(obj).parent().attr('id');
 
+        // item
+        var item = id.split('_')
+        item.pop()
+        item = item.join("_");
+    
+        //get serial
+        var serial = getSerial();
+
+        getStatus(item, serial, id)
+    });
+}
+
+function getSerial() {
+    var serial = window.location.hash
+    serial.slice(1)
+    return serial.substring(1)
+}
 
 //edit software

@@ -5,6 +5,7 @@ urlpatterns = [
     url(r'^$', reports.views.index),
 
     url(r'^_catalogJson$', reports.views.createRequired),
+    url(r'^_status$', reports.views.getStatus),
     url(r'^_getManifest/(?P<manifest_path>[^/]+)$', reports.views.getManifest),
     url(r'^(?P<computer_serial>[^/]+)$', reports.views.index),
     

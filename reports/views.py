@@ -312,6 +312,36 @@ def createRequired(request):
                         content_type='application/json')
 
 @login_required
+def getStatus(request):
+    serial = request.POST.getlist('serial')[0]
+    item = request.POST.getlist('item')[0]
+    if request.is_ajax() and serial and item:
+        machine = None
+        report_plist = None
+        try:
+            machine = Machine.objects.get(serial_number=serial)
+        except Machine.DoesNotExist, err:
+            pass
+
+        if machine:
+            try:
+                report = MunkiReport.objects.get(machine=machine)
+                report_plist = report.get_report()
+            except MunkiReport.DoesNotExist:
+                pass
+
+        if report_plist:
+            status = "report_plist"
+            return HttpResponse(json.dumps(status),
+                            content_type='application/json')
+    # no ajax
+    return HttpResponse(
+        json.dumps({'result': 'failed',
+                    'exception_type': str(type(err)),
+                    'detail': str(err)}),
+        content_type='application/json', status=404)
+
+@login_required
 def staging(request, serial):
     if request.method == 'POST':
         submit = request.POST
