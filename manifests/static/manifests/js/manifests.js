@@ -188,27 +188,11 @@ function monitor_manifest_list() {
 
 function cancelEdit() {
     //$('#cancelEditConfirmationModal').modal('hide');
+    hideSaveOrCancelBtns();
     $("#manifestItems").modal("hide");
     //$('.modal-backdrop').remove();
-    hideSaveOrCancelBtns();
     //getManifestItem(current_pathname);
 }
-
-
-function discardChangesAndLoadNext() {
-    //$('#saveOrCancelConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
-    hideSaveOrCancelBtns();
-    getManifestItem(requested_pathname);
-}
-
-
-function saveChangesAndLoadNext() {
-    saveManifestItem();
-    //$('#saveOrCancelConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
-}
-
 
 var js_obj = {};
 
@@ -618,13 +602,10 @@ function saveManifestItem() {
         timeout: 10000,
         success: function(data) {
             hideSaveOrCancelBtns();
-            if (requested_pathname.length) {
-                getManifestItem(requested_pathname);
-            } else {
-                //trigger a rebuild/redraw
-                //plistChanged();
-                //hideSaveOrCancelBtns();
-            }
+            $("#manifestItems").modal("hide");
+            //window.location.hash = '';
+            //$('#list_items').DataTable().ajax.reload();
+            //$('.modal-backdrop').remove();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $("#errorModalTitleText").text("Manifest save error");
