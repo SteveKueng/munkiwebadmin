@@ -82,6 +82,7 @@
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="System">
 							<div class="panel-body">
+							{% if report_plist %}
 							<h3>Basic</h3>
 							<div class="row">
 								<div class="col-lg-6">
@@ -238,8 +239,15 @@
 								</li>
 								{% endfor %}
 							</ul>
+							{% else %}
+							<div class="row">
+								<div class="col-md-12">
+									<div class="alert alert-danger">report data not valid!</div>
+								</div>
+							</div>
+							{% endif %}
 						</div>
-						</div>
+					</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
 						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">Staging</div>
 				  </div>

@@ -90,91 +90,68 @@ def index(request, computer_serial=None):
                 except MunkiReport.DoesNotExist:
                     report_plist = None
                     pass
-            # determine if the model description information should be shown
-            try:
-                MODEL_LOOKUP_ENABLED = settings.MODEL_LOOKUP_ENABLED
-            except:
-                MODEL_LOOKUP_ENABLED = False
 
-            # additional_info
-            additional_info = {}
-            # If enabled lookup the model description
-         #   if MODEL_LOOKUP_ENABLED and machine.serial_number:
-          #      additional_info['model_description'] = \
-           #         model_description_lookup(machine.serial_number)
+            if report_plist:
+                time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
+                time = time[3:].split(':')
 
-            # -- get CLIENT_MANIFEST option --
-            manifest_name = machine.serial_number
-            try:
-                if settings.CLIENT_MANIFEST == "hostname":
-                    manifest_name = machine.hostname
-            except:
-                pass
-            #for key, value in report_plist["MachineInfo"]["SystemProfile"][0].iteritems():
-            #    print key
-            CLIENT.clear()
-            plist = getSoftware(manifest_name)
-            #print plist
-
-            time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
-
-            time = time[3:].split(':')
-
-            disksPreList = []
-            disksList = []
-            counter = 0
-            # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
-            for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
-                partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
-                for p in disksPreList:
-                    if p == deviceName:
-                        counter = counter + 1
-                if counter == 0:
-                    disksPreList.append(deviceName)
+                disksPreList = []
+                disksList = []
                 counter = 0
-
-            diskInfoDict = {}
-            partitionsList = []
-            partitionsAttributesDict = {}
-            partitionDict = {}
-            diskSize = 0
-
-            #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
-            for i in disksPreList:
-                for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                    # Reading Name of disk inside the partition-information
-                    diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
+                # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
+                for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                    deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
                     partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                    # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
-                    if diskName == i:
-                        # Reading partition information from system_profiler
-                        partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
-                        # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
-                        partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
-                        partitionDict['partitionName'] = partitionName
-                        partitionDict['partitionAtributes'] = partitionsAttributesDict
-                        partitionsList.append(partitionDict)
-                        partitionDict = {}
-                        # Calculate the diskSize by adding every parttion-size to diskSize
-                        diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
-                        diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive
-                diskInfoDict['partitions'] = partitionsList
-                partitionsList = []
-                diskInfoDict['diskName'] = i
-                diskInfoDict['diskSize'] = diskSize
-                disksList.append(diskInfoDict)
-                diskSize = 0
-                partitionsDict = {}
-                diskInfoDict = {}
+                    # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
+                    for p in disksPreList:
+                        if p == deviceName:
+                            counter = counter + 1
+                    if counter == 0:
+                        disksPreList.append(deviceName)
+                    counter = 0
 
-            context = {'machine': machine,
-                       'plist_text': plist,
+                diskInfoDict = {}
+                partitionsList = []
+                partitionsAttributesDict = {}
+                partitionDict = {}
+                diskSize = 0
+
+                #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
+                for i in disksPreList:
+                    for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                        # Reading Name of disk inside the partition-information
+                        diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
+                        partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                        # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
+                        if diskName == i:
+                            # Reading partition information from system_profiler
+                            partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
+                            # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
+                            partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                            partitionDict['partitionName'] = partitionName
+                            partitionDict['partitionAtributes'] = partitionsAttributesDict
+                            partitionsList.append(partitionDict)
+                            partitionDict = {}
+                            # Calculate the diskSize by adding every parttion-size to diskSize
+                            diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
+                            diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive
+                    diskInfoDict['partitions'] = partitionsList
+                    partitionsList = []
+                    diskInfoDict['diskName'] = i
+                    diskInfoDict['diskSize'] = diskSize
+                    disksList.append(diskInfoDict)
+                    diskSize = 0
+                    partitionsDict = {}
+                    diskInfoDict = {}
+
+                context = {'machine': machine,
+                           'report_plist': report_plist,
+                           'disksList': disksList,
+                           'time': time,
+                           }
+            else:
+                context = {'machine': machine,
                        'report_plist': report_plist,
-                       'additional_info': additional_info,
-                       'disksList': disksList,
-                       'time': time,
                        }
             return render(request, 'reports/detail.html', context=context)
 
@@ -344,7 +321,7 @@ def getManifest(request, manifest_path):
                         'exception_type': str(type(err)),
                         'detail': str(err)}),
             content_type='application/json', status=404)
-    
+
     return HttpResponse(json.dumps(plist),
                         content_type='application/json')
 
