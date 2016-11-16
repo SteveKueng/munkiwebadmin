@@ -203,7 +203,6 @@ def index(request, computer_serial=None):
                 if counter == 0:
                     disksPreList.append(deviceName)
                 counter = 0
-            print disksPreList
 
             diskInfoDict = {}
             partitionsList = []
