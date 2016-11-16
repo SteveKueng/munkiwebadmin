@@ -1,0 +1,34 @@
+#item_editor,
+#item_list {
+    overflow-y: scroll;
+}
+
+/* fix for DataTables duplicate sorting controls */
+.dataTables_scrollBody thead {
+    visibility: hidden;
+}
+
+.list {
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+.listborder {
+	border-top: solid 1px #DDD;
+}
+
+/* css fix to allow us to drag items into empty lists */
+tbody.connectable {
+    display:block;
+    min-height:10px;
+    background-color: inherit;
+}
+
+.plist-editor tr[data-path="included_manifests"] tr:hover td.row-controls span.row_link_btn {
+    visibility: visible;
+    color: gray;
+    position: relative;
+    top: 4px;
+    left: -2px;
+}
