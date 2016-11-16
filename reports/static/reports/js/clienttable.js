@@ -130,7 +130,7 @@ function getComputerItem(pathname) {
         cache: false,
         success: function(data) {
             $('#computer_detail').html(data);
-            getManifest(pathname);
+            getManifest(getManifestName());
           	//  hideSaveOrCancelBtns();
           	//  detectUnsavedChanges();
             current_pathname = pathname;
@@ -170,6 +170,7 @@ function getComputerItem(pathname) {
 //create software list
 var catalogData = ""
 function getSoftwareList(catalogList) {
+    catalogData = ""
     $.ajax({
         type:"POST",
         async: false,
@@ -232,13 +233,13 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
     });
-    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' class='newElementInput' name='new'></li>" );
+    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' class='newElementInput' name='new' onkeypress='saveChanges(this, event)'></li>" );
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" class="newElementInput" name="newSoftware"></p></div>' );
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" class="newElementInput" name="new" onkeypress="saveChanges(this, event)"></p></div>' );
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -273,7 +274,7 @@ function createSoftwareElement(element, addTo, require_update) {
             }
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'>"+require_update+"</small><span class='label label-default pull-right status'>set</span></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -344,4 +345,51 @@ function getSerial() {
     return serial.substring(1)
 }
 
+function getManifestName() {
+    return $("#manifestName").attr('value')
+}
+
+
 //edit software
+function addListElement() {
+
+}
+
+function removeListElement() {
+    
+}
+
+function saveChanges(item, event) {
+    if (event.which == '13' && item.value != "") {
+        //enter key pressed
+        
+        manifest = getManifestName()
+        listid = $(item).parent().parent().attr('id')
+        itemValue = item.value
+
+        //add new item
+        $(item).parent().before("<li class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</li>")
+        item.value = ""
+
+        //get items to save
+        itemList = $('[id^="'+listid+'_"]').map(function() { 
+            return this.id.substring(listid.length + 1); 
+        }).get()
+        itemList = JSON.stringify(itemList);
+
+        $.ajax({
+            type:"POST",
+            url:"/api/manifests/"+manifest,
+            method: "PATCH",
+            data: '{ "'+[listid]+'": '+itemList+' }',
+            contentType: 'application/json',
+            success: function(data){
+                
+            },
+            error: function(){
+                $("#"+listid+"_"+itemValue).remove();
+                alert("could not save "+itemValue+"!");
+            }
+        }); 
+    }
+}
