@@ -41,7 +41,10 @@
 .grid li {
   float: left;
   border: 1px solid rgb(231, 231, 231);
-  padding: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
   background-color: #f8f8f8;
   text-align: center;
 }
