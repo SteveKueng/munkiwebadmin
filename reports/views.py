@@ -645,10 +645,11 @@ def getSoftwareList(catalogs):
     swDict = dict()
     for catalog in catalogs:
         catalog_items = Catalog.detail(catalog)
-        for item in catalog_items:
-            if item.name in swDict:
-                if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
+        if catalog_items:
+            for item in catalog_items:
+                if item.name in swDict:
+                    if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
+                        swDict[item.name] = item
+                else:
                     swDict[item.name] = item
-            else:
-                swDict[item.name] = item
     return swDict
