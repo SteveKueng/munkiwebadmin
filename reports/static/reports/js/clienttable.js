@@ -367,29 +367,35 @@ function saveChanges(item, event) {
         listid = $(item).parent().parent().attr('id')
         itemValue = item.value
 
-        //add new item
-        $(item).parent().before("<li class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</li>")
-        item.value = ""
-
         //get items to save
         itemList = $('[id^="'+listid+'_"]').map(function() { 
             return this.id.substring(listid.length + 1); 
         }).get()
-        itemList = JSON.stringify(itemList);
 
-        $.ajax({
-            type:"POST",
-            url:"/api/manifests/"+manifest,
-            method: "PATCH",
-            data: '{ "'+[listid]+'": '+itemList+' }',
-            contentType: 'application/json',
-            success: function(data){
-                
-            },
-            error: function(){
-                $("#"+listid+"_"+itemValue).remove();
-                alert("could not save "+itemValue+"!");
-            }
-        }); 
+        //check if item already in list
+        if(jQuery.inArray(itemValue, itemList) == -1) {
+            itemList.push(itemValue)
+
+            //add new item
+            $(item).parent().before("<li class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</li>")
+            item.value = ""
+
+            itemList = JSON.stringify(itemList);
+
+            $.ajax({
+                type:"POST",
+                url:"/api/manifests/"+manifest,
+                method: "PATCH",
+                data: '{ "'+[listid]+'": '+itemList+' }',
+                contentType: 'application/json',
+                success: function(data){
+                    getIncludedManifest(itemValue);
+                },
+                error: function(){
+                    $("#"+listid+"_"+itemValue).remove();
+                    alert("could not save "+itemValue+"!");
+                }
+            });
+        }
     }
 }
