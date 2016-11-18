@@ -10,6 +10,7 @@ import logging
 import os
 import subprocess
 import time
+import sys
 
 from django.conf import settings
 
@@ -94,7 +95,7 @@ def run(request):
                 break
             time.sleep(1)
 
-        proc = subprocess.Popen([MAKECATALOGS, REPO_DIR],
+        proc = subprocess.Popen([sys.executable, MAKECATALOGS, REPO_DIR],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         record = Process(name='makecatalogs')
         record.pid = proc.pid
