@@ -219,7 +219,7 @@
                   Hello, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fa fa-caret-down"></i>
                 </a>
                   <ul class="dropdown-menu dropdown-user">
-                      <li id="admin" class="loginlogout"><a href="/admin/"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
+                      <li id="admin" class="loginlogout"><a href="/admin/" target="_blank"><i class="fa fa-gear fa-fw"></i> Admin</a></li>
                       <li class="divider"></li>
                       <li id="login" class="loginlogout">
                         {% if user.is_authenticated %}
