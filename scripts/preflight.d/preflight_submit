@@ -42,7 +42,7 @@ if [ "$RUNTYPE" == "custom" -o "$RUNTYPE" == "auto" ]; then
     fi
 fi
 
-curl -H "Authorization: Basic YWRtaW46QWRtaW4xMjM=" \
+curl -H "$authHeader" \
      -H "Content-Type: application/json" \
      -X POST \
      --data "{\"runtype\": \"$RUNTYPE\", \"submission_type\": \"preflight\", \"name\": \"$NAME\"}" \
