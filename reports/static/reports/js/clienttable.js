@@ -351,18 +351,8 @@ function getManifestName() {
 
 
 //edit software
-function addListElement() {
-
-}
-
-function removeListElement() {
-    
-}
-
 function saveChanges(item, event) {
     if (event.which == '13' && item.value != "") {
-        //enter key pressed
-        
         manifest = getManifestName()
         listid = $(item).parent().parent().attr('id')
         itemValue = item.value
@@ -389,7 +379,10 @@ function saveChanges(item, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
-                    getIncludedManifest(itemValue);
+                    if (listid.indexOf("catalogs") == -1) {
+                        getIncludedManifest(itemValue);
+                    }
+                    //getIncludedManifest(itemValue);
                 },
                 error: function(){
                     $("#"+listid+"_"+itemValue).remove();
