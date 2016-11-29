@@ -539,7 +539,7 @@ def db_api(request, kind, serial_number=None):
 
             if machine and report:
                 machine.remote_ip = request.META['REMOTE_ADDR']
-                if 'name' in submit:
+                if 'name' in submit and machine.hostname == '':
                     machine.hostname = submit.get('name')
                 if 'username' in submit:
                     machine.username = submit.get('username')
@@ -563,6 +563,7 @@ def db_api(request, kind, serial_number=None):
                         hwinfo = profile['SPSoftwareDataType']
 
                 if hwinfo:
+                    print hwinfo
                     machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
                     machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
                     machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed

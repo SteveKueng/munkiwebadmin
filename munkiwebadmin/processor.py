@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.core.context_processors import csrf
 from django.conf import settings
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.auth.models import User, Group
 
 import os
@@ -19,9 +20,9 @@ except:
 def index(request):
     try:
         image = request.user.ldap_user.attrs["thumbnailPhoto"]
-        imgString = base64.b64encode(image[0])
+        imgString = "data:image/png;base64,"+base64.b64encode(image[0])
     except:
-        imgString = ""
+        imgString = static('img/placeholder.jpg')
         pass
-
+    
     return {'style': STYLE, 'APPNAME': APPNAME, 'userImage': imgString }

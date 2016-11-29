@@ -69,7 +69,7 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/"><span><img style="max-width:100px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span> {{APPNAME}}</a>
+              <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span> {{APPNAME}}</a>
           </div>
           <!-- /.navbar-header -->
           <ul class="nav navbar-top-links navbar-right">
@@ -231,7 +231,7 @@
                 <!-- /.dropdown-user -->
               </li>
               <li>
-                <img alt="Embedded Image" src="data:image/png;base64,{{ userImage }}" class="img-circle" height="40" />
+                <img alt="Embedded Image" src="{{ userImage }}" class="img-circle" height="40" />
               </li>
               <!-- /.dropdown -->
           </ul>
