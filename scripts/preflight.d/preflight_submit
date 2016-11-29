@@ -1,51 +1,15 @@
 #!/bin/bash
 source "`dirname "${0}"`/../munkiwebadmin-config"
-SUBMITURL="${MWA_HOST}/api/report"
-LOOKUPURL="${MWA_HOST}/lookup/ip"
+REPORTSUBMITURL="${MWA_HOST}/api/report"
 
 RUNTYPE="$1"
 SERIAL=`ioreg -c IOPlatformExpertDevice | grep IOPlatformSerialNumber | awk '{print $4}' | tr -d '"' | tr -d + | tr -d /`
 NAME=`/usr/sbin/scutil --get ComputerName`
 
-if [ "$RUNTYPE" == "custom" -o "$RUNTYPE" == "auto" ]; then
-    if [ ! -z "$MWA_ALLOWED_NETWORKS" ]; then
-        echo "Checking network"
-
-        external_ip=`mwa_curl --max-time 5 --fail "${LOOKUPURL}"`
-        if [ $? -ne 0 ]; then
-            echo "External IP lookup failed, aborting munki run"
-            exit 1
-        fi
-
-    prefix_ok="no"
-        for prefix in ${MWA_ALLOWED_NETWORKS[@]}; do
-            echo -n "Checking $prefix for IP address $external_ip"
-            prefix_len=$( echo `echo "$prefix" | tr . '\012' | wc -l` )
-            for (( i=$prefix_len ; i<4 ; i++ )); do
-                echo -n '.x'
-            done
-            my_ip_prefix=`echo $external_ip | cut -d. -f1-$prefix_len`
-            if [ "$my_ip_prefix" == "$prefix" ]; then
-                echo ": Inside"
-                prefix_ok="yes"
-                break
-            else
-                echo ": Outside"
-            fi
-    done
-    if [ "$prefix_ok" == "yes" ]; then
-            echo "Network check OK, proceeding with munki run"
-        else
-            echo "Network check failed, aborting munki run"
-            exit 1
-        fi
-    fi
-fi
-
 curl -H "$authHeader" \
      -H "Content-Type: application/json" \
      -X POST \
      --data "{\"runtype\": \"$RUNTYPE\", \"submission_type\": \"preflight\", \"name\": \"$NAME\"}" \
-     http://localhost:8080/api/report/$SERIAL
+     $REPORTSUBMITURL/$SERIAL
 
 exit 0
