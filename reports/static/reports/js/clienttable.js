@@ -196,7 +196,7 @@ function getManifest(manifest) {
                 loopElement(JSON.parse(data).managed_installs, "managed_installs"),
                 loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls"),
                 loopElement(JSON.parse(data).optional_installs, "optional_installs"),
-                loopManifests(JSON.parse(data).included_manifests),
+                loopManifests(JSON.parse(data).included_manifests)
             );
         },
         error: function(jqXHR, textStatus, errorThrown) {
