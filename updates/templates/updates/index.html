@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block java_script %}
+<script src="{% get_static_prefix %}updates/js/updates.js"></script>
+{% endblock %}
+
+{% block extra_style %}
+<link href="{% get_static_prefix %}updates/css/updates.css" rel="stylesheet">
+{% endblock %}
+
+{% block navbar-top_extensions %}
+<li><a href="#" onclick="sendqueue();">Apply changes <span class="badge" id="queue">0</span></a></li>
+<li><a href="#" id="icon" onclick="hidecommonly();"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Hide commonly updates</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div id='item_list'>
+        <div class="form-inline">
+            <div class="form-group">
+                  <div class="btn-group">
+                      <button type="button" class="btn" data-toggle="modal" data-target="#searchManifestModal">
+                          Search manifests
+                      </button>
+                  </div>
+                  {% if perms.manifests.add_manifestfile %}
+                  <div class="btn-group">
+                      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newManifestModal">
+                          New manifest
+                      </button>
+                  </div>
+                  {% endif %}
+            </div>
+
+        </div>
+        <table class="table table-striped table-bordered wraptext" id='list_items' style="width:100%; border-radius: 4px;">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Title</th>
+              <th>Version</th>
+              <th>Date</th>
+              <th>Branches</th>
+              <th>Depr</th>
+            </tr>
+          </thead>
+          <tbody>
+              <!-- table is filled via AJAX/JSON calls by DataTables -->
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Delete</h4>
+      </div>
+      <div class="modal-body">
+        <p id="modal_text"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger">delete</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="newbranch" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">new Branch</h4>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" id="branch-name" placeholder="Name">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="newbranch($('#branch-name').val());" data-dismiss="modal">Create</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}

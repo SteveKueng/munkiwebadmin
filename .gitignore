@@ -5,3 +5,5 @@ db.sqlite3
 .DS_Store
 unused_*
 /munkiwebadmin/static/styles/srgssr
+
+.vscode/settings.json
