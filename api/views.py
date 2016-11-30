@@ -539,7 +539,7 @@ def db_api(request, kind, serial_number=None):
 
             if machine and report:
                 machine.remote_ip = request.META['REMOTE_ADDR']
-                if 'name' in submit:
+                if 'name' in submit and machine.hostname == '':
                     machine.hostname = submit.get('name')
                 if 'username' in submit:
                     machine.username = submit.get('username')
@@ -559,14 +559,17 @@ def db_api(request, kind, serial_number=None):
 
                 hwinfo = {}
                 if 'SystemProfile' in report_data.get('MachineInfo', []):
-                    if 'SPSoftwareDataType' in report_data['MachineInfo'].keys():
-                        hwinfo = profile['SPSoftwareDataType']
+                    if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
+                        hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
                 if hwinfo:
                     machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
                     machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
                     machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
                     machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
+
+                report.runtype = submit.get('runtype', 'UNKNOWN')
+                
 
                 if submission_type == 'reportimagr':
                     if submit.get('status'):
@@ -578,12 +581,6 @@ def db_api(request, kind, serial_number=None):
                     if submit.get('status') == 'success':
                         machine.imagr_workflow = ""
                     report.runstate = u"imagr"
-                    machine.save()
-                    report.save()
-                    return HttpResponse(status=204)
-
-                    report.runtype = submit.get('runtype', 'UNKNOWN')
-                    report.timestamp = datetime.now()
 
                 if submission_type == 'postflight':
                     report.runstate = u"done"
@@ -597,7 +594,9 @@ def db_api(request, kind, serial_number=None):
                     #report.report = None
                     report.errors = 1
                     report.warnings = 0
-
+                
+                print report.runtype
+                report.timestamp = datetime.now()
                 machine.save()
                 report.save()
                 return HttpResponse(status=204)

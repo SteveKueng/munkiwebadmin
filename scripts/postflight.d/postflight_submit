@@ -50,7 +50,7 @@ $PLISTBUDDY -c "Merge $PROFILEPLIST :MachineInfo:SystemProfile" "$TMPPLIST"
 REPORTTMP="$(bzip2 --best < "$TMPPLIST" | openssl base64 | tr "\n" "-")"
 
 # Submit Munki report to server.
-curl -H "Authorization: Basic YWRtaW46QWRtaW4xMjM=" \
+curl -H "$authHeader" \
      -H "Content-Type: application/json" \
      -X POST \
      -d "{\"runtype\": \"$RUNTYPE\", \"submission_type\": \"postflight\", \"name\": \"$NAME\", \"base64bz2report\":\"$REPORTTMP\"}" \
