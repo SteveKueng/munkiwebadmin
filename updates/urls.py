@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^delete_branch/(?P<branchname>^.*$)', updates.views.delete_branch),
     url(r'^new_branch/(?P<branchname>^.*$)', updates.views.new_branch),
     url(r'^delete_depr$', updates.views.purge_product),
+    url(r'^__get_update_list_status$', updates.views.status),
 ]

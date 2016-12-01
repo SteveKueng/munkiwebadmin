@@ -200,7 +200,7 @@ function hidecommonly() {
 function initUpdatesTable() {
     $('#list_items').dataTable({
         ajax: {
-            url: "/updates",
+            url: "/updates/",
             cache: false,
             dataSrc: function ( json ) {
                 var column_rows = [];
@@ -211,7 +211,7 @@ function initUpdatesTable() {
                 return column_rows;
             },
             complete: function(jqXHR, textStatus) {
-                //window.clearInterval(poll_loop);
+                window.clearInterval(poll_loop);
                 $('#process_progress').modal('hide');
             },
             global: false,
@@ -234,10 +234,18 @@ function initUpdatesTable() {
          "aaSorting": [[3,'desc']]
      });
      // start our monitoring timer loop
-    // monitor_manifest_list();
+     monitor_update_list();
      // tie our search field to the table
      var thisTable = $('#list_items').DataTable();
      $('#listSearchField').keyup(function(){
           thisTable.search($(this).val()).draw();
      });
+}
+
+function monitor_update_list() {
+    $('#process_progress_title_text').text('Getting updates...')
+    $('#process_progress_status_text').text('Processing...')
+    poll_loop = setInterval(function() {
+            update_status('/updates/__get_update_list_status');
+        }, 200);
 }

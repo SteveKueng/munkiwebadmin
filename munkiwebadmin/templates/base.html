@@ -294,9 +294,11 @@
                       <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
                         <a href="/pkgsinfo/">Package Info</a>
                       </li>
+                      {% if REPOSADOLIB %}
                       <li {% if page == 'updates' %} class="active" {% endif %}>
                         <a href="/updates/">Softwareupdate</a>
                       </li>
+                      {% endif %}
                   </ul>
               </div>
               <!-- /.sidebar-collapse -->

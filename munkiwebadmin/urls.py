@@ -7,10 +7,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 admin.autodiscover()
 
+import os
+try:
+	BASE_DIR = settings.BASE_DIR
+except:
+	BASE_DIR = ""
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-
     url(r'^login/$', django.contrib.auth.views.login, name='login'),
     url(r'^logout/$', django.contrib.auth.views.logout_then_login, name='logout'),
     url(r'^api/', include('api.urls')),
@@ -19,9 +23,12 @@ urlpatterns = [
     url(r'^catalogs/', include('catalogs.urls')),
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
     url(r'^makecatalogs/', include('process.urls')),
-    url(r'^updates/', include('updates.urls')),
     url(r'^$', django.contrib.auth.views.login, name='login'),
 ]
+
+if os.path.isdir(BASE_DIR + '/reposadolib'):
+    urlpatterns += [url(r'^updates/', include('updates.urls'))]
+
 # comment out the following if you are serving
 # static files a different way
 urlpatterns += staticfiles_urlpatterns()

@@ -3,12 +3,39 @@ from django.http import HttpResponse
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from process.models import Process
 
 import json
 import os
+import logging
 
 from operator import itemgetter
-from reposadolib import reposadocommon
+
+try:
+    BASE_DIR = settings.BASE_DIR
+except:
+	BASE_DIR = ""
+
+if os.path.isdir(BASE_DIR + '/reposadolib'):
+	from reposadolib import reposadocommon
+
+LOGGER = logging.getLogger('munkiwebadmin')
+
+def status(request):
+    	'''Returns status of long-running process'''
+	LOGGER.debug('got status request for update_list_process')
+	status_response = {}
+	processes = Process.objects.filter(name='update_list_process')
+	if processes:
+		# display status from one of the active processes
+		# (hopefully there is only one!)
+		process = processes[0]
+		status_response['statustext'] = process.statustext
+	else:
+		status_response['statustext'] = 'Processing'
+	return HttpResponse(json.dumps(status_response),
+						content_type='application/json')
 
 def list_products(sort_order='date'):
 	'''Prints a list of Software Update products'''
@@ -51,11 +78,6 @@ def list_products(sort_order='date'):
 	product_item = []
 	for product in product_list:
 		if product['key'] in products:
-			if not catalog_branches:
-				branchlist = ''
-			else:
-				branchlist = [branch for branch in catalog_branches.keys()
-                          if product['key'] in catalog_branches[branch]]
 			deprecation_state = ''
 			if not products[product['key']].get('AppleCatalogs'):
 				# not in any Apple catalogs
@@ -64,13 +86,22 @@ def list_products(sort_order='date'):
 				post_date = products[product['key']].get('PostDate').strftime('%Y-%m-%d')
 			except BaseException:
 				post_date = 'None'
-
-			product_item.append({'key': product['key'],
+			
+			item = {'key': product['key'],
 			'title': products[product['key']].get('title'),
 			'version': products[product['key']].get('version'),
 			'date': post_date,
-			'branches': branchlist,
-			'depricated': deprecation_state})
+			'depricated': deprecation_state
+			}
+			
+			if catalog_branches:
+				for branch in catalog_branches.keys():
+					if product['key'] in catalog_branches[branch]:
+						item[branch] = True
+					else:
+						item[branch] = False
+
+			product_item.append(item)
 	return product_item
 
 @login_required
@@ -79,7 +110,10 @@ def index(request):
 		response = list_products()
 		return HttpResponse(json.dumps(response),
                                 content_type='application/json')
-	return render(request, 'updates/index.html')
+	
+	catalog_branches = reposadocommon.getCatalogBranches().keys()
+	context = {'branches': catalog_branches}
+	return render(request, 'updates/updates.html', context=context)
 
 @login_required
 def update_list(request):

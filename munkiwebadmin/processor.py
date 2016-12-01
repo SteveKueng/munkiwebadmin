@@ -13,9 +13,15 @@ import base64
 try:
     STYLE = settings.STYLE
     APPNAME = settings.APPNAME
+    BASE_DIR = settings.BASE_DIR
 except:
     STYLE = 'default'
     APPNAME = "MunkiWebAdmin"
+    BASE_DIR = ""
+
+REPOSADOLIB = False
+if os.path.isdir(BASE_DIR + '/reposadolib'):
+    REPOSADOLIB = True
 
 def index(request):
     try:
@@ -25,4 +31,4 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
     
-    return {'style': STYLE, 'APPNAME': APPNAME, 'userImage': imgString }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'userImage': imgString }
