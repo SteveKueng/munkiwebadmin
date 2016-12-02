@@ -5,4 +5,6 @@ db.sqlite3
 .DS_Store
 unused_*
 .vscode/settings.json
-/munkiwebadmin/static/styles/srg ssr
+/munkiwebadmin/static/styles
+reposadolib
+preferences.plist
