@@ -193,11 +193,9 @@ function hidecommonly() {
 	getdata();
 }
 
-
-
-
 //
 function initUpdatesTable() {
+	var columns = dataTableCols('#list_items');
     $('#list_items').dataTable({
         ajax: {
             url: "/updates/",
@@ -207,7 +205,7 @@ function initUpdatesTable() {
                 for ( var i=0 ; i < json.length; i++ ) {
                     column_rows.push(json[i]);
 				}
-				console.log(column_rows);
+				//console.log(column_rows);
                 return column_rows;
             },
             complete: function(jqXHR, textStatus) {
@@ -216,14 +214,7 @@ function initUpdatesTable() {
             },
             global: false,
         },
-		"columns": [
-			{ "data": "key" },
-            { "data": "title" },
-            { "data": "version" },
-            { "data": "date" },
-            { "data": "branches" },
-            { "data": "depricated" }
-        ],
+		"columns": columns,
          //"sDom": "<t>",
          "bPaginate": false,
          "scrollY": '80vh',
@@ -248,4 +239,11 @@ function monitor_update_list() {
     poll_loop = setInterval(function() {
             update_status('/updates/__get_update_list_status');
         }, 200);
+}
+
+function dataTableCols(id) {
+	columns = $(id + ' thead tr th').map(function() { 
+    	return { "data": this.innerHTML.toLowerCase() };
+  	}).get();;
+	return columns
 }
