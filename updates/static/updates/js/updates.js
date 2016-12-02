@@ -214,8 +214,23 @@ function initUpdatesTable() {
             },
             global: false,
         },
+		"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+			if ( aData['depricated'] == "depricated" )
+			{
+				$('td', nRow).css('background-color', 'Red');
+			}
+		},
 		"columns": columns,
-         //"sDom": "<t>",
+		columnDefs: [
+			{ targets: [0, 1, 2], "className": "left", },
+			{ targets: [0], "width": 80 },
+			{ targets: [1], "width": "auto" },
+			{ targets: [2], "width": 50 },
+			{ targets: [3], "width": 75 },
+			{ "className": "text-center", "width": 20, "targets": "_all"},
+			{ targets: [-1], visible: false }
+		],
+         "sDom": "<t>",
          "bPaginate": false,
          "scrollY": '80vh',
          //"bScrollCollapse": true,
@@ -242,8 +257,11 @@ function monitor_update_list() {
 }
 
 function dataTableCols(id) {
+	keylist = ['key', 'title', 'version', 'date', 'depricated']
 	columns = $(id + ' thead tr th').map(function() { 
-    	return { "data": this.innerHTML.toLowerCase() };
+    	item = { "data": this.innerHTML.toLowerCase() };
+
+		return item
   	}).get();;
 	return columns
 }
