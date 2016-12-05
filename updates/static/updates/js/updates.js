@@ -196,7 +196,7 @@ function hidecommonly() {
 //
 function initUpdatesTable() {
 	var columns = dataTableCols('#list_items');
-    $('#list_items').dataTable({
+    var table = $('#list_items').DataTable({
         ajax: {
             url: "/updates/",
             cache: false,
@@ -222,9 +222,9 @@ function initUpdatesTable() {
 		},
 		"columns": columns,
 		columnDefs: [
-			{ targets: [0, 1, 2], "className": "left", },
+			{ targets: [0, 2], "className": "left", },
 			{ targets: [0], "width": 80 },
-			{ targets: [1], "width": "auto" },
+			{ targets: [1], "className": 'details-control', "width": "auto" },
 			{ targets: [2], "width": 50 },
 			{ targets: [3], "width": 75 },
 			{ "className": "text-center", "width": 20, "targets": "_all"},
@@ -246,6 +246,23 @@ function initUpdatesTable() {
      $('#listSearchField').keyup(function(){
           thisTable.search($(this).val()).draw();
      });
+
+	 // Add event listener for opening and closing details
+    $('#list_items tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    } );
 }
 
 function monitor_update_list() {
@@ -264,4 +281,10 @@ function dataTableCols(id) {
 		return item
   	}).get();;
 	return columns
+}
+
+/* Formatting function for row details - modify as you need */
+function format ( d ) {
+    // `d` is the original data object for the row
+    return d.description
 }

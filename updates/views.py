@@ -22,6 +22,7 @@ if os.path.isdir(BASE_DIR + '/reposadolib'):
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
+@login_required
 def status(request):
     	'''Returns status of long-running process'''
 	LOGGER.debug('got status request for update_list_process')
@@ -87,11 +88,13 @@ def list_products(sort_order='date'):
 			except BaseException:
 				post_date = 'None'
 			
+			print products[product['key']].get('description', 'None')
 			item = {'key': product['key'],
 			'title': products[product['key']].get('title'),
 			'version': products[product['key']].get('version'),
 			'date': post_date,
-			'depricated': deprecation_state
+			'depricated': deprecation_state,
+			'description': products[product['key']].get('description')
 			}
 			
 			if catalog_branches:
