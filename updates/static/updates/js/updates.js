@@ -222,11 +222,10 @@ function initUpdatesTable() {
 		},
 		"columns": columns,
 		columnDefs: [
-			{ targets: [0, 2], "className": "left", },
-			{ targets: [0], "width": 80 },
-			{ targets: [1], "className": 'details-control', "width": "auto" },
-			{ targets: [2], "width": 50 },
-			{ targets: [3], "width": 75 },
+			{ targets: [1], "className": "left", },
+			{ targets: [0], "className": 'details-control', "width": "auto" },
+			{ targets: [1], "width": 50 },
+			{ targets: [2], "width": 75 },
 			{ "className": "text-center", "width": 20, "targets": "_all"},
 			{ targets: [-1], visible: false }
 		],
@@ -237,7 +236,7 @@ function initUpdatesTable() {
          "bInfo": false,
          "bFilter": true,
          "bStateSave": false,
-         "aaSorting": [[3,'desc']]
+         "aaSorting": [[2,'desc']]
      });
      // start our monitoring timer loop
      monitor_update_list();
@@ -286,5 +285,8 @@ function dataTableCols(id) {
 /* Formatting function for row details - modify as you need */
 function format ( d ) {
     // `d` is the original data object for the row
-    return d.description
+	test = d.description
+	test=test.replaceChild;
+	alert(test)
+    return d.key + '<br>' + test
 }
