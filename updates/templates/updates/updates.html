@@ -31,13 +31,20 @@
           <thead>
             <tr>
               <!--<th>Key</th>-->
-              <th>Title</th>
-              <th>Version</th>
-              <th>Date</th>
+              <th class="table-header">Title</th>
+              <th class="table-header">Version</th>
+              <th class="table-header">Date</th>
               {% for branch in branches %}
-              <th>{{ branch }}</th>
+              <th><div class="dropdown">
+                <button class="btn btn-default btn-sm dropdown-toggle table-header" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ branch }}
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="#" onclick="openDeleteModal('{{ branch }}');">Delete</a></li>
+                </ul>
+              </div></th>
               {% endfor %}
-              <th>Depricated</th>
+              <th class="table-header">Depricated</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +70,7 @@ Bootstrap modal for add new branch
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="newBranch();" data-dismiss="modal">Create</button>
+        <button type="button" class="btn btn-primary" onclick="newBranch($('#branch-name').val());" data-dismiss="modal">Create</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -78,11 +85,11 @@ Bootstrap modal for confirming branch deletion
         <h4 class="modal-title">Delete selected branch?</h4>
       </div>
       <div class="modal-body">
-        <p id="massDeleteConfirmationModalBodyText">Really delete the selected branch?</p>
+        <p id="massDeleteConfirmationModalBodyText">Really delete <b id="branchName"></b>?</p>
         <p>This action cannot be undone.</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="deleteBranch()">Delete</button>
+        <button type="button" class="btn btn-danger submit-button " data-dismiss="modal" id="deleteButton" onClick="deleteBranch()">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->

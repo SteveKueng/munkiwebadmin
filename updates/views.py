@@ -9,6 +9,7 @@ from process.models import Process
 import json
 import os
 import logging
+import re
 
 from operator import itemgetter
 
@@ -79,22 +80,24 @@ def list_products(sort_order='date'):
 	product_item = []
 	for product in product_list:
 		if product['key'] in products:
-			deprecation_state = ''
+			deprecation_state = False
 			if not products[product['key']].get('AppleCatalogs'):
 				# not in any Apple catalogs
-				deprecation_state = 'Deprecated'
+				deprecation_state = True
 			try:
 				post_date = products[product['key']].get('PostDate').strftime('%Y-%m-%d')
 			except BaseException:
 				post_date = 'None'
 			
-			print products[product['key']].get('description', 'None')
+			if products[product['key']].get('description', 'None'):
+				description = re.findall('<body>(.*?)</body>', products[product['key']].get('description'), re.DOTALL)
+			
 			item = {'key': product['key'],
 			'title': products[product['key']].get('title'),
 			'version': products[product['key']].get('version'),
 			'date': post_date,
 			'depricated': deprecation_state,
-			'description': products[product['key']].get('description')
+			'description': description
 			}
 			
 			if catalog_branches:
@@ -117,93 +120,6 @@ def index(request):
 	catalog_branches = reposadocommon.getCatalogBranches().keys()
 	context = {'branches': catalog_branches}
 	return render(request, 'updates/updates.html', context=context)
-
-@login_required
-def update_list(request):
-	products = reposadocommon.getProductInfo()
-	prodlist = []
-	
-	hidecommonly = request.COOKIES.get('hidecommonly')
-	branches = list_branches(request)
-
-	for prodid in products.keys():
-		visible = True
-		if 'title' in products[prodid] and 'version' in products[prodid] and 'PostDate' in products[prodid]:
-			num = 0
-			for branch in branches: 
-				if prodid in branch["products"]:
-					num = num + 1
-
-			depr = len(products[prodid].get('AppleCatalogs', [])) < 1
-			if hidecommonly == "true":
-				if num == len(branches) and depr == False:
-					visible = False
-
-			prodlist.append({
-				'title': products[prodid]['title'],
-				'version': products[prodid]['version'],
-				'PostDate': products[prodid]['PostDate'],
-				'size': products[prodid]['size'],
-				'description': get_description_content(products[prodid]['description']),
-				'id': prodid,
-				'depr': depr,
-				'visible': visible,
-				})
-		else:
-			print 'Invalid update!'
-
-	sprodlist = sorted(prodlist, key=itemgetter('PostDate'), reverse=True)
-
-	context = {'products': sprodlist,
-				'branches': branches,
-				'hidecommonly': hidecommonly}
-	return render(request, 'updates/updats_list.html', context)
-
-@login_required
-def list_branches(request):
-	catalog_branches = reposadocommon.getCatalogBranches()
-
-	# reorganize the updates into an array of branches
-	branches = []
-	for branch in catalog_branches.keys():
-		branches.append({'name': branch, 'products': catalog_branches[branch]}) 
-
-	return branches
-
-def get_description_content(html):
-	if len(html) == 0:
-		return None
-
-	# in the interest of (attempted) speed, try to avoid regexps
-	lwrhtml = html.lower()
-
-	celem = 'p'
-	startloc = lwrhtml.find('<' + celem + '>')
-
-	if startloc == -1:
-		startloc = lwrhtml.find('<' + celem + ' ')
-
-	if startloc == -1:
-		celem = 'body'
-		startloc = lwrhtml.find('<' + celem)
-
-		if startloc != -1:
-			startloc += 6 # length of <body>
-
-	if startloc == -1:
-		# no <p> nor <body> tags. bail.
-		return None
-
-	endloc = lwrhtml.rfind('</' + celem + '>')
-
-	if endloc == -1:
-		endloc = len(html)
-	elif celem != 'body':
-		# if the element is a body tag, then don't include it.
-		# DOM parsing will just ignore it anyway
-		endloc += len(celem) + 3
-
-	return html[startloc:endloc]
 
 @login_required
 def dup_apple(branchname):
@@ -229,49 +145,17 @@ def dup_apple(branchname):
 	return jsonify(result=True)
 
 @login_required
-def process_queue(request):
-	if request.is_ajax():
-	    if request.method == 'POST':
-			catalog_branches = reposadocommon.getCatalogBranches()
-
-			data = json.loads(request.body)
-			for change in data:
-			 	prodId = change['productId']
-			 	branch = change['branch']
-
-				if branch not in catalog_branches.keys():
-					print 'No such catalog'
-					continue
-				
-				print change
-
-				if change['listed']:
-					print "test"
-					# if this change /was/ listed, then unlist it
-					if prodId in catalog_branches[branch]:
-						print 'Removing product %s from branch %s' % (prodId, branch, )
-						catalog_branches[branch].remove(prodId)
-				else:
-					# if this change /was not/ listed, then list it
-					if prodId not in catalog_branches[branch]:
-						print 'Adding product %s to branch %s' % (prodId, branch, )
-						catalog_branches[branch].append(prodId)
-
-			reposadocommon.writeCatalogBranches(catalog_branches)
-			reposadocommon.writeAllBranchCatalogs()
-
-	return HttpResponse("OK")
-
-@login_required
 def new_branch(request, branchname):
-	print branchname
 	catalog_branches = reposadocommon.getCatalogBranches()
 	if branchname in catalog_branches:
-	    reposadocommon.print_stderr('Branch %s already exists!', branchname)
-	    return HttpResponse('Branch already exists!')
+		reposadocommon.print_stderr('Branch %s already exists!', branchname)
+		return HttpResponse(
+			json.dumps({'result': 'failed',
+			'exception_type': 'Branch already exists!',
+			'detail': 'Branch already exists!'}),
+			content_type='application/json', status=404)
 	catalog_branches[branchname] = []
 	reposadocommon.writeCatalogBranches(catalog_branches)
-
 	return HttpResponse("OK")
 
 @login_required
