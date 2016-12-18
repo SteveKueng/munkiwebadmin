@@ -40,7 +40,13 @@
                   {{ branch }}
                 </button>
                 <ul class="dropdown-menu">
-                  <li><a href="#" onclick="openDeleteModal('{{ branch }}');">Delete</a></li>
+                  <li><a href="#" onclick="openAddProductConfirmModal('{{ branch }}', ['all']);">add <b>all</b></a></li>
+                  <li><a href="#" onclick="openAddProductConfirmModal('{{ branch }}', ['non-deprecated']);">add <b>non-depricated</b></a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#" onclick="openRemoveProductConfirmModal('{{ branch }}', ['all']);">remove <b>all</b></a></li>
+                  <li><a href="#" onclick="openRemoveProductConfirmModal('{{ branch }}', ['deprecated']);">remove <b>depricated</b></a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#" onclick="openDeleteBranchConfirmModal('{{ branch }}');">Delete <b>{{ branch }}</b></a></li>
                 </ul>
               </div></th>
               {% endfor %}
@@ -78,18 +84,17 @@ Bootstrap modal for add new branch
 <!--
 Bootstrap modal for confirming branch deletion
 -->
-<div class="modal fade" id="deleteConfirmationModal">
+<div class="modal fade" id="confirmationModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Delete selected branch?</h4>
+        <h4 class="modal-title" id="confirmationModalTitle"></h4>
       </div>
       <div class="modal-body">
-        <p id="massDeleteConfirmationModalBodyText">Really delete <b id="branchName"></b>?</p>
-        <p>This action cannot be undone.</p>
+        <p id="confirmationModalBodyText"></p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger submit-button " data-dismiss="modal" id="deleteButton" onClick="deleteBranch()">Delete</button>
+        <button type="button" class="btn btn-danger submit-button " data-dismiss="modal" id="confirmationButton" onClick=""></button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->

@@ -103,9 +103,9 @@ def list_products(sort_order='date'):
 			if catalog_branches:
 				for branch in catalog_branches.keys():
 					if product['key'] in catalog_branches[branch]:
-						item[branch] = '<input type="checkbox" id="'+product['key']+'_'+branch+'" checked/>'
+						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="checkbox text-center" checked/>'
 					else:
-						item[branch] = '<input type="checkbox" id="'+product['key']+'_'+branch+'" />'
+						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="checkbox text-center" />'
 
 			product_item.append(item)
 	return product_item
@@ -118,37 +118,13 @@ def index(request):
                                 content_type='application/json')
 	
 	catalog_branches = reposadocommon.getCatalogBranches().keys()
-	context = {'branches': catalog_branches}
+	context = {'branches': sorted(catalog_branches)}
 	return render(request, 'updates/updates.html', context=context)
-
-@login_required
-def dup_apple(branchname):
-	catalog_branches = reposadocommon.getCatalogBranches()
-
-	if branchname not in catalog_branches.keys():
-		print 'No branch ' + branchname
-		return jsonify(result=False)
-
-	# generate list of (non-drepcated) updates
-	products = reposadocommon.getProductInfo()
-	prodlist = []
-	for prodid in products.keys():
-		if len(products[prodid].get('AppleCatalogs', [])) >= 1:
-			prodlist.append(prodid)
-
-	catalog_branches[branchname] = prodlist
-
-	print 'Writing catalogs'
-	reposadocommon.writeCatalogBranches(catalog_branches)
-	reposadocommon.writeAllBranchCatalogs()
-
-	return jsonify(result=True)
 
 @login_required
 def new_branch(request, branchname):
 	catalog_branches = reposadocommon.getCatalogBranches()
 	if branchname in catalog_branches:
-		reposadocommon.print_stderr('Branch %s already exists!', branchname)
 		return HttpResponse(
 			json.dumps({'result': 'failed',
 			'exception_type': 'Branch already exists!',
@@ -197,20 +173,100 @@ def add_all(request, branchname):
 	return HttpResponse("OK")
 
 @login_required
-def dup(request, frombranch, tobranch):
-	catalog_branches = reposadocommon.getCatalogBranches()
+def add_product_to_branch(request):
+	'''Adds one product to a branch. Takes a list of strings.
+	The last string must be the name of a branch catalog. All other
+	strings must be product_ids.'''
+	if request.is_ajax():
+		branch_name = request.POST.get('branch_name')
+		product_id_list = request.POST.getlist('product_id_list[]')
 
-	if frombranch not in catalog_branches.keys() or tobranch not in catalog_branches.keys():
-		print 'No branch ' + branchname
-		return jsonify(result=False)
+		# remove all duplicate product ids
+		product_id_list = list(set(product_id_list))
 
-	catalog_branches[tobranch] = catalog_branches[frombranch]
+		catalog_branches = reposadocommon.getCatalogBranches()
+		if not branch_name in catalog_branches:
+			return HttpResponse(json.dumps({'result': 'failed',
+				'exception_type': 'Catalog branch not found',
+				'detail': 'Catalog branch '+branch_name+' doesn\'t exist!'}),
+				content_type='application/json', status=500)
+		
+		products = reposadocommon.getProductInfo()
+		if 'all' in product_id_list:
+			product_id_list = products.keys()
+		elif 'non-deprecated' in product_id_list:
+			product_id_list = [key for key in products.keys()
+								if products[key].get('AppleCatalogs')]
 
-	print 'Writing catalogs'
-	reposadocommon.writeCatalogBranches(catalog_branches)
-	reposadocommon.writeAllBranchCatalogs()
+		for product_id in product_id_list:
+			if not product_id in products:
+				return HttpResponse(json.dumps({'result': 'failed',
+				'exception_type': 'Product not found',
+				'detail': 'Product '+product_id+' doesn\'t exist!'}),
+				content_type='application/json', status=500)
+			else:
+				try:
+					title = products[product_id]['title']
+					vers = products[product_id]['version']
+				except KeyError:
+					# skip this one and move on
+					continue
+				if product_id in catalog_branches[branch_name]:
+					reposadocommon.print_stderr(
+					'%s (%s-%s) is already in branch %s!',
+					product_id, title, vers, branch_name)
+					continue
+				else:
+					catalog_branches[branch_name].append(product_id)
 
-	return HttpResponse("OK")
+		reposadocommon.writeCatalogBranches(catalog_branches)
+		reposadocommon.writeAllBranchCatalogs()
+	return HttpResponse(status=204)
+
+@login_required
+def remove_product_from_branch(request):
+	'''Removes one or more products from a branch. Takes a list of strings.
+    The last string must be the name of a branch catalog. All other
+    strings must be product_ids.'''
+	if request.is_ajax():
+		branch_name = request.POST.get('branch_name')
+		product_id_list = request.POST.getlist('product_id_list[]')
+
+		catalog_branches = reposadocommon.getCatalogBranches()
+		if not branch_name in catalog_branches:
+    			return HttpResponse(json.dumps({'result': 'failed',
+				'exception_type': 'Catalog branch not found',
+				'detail': 'Catalog branch '+branch_name+' doesn\'t exist!'}),
+				content_type='application/json', status=500)
+
+		products = reposadocommon.getProductInfo()
+		if 'all' in product_id_list:
+			product_id_list = products.keys()
+		elif 'deprecated' in product_id_list:
+			product_id_list = [key for key in catalog_branches[branch_name]
+								if not products[key].get('AppleCatalogs')]
+		else:
+			# remove all duplicate product ids
+			product_id_list = list(set(product_id_list))
+
+		for product_id in product_id_list:
+			if product_id in products:
+				title = products[product_id].get('title')
+				vers = products[product_id].get('version')
+			else:
+				return HttpResponse(json.dumps({'result': 'failed',
+				'exception_type': 'Product not found',
+				'detail': 'Product '+product_id+' doesn\'t exist!'}),
+				content_type='application/json', status=500)
+			if not product_id in catalog_branches[branch_name]:
+				reposadocommon.print_stderr('%s (%s-%s) is not in branch %s!',
+											product_id, title, vers, branch_name)
+				continue
+
+			catalog_branches[branch_name].remove(product_id)
+		reposadocommon.writeCatalogBranches(catalog_branches)
+		reposadocommon.writeAllBranchCatalogs()
+	return HttpResponse(status=204)
 
 @login_required
 def purge_product(request, product_ids="all-deprecated", force=False):
@@ -301,8 +357,4 @@ def purge_product(request, product_ids="all-deprecated", force=False):
     return HttpResponse("OK")
 
 
-def datetime_handler(x):
-	if isinstance(x, datetime.datetime):
-		return x.isoformat()
-	raise TypeError("Unknown type")
 

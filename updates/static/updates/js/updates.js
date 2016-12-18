@@ -28,6 +28,18 @@ $.ajaxSetup({
 $(document).ready(function() {
 	initUpdatesTable();
 	fixDropdown();
+	
+	$('#list_items').on( 'change', 'input.checkbox', function () {
+		element = $(this).attr('id').split(':')
+        id = new Array();
+		id[0] = element[0]
+		branch = element[1]
+        if ($(this).prop("checked")) {
+        	addProductToBranch(id, branch);
+    	} else {
+			removeProductFromBranch(id, branch);
+		}
+    } );
 });
 
 function fixDropdown() {
@@ -50,7 +62,7 @@ function fixDropdown() {
     dropdownMenu.css({
         'display': 'block',
         'top': eOffset.top + $(e.target).outerHeight(),
-        'left': eOffset.left - $(e.target).width()
+        'left': eOffset.left - 2*($(e.target).width())
     });                                                
   });
 
@@ -164,7 +176,22 @@ function newBranch(branch) {
 			contentType: 'application/json; charset=utf-8',
 			success: function() {
 				location.reload();
-			}
+			},
+            error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("create branch error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+          }
 		});
 	}
 } 
@@ -177,15 +204,110 @@ function deleteBranch(branch) {
 			contentType: 'application/json; charset=utf-8',
 			success: function() {
 				location.reload();
-			}
+			},
+            error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("delete branch error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+          }
 		});
 	}
 }
 
-function openDeleteModal(branch) {
-	$('#branchName').text(branch)
-	$('#deleteButton').attr("onclick","deleteBranch('"+branch+"')");
-	$('#deleteConfirmationModal').modal({
+function openDeleteBranchConfirmModal(branch) {
+    $('#confirmationModalTitle').text("Delete selected branch?");
+	$('#confirmationModalBodyText').html("Really delete <b>"+branch+"</b>?<br>This action cannot be undone.");
+	$('#confirmationButton').attr("onclick","deleteBranch('"+branch+"')");
+    $('#confirmationButton').text("Delete");
+	$('#confirmationModal').modal({
 		show: 'true',
 	}); 
+}
+
+function openAddProductConfirmModal(branch, products) {
+    $('#confirmationModalTitle').text("Add products to branch?");
+	$('#confirmationModalBodyText').html("Really add <b>"+products+"</b> to <b>"+branch+"</b>?");
+	$('#confirmationButton').attr("onclick","addProductToBranch(['"+products+"'], '"+branch+"', true)");
+    $('#confirmationButton').text("Add");
+	$('#confirmationModal').modal({
+		show: 'true',
+	}); 
+}
+
+function openRemoveProductConfirmModal(branch, products) {
+    $('#confirmationModalTitle').text("Remove products from branch?");
+	$('#confirmationModalBodyText').html("Really remove <b>"+products+"</b> from <b>"+branch+"</b>?");
+	$('#confirmationButton').attr("onclick","removeProductFromBranch(['"+products+"'], '"+branch+"', true)");
+    $('#confirmationButton').text("Remove");
+	$('#confirmationModal').modal({
+		show: 'true',
+	}); 
+}
+
+function addProductToBranch(products, branch, reload = false) {
+	$.ajax({
+        url: '/updates/add_product',
+        type: 'POST',
+        data: {product_id_list: products, branch_name: branch},
+        dataType: 'json',
+        success: function() {
+            if(reload) {
+                location.reload();
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("product add error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+        },
+    });
+}
+
+function removeProductFromBranch(products, branch, reload = false) {
+	$.ajax({
+        url: '/updates/remove_product',
+        type: 'POST',
+        data: {product_id_list: products, branch_name: branch},
+        dataType: 'json',
+        success: function() {
+            if(reload) {
+                location.reload();
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("product remove error");
+             try {
+                 var json_data = $.parseJSON(jqXHR.responseText)
+                 if (json_data['result'] == 'failed') {
+                     $("#errorModalDetailText").text(json_data['detail']);
+                     $("#errorModal").modal("show");
+                     return;
+                 }
+             } catch(err) {
+                 // do nothing
+             }
+             $("#errorModalDetailText").text(errorThrown);
+             $("#errorModal").modal("show");
+        }
+    });
 }
