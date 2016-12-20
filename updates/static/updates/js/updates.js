@@ -58,12 +58,17 @@ function fixDropdown() {
     // grab the new offset position
     var eOffset = $(e.target).offset();
 
+    if((eOffset.left + $(e.target).width()) > $("#page-wrapper").width()) {
+        var offsetLeft = $("#page-wrapper").width() - $(e.target).width()
+    } else {
+        var offsetLeft = eOffset.left
+    }
     // make sure to place it where it would normally go (this could be improved)
     dropdownMenu.css({
         'display': 'block',
         'top': eOffset.top + $(e.target).outerHeight(),
-        'left': eOffset.left - 2*($(e.target).width())
-    });                                                
+        'left': offsetLeft
+    });                                             
   });
 
   // and when you hide it, reattach the drop down, and hide it normally                                                   
@@ -165,6 +170,17 @@ function dataTableCols(id) {
 function format ( d ) {
     // `d` is the original data object for the row
     return '<b>' + d.key + '</b><br><br>' + d.description
+}
+
+function filterDatatable() {
+    var id = 1
+    $.fn.dataTableExt.afnFiltering.push(
+		function( oSettings, aData, iDataIndex ) {
+          // If our date from the row is between the start and end
+          return JSON.parse(aData.pop())
+        }
+	);
+    $('#list_items').dataTable().fnDraw(); // Manually redraw the table after filtering
 }
 
 // add new branch
