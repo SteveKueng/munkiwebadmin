@@ -1,7 +1,47 @@
 # Django settings for munkiwebadmin project.
-
 import os
 from django.conf import global_settings
+
+STATIC_URL = '/static/'
+MEDIA_URL = "/media/"
+
+###########################################################################
+# munkiwebadmin-specific
+###########################################################################
+# APPNAME is user-visible web app name
+APPNAME = 'MunkiWebAdmin2'
+# MUNKI_REPO_DIR holds the local filesystem path to the Munki repo
+MUNKI_REPO_DIR = '/Users/Shared/munkirepo'
+#MUNKI_REPO_DIR = '/Volumes/munkirepo'
+
+# if you want to display product icons, provide a base ICONS_URL
+# be sure to include trailing slash
+
+# for development work (Set DEBUG=True), you can set the ICONS_URL to MEDIA_URL.
+# This is not recommended for production.
+MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
+ICONS_URL = MEDIA_URL
+
+# For production, you can point to your Munki server
+# if retrieving icons requires no special authentication
+# -- otherwise, you'll need some other static file server
+#ICONS_URL = "http://localhost/munki_repo/icons/"
+#ICONS_URL = "http://munki/repo/icons/"
+
+# path to the makecatalogs binary
+MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
+
+# provide the path to the git binary if you want MunkiWebAdmin to add and commit
+# manifest edits to a git repo
+# if GITPATH is undefined or None MunkiWebAdmin will not attempt to do a git add
+# or commit
+#GIT_PATH = '/usr/bin/git'
+
+MODEL_LOOKUP_ENABLED = True
+
+#Define your style from styles-folder located in static
+STYLE = 'default'
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -17,6 +57,12 @@ SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+###########################################################################
+# munkiwebadmin-specific end
+###########################################################################
+
+
 
 # Application definition
 
@@ -115,15 +161,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
-STATIC_URL = '/static/'
-
-# https://docs.djangoproject.com/en/1.9/howto/static-files/#serving-files-uploaded-by-a-user-during-development
-MEDIA_URL = "/media/"
-
 #### end basic Django settings
 
 LOGGING = {
@@ -142,11 +179,24 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
+        'file': {
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': APPNAME+'.log',
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False
+        },
         'munkiwebadmin': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': 'INFO',
+            'handlers': ['console', 'file'],
+            'propagate': False,
         },
     },
 }
@@ -217,41 +267,3 @@ ADMINS = (
 # who gets broken link notifcations when DEBUG is False
 # https://docs.djangoproject.com/en/1.9/ref/settings/#managers
 MANAGERS = ADMINS
-
-###########################################################################
-# munkiwebadmin-specific
-###########################################################################
-
-# APPNAME is user-visible web app name
-APPNAME = 'MunkiWebAdmin2'
-# MUNKI_REPO_DIR holds the local filesystem path to the Munki repo
-MUNKI_REPO_DIR = '/Users/Shared/munki_repo'
-#MUNKI_REPO_DIR = '/Volumes/repo'
-
-# if you want to display product icons, provide a base ICONS_URL
-# be sure to include trailing slash
-
-# for development work (Set DEBUG=True), you can set the ICONS_URL to MEDIA_URL.
-# This is not recommended for production.
-MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
-ICONS_URL = MEDIA_URL
-
-# For production, you can point to your Munki server
-# if retrieving icons requires no special authentication
-# -- otherwise, you'll need some other static file server
-#ICONS_URL = "http://localhost/munki_repo/icons/"
-#ICONS_URL = "http://munki/repo/icons/"
-
-# path to the makecatalogs binary
-MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
-
-# provide the path to the git binary if you want MunkiWebAdmin to add and commit
-# manifest edits to a git repo
-# if GITPATH is undefined or None MunkiWebAdmin will not attempt to do a git add
-# or commit
-#GIT_PATH = '/usr/bin/git'
-
-MODEL_LOOKUP_ENABLED = True
-
-#Define your style from styles-folder located in static
-STYLE = 'default'
