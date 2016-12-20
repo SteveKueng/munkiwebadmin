@@ -182,7 +182,7 @@ function filterDatatable() {
     $('#list_items').dataTable().fnDraw(); // Manually redraw the table after filtering
 }
 
-function filterDatatable() {
+function clearFilterDatatable() {
     $.fn.dataTableExt.afnFiltering.length = 0;
     $('#list_items').dataTable().fnDraw();
 }
