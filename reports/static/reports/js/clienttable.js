@@ -233,13 +233,13 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
     });
-    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' class='newElementInput' name='new' onkeypress='saveChanges(this, event)'></li>" );
+    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' onkeypress='saveList(this, \""+listid+"\", event)'></li>" );
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" class="newElementInput" name="new" onkeypress="saveChanges(this, event)"></p></div>' );
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" onkeypress="saveList(this, listid, event)"></p></div>' );
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -351,16 +351,13 @@ function getManifestName() {
 
 
 //edit software
-function saveChanges(item, event) {
+function saveList(item, listid, event) {
     if (event.which == '13' && item.value != "") {
         manifest = getManifestName()
-        listid = $(item).parent().parent().attr('id')
         itemValue = item.value
 
         //get items to save
-        itemList = $('[id^="'+listid+'_"]').map(function() { 
-            return this.id.substring(listid.length + 1); 
-        }).get()
+        itemList = getItemsToSave(listid)
 
         //check if item already in list
         if(jQuery.inArray(itemValue, itemList) == -1) {
@@ -381,8 +378,9 @@ function saveChanges(item, event) {
                 success: function(data){
                     if (listid.indexOf("catalogs") == -1) {
                         getIncludedManifest(itemValue);
+                    } else {
+
                     }
-                    //getIncludedManifest(itemValue);
                 },
                 error: function(){
                     $("#"+listid+"_"+itemValue).remove();
@@ -391,4 +389,12 @@ function saveChanges(item, event) {
             });
         }
     }
+}
+
+function getItemsToSave(listid) {
+    //get items to save
+    itemList = $('[id^="'+listid+'_"]').map(function() { 
+        return this.id.substring(listid.length + 1); 
+    }).get()
+    return itemList
 }

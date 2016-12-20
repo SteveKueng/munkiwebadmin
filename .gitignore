@@ -1,8 +1,22 @@
+# python compiled files
 *.pyc
 *.pyo
+
+# settings.py and default db
 settings.py
 db.sqlite3
+
+# hidden mac settings
 .DS_Store
-unused_*
-/munkiwebadmin/static/styles/srg ssr
+.vscode/settings.json
+
+# ignore styles exept of Default
+!/munkiwebadmin/static/styles/Default
+/munkiwebadmin/static/styles/*
+
+# ignore reposado links
+reposadolib
+preferences.plist
+
+# ignore webconfig
 Web.config

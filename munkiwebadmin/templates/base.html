@@ -36,11 +36,10 @@
     <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
     <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui/jquery-ui.min.js'></script>
     <script type='text/javascript' src='{% get_static_prefix %}js/jqueryDataTables/jquery.dataTables.min.js'></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/jqueryDataTables/dataTables.responsive.js'></script>
     <!-- Bootstrap Core JavaScript -->
     <script type='text/javascript' src="{% get_static_prefix %}js/bootstrap.min.js"></script>
-
     <script type='text/javascript' src='{% get_static_prefix %}js/typeahead/bootstrap3-typeahead.min.js'></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/dataTables/dataTables.bootstrap.min.js'></script>
     <script type='text/javascript' src='{% get_static_prefix %}js/bootstrap-tabdrop.js'></script>
 
     {% block java_script %}{% endblock %}
@@ -69,7 +68,7 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/"><span><img style="max-width:100px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span> {{APPNAME}}</a>
+              <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span> {{APPNAME}}</a>
           </div>
           <!-- /.navbar-header -->
           <ul class="nav navbar-top-links navbar-right">
@@ -231,7 +230,7 @@
                 <!-- /.dropdown-user -->
               </li>
               <li>
-                <img alt="Embedded Image" src="data:image/png;base64,{{ userImage }}" class="img-circle" height="40" />
+                <img alt="Embedded Image" src="{{ userImage }}" class="img-circle" height="40" />
               </li>
               <!-- /.dropdown -->
           </ul>
@@ -294,6 +293,11 @@
                       <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
                         <a href="/pkgsinfo/">Package Info</a>
                       </li>
+                      {% if REPOSADOLIB %}
+                      <li {% if page == 'updates' %} class="active" {% endif %}>
+                        <a href="/updates/">Softwareupdate</a>
+                      </li>
+                      {% endif %}
                   </ul>
               </div>
               <!-- /.sidebar-collapse -->

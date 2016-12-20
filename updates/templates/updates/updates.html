@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block java_script %}
+<script src="{% get_static_prefix %}updates/js/updates.js"></script>
+<script type='text/javascript' src='{% get_static_prefix %}js/mwa_editor_shared.js'></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div id='item_list'>
+        <div class="form-inline">
+            <div class="form-group">
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Filter <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a href="#" onclick="filterDatatable();">Show depricated</a></li>
+                      <li><a href="#">Another action</a></li>
+                      <li><a href="#">Something else here</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="#">Separated link</a></li>
+                    </ul>
+                  </div>
+                  {% if perms.manifests.add_manifestfile %}
+                  <div class="btn-group">
+                      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newBranchModal">
+                          New Branch
+                      </button>
+                  </div>
+                  {% endif %}
+            </div>
+
+        </div>
+        <table class="table table-striped table-bordered wraptext" id='list_items' style="width:100%; border-radius: 4px;">
+          <thead>
+            <tr>
+              <!--<th>Key</th>-->
+              <th class="table-header">Title</th>
+              <th class="table-header">Version</th>
+              <th class="table-header">Date</th>
+              {% for branch in branches %}
+              <th><div class="dropdown">
+                <button class="btn btn-default btn-sm dropdown-toggle table-header" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ branch }}
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="#" onclick="openAddProductConfirmModal('{{ branch }}', ['all']);">add <b>all</b></a></li>
+                  <li><a href="#" onclick="openAddProductConfirmModal('{{ branch }}', ['non-deprecated']);">add <b>non-depricated</b></a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#" onclick="openRemoveProductConfirmModal('{{ branch }}', ['all']);">remove <b>all</b></a></li>
+                  <li><a href="#" onclick="openRemoveProductConfirmModal('{{ branch }}', ['deprecated']);">remove <b>depricated</b></a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#" onclick="openDeleteBranchConfirmModal('{{ branch }}');">Delete <b>{{ branch }}</b></a></li>
+                </ul>
+              </div></th>
+              {% endfor %}
+              <th class="table-header">Depricated</th>
+            </tr>
+          </thead>
+          <tbody>
+              <!-- table is filled via AJAX/JSON calls by DataTables -->
+          </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+
+<!--
+Bootstrap modal for add new branch
+-->
+<div id="newBranchModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">new Branch</h4>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" id="branch-name" placeholder="Name">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="newBranch($('#branch-name').val());" data-dismiss="modal">Create</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--
+Bootstrap modal for confirming branch deletion
+-->
+<div class="modal fade" id="confirmationModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="confirmationModalTitle"></h4>
+      </div>
+      <div class="modal-body">
+        <p id="confirmationModalBodyText"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger submit-button " data-dismiss="modal" id="confirmationButton" onClick=""></button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--
+Bootstrap modal for showing process progress
+-->
+<div class="modal fade" data-backdrop="static" id="process_progress">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="process_progress_title_text">Processing...</h4>
+      </div>
+      <div class="modal-body">
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+              <span class="sr-only">Indeterminate progress</span>
+              <div id='process_progress_status_text'>&nbsp;</div>
+            </div>
+          </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--
+Bootstrap modal for errors
+-->
+<div class="modal fade" data-backdrop="static" id="errorModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-danger">
+            <span class="glyphicon glyphicon-alert text-danger" aria-hidden="true"></span>
+            <span id="errorModalTitleText">Error</span>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          <p id="errorModalDetailText">An unexpected error occurred.</p>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+{% endblock %}

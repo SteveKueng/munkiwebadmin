@@ -14,7 +14,6 @@ import plistlib
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-
 def status(request):
     '''Returns status of long-running process'''
     LOGGER.debug('got status request for manifests_list_process')
@@ -29,7 +28,6 @@ def status(request):
         status_response['statustext'] = 'Processing'
     return HttpResponse(json.dumps(status_response),
                         content_type='application/json')
-
 
 @login_required
 def index(request, manifest_path=None):
