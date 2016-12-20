@@ -167,20 +167,24 @@ function dataTableCols(id) {
 }
 
 /* Formatting function for row details - modify as you need */
-function format ( d ) {
+function format( d ) {
     // `d` is the original data object for the row
     return '<b>' + d.key + '</b><br><br>' + d.description
 }
 
 function filterDatatable() {
-    var id = 1
     $.fn.dataTableExt.afnFiltering.push(
-		function( oSettings, aData, iDataIndex ) {
-          // If our date from the row is between the start and end
-          return JSON.parse(aData.pop())
+        function( oSettings, aData, iDataIndex ) {
+            // If our date from the row is between the start and end
+            return JSON.parse(aData.pop())
         }
-	);
+    );
     $('#list_items').dataTable().fnDraw(); // Manually redraw the table after filtering
+}
+
+function filterDatatable() {
+    $.fn.dataTableExt.afnFiltering.length = 0;
+    $('#list_items').dataTable().fnDraw();
 }
 
 // add new branch
