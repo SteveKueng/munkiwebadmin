@@ -5,3 +5,4 @@ db.sqlite3
 .DS_Store
 unused_*
 /munkiwebadmin/static/styles/srg ssr
+Web.config
