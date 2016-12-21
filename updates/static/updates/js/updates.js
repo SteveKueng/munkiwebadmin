@@ -57,9 +57,8 @@ function fixDropdown() {
 
     // grab the new offset position
     var eOffset = $(e.target).offset();
-
-    if((eOffset.left + $(e.target).width()) > $("#page-wrapper").width()) {
-        var offsetLeft = $("#page-wrapper").width() - $(e.target).width()
+    if(eOffset.left + dropdownMenu.width() + 5 > $(window).width()) {
+        var offsetLeft = $(window).width() - dropdownMenu.width() - 5;
     } else {
         var offsetLeft = eOffset.left
     }
