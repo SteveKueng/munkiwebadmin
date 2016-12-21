@@ -103,9 +103,9 @@ def list_products(sort_order='date'):
 			if catalog_branches:
 				for branch in catalog_branches.keys():
 					if product['key'] in catalog_branches[branch]:
-						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="checkbox text-center" checked/>'
+						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="cbox" checked/>'
 					else:
-						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="checkbox text-center" />'
+						item[branch] = '<input type="checkbox" id="'+product['key']+':'+branch+'" class="cbox" />'
 
 			product_item.append(item)
 	return product_item

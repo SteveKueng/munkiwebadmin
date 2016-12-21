@@ -29,7 +29,7 @@ $(document).ready(function() {
 	initUpdatesTable();
 	fixDropdown();
 	
-	$('#list_items').on( 'change', 'input.checkbox', function () {
+	$('#list_items').on( 'change', 'input.cbox', function () {
 		element = $(this).attr('id').split(':')
         id = new Array();
 		id[0] = element[0]
