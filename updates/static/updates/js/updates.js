@@ -173,17 +173,16 @@ function format( d ) {
 }
 
 function filterDatatable(filter) {
+    clearFilterDatatable()
     $.fn.dataTableExt.afnFiltering.push(
-        function( oSettings, aData, iDataIndex ) {
+        function( oSettings, aData, iDataIndex, rowData, counter ) {
             switch(filter) {
-                case 1:
+                case "depricated":
                     return JSON.parse(aData[aData.length - 1])
                     break;
-                case n:
-                    return JSON.parse(aData[aData.length - 1])
+                case "no-depricated":
+                    return !JSON.parse(aData[aData.length - 1])
                     break;
-                default:
-                    return true
                 }
         }
     );
