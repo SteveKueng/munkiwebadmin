@@ -160,7 +160,7 @@ function monitor_update_list() {
 function dataTableCols(id) {
 	keylist = ['key', 'title', 'version', 'date', 'depricated']
 	columns = $(id).map(function() { 
-    	item = { "data": $.trim(this.innerHTML.toLowerCase()) };
+        item = { "data": $(this).attr('id') };
 		return item
   	}).get();;
 	return columns
@@ -172,11 +172,19 @@ function format( d ) {
     return '<b>' + d.key + '</b><br><br>' + d.description
 }
 
-function filterDatatable() {
+function filterDatatable(filter) {
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
-            // If our date from the row is between the start and end
-            return JSON.parse(aData.pop())
+            switch(filter) {
+                case 1:
+                    return JSON.parse(aData[aData.length - 1])
+                    break;
+                case n:
+                    return JSON.parse(aData[aData.length - 1])
+                    break;
+                default:
+                    return true
+                }
         }
     );
     $('#list_items').dataTable().fnDraw(); // Manually redraw the table after filtering

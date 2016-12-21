@@ -17,9 +17,9 @@
                     Filter <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                      <li><a href="#" onclick="filterDatatable();">Show depricated</a></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
+                      <li><a href="#" onclick="filterDatatable();">depricated</a></li>
+                      <li><a href="#">no depricated</a></li>
+                      <li><a href="#">commonly</a></li>
                       <li role="separator" class="divider"></li>
                       <li><a href="#" onclick="clearFilterDatatable();">Clear filter</a></li>
                     </ul>
@@ -38,12 +38,12 @@
           <thead>
             <tr>
               <!--<th>Key</th>-->
-              <th class="table-header">Title</th>
-              <th class="table-header">Version</th>
-              <th class="table-header">Date</th>
+              <th class="table-header" id="title">Title</th>
+              <th class="table-header" id="version">Version</th>
+              <th class="table-header" id="date">Date</th>
               {% for branch in branches %}
               <th><div class="dropdown">
-                <button class="btn btn-default btn-sm dropdown-toggle table-header" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-default btn-sm dropdown-toggle table-header" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="{{ branch }}">
                   {{ branch }}
                 </button>
                 <ul class="dropdown-menu">
@@ -57,7 +57,7 @@
                 </ul>
               </div></th>
               {% endfor %}
-              <th class="table-header">Depricated</th>
+              <th class="table-header" id="depricated">Depricated</th>
             </tr>
           </thead>
           <tbody>
