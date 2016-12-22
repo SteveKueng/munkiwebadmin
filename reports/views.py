@@ -2,8 +2,7 @@
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
@@ -390,79 +389,13 @@ def getStatus(request):
                     'detail': str(err)}),
         content_type='application/json', status=404)
 
-@login_required
-def staging(request, serial):
-    if request.method == 'POST':
-        submit = request.POST
-        workflow = submit.get('workflow')
-        runtype = submit.get('type')
 
-        if serial:
-            try:
-                machine = Machine.objects.get(serial_number=serial)
-            except Machine.DoesNotExist:
-                machine = Machine(serial_number=serial)
-        else:
-            raise Http404
-
-        if runtype == "save":
-            if workflow == "no workflow":
-                machine.imagr_workflow = ""
-                machine.imagr_status = ""
-                machine.imagr_message = ""
-            else:
-                machine.imagr_workflow = workflow
-            machine.save()
-            return HttpResponse("OK!")
-        elif runtype == "load":
-            imagr_status = machine.imagr_status
-            imagr_message = machine.imagr_message
-
-            c = RequestContext(request,{'imagr_status': imagr_status,
-                                        'imagr_message': imagr_message
-                                        })
-            c.update(csrf(request))
-            return render_to_response('reports/staging_status.html', c)
-    else:
-        machine = None
-        if serial:
-            try:
-                machine = Machine.objects.get(serial_number=serial)
-            except Machine.DoesNotExist:
-                raise Http404
-        else:
-            raise Http404
-
-        imagr_workflow = machine.imagr_workflow
-        #imagr_target = machine.imagr_target
-
-        error = None
-        workflows = {}
-        imagr_config_plist = ""
-
-        if IMAGR_CONFIG_URL:
-            try:
-                config = urllib.urlopen(IMAGR_CONFIG_URL)
-                imagr_config_plist = config.read()
-                imagr_config_plist = plistlib.readPlistFromString(imagr_config_plist)
-            except:
-                error = "Can't reach server!"
-        else:
-            error = "Imagr URL not defined!"
-
-        c = RequestContext(request,{'imagr_workflow': imagr_workflow,
-                                   #'imagr_target': imagr_target,
-                                   'workflows': workflows,
-                                   'error': error,
-                                   'imagr_config_plist': imagr_config_plist,
-                                   'machine_serial': serial,
-                                   'page': 'reports'})
-
-        c.update(csrf(request))
-        return render_to_response('reports/staging.html', c)
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
+def imagr(request, serial):
+    return
+
 def raw(request, serial):
     machine = None
     if serial:
@@ -484,38 +417,7 @@ def raw(request, serial):
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
-def imagr(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
 
-    imagr_infos = {}
-    if machine.imagr_workflow:
-        imagr_infos["workflow"] = machine.imagr_workflow
-    imagr_infos["target"] = "firstDisk"
-    #imagr_infos["target"] = machine.imagr_target
-
-    return HttpResponse(plistlib.writePlistToString(imagr_infos),
-        content_type='text/plain')
-
-def getname(request, serial):
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            return HttpResponse("none",
-                content_type='text/plain')
-    else:
-        raise Http404
-
-    return HttpResponse(machine.hostname,
-        content_type='text/plain')
 
 def estimate_manufactured_date(serial):
     """Estimates the week the machine was manfactured based off it's serial

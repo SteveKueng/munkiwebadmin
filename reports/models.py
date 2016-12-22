@@ -30,10 +30,6 @@ class Machine(models.Model):
     cpu_arch = models.CharField(max_length=32, blank=True)
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
-    imagr_workflow = models.CharField(max_length=128, blank=True)
-    imagr_status = models.CharField(max_length=128, blank=True)
-    imagr_message = models.CharField(max_length=256, blank=True)
-    #imagr_target = models.CharField(max_length=128, blank=True)
 
     def console_user(self):
         obj = MunkiReport.objects.get(machine=self)
