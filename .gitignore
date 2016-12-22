@@ -20,3 +20,4 @@ preferences.plist
 
 # ignore webconfig
 Web.config
+*.log
