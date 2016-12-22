@@ -595,8 +595,7 @@ def db_api(request, kind, serial_number=None):
                     report.errors = 1
                     report.warnings = 0
                 
-                print report.runtype
-                report.timestamp = datetime.now()
+                report.timestamp = datetime.datetime.now()
                 machine.save()
                 report.save()
                 return HttpResponse(status=204)
