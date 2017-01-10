@@ -68,170 +68,180 @@ if PROXY_ADDRESS:
 @permission_required('reports.can_view_reports', login_url='/login/')
 def index(request, computer_serial=None):
     '''Returns computer list or detail'''
-    if computer_serial and request.is_ajax():
-        # return manifest detail
-        if request.method == 'GET':
-            LOGGER.debug("Got read request for %s", computer_serial)
-            machine = None
-            try:
-                machine = Machine.objects.get(serial_number=computer_serial)
-            except Machine.DoesNotExist, err:
+    if request.is_ajax():
+        if computer_serial:
+            # return manifest detail
+            if request.method == 'GET':
+                LOGGER.debug("Got read request for %s", computer_serial)
+                machine = None
+                try:
+                    machine = Machine.objects.get(serial_number=computer_serial)
+                except Machine.DoesNotExist, err:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': str(type(err)),
+                                    'detail': str(err)}),
+                        content_type='application/json', status=404)
+
+                if machine:
+                    try:
+                        report = MunkiReport.objects.get(machine=machine)
+                        report_plist = report.get_report()
+                    except MunkiReport.DoesNotExist:
+                        report_plist = None
+                        pass
+
+                if report_plist:
+                    time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
+                    time = time[3:].split(':')
+
+                    disksPreList = []
+                    disksList = []
+                    counter = 0
+                    # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
+                    for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                        if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
+                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
+                        else:
+                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                        partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                        # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
+                        for p in disksPreList:
+                            if p == deviceName:
+                                counter = counter + 1
+                        if counter == 0:
+                            disksPreList.append(deviceName)
+                        counter = 0
+
+                    diskInfoDict = {}
+                    partitionsList = []
+                    partitionsAttributesDict = {}
+                    partitionDict = {}
+                    diskSize = 0
+
+                    #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
+                    for i in disksPreList:
+                        for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                            # Reading Name of disk inside the partition-information
+                            if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
+                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
+                            else:
+                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                            partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                            # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
+                            if diskName == i:
+                                # Reading partition information from system_profiler
+                                partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
+                                # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
+                                partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                                partitionDict['partitionName'] = partitionName
+                                partitionDict['partitionAtributes'] = partitionsAttributesDict
+                                partitionsList.append(partitionDict)
+                                partitionDict = {}
+                                # Calculate the diskSize by adding every parttion-size to diskSize
+                                diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
+                                diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].get("physical_drive", None)
+                        diskInfoDict['partitions'] = partitionsList
+                        partitionsList = []
+                        diskInfoDict['diskName'] = i
+                        diskInfoDict['diskSize'] = diskSize
+                        disksList.append(diskInfoDict)
+                        diskSize = 0
+                        partitionsDict = {}
+                        diskInfoDict = {}
+
+                    context = {'machine': machine,
+                            'report_plist': report_plist,
+                            'disksList': disksList,
+                            'time': time,
+                            }
+                else:
+                    context = {'machine': machine,
+                        'report_plist': report_plist,
+                        }
+                return render(request, 'reports/detail.html', context=context)
+
+            if request.method == 'POST':
                 return HttpResponse(
                     json.dumps({'result': 'failed',
-                                'exception_type': str(type(err)),
-                                'detail': str(err)}),
+                                'exception_type': 'MethodNotSupported',
+                                'detail': 'POST/PUT/DELETE should use the API'}),
                     content_type='application/json', status=404)
 
-            if machine:
-                try:
-                    report = MunkiReport.objects.get(machine=machine)
-                    report_plist = report.get_report()
-                except MunkiReport.DoesNotExist:
-                    report_plist = None
-                    pass
+        # return list of available computers
+        LOGGER.debug("Got index request for computers")
 
-            if report_plist:
-                time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
-                time = time[3:].split(':')
+        show = request.GET.get('show', None)
+        hardware = request.GET.get('hardware', None)
+        os_version = request.GET.get('os_version', None)
+        model = request.GET.get('model', None)
+        businessunit = request.GET.get('businessunit', None)
+        unknown = request.GET.get('unknown', None)
 
-                disksPreList = []
-                disksList = []
-                counter = 0
-                # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
-                for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                    deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
-                    partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                    # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
-                    for p in disksPreList:
-                        if p == deviceName:
-                            counter = counter + 1
-                    if counter == 0:
-                        disksPreList.append(deviceName)
-                    counter = 0
-
-                diskInfoDict = {}
-                partitionsList = []
-                partitionsAttributesDict = {}
-                partitionDict = {}
-                diskSize = 0
-
-                #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
-                for i in disksPreList:
-                    for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                        # Reading Name of disk inside the partition-information
-                        diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.device_name
-                        partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                        # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
-                        if diskName == i:
-                            # Reading partition information from system_profiler
-                            partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
-                            # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
-                            partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
-                            partitionDict['partitionName'] = partitionName
-                            partitionDict['partitionAtributes'] = partitionsAttributesDict
-                            partitionsList.append(partitionDict)
-                            partitionDict = {}
-                            # Calculate the diskSize by adding every parttion-size to diskSize
-                            diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
-                            diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive
-                    diskInfoDict['partitions'] = partitionsList
-                    partitionsList = []
-                    diskInfoDict['diskName'] = i
-                    diskInfoDict['diskSize'] = diskSize
-                    disksList.append(diskInfoDict)
-                    diskSize = 0
-                    partitionsDict = {}
-                    diskInfoDict = {}
-
-                context = {'machine': machine,
-                           'report_plist': report_plist,
-                           'disksList': disksList,
-                           'time': time,
-                           }
+        if BUSINESS_UNITS_ENABLED:
+            business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
+            if unknown:
+                reports = Machine.objects.filter(businessunit__isnull=True)
             else:
-                context = {'machine': machine,
-                       'report_plist': report_plist,
-                       }
-            return render(request, 'reports/detail.html', context=context)
-
-        if request.method == 'POST':
-            return HttpResponse(
-                json.dumps({'result': 'failed',
-                            'exception_type': 'MethodNotSupported',
-                            'detail': 'POST/PUT/DELETE should use the API'}),
-                content_type='application/json', status=404)
-
-    # return list of available computers
-    LOGGER.debug("Got index request for computers")
-
-    show = request.GET.get('show', None)
-    hardware = request.GET.get('hardware', None)
-    os_version = request.GET.get('os_version', None)
-    model = request.GET.get('model', None)
-    businessunit = request.GET.get('businessunit', None)
-    unknown = request.GET.get('unknown', None)
-
-    if BUSINESS_UNITS_ENABLED:
-        business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-        if unknown:
-            reports = Machine.objects.filter(businessunit__isnull=True)
+                reports = Machine.objects.filter(businessunit__exact=business_units)
         else:
-            reports = Machine.objects.filter(businessunit__exact=business_units)
-    else:
-        reports = Machine.objects.all()
+            reports = Machine.objects.all()
 
-    if show is not None:
-        now = datetime.now()
-        hour_ago = now - timedelta(hours=1)
-        today = date.today()
-        tomorrow = today + timedelta(days=1)
-        week_ago = today - timedelta(days=7)
-        month_ago = today - timedelta(days=30)
-        three_months_ago = today - timedelta(days=90)
+        if show is not None:
+            now = datetime.now()
+            hour_ago = now - timedelta(hours=1)
+            today = date.today()
+            tomorrow = today + timedelta(days=1)
+            week_ago = today - timedelta(days=7)
+            month_ago = today - timedelta(days=30)
+            three_months_ago = today - timedelta(days=90)
 
-        if show == 'errors':
-            reports = reports.filter(munkireport__errors__gt=0)
-        elif show == 'warnings':
-            reports = reports.filter(munkireport__warnings__gt=0)
-        elif show == 'activity':
-            reports = reports.filter(munkireport__activity__isnull=False)
-        elif show == 'hour':
-            reports = reports.filter(report_time__gte=hour_ago)
-        elif show == 'today':
-            reports = reports.filter(report_time__gte=today)
-        elif show == 'week':
-            reports = reports.filter(report_time__gte=week_ago)
-        elif show == 'month':
-            reports = reports.filter(report_time__gte=month_ago)
-        elif show == 'notweek':
-            reports = reports.filter(report_time__range=(month_ago, week_ago))
-        elif show == 'notmonth':
-            reports = reports.filter(report_time__range=(three_months_ago,month_ago))
-        elif show == 'notquarter':
-            reports = reports.exclude(report_time__gte=three_months_ago)
+            if show == 'errors':
+                reports = reports.filter(munkireport__errors__gt=0)
+            elif show == 'warnings':
+                reports = reports.filter(munkireport__warnings__gt=0)
+            elif show == 'activity':
+                reports = reports.filter(munkireport__activity__isnull=False)
+            elif show == 'hour':
+                reports = reports.filter(report_time__gte=hour_ago)
+            elif show == 'today':
+                reports = reports.filter(report_time__gte=today)
+            elif show == 'week':
+                reports = reports.filter(report_time__gte=week_ago)
+            elif show == 'month':
+                reports = reports.filter(report_time__gte=month_ago)
+            elif show == 'notweek':
+                reports = reports.filter(report_time__range=(month_ago, week_ago))
+            elif show == 'notmonth':
+                reports = reports.filter(report_time__range=(three_months_ago,month_ago))
+            elif show == 'notquarter':
+                reports = reports.exclude(report_time__gte=three_months_ago)
 
-    if hardware:
-        if hardware == 'macbook':
-            reports = reports.filter(machine_model__startswith="MacBook")
-        elif hardware == 'mac':
-            reports = reports.exclude(machine_model__startswith="MacBook")
-            reports = reports.exclude(machine_model__startswith="VMware")
-        elif hardware == 'vm':
-            reports = reports.filter(machine_model__startswith="VMware")
+        if hardware:
+            if hardware == 'macbook':
+                reports = reports.filter(machine_model__startswith="MacBook")
+            elif hardware == 'mac':
+                reports = reports.exclude(machine_model__startswith="MacBook")
+                reports = reports.exclude(machine_model__startswith="VMware")
+            elif hardware == 'vm':
+                reports = reports.filter(machine_model__startswith="VMware")
 
-    if os_version:
-        reports = reports.filter(os_version__exact=os_version)
+        if os_version:
+            reports = reports.filter(os_version__exact=os_version)
 
-    if model:
-        reports = reports.filter(machine_model__exact=model)
+        if model:
+            reports = reports.filter(machine_model__exact=model)
 
-    if businessunit:
-        reports = reports.filter(businessunit__exact=businessunit)
+        if businessunit:
+            reports = reports.filter(businessunit__exact=businessunit)
 
-    context = {'reports': reports,
-                'user': request.user,
-                'page': 'reports',}
-    return render(request, 'reports/clienttable.html', context=context)
+        context = {'reports': reports,}
+        return render(request, 'reports/clienttable.html', context=context)
+    
+    # no ajax
+    context = {'user': request.user,
+    'page': 'reports',}
+    return render(request, 'reports/index.html', context=context)
 
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
