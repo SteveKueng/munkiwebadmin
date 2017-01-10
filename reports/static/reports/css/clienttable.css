@@ -41,10 +41,16 @@
   margin-bottom: 5px;
   background-color: #eeeeee;
   text-align: center;
+  box-sizing: border-box;
+  border: solid 1px #eeeeee;
 }
 
 .grid li:hover, .list li:hover {
   background-color: #e5e5e5;
+}
+
+.grid li:hover {
+  border: solid 1px #d9d9d9;
 }
 
 .grid li .detail {
