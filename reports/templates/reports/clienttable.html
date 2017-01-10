@@ -2,7 +2,7 @@
 
 {% block extra_style %}
 {% load static %}
-<link href="{% get_static_prefix %}reports/css/clienttable.css" rel="stylesheet">
+
 {% endblock %}
 
 {% block java_script %}
@@ -11,12 +11,24 @@
 {% endblock java_script %}
 
 {% block content %}
-{% if reports|length %}
 <div class="btn-group" role="group">
+  <button class="btn btn-default">Mac</button>
+  <button class="btn btn-default">MacBook</button>
+  <button class="btn btn-default">VM</button>
+</div>
+
+<div class="btn-group" role="group">
+  <button class="btn btn-default">Errors</button>
+  <button class="btn btn-default">Warnings</button>
+  <button class="btn btn-default">Acrive</button>
+</div>
+
+<div class="btn-group pull-right" role="group">
   <button class="grid grid_list btn btn-default active"><i class="fa fa-th" aria-hidden="true"></i></button>
   <button class="list grid_list btn btn-default"><i class="fa fa-list" aria-hidden="true"></i></button>
 </div>
 
+{% if reports|length %}
 <div class="row-fluid">
 		<ul id="deviceList" class="grid">
 			{% for report in reports %}

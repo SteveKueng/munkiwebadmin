@@ -164,21 +164,17 @@ def index(request, computer_serial=None):
     # return list of available computers
     LOGGER.debug("Got index request for computers")
 
-    show = request.GET.get('show')
-    os_version = request.GET.get('os_version')
-    model = request.GET.get('model')
-    nameFilter = request.GET.get('nameFilter')
-    typeFilter = request.GET.get('typeFilter')
-    businessunit = request.GET.get('businessunit')
-    unknown = request.GET.get('unknown')
-
-    subpage = ""
+    show = request.GET.get('show', None)
+    hardware = request.GET.get('hardware', None)
+    os_version = request.GET.get('os_version', None)
+    model = request.GET.get('model', None)
+    businessunit = request.GET.get('businessunit', None)
+    unknown = request.GET.get('unknown', None)
 
     if BUSINESS_UNITS_ENABLED:
         business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
         if unknown:
             reports = Machine.objects.filter(businessunit__isnull=True)
-            subpage = "unknown"
         else:
             reports = Machine.objects.filter(businessunit__exact=business_units)
     else:
@@ -208,48 +204,33 @@ def index(request, computer_serial=None):
         elif show == 'month':
             reports = reports.filter(report_time__gte=month_ago)
         elif show == 'notweek':
-            reports = reports.filter(
-                report_time__range=(month_ago, week_ago))
+            reports = reports.filter(report_time__range=(month_ago, week_ago))
         elif show == 'notmonth':
-            reports = reports.filter(
-                report_time__range=(three_months_ago,
-                                                   month_ago))
+            reports = reports.filter(report_time__range=(three_months_ago,month_ago))
         elif show == 'notquarter':
             reports = reports.exclude(report_time__gte=three_months_ago)
-        elif show == 'macbook':
+
+    if hardware:
+        if hardware == 'macbook':
             reports = reports.filter(machine_model__startswith="MacBook")
-            subpage = "macbook"
-        elif show == 'mac':
+        elif hardware == 'mac':
             reports = reports.exclude(machine_model__startswith="MacBook")
             reports = reports.exclude(machine_model__startswith="VMware")
-            subpage = "mac"
-        elif show == 'vm':
+        elif hardware == 'vm':
             reports = reports.filter(machine_model__startswith="VMware")
-            subpage = "vm"
 
-    if not subpage:
-        subpage = "reports"
-
-    if os_version is not None:
+    if os_version:
         reports = reports.filter(os_version__exact=os_version)
 
-    if model is not None:
+    if model:
         reports = reports.filter(machine_model__exact=model)
 
-    if nameFilter is not None:
-        reports = reports.filter(hostname__startswith=nameFilter)
-
-    if typeFilter is not None and model is None:
-        reports = reports.filter(machine_model__contains=typeFilter)
-
-    if businessunit is not None:
+    if businessunit:
         reports = reports.filter(businessunit__exact=businessunit)
-        subpage = businessunit
 
     context = {'reports': reports,
                 'user': request.user,
-                'page': 'reports',
-                'subpage': subpage,}
+                'page': 'reports',}
     return render(request, 'reports/clienttable.html', context=context)
 
 @login_required
