@@ -11,10 +11,11 @@
 
     {% load static %}
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/bootstrap.min.css' type="text/css" media="all" />
+    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/srg-bootstrap.css' type="text/css" media="all" />
+   
 
-    <!-- MetisMenu CSS -->
-    <link href="{% get_static_prefix %}css/metisMenu/metisMenu.min.css" rel="stylesheet">
+    <!-- MetisMenu CSS 
+    <link href="{% get_static_prefix %}css/metisMenu/metisMenu.min.css" rel="stylesheet">-->
 
     <!-- Custom CSS -->
     <link href="{% get_static_prefix %}css/sb-admin-2/sb-admin-2.css" rel="stylesheet">
@@ -71,7 +72,9 @@
               <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span> {{APPNAME}}</a>
           </div>
           <!-- /.navbar-header -->
-          <ul class="nav navbar-top-links navbar-right">
+          <div id="navbar" class="collapse navbar-collapse">
+        
+          <ul class="nav navbar-nav navbar-right">
               <!-- /.dropdown -->
               <li class="dropdown">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -229,20 +232,22 @@
                 </ul>
                 <!-- /.dropdown-user -->
               </li>
-              <li>
-                <img alt="Embedded Image" src="{{ userImage }}" class="img-circle" height="40" />
+              <li><a>
+                <img alt="Embedded Image" src="{{ userImage }}" class="img-circle" height="3" />
+                </a>
               </li>
               <!-- /.dropdown -->
           </ul>
+          </div>
           <!-- /.navbar-top-links -->
 
           <div class="navbar-default sidebar" role="navigation">
-              <div class="sidebar-nav navbar-collapse">
+              
                   <ul class="nav" id="side-menu">
                       <li class="sidebar-search">
                         <div class="left-inner-addon">
                             <span class="icon-addon">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                <i class="fa fa-search" aria-hidden="true"></i>
                             </span>
                             <input type="search" class="form-control" id="listSearchField" placeholder="Search" value="{{search}}">
                         </div>
@@ -299,9 +304,10 @@
                       </li>
                       {% endif %}
                   </ul>
-              </div>
+              
               <!-- /.sidebar-collapse -->
           </div>
+          
           <!-- /.navbar-static-side -->
       </nav>
       {% endblock %}

@@ -14,15 +14,8 @@
   background-color:#f9f9f9;
 }
 
-.list li:first-child  {
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-}
-
 .list li:last-child  {
   border-bottom: 1px solid #CCC;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
 }
 
 .list li img {
@@ -40,17 +33,18 @@
 
 .grid li {
   float: left;
-  border: 1px solid rgb(231, 231, 231);
   padding-top: 20px;
   padding-bottom: 20px;
   padding-left: 10px;
   padding-right: 10px;
-  background-color: #f8f8f8;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  background-color: #eeeeee;
   text-align: center;
 }
 
 .grid li:hover, .list li:hover {
-  background-color: #f1f1f1;
+  background-color: #e5e5e5;
 }
 
 .grid li .detail {

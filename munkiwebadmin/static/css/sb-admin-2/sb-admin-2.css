@@ -5,7 +5,6 @@
  */
 
 body {
-    background-color: #f8f8f8;
     padding-top: 100px;
 }
 
@@ -16,7 +15,7 @@ body {
 #page-wrapper {
     padding: 15px;
     min-height: 568px;
-    background-color: #fff;
+    background-color: transparent;
 }
 
 @media(min-width:768px) {
@@ -28,7 +27,7 @@ body {
         position: inherit;
         margin: 0 0 0 250px;
         padding: 15px;
-        border-left: 1px solid #e7e7e7;
+        background-color: transparent;
     }
 }
 
@@ -90,6 +89,15 @@ body {
     left: auto;
 }
 
+.sidebar li a {
+    color: #ddd;
+}
+
+.sidebar li a:hover {
+    background-color: #f8f8f8;
+    color: rgb(175,0,29);
+}
+
 .sidebar .sidebar-nav.navbar-collapse {
     padding-right: 0;
     padding-left: 0;
@@ -100,11 +108,10 @@ body {
 }
 
 .sidebar ul li {
-    border-bottom: 1px solid #e7e7e7;
+    
 }
 
 .sidebar ul li a.active {
-    background-color: #eee;
 }
 
 .sidebar .arrow {
@@ -135,9 +142,10 @@ body {
 @media(min-width:768px) {
     .sidebar {
         z-index: 1;
-        position: absolute;
+        position: inherit;
         width: 250px;
-        margin-top: 51px;
+        box-sizing: border-box;
+        min-height: 100%;
     }
 
     .navbar-top-links .dropdown-messages,
@@ -293,7 +301,7 @@ table.dataTable thead .sorting:after {
     padding-top: 10px;
     padding-bottom: 10px;
     border: 1px solid #ddd;
-    background-color: #eee!important;
+    
 }
 
 .show-grid {
@@ -374,4 +382,8 @@ table.dataTable thead .sorting:after {
 .modal-header {
   border-bottom: none;
   padding-bottom: 0px;
+}
+
+#sidebar-fill {
+    height: 500px;
 }
