@@ -22,3 +22,4 @@ preferences.plist
 Web.config
 
 config.codekit3
+*.log
