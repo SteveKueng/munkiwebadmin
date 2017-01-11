@@ -431,7 +431,6 @@ function getItemsToSave(listid) {
 }
 
 function getClientTable(filter) {
-    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
     showProgressBar();
     var manifestItemURL = '/reports/?'+filter;
     $.ajax({
@@ -473,7 +472,8 @@ function getClientTable(filter) {
 }
 
 function showProgressBar() {
-     $("#site-loading-bar").fadeIn(1);
+    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
+    $("#site-loading-bar").fadeIn(1);
 }
 
 function hideProgressBar() {
