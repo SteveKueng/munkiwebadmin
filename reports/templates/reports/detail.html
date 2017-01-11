@@ -20,7 +20,7 @@
 				      {{ machine.machine_model }}
 				    {% endif %}
 				    {% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
-				    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}', '{{manifest_name}}');"><span class="glyphicon glyphicon-trash"></span></a>
+				    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}', '{{manifest_name}}');"><i class="fa fa-trash" aria-hidden="true"></i></a>
 				    {% endif %}
 				    </small></h4>
 				  </div>
@@ -43,7 +43,7 @@
 				  <div class="tab-content" id="detail_content">
 						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="overflow-x:auto; height:100%;">
 							<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
-							<div class="container-fluid" id="SoftwareView">
+							<div class="panel-body" id="SoftwareView">
 								<!-- Manifests / Catalog -->
 								<div class="row">
 									<!-- Manifests -->
@@ -69,6 +69,7 @@
 							</div>
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
+						<div class="panel-body">
 							<table class="table table-striped">
     						<tbody>
 									{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
@@ -80,17 +81,18 @@
 								</tbody>
 							</table>
 						</div>
+					</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="System">
 							<div class="panel-body">
 							{% if report_plist %}
-							<h3>Basic</h3>
+							<h4>Basic</h4>
 							<div class="row">
 								<div class="col-lg-6">
 									<ul class="list-group">
 										<li class="list-group-item"><b>Last-User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
 										<li class="list-group-item"><b>Munki-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
 										<li class="list-group-item"><b>OS-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
-										<li class="list-group-item"><b>Boot-Volume</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
+										<li class="list-group-item"><b>Boot-Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
 										<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
 										<script>
 											$('#osversion').popover();
@@ -106,7 +108,7 @@
 									</ul>
 											</div>
 										</div>
-								<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h3></a>Drives</h3>
+								<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
 							<ul class="list-group">
 									{% for device in disksList %}
 		  					<li class="list-group-item">
@@ -163,7 +165,7 @@
 								</li>
 								{% endfor %}
 							</ul>
-							<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h3></a>Graphics</h3>
+							<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Graphics</h4>
 							<ul class="list-group">
 									{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
 		  					<li class="list-group-item">
@@ -249,7 +251,11 @@
 						</div>
 					</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
-						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">Staging</div>
+						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
+							<div class="panel-body">
+							<h4>Staging</h4>
+							</div>
+						</div>
 				  </div>
 				</div>
 

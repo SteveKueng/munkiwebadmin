@@ -143,9 +143,18 @@ function getComputerItem(pathname) {
         event.preventDefault();
         return;
     }
-	$("#loadingModal").modal("show");
+    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
+    showProgressBar();
     var manifestItemURL = '/reports/' + pathname;
     $.ajax({
+        xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.addEventListener("progress", function(e) {
+                    var pro = (e.loaded / e.total) * 100;
+                    $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
+                }, false);
+                return xhr;
+            },
         method: 'GET',
         url: manifestItemURL,
         timeout: 10000,
@@ -165,7 +174,7 @@ function getComputerItem(pathname) {
                 do_resize();              
                 $("#computerDetails").modal("show");
             }
-            $("#loadingModal").modal("hide");
+            hideProgressBar();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -183,7 +192,7 @@ function getComputerItem(pathname) {
              }
              $("#errorModalDetailText").text(errorThrown);
              $("#errorModal").modal("show");
-						 $("#loadingModal").modal("hide");
+			hideProgressBar();
         },
         dataType: 'html'
     })
@@ -255,13 +264,13 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
     });
-    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style='padding-top: 1px !important; padding-bottom: 1px !important;'><input type='text' onkeypress='saveList(this, \""+listid+"\", event)'></li>" );
+    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style=''><input type='text' class='form-control' onkeypress='saveList(this, \""+listid+"\", event)'></li>" );
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root well" id="'+listid+'"><p class="list-group-item" id="addItem" style="padding-top: 1px !important; padding-bottom: 2px !important;"><input type="text" onkeypress="saveList(this, listid, event)"></p></div>' );
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root" id="'+listid+'"><p class="list-group-item" id="addItem" style=";"><input type="text" class="form-control" onkeypress="saveList(this, listid, event)"></p></div>' );
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -422,19 +431,28 @@ function getItemsToSave(listid) {
 }
 
 function getClientTable(filter) {
-    $("#loadingModal").modal("show");
+    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
+    showProgressBar();
     var manifestItemURL = '/reports/?'+filter;
     $.ajax({
+        xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.addEventListener("progress", function(e) {
+                    var pro = (e.loaded / e.total) * 100;
+                    $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
+                }, false);
+                return xhr;
+            },
         method: 'GET',
         url: manifestItemURL,
         timeout: 10000,
         cache: false,
         success: function(data) {
             $('#clienttable').html(data);
-            $("#loadingModal").modal("hide");
+            hideProgressBar();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#clienttable').html("")
+            $('#clienttable').html("");
             $("#errorModalTitleText").text("computer list read error");
              try {
                  var json_data = $.parseJSON(jqXHR.responseText)
@@ -448,8 +466,16 @@ function getClientTable(filter) {
              }
              $("#errorModalDetailText").text(errorThrown);
              $("#errorModal").modal("show");
-			 $("#loadingModal").modal("hide");
+                hideProgressBar();
         },
         dataType: 'html'
     })
+}
+
+function showProgressBar() {
+     $("#site-loading-bar").fadeIn(1);
+}
+
+function hideProgressBar() {
+     $("#site-loading-bar").fadeOut(1000);
 }
