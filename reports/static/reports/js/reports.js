@@ -60,6 +60,7 @@ $(document).on('click','.filterDevices', function (e) {
     } else {
         $(".filterDevices").removeClass('active')
         if($(this).hasClass('vm')) {
+            //window.location.assign('?hardware=vm');
             getClientTable("hardware=vm");
             $(this).addClass('active');
         }

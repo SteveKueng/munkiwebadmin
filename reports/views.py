@@ -239,7 +239,7 @@ def index(request, computer_serial=None):
         return render(request, 'reports/clienttable.html', context=context)
     
     # no ajax
-    context = {'user': request.user,
+    context = {'filterDevices': request.GET.urlencode(),
     'page': 'reports',}
     return render(request, 'reports/index.html', context=context)
 

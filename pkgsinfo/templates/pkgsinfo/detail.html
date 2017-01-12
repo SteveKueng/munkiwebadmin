@@ -8,8 +8,7 @@
           <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()" style="margin-top:-40px;">Delete</button>
           {% endif %}
       </div>
-      <div role="tabpanel" class="modal-body" style="padding:10px;">
-        <!-- Nav tabs -->
+      <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist" id="editortabs">
           <li role="presentation" class="active">
             <a href="#basicstab" aria-controls="basicstab" role="tab" data-toggle="tab">Basics</a>
@@ -21,6 +20,7 @@
             <a href="#plisttab" aria-controls="plisttab" role="tab" data-toggle="tab">plist</a>
           </li>
         </ul>
+      <div role="tabpanel" class="modal-body" >
         <!-- Tab panes -->
         <div class="tab-content" id="item_editor">
           <div role="tabpanel" class="tab-pane active" id="basicstab">
@@ -43,7 +43,7 @@
         {% endif %}
         <div class='pull-right' id='cancel'>
         {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-          <button type="button" class="btn" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
         </div>
 
       </div>

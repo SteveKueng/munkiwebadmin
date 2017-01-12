@@ -142,7 +142,7 @@
         var appender = $('<div>', { 'class': 'item appender' }),
            // btn     = $('<button />', { 'class': 'btn btn-success btn-xs' }),
             //span    = $('<span>', { 'class': 'glyphicon glyphicon-plus' })
-            btn = $('<span>', { 'class': 'glyphicon glyphicon-plus-sign' })
+            btn = $('<i>', { 'class': 'fa fa-plus-circle' })
         //btn.text('Add New Value');
         //btn.append(span);
         btn.click(handler);
@@ -153,8 +153,8 @@
     function rowControls(opt) {
         var _rowControls = $('<td>', 
                              {'class': 'row-controls', 'width': '20px'}),
-            del_btn = $('<span>',
-                        {'class': 'row_del_btn glyphicon glyphicon-remove-circle'});
+            del_btn = $('<i>',
+                        {'class': 'row_del_btn fa fa-minus-circle'});
 
         _rowControls.append(del_btn);
         del_btn.click(deleteRow(opt));
@@ -316,8 +316,8 @@
                 var tableRow = $('<tr>', {'data-path': dataPath});
                 var rowHeader = $('<th>',
                                   {'scope': 'row'});
-                var grabber = $('<span>',
-                                {'class': 'grabber glyphicon glyphicon-menu-hamburger',
+                var grabber = $('<i>',
+                                {'class': 'grabber fa fa-bars',
                                  'aria-hidden': 'true'});
                 var rowValue = $('<td>', 
                                  {'data-type': getType(obj[i]), 

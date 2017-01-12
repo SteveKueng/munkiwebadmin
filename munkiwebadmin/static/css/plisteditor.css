@@ -40,11 +40,6 @@
 
 .plist-editor td.expanded > div.appender {
   display: initial;
-  visibility: hidden;
-}
-
-.plist-editor td.expanded:hover > div.appender {
-  visibility: visible;
 }
 
 .plist-editor td.expanded > table {
@@ -52,15 +47,10 @@
 }
 
 .plist-editor tr > th > span.grabber {
-    visibility: hidden;
     position: relative;
     top: 10px;
     color: #999999;
     width: 9px;
-}
-
-.plist-editor tr:hover > th > span.grabber {
-    visibility: visible;
 }
 
 .plist-editor td.row-controls {
@@ -78,14 +68,8 @@
 
 .plist-editor tr > td.row-controls button,
 .plist-editor tr > td.row-controls span {
-    visibility: hidden;
     position: relative;
     left: -2px;
-}
-
-.plist-editor tr:hover > td.row-controls button,
-.plist-editor tr:hover > td.row-controls span.row_del_btn {
-    visibility: visible;
 }
 
 .plist-editor td > .expander {
@@ -133,4 +117,8 @@ textarea#plist  {
     border-style: none none none solid;
     border-color: #DDD;
     font-family: Courier, monospace;
+}
+
+grabber {
+  vertical-align: middle;
 }

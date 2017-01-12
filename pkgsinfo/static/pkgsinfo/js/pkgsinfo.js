@@ -240,8 +240,8 @@ function initPkginfoTable() {
          "bPaginate": false,
          //"scrollY": "100vh",
          "bInfo": false,
+         "autoWidth": false,
          "bFilter": true,
-         "autoWidth": true,
          "bStateSave": false,
          "aaSorting": [[0,'asc']]
      });

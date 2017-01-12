@@ -12,15 +12,15 @@
 
 {% block content %}
 <div class="btn-group" role="group">
-  <button class="btn btn-default mac filterDevices">Mac</button>
-  <button class="btn btn-default macbook filterDevices">MacBook</button>
-  <button class="btn btn-default vm filterDevices">VM</button>
+  <button class="btn btn-default mac filterDevices {% if 'mac' in filterDevices %}active{% endif %}">Mac</button>
+  <button class="btn btn-default macbook filterDevices {% if 'macbook' in filterDevices %}active{% endif %}">MacBook</button>
+  <button class="btn btn-default vm filterDevices {% if 'vm' in filterDevices %}active{% endif %}">VM</button>
 </div>
 
 <div class="btn-group" role="group">
-  <button class="btn btn-default">Errors</button>
-  <button class="btn btn-default">Warnings</button>
-  <button class="btn btn-default">Acrive</button>
+  <button class="btn btn-default {% if 'errors' in filterDevices %}active{% endif %}">Errors</button>
+  <button class="btn btn-default {% if 'warnings' in filterDevices %}active{% endif %}">Warnings</button>
+  <button class="btn btn-default {% if 'active' in filterDevices %}active{% endif %}">Acrive</button>
 </div>
 
 <div class="btn-group pull-right" role="group">
@@ -30,7 +30,7 @@
 
 <div class="row-fluid" id="clienttable">
   <script type='text/javascript'>
-    getClientTable();
+    getClientTable("{{ filterDevices }}");
   </script>
 </div>
 

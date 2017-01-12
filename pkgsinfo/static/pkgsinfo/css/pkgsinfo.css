@@ -1,6 +1,6 @@
 #item_editor,
 #item_list {
-    overflow-y: scroll;
+    
 }
 
 /* fix for DataTables duplicate sorting controls */
@@ -12,10 +12,6 @@
 	list-style: none;
 	padding: 0px;
 	margin: 0px;
-}
-
-#item_list .listborder {
-	border-top: solid 1px #DDD;
 }
 
 /* display script items in a monospaced font */

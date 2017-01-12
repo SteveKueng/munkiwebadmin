@@ -1,7 +1,4 @@
-#item_editor,
-#item_list {
-    overflow-y: scroll;
-}
+
 
 /* fix for DataTables duplicate sorting controls */
 .dataTables_scrollBody thead {

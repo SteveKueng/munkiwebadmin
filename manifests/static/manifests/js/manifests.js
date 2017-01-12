@@ -160,9 +160,10 @@ function initManifestsTable() {
           }],
          "sDom": "<t>",
          "bPaginate": false,
-         "scrollY": '80vh',
+         //"scrollY": '100vh',
          //"bScrollCollapse": true,
          "bInfo": false,
+         "autoWidth": false,
          "bFilter": true,
          "bStateSave": false,
          "aaSorting": [[0,'asc']]
