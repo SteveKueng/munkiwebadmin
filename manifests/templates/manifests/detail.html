@@ -12,7 +12,7 @@
         {% endif %}
         </div>
       </div>
-      <div role="tabpanel" class="modal-body" style="padding:0px;">
+      <div role="tabpanel" class="">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist" id="editortabs">
           <li role="presentation" class="active">
@@ -25,6 +25,7 @@
             <a href="#plisttab" aria-controls="plisttab" role="tab" data-toggle="tab">plist</a>
           </li>
         </ul>
+        <div role="tabpanel" class="modal-body" >
         <!-- Tab panes -->
         <div class="tab-content" id="item_editor">
           <div role="tabpanel" class="tab-pane active" id="basicstab">
@@ -38,6 +39,7 @@
               <div id='plist'>{{ plist_text }}</div>
           </div>
          </div>
+         </div>
       </div>
       <div class="modal-footer">
         {% if perms.manifests.change_manifestfile %}
@@ -48,7 +50,7 @@
         {% endif %}
         <div class='pull-right' id='cancel'>
           {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-          <button type="button" class="btn" onClick="cancelEdit()">Cancel</button>
+          <button type="button" class="btn btn-default" onClick="cancelEdit()">Cancel</button>
         </div>
       </div>
     </div><!-- /.modal-content -->

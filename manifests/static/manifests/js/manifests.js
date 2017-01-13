@@ -421,7 +421,7 @@ function addIncludedManifestLinks(editor) {
             //alert(manifest_path);
             //var link_btn = $('<span>',
             //                 {'class': 'row_link_btn glyphicon glyphicon-circle-arrow-right'});
-            var link_btn = $('<a href="#' + manifest_path + '"><span class="row_link_btn glyphicon glyphicon-circle-arrow-right"/></a>')
+            var link_btn = $('<a href="#' + manifest_path + '"><i class="row_link_btn fa fa-arrow-circle-right"/></a>')
             $(this).append(link_btn);
         });
     });
