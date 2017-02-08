@@ -16,7 +16,7 @@ On OS X (10.7+):
     https://github.com/munki/contrib/raw/master/mwa2_demo.zip
 
 *   Via the command-line, run the script within the expanded zip:
-    `/Users/me/Downloads/mwa2_demo/run_mwa2.sh`
+    `https://github.com/SteveKueng/munki_dev/blob/master/mwa2_demo.zip`
 
 *   Follow the script prompts. Of note, at one place you'll be advised to edit a settings file. Specifically, you'll edit `mwa2/munkiwebadmin/settings.py`. Near the end of this file is this:
 
