@@ -102,6 +102,22 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
   }
 });
 
+$(document).on('click','.list-group-item', function (e) {
+    e.preventDefault()
+    if($(this).hasClass('active')) {
+        removeDeleteButton(this);
+        $(this).removeClass('active');
+    } else {
+        item = $("#SoftwareView").find('.list-group-item')
+        $(item).removeClass('active');
+        removeDeleteButton(item);
+        if(! $(this).is('input')) {
+            addDeleteButton(this);
+            $(this).addClass('active');
+        }
+    }
+});
+
 $(document).ready(function() {
     hash = window.location.hash;
     if (hash.length > 1) {
@@ -125,6 +141,7 @@ $(document).ready(function() {
         }
     });
 });
+
 
 function getDeviceIcon(serial, iconid) {
     var image_url = "https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
@@ -234,7 +251,7 @@ function getManifest(manifest) {
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
             $("#SoftwareView").empty();
-            $(  "#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
+            $("#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
         },
         dataType: 'html'
     });
@@ -263,15 +280,17 @@ function createListElements(elements, listid) {
     //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
-        $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</li>" );
+        $( "#"+listid ).append( "<a class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<li class='list-group-item' id='"+listid+"' style=''><input type='text' class='form-control' onkeypress='saveList(this, \""+listid+"\", event)'></li>" );
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"_input' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+    setupTypeahead();
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root" id="'+listid+'"><p class="list-group-item" id="addItem" style=";"><input type="text" class="form-control" onkeypress="saveList(this, listid, event)"></p></div>' );
+        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root" id="'+listid+'"><p class="list-group-item" id="addItem" style=";"><input type="text" class="form-control" onkeypress="addElementToList(this, listid, event)"></p></div>' );
+        setupTypeahead();
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -381,9 +400,13 @@ function getManifestName() {
     return $("#manifestName").attr('value')
 }
 
+function addElementToList() {
+    if (event.which == '13' && item.value != "") {
+    }
+}
 
 //edit software
-function saveList(item, listid, event) {
+function addElementToList(item, listid, event) {
     if (event.which == '13' && item.value != "") {
         manifest = getManifestName()
         itemValue = item.value
@@ -393,11 +416,7 @@ function saveList(item, listid, event) {
 
         //check if item already in list
         if(jQuery.inArray(itemValue, itemList) == -1) {
-            itemList.push(itemValue)
-
-            //add new item
-            $(item).parent().before("<li class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</li>")
-            item.value = ""
+            itemList.push(itemValue);
 
             itemList = JSON.stringify(itemList);
 
@@ -408,6 +427,9 @@ function saveList(item, listid, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
+                    //add new item
+                    $(item).before("<a class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</a>");
+                    item.value = "";
                     if (listid.indexOf("catalogs") == -1) {
                         getIncludedManifest(itemValue);
                     } else {
@@ -415,12 +437,35 @@ function saveList(item, listid, event) {
                     }
                 },
                 error: function(){
-                    $("#"+listid+"_"+itemValue).remove();
                     alert("could not save "+itemValue+"!");
                 }
             });
         }
     }
+}
+
+function removeElementFromList(item, listid) {
+    manifest = getManifestName();
+    itemValue = $(item).parent().text();
+
+    //get items to save
+    itemList = getItemsToSave(listid);
+    itemList.splice(itemList.indexOf(itemValue), 1);
+    itemList = JSON.stringify(itemList);
+
+    $.ajax({
+        type:"POST",
+        url:"/api/manifests/"+manifest,
+        method: "PATCH",
+        data: '{ "'+[listid]+'": '+itemList+' }',
+        contentType: 'application/json',
+        success: function(data){ 
+            $("#"+listid+"_"+itemValue).remove();
+        },
+        error: function(){
+            alert("could not remove "+item+"!");
+        }
+    });
 }
 
 function getItemsToSave(listid) {
@@ -472,6 +517,14 @@ function getClientTable(filter) {
     })
 }
 
+function addDeleteButton(id) {
+    $(id).append("<i class='row_del_btn fa fa-minus-circle pull-right delete' onclick='removeElementFromList(this, \""+$(id).parent().attr('id')+"\")'></i>");
+}
+
+function removeDeleteButton(id) {
+    $(id).find(".delete").remove();
+}
+
 function showProgressBar() {
     $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
     $("#site-loading-bar").fadeIn(1);
@@ -479,4 +532,18 @@ function showProgressBar() {
 
 function hideProgressBar() {
      $("#site-loading-bar").fadeOut(1000);
+}
+
+function setupTypeahead() {
+    var catalogs = ['Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
+    var manifests = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'];
+    $('#catalogs_input').typeahead({source: catalogs});
+    $('#included_manifests_input').typeahead({
+        source: function (query, process) {
+        return $.get('/api/manifests', { api_fields: "filename" }, function (data) {
+            var json = JSON.parse(data); // string to json
+            return process(json.filename);
+        });
+    }
+    });
 }
