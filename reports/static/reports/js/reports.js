@@ -282,14 +282,14 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<a class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"_input' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
     setupTypeahead();
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append( '<div class="section_label"><h4>'+listid.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+'</h4></div><div class="list-group list-group-root" id="'+listid+'"><p class="list-group-item" id="addItem" style=";"><input type="text" class="form-control" onkeypress="addElementToList(this, listid, event)"></p></div>' );
+        $( "#SoftwareList" ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
         setupTypeahead();
     }
     $.each(elements, function( index, value ) {
@@ -302,7 +302,7 @@ var softwareElementCount = 0
 function createSoftwareElement(element, addTo, require_update) {
         var itemID = element + "_" + softwareElementCount
         var listGroupID = element + "_" + softwareElementCount + "_" + addTo
-        var additionalClass = ""
+        var additionalClass = " "
 
         //item infos
         var display_name = element
@@ -312,10 +312,10 @@ function createSoftwareElement(element, addTo, require_update) {
         if (typeof require_update === 'undefined') {
             require_update = ""
         } else {
-            additionalClass = "manifestObjects"
+            additionalClass += "manifestObjects"
         }
         if (typeof catalogData[element] === 'undefined') {
-            additionalClass = "list-group-item-danger"
+            additionalClass += " list-group-item-danger"
         } else {
             display_name = catalogData[element].display_name
             version = catalogData[element].version
@@ -325,7 +325,7 @@ function createSoftwareElement(element, addTo, require_update) {
             }
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item"+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -400,11 +400,6 @@ function getManifestName() {
     return $("#manifestName").attr('value')
 }
 
-function addElementToList() {
-    if (event.which == '13' && item.value != "") {
-    }
-}
-
 //edit software
 function addElementToList(item, listid, event) {
     if (event.which == '13' && item.value != "") {
@@ -446,7 +441,14 @@ function addElementToList(item, listid, event) {
 
 function removeElementFromList(item, listid) {
     manifest = getManifestName();
-    itemValue = $(item).parent().text();
+
+    itemValue = $(item).parent().attr('id').split(/[_ ]+/).pop()
+    alert(itemValue);
+    if($.isNumeric(itemValue)) {
+        length = $(item).parent().attr('id').split(/[_ ]+/).pop().length
+        itemValue = $(item).parent().attr('id').substring(0, length);
+        alert(itemValue);
+    }
 
     //get items to save
     itemList = getItemsToSave(listid);
@@ -470,8 +472,14 @@ function removeElementFromList(item, listid) {
 
 function getItemsToSave(listid) {
     //get items to save
-    itemList = $('[id^="'+listid+'_"]').map(function() { 
-        return this.id.substring(listid.length + 1); 
+    itemList = $('#'+listid).children('a').map(function() {
+        if(this.id.match("^"+listid)) { 
+            return this.id.substring(listid.length + 1); 
+        } 
+        else {
+            idLength = this.id.length - (this.id.split(/[_ ]+/).pop().length + 1)
+            return this.id.substring(0, idLength);
+        }
     }).get()
     return itemList
 }

@@ -14,7 +14,7 @@ from api.models import FileError, FileWriteError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
-from reports.models import Machine, MunkiReport
+from reports.models import Machine, MunkiReport, ImagrReport
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 import datetime
@@ -508,12 +508,28 @@ def file_api(request, kind, filepath=None):
 def db_api(request, kind, serial_number=None):
     if kind not in ['report', 'inventory']:
         return HttpResponse(status=404)
+
+    response_type = 'json'
+    if request.META.get('HTTP_ACCEPT') == 'application/xml':
+        response_type = 'xml'
+    
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
+
+        filter_terms = request.GET.copy()
+        if '_' in filter_terms.keys():
+            del filter_terms['_']
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields'].split(',')
+            del filter_terms['api_fields']
+        else:
+            api_fields = None
+
+        response = dict()
         if serial_number:
             try:
-                response = serializers.serialize('json', Machine.objects.filter(serial_number=serial_number))
-                return HttpResponse(response, content_type='application/json')
+                item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
+                response = item_list[0]['fields']
             except Machine.DoesNotExist:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
@@ -521,8 +537,19 @@ def db_api(request, kind, serial_number=None):
                                 'detail': '%s does not exist' % serial_number}),
                     content_type='application/json', status=404)
         else:
-            response = serializers.serialize('json', Machine.objects.all())
-            return HttpResponse(response, content_type='application/json')
+            item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
+            for item in item_list:
+                response[item["pk"]] = item['fields']
+
+        if response_type == 'json':
+            response = convert_dates_to_strings(response)
+            return HttpResponse(
+                json.dumps(response) + '\n',
+                content_type='application/json', status=201)
+        else:
+            return HttpResponse(
+                response,
+                content_type='application/xml', status=201)
 
     if request.method == 'POST':
         submit = json.loads(request.body)
@@ -570,17 +597,16 @@ def db_api(request, kind, serial_number=None):
 
                 report.runtype = submit.get('runtype', 'UNKNOWN')
                 
-
-                if submission_type == 'reportimagr':
-                    if submit.get('status'):
-                        machine.imagr_status = submit.get('status')
-                    if submit.get('message'):
-                        machine.imagr_message = submit.get('message')
-
-                    # delete pending workflow if successful ended
-                    if submit.get('status') == 'success':
-                        machine.imagr_workflow = ""
+                if submit.get('imagr_workflow'):
+                    machine.imagr_workflow = submit.get('imagr_workflow')
+                if submit.get('status') and submit.get('message'):
+                    machine.current_status = submit.get('status')
+                    imagrReport = ImagrReport(machine=machine, message=submit.get('message'), status=submit.get('status'))
                     report.runstate = u"imagr"
+                    imagrReport.save()
+                # delete pending workflow if successful ended
+                if submit.get('status') == 'success' or submit.get('status') == 'error':
+                    machine.imagr_workflow = ""
 
                 if submission_type == 'postflight':
                     report.runstate = u"done"
