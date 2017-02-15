@@ -89,10 +89,10 @@
 							<div class="row">
 								<div class="col-lg-6">
 									<ul class="list-group">
-										<li class="list-group-item"><b>Last-User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
-										<li class="list-group-item"><b>Munki-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
-										<li class="list-group-item"><b>OS-Version:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
-										<li class="list-group-item"><b>Boot-Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
+										<li class="list-group-item"><b>Last User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
+										<li class="list-group-item"><b>Munki:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
+										<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
+										<li class="list-group-item"><b>Boot Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
 										<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
 										<script>
 											$('#osversion').popover();
@@ -101,10 +101,10 @@
 								</div>
 								<div class="col-lg-6">
 									<ul class="list-group">
-										<li class="list-group-item"><b>Hardware-Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
-										<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
+										<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
+										<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
 										<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
-										<li class="list-group-item"><b>Physical-Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
+										<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
 									</ul>
 											</div>
 										</div>
@@ -250,30 +250,17 @@
 							{% endif %}
 						</div>
 					</div>
-				    <div role="tabpanel" class="tab-pane tabDetail" id="Inventory">Inventory</div>
-						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
-							<div class="panel-body">
-							<h4>Staging</h4>
-							</div>
+					<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
+						<div class="panel-body">
+						<h4>Staging</h4>
 						</div>
+					</div>
 				  </div>
 				</div>
 
 
 				<div id="data">
 				</div>
-	<!--		<div class="modal-footer">
-				{% if perms.manifests.change_manifestfile %}
-				<div class='pull-right hidden' id='save_and_cancel'>
-					<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
-					<button type="button" class="btn btn-success" onClick="saveManifestItem()">Save</button>
-				</div>
-				{% endif %}
-				<div class='pull-right' id='cancel'>
-					{% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-					<button type="button" class="btn" onClick="cancelEdit()">Cancel</button>
-				</div>
-			</div>-->
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->

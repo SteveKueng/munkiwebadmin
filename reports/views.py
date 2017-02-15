@@ -380,13 +380,6 @@ def getStatus(request):
                     'detail': str(err)}),
         content_type='application/json', status=404)
 
-
-
-@login_required
-@permission_required('reports.can_view_reports', login_url='/login/')
-def imagr(request, serial):
-    return
-
 def raw(request, serial):
     machine = None
     if serial:

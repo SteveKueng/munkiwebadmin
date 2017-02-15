@@ -5,9 +5,9 @@ from django.http import HttpResponse
 from django.http import QueryDict
 from django.http import FileResponse
 from django.core import serializers
-#from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, \
@@ -566,6 +566,8 @@ def db_api(request, kind, serial_number=None):
 
             if machine and report:
                 machine.remote_ip = request.META['REMOTE_ADDR']
+                report.activity = ""
+
                 if 'name' in submit and machine.hostname == '':
                     machine.hostname = submit.get('name')
                 if 'username' in submit:
@@ -617,11 +619,10 @@ def db_api(request, kind, serial_number=None):
 
                 if submission_type == 'report_broken_client':
                     report.runstate = u"broken client"
-                    #report.report = None
                     report.errors = 1
                     report.warnings = 0
                 
-                report.timestamp = datetime.datetime.now()
+                report.timestamp = timezone.now()
                 machine.save()
                 report.save()
                 return HttpResponse(status=204)
