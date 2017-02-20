@@ -31,6 +31,9 @@ ICONS_URL = MEDIA_URL
 # path to the makecatalogs binary
 MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
 
+#imagr server url
+IMAGR_URL = ''
+
 # provide the path to the git binary if you want MunkiWebAdmin to add and commit
 # manifest edits to a git repo
 # if GITPATH is undefined or None MunkiWebAdmin will not attempt to do a git add

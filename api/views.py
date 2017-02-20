@@ -506,7 +506,7 @@ def file_api(request, kind, filepath=None):
 @csrf_exempt
 @logged_in_or_basicauth()
 def db_api(request, kind, serial_number=None):
-    if kind not in ['report', 'inventory']:
+    if kind not in ['report', 'inventory', 'imagr']:
         return HttpResponse(status=404)
 
     response_type = 'json'
@@ -525,11 +525,17 @@ def db_api(request, kind, serial_number=None):
         else:
             api_fields = None
 
-        response = dict()
+        if kind == "report":
+            response = dict()
+        elif kind == "imagr":
+            response = list()
+        
         if serial_number:
             try:
-                item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
-                response = item_list[0]['fields']
+                if kind == "report":
+                    item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
+                elif kind == "imagr":
+                    item_list = serializers.serialize('python', ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
             except Machine.DoesNotExist:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
@@ -537,8 +543,17 @@ def db_api(request, kind, serial_number=None):
                                 'detail': '%s does not exist' % serial_number}),
                     content_type='application/json', status=404)
         else:
-            item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
-            for item in item_list:
+            if kind == "report":
+                item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
+            elif kind == "imagr":
+                item_list = serializers.serialize('python', ImagrReport.objects.all(), fields=(api_fields))
+        
+        for item in item_list:
+            if serial_number == item["pk"]:
+                response = item['fields']
+            elif kind == "imagr":
+                response.append(item['fields'])
+            else:
                 response[item["pk"]] = item['fields']
 
         if response_type == 'json':

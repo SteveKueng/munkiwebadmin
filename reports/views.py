@@ -22,7 +22,6 @@ import base64
 import bz2
 import plistlib
 import re
-import urllib
 import urllib2
 from datetime import datetime, timedelta, date
 from xml.etree import ElementTree
@@ -45,14 +44,14 @@ except:
     BUSINESS_UNITS_ENABLED = False
 
 try:
-    IMAGR_CONFIG_URL = settings.IMAGR_CONFIG_URL
-except:
-    IMAGR_CONFIG_URL = ""
-
-try:
     MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
 except:
     MUNKI_REPO_DIR = False
+
+try:
+    IMAGR_URL = settings.IMAGR_URL
+except:
+    IMAGR_URL = ""
 
 proxies = {
     "http":  PROXY_ADDRESS,
@@ -90,6 +89,16 @@ def index(request, computer_serial=None):
                     except MunkiReport.DoesNotExist:
                         report_plist = None
                         pass
+
+                imagr_plist = None
+                if IMAGR_URL:
+                    try:
+                        config = urllib2.urlopen(IMAGR_URL)
+                    except:
+                        imagr_plist = "Can't reach server!"
+                    else:
+                        plist = config.read()
+                        imagr_plist = plistlib.readPlistFromString(plist)
 
                 if report_plist:
                     time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
@@ -154,11 +163,14 @@ def index(request, computer_serial=None):
                             'report_plist': report_plist,
                             'disksList': disksList,
                             'time': time,
+                            'imagr_plist': imagr_plist,
                             }
                 else:
                     context = {'machine': machine,
                         'report_plist': report_plist,
+                        'imagr_plist': imagr_plist,
                         }
+
                 return render(request, 'reports/detail.html', context=context)
 
             if request.method == 'POST':
@@ -203,19 +215,19 @@ def index(request, computer_serial=None):
             elif show == 'activity':
                 reports = reports.filter(munkireport__activity__isnull=False)
             elif show == 'hour':
-                reports = reports.filter(report_time__gte=hour_ago)
+                reports = reports.filter(munkireport__timestamp__gte=hour_ago)
             elif show == 'today':
-                reports = reports.filter(report_time__gte=today)
+                reports = reports.filter(munkireport__timestamp__gte=today)
             elif show == 'week':
-                reports = reports.filter(report_time__gte=week_ago)
+                reports = reports.filter(munkireport__timestamp__gte=week_ago)
             elif show == 'month':
-                reports = reports.filter(report_time__gte=month_ago)
+                reports = reports.filter(munkireport__timestamp__gte=month_ago)
             elif show == 'notweek':
-                reports = reports.filter(report_time__range=(month_ago, week_ago))
+                reports = reports.filter(munkireport__timestamp__range=(month_ago, week_ago))
             elif show == 'notmonth':
-                reports = reports.filter(report_time__range=(three_months_ago,month_ago))
+                reports = reports.filter(munkireport__timestamp__range=(three_months_ago,month_ago))
             elif show == 'notquarter':
-                reports = reports.exclude(report_time__gte=three_months_ago)
+                reports = reports.exclude(munkireport__timestamp__gte=three_months_ago)
 
         if hardware:
             if hardware == 'macbook':
@@ -257,8 +269,7 @@ def dashboard(request):
     munki = {}
     munki['errors'] = reports.filter(errors__gt=0).count()
     munki['warnings'] = reports.filter(warnings__gt=0).count()
-    munki['activity'] = reports.filter(
-                            activity__isnull=False).count()
+    munki['activity'] = reports.filter(activity__isnull=False).count()
 
     now = datetime.now()
     hour_ago = now - timedelta(hours=1)

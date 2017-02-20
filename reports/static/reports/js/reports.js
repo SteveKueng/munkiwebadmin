@@ -60,16 +60,33 @@ $(document).on('click','.filterDevices', function (e) {
     } else {
         $(".filterDevices").removeClass('active')
         if($(this).hasClass('vm')) {
-            //window.location.assign('?hardware=vm');
+            history.pushState('', '', '?hardware=vm');
             getClientTable("hardware=vm");
             $(this).addClass('active');
         }
         else if ($(this).hasClass('mac')) {
+            history.pushState('', '', '?hardware=mac');
             getClientTable("hardware=mac");
             $(this).addClass('active');
         }
         else if ($(this).hasClass('macbook')) {
+            history.pushState('', '', '?hardware=macbook');
             getClientTable("hardware=macbook");
+            $(this).addClass('active');
+        }
+        else if ($(this).hasClass('warnings')) {
+            history.pushState('', '', '?show=warnings');
+            getClientTable("show=warnings");
+            $(this).addClass('active');
+        }
+        else if ($(this).hasClass('errors')) {
+            history.pushState('', '', '?show=errors');
+            getClientTable("show=errors");
+            $(this).addClass('active');
+        }
+        else if ($(this).hasClass('activity')) {
+            history.pushState('', '', '?show=activity');
+            getClientTable("show=activity");
             $(this).addClass('active');
         }
     }
@@ -178,10 +195,11 @@ function getComputerItem(pathname) {
         timeout: 10000,
         cache: false,
         success: function(data) {
+            // load date
             $('#computer_detail').html(data);
             getManifest(getManifestName());
-          	//  hideSaveOrCancelBtns();
-          	//  detectUnsavedChanges();
+            getImagrReports(pathname);
+
             current_pathname = pathname;
             requested_pathname = "";
 
@@ -554,4 +572,36 @@ function setupTypeahead() {
         });
     }
     });
+}
+
+function getImagrReports(serial) {
+    $('#imagrreports').DataTable( {
+        "sAjaxSource": "/api/imagr/"+serial,
+        "sAjaxDataProp": "",
+        "aoColumns": [
+            { "mDataProp": "date_added", "sWidth": "140px", "mRender": function (data) {
+                var date = new Date(data);
+                var month = date.getMonth() + 1;
+                return date.getDate() + "." + (month.length > 1 ? month : "0" + month) + "." + date.getFullYear() + " - " + date.getHours()+":"+date.getMinutes();
+            }},
+            { "mDataProp": "message" },
+            { "mDataProp": "status", "sWidth": "80px", },
+        ],
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+			if ( aData['status'] == "in_progress" ) {
+				$('td', nRow).addClass('info');
+			} else if ( aData['status'] == "success" ) {
+				$('td', nRow).addClass('success');
+			} else if ( aData['status'] == "error" ) {
+				$('td', nRow).addClass('error');
+			} 
+		},
+        "bAutoWidth": false,
+        "sDom": "<t>",
+         "bPaginate": false,
+         "bInfo": false,
+         "bFilter": true,
+         "bStateSave": false,
+         "aaSorting": [[0,'desc']]
+    } );
 }
