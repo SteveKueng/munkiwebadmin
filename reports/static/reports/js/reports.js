@@ -255,6 +255,7 @@ function getManifest(manifest) {
         method: 'GET',
         url: "/reports/_getManifest/"+manifest,
         timeout: 10000,
+        async: true,
         cache: false,
         success: function(data) {
             $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
@@ -280,6 +281,7 @@ function getIncludedManifest(manifest) {
         method: 'GET',
         url: "/reports/_getManifest/"+manifest,
         timeout: 10000,
+        async: true,
         cache: false,
         success: function(data) {
             loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
@@ -301,14 +303,12 @@ function createListElements(elements, listid) {
         $( "#"+listid ).append( "<a class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
     $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
-    setupTypeahead();
 }
 
 function loopElement(elements, listid, require_update) {
     //alert(JSON.stringify(catalogData))
     if ($("#"+listid ).length < 1){
         $( "#SoftwareList" ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
-        setupTypeahead();
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
@@ -339,7 +339,6 @@ function createSoftwareElement(element, addTo, require_update) {
             version = catalogData[element].version
             if (typeof catalogData[element].icon !== 'undefined') {
                 var icon = catalogData[element].icon
-                alert(icon)
             }
         }
 
@@ -381,7 +380,7 @@ function loopManifests(manifests) {
 function getStatus(item, serial, id) {
     $.ajax({
         type:"POST",
-        async: false,
+        async: true,
         url:"/reports/_status",
         data: {item : item, serial: serial},
         dataType: 'json',
@@ -461,11 +460,9 @@ function removeElementFromList(item, listid) {
     manifest = getManifestName();
 
     itemValue = $(item).parent().attr('id').split(/[_ ]+/).pop()
-    alert(itemValue);
     if($.isNumeric(itemValue)) {
         length = $(item).parent().attr('id').split(/[_ ]+/).pop().length
         itemValue = $(item).parent().attr('id').substring(0, length);
-        alert(itemValue);
     }
 
     //get items to save
@@ -515,6 +512,7 @@ function getClientTable(filter) {
                 return xhr;
             },
         method: 'GET',
+        async: true,
         url: manifestItemURL,
         timeout: 10000,
         cache: false,
@@ -558,20 +556,6 @@ function showProgressBar() {
 
 function hideProgressBar() {
      $("#site-loading-bar").fadeOut(1000);
-}
-
-function setupTypeahead() {
-    var catalogs = ['Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
-    var manifests = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'];
-    $('#catalogs_input').typeahead({source: catalogs});
-    $('#included_manifests_input').typeahead({
-        source: function (query, process) {
-        return $.get('/api/manifests', { api_fields: "filename" }, function (data) {
-            var json = JSON.parse(data); // string to json
-            return process(json.filename);
-        });
-    }
-    });
 }
 
 function getImagrReports(serial) {
