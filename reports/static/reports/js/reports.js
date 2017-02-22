@@ -582,7 +582,7 @@ function getImagrReports(serial) {
             { "mDataProp": "date_added", "sWidth": "140px", "mRender": function (data) {
                 var date = new Date(data);
                 var month = date.getMonth() + 1;
-                return date.getDate() + "." + (month.length > 1 ? month : "0" + month) + "." + date.getFullYear() + " - " + date.getHours()+":"+date.getMinutes();
+                return date.getDate() + "." + (month.length > 1 ? month : "0" + month) + "." + date.getFullYear() + " - " + (date.getHours() < 10 ? '0' : '') + date.getHours()+":"+(date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
             }},
             { "mDataProp": "message" },
             { "mDataProp": "status", "sWidth": "80px", },
@@ -593,7 +593,7 @@ function getImagrReports(serial) {
 			} else if ( aData['status'] == "success" ) {
 				$('td', nRow).addClass('success');
 			} else if ( aData['status'] == "error" ) {
-				$('td', nRow).addClass('error');
+				$('td', nRow).addClass('danger');
 			} 
 		},
         "bAutoWidth": false,

@@ -569,6 +569,10 @@ def db_api(request, kind, serial_number=None):
     if request.method == 'POST':
         submit = json.loads(request.body)
         submission_type = submit.get('submission_type')
+
+        if not serial_number:
+            serial_number = submit.get('serial')
+
         if serial_number:
             try:
                 machine = Machine.objects.get(serial_number=serial_number)
