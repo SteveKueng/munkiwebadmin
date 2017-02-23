@@ -567,7 +567,11 @@ def db_api(request, kind, serial_number=None):
                 content_type='application/xml', status=201)
 
     if request.method == 'POST':
-        submit = json.loads(request.body)
+        try:
+            submit = json.loads(request.body)
+        except:
+            submit = request.POST
+        
         submission_type = submit.get('submission_type')
 
         if not serial_number:
