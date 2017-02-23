@@ -32,6 +32,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $.ajaxSetup({
+    timeout:500,
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -325,7 +326,7 @@ function createSoftwareElement(element, addTo, require_update) {
         //item infos
         var display_name = element
         var version = ""
-        var icon = element + ".png"
+        var icon = ""
 
         if (typeof require_update === 'undefined') {
             require_update = ""
@@ -337,9 +338,7 @@ function createSoftwareElement(element, addTo, require_update) {
         } else {
             display_name = catalogData[element].display_name
             version = catalogData[element].version
-            if (typeof catalogData[element].icon !== 'undefined') {
-                var icon = catalogData[element].icon
-            }
+            var icon = catalogData[element].icon
         }
 
         $( "#"+addTo ).append( "<a href='#' class='list-group-item"+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
@@ -349,12 +348,13 @@ function createSoftwareElement(element, addTo, require_update) {
         getStatus(element, serial, itemID);
 
         //icon
-        var image_url = media_url + icon
-        $.get(image_url).done(function() { 
-            document.getElementById(itemID+'_icon').src = image_url;
-        }).fail(function() { 
-            // Image doesn't exist
-        })
+        if (icon !== '') {
+            $.get(icon).done(function() { 
+                document.getElementById(itemID+'_icon').src = icon;
+            }).fail(function() { 
+                document.getElementById(itemID+'_icon').src = static_url + "/img/GenericPkg.png"
+            })
+        }
 
         if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].requires !== 'undefined') {
             $.each(catalogData[element].requires, function( index, element_requires ) {

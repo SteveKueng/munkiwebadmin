@@ -53,6 +53,11 @@ try:
 except:
     IMAGR_URL = ""
 
+try:
+    ICONS_URL = settings.ICONS_URL
+except:
+    ICONS_URL = ""
+
 proxies = {
     "http":  PROXY_ADDRESS,
     "https": PROXY_ADDRESS
@@ -339,7 +344,9 @@ def createRequired(request):
         else:
             requiredDict[software.name] = {'version': software.version}
         if "icon" in software:
-            requiredDict[software.name]['icon'] = software.icon
+            requiredDict[software.name]['icon'] = ICONS_URL + "/" + software.icon
+        else:
+            requiredDict[software.name]['icon'] = ICONS_URL + "/" + software.name + ".png"
         if "display_name" in software:
             requiredDict[software.name]['display_name'] = software.display_name
         # if software has requres add them to requiredDict

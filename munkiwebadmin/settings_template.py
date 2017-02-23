@@ -21,12 +21,8 @@ MUNKI_REPO_DIR = '/Users/Shared/munkirepo'
 # This is not recommended for production.
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
-
 # For production, you can point to your Munki server
-# if retrieving icons requires no special authentication
-# -- otherwise, you'll need some other static file server
 #ICONS_URL = "http://localhost/munki_repo/icons/"
-#ICONS_URL = "http://munki/repo/icons/"
 
 # path to the makecatalogs binary
 MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
