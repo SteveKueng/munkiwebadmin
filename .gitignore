@@ -14,6 +14,9 @@ db.sqlite3
 !/munkiwebadmin/static/styles/Default
 /munkiwebadmin/static/styles/*
 
+# ignore collectstatics
+/munkiwebadmin/collected_static
+
 # ignore reposado links
 reposadolib
 preferences.plist
