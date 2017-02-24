@@ -617,3 +617,67 @@ function newManifestItem() {
         },
     });
 }
+
+function deleteMachine() {
+    var machineURL = '/api/report/' + current_pathname;
+    $.ajax({
+        method: 'POST',
+        url: machineURL,
+        headers: {'X-METHODOVERRIDE': 'DELETE'},
+        success: function(data) {
+            getClientTable();
+            $('#computerDetails').modal('hide');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("Machine delete error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
+        }
+    });;
+}
+
+function deleteManifest() {
+     var manifestItemURL = '/api/manifests/' + current_pathname;
+    $.ajax({
+        method: 'POST',
+        url: manifestItemURL,
+        headers: {'X-METHODOVERRIDE': 'DELETE'},
+        success: function(data) {
+            //
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if(jqXHR.status==404) {
+            // ignore 404
+            } else {
+                $("#errorModalTitleText").text("Manifest delete error");
+                try {
+                    var json_data = $.parseJSON(jqXHR.responseText)
+                    if (json_data['result'] == 'failed') {
+                        $("#errorModalDetailText").text(json_data['detail']);
+                        $("#errorModal").modal("show");
+                        return;
+                    }
+                } catch(err) {
+                    // do nothing
+                }
+                $("#errorModalDetailText").text(errorThrown);
+                $("#errorModal").modal("show");
+            }
+        }
+    });;
+}
+
+function deleteMachineAndManifest() {
+    deleteManifest();
+    deleteMachine();
+}

@@ -36,13 +36,27 @@
 
 <div id="computer_detail"></div>
 
-<div id="loadingModal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true" style="padding-top:15%; overflow-y:visible;">
-  <div class="modal-dialog modal-sm">
+<!--
+Bootstrap modal for errors
+-->
+<div class="modal fade" data-backdrop="static" id="errorModal">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-body">
-        <div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>
+      <div class="modal-header">
+        <h4 class="modal-title text-danger">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span id="errorModalTitleText">Error</span>
+        </h4>
       </div>
-    </div>
-  </div>
+      <div class="modal-body">
+        <form>
+          <p id="errorModalDetailText">An unexpected error occurred.</p>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
 </div>
 {% endblock %}

@@ -20,7 +20,7 @@
 				      {{ machine.machine_model }}
 				    {% endif %}
 				    {% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
-				    <a href="#" onclick="delete_machine_modal('{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial }}{% endif %}', '{{ machine.serial_number }}', '{{manifest_name}}');"><i class="fa fa-trash" aria-hidden="true"></i></a>
+					<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal"><i class="fa fa-trash" aria-hidden="true"></i></button>
 				    {% endif %}
 				    </small></h4>
 				  </div>
@@ -314,15 +314,15 @@ Bootstrap modal for confirming manifest deletion
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Delete manifest?</h4>
+				<h4 class="modal-title">Delete computer?</h4>
 			</div>
 			<div class="modal-body">
-				<p>Really delete <strong>{{ pathname }}</strong>?</p>
+				<p>Really delete <strong>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</strong>?</p>
 				<p>This action cannot be undone.</p>
 				<br>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="deleteManifestItem()">Delete</button>
+				<button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="deleteMachineAndManifest()">Delete</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 			</div>
 		</div><!-- /.modal-content -->

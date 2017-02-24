@@ -565,6 +565,14 @@ def db_api(request, kind, serial_number=None):
             return HttpResponse(
                 response,
                 content_type='application/xml', status=201)
+    
+    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+        # support browsers/libs that don't directly support the other verbs
+        http_method = request.META['HTTP_X_METHODOVERRIDE']
+        if http_method.lower() == 'delete':
+            request.method = 'DELETE'
+            request.META['REQUEST_METHOD'] = 'DELETE'
+            request.DELETE = QueryDict(request.body)
 
     if request.method == 'POST':
         try:
@@ -658,3 +666,26 @@ def db_api(request, kind, serial_number=None):
                 
                 return HttpResponse(status=204)
         return HttpResponse(status=404)
+
+    if request.method == 'DELETE':
+        LOGGER.debug("Got API DELETE request for %s", kind)
+        if not request.user.has_perm('reports.delete_machine'):
+            raise PermissionDenied
+        if not serial_number:
+            return HttpResponse(
+                json.dumps({'result': 'failed',
+                            'exception_type': 'MassDeleteNotSupported',
+                            'detail': 'Deleting all items is not supported'}
+                        ),
+                content_type='application/json', status=403)
+        try:
+            Machine.objects.filter(serial_number=serial_number).delete()
+        except Machine.DoesNotExist:
+                return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'MachineDoesNotExist',
+                                'detail': '%s does not exist' % serial_number}),
+                    content_type='application/json', status=404)
+        else:
+            # success
+            return HttpResponse(status=204)
