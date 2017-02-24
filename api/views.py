@@ -628,7 +628,6 @@ def db_api(request, kind, serial_number=None):
                     machine.current_status = submit.get('status')
                     imagrReport = ImagrReport(machine=machine, message=submit.get('message'), status=submit.get('status'))
                     report.runstate = u"imagr"
-                    imagrReport.save()
                 # delete pending workflow if successful ended
                 if submit.get('status') == 'success' or submit.get('status') == 'error':
                     machine.imagr_workflow = ""
@@ -652,5 +651,10 @@ def db_api(request, kind, serial_number=None):
                 report.timestamp = timezone.now()
                 machine.save()
                 report.save()
+
+                # save imagr report
+                if imagrReport:
+                    imagrReport.save()
+                
                 return HttpResponse(status=204)
         return HttpResponse(status=404)
