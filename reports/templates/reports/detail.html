@@ -47,7 +47,7 @@
 							<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
 							<div class="panel-body" id="SoftwareView">
 								<!-- Manifests / Catalog -->
-								<div class="row">
+								<div class="row hidden" id="manifestTop">
 									<!-- Manifests -->
 									<div class='col-md-6'>
 										<div class="section_label"><h4>Included Manifests</h4></div>
@@ -72,8 +72,9 @@
 						</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
 						<div class="panel-body">
+							{% if report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType %}
 							<table class="table table-striped">
-    						<tbody>
+								<tbody>
 									{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
 										{% if item.package_source == "package_source_apple"%}
 										<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}img/appleupdate.png' width="20"/></td>
@@ -82,6 +83,13 @@
 									{% endfor %}
 								</tbody>
 							</table>
+							{% else %}
+							<div class="row">
+								<div class="col-md-12">
+									<div class="alert alert-info">No installed updates!</div>
+								</div>
+							</div>
+							{% endif %}
 						</div>
 					</div>
 				    <div role="tabpanel" class="tab-pane tabDetail" id="System">
@@ -246,7 +254,7 @@
 							{% else %}
 							<div class="row">
 								<div class="col-md-12">
-									<div class="alert alert-danger">report data not valid!</div>
+									<div class="alert alert-warning">No system data found!</div>
 								</div>
 							</div>
 							{% endif %}

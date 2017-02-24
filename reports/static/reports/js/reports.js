@@ -259,6 +259,8 @@ function getManifest(manifest) {
         async: true,
         cache: false,
         success: function(data) {
+            $("#manifestTop").removeClass("hidden");
+            $("#manifestWarning").remove()
             $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
                 createListElements(JSON.parse(data).included_manifests, "included_manifests"),
                 createListElements(JSON.parse(data).catalogs, "catalogs"),
@@ -270,8 +272,7 @@ function getManifest(manifest) {
         },
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
-            $("#SoftwareView").empty();
-            $("#SoftwareView").append('<div class="row"><div class="col-md-12"><div class="alert alert-danger" style="margin-top:20px;">manifest read error!</div></div></div>');
+            $("#SoftwareView").append('<div class="row" id="manifestWarning"><div class="col-md-12"><div class="alert alert-warning">No manifest found! <a class="alert-link" onclick="newManifestItem();">create</a></div></div></div>');
         },
         dataType: 'html'
     });
@@ -588,4 +589,31 @@ function getImagrReports(serial) {
          "bStateSave": false,
          "aaSorting": [[0,'desc']]
     } );
+}
+
+function newManifestItem() {
+    var pathname = getManifestName();
+    var manifestItemURL = '/api/manifests/' + pathname;
+    $.ajax({
+        method: 'POST',
+        url: manifestItemURL,
+        timeout: 10000,
+        cache: false,
+        success: function(data) {
+            getManifest(pathname);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("Manifest creation error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+        },
+    });
 }

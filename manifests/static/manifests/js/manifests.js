@@ -690,6 +690,7 @@ function deleteManifestItem() {
         url: manifestItemURL,
         headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
+            hideSaveOrCancelBtns();
             window.location.hash = '';
             $('#manifest_detail').html('');
             $('#list_items').DataTable().ajax.reload();
@@ -709,5 +710,5 @@ function deleteManifestItem() {
             $("#errorModalDetailText").text(errorThrown);
             $("#errorModal").modal("show");
         }
-    });
+    });;
 }

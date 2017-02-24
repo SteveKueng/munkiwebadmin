@@ -591,7 +591,7 @@ def db_api(request, kind, serial_number=None):
                 machine.remote_ip = request.META['REMOTE_ADDR']
                 report.activity = ""
 
-                if 'name' in submit and machine.hostname == '':
+                if 'name' in submit:
                     machine.hostname = submit.get('name')
                 if 'username' in submit:
                     machine.username = submit.get('username')
@@ -645,6 +645,10 @@ def db_api(request, kind, serial_number=None):
                     report.errors = 1
                     report.warnings = 0
                 
+                # setting hostname if there isn't set one / prevent save issues
+                if machine.hostname == "unknown":
+                    machine.hostname = serial_number
+
                 report.timestamp = timezone.now()
                 machine.save()
                 report.save()

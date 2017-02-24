@@ -20,11 +20,11 @@ class BusinessUnit(models.Model):
 
 class Machine(models.Model):
     serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
-    hostname = models.CharField(max_length=64)
-    username = models.CharField(max_length=256, blank=True, default="unknown")
+    hostname = models.CharField(max_length=64, default="unknown")
+    username = models.CharField(max_length=256, blank=True)
     remote_ip = models.CharField(max_length=15, blank=True)
     businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None)
-    machine_model = models.CharField(max_length=64, blank=True, default="virtual-machine")
+    machine_model = models.CharField(max_length=64, blank=True)
     cpu_type = models.CharField(max_length=64, blank=True)
     cpu_speed = models.CharField(max_length=32, blank=True)
     cpu_arch = models.CharField(max_length=32, blank=True)
