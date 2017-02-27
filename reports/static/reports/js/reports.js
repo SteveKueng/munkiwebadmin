@@ -56,6 +56,7 @@ $(document).on('click','.grid_list', function (e) {
 // filter devices
 $(document).on('click','.filterDevices', function (e) {
     if ($(this).hasClass('active')) {
+        history.pushState('', '', '/reports/');
         getClientTable("");
         $(this).removeClass('active');
     } else {
@@ -120,13 +121,13 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
   }
 });
 
-$(document).on('click','.list-group-item', function (e) {
+$(document).on('click','.manifestItem', function (e) {
     e.preventDefault()
     if($(this).hasClass('active')) {
         removeDeleteButton(this);
         $(this).removeClass('active');
     } else {
-        item = $("#SoftwareView").find('.list-group-item')
+        item = $("#SoftwareView").find('.manifestItem')
         $(item).removeClass('active');
         removeDeleteButton(item);
         if(! $(this).is('input')) {
@@ -302,7 +303,7 @@ function createListElements(elements, listid) {
     //alert(JSON.stringify(catalogData))
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
-        $( "#"+listid ).append( "<a class='list-group-item' id='"+listid+"_"+value+"'>"+value+"</a>" );
+        $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
     $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
 }
@@ -331,8 +332,7 @@ function createSoftwareElement(element, addTo, require_update) {
 
         if (typeof require_update === 'undefined') {
             require_update = ""
-        } else {
-            additionalClass += "manifestObjects"
+            additionalClass += "manifestItem"
         }
         if (typeof catalogData[element] === 'undefined') {
             additionalClass += " list-group-item-danger"
@@ -342,7 +342,7 @@ function createSoftwareElement(element, addTo, require_update) {
             var icon = catalogData[element].icon
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item"+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -441,7 +441,7 @@ function addElementToList(item, listid, event) {
                 contentType: 'application/json',
                 success: function(data){
                     //add new item
-                    $(item).before("<a class='list-group-item' id='"+listid+"_"+itemValue+"'>"+itemValue+"</a>");
+                    $(item).before("<a class='list-group-item manifestItem' id='"+listid+"_"+itemValue+"'>"+itemValue+"</a>");
                     item.value = "";
                     if (listid.indexOf("catalogs") == -1) {
                         getIncludedManifest(itemValue);
