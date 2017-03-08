@@ -128,11 +128,16 @@ $(document).on('click','.form-control', function (e) {
 });
 
 $(document).on('click','.workflows', function (e) {
-    workflowName = $(this).find(':first-child').text();
+    if($(this).hasClass('active')) {
+        workflowName = " "
+        $(this).removeClass('active');
+    } else {
+        workflowName = $(this).find(':first-child').text();
+        item = $("#imagrworkflow").find('.workflows');
+        $(item).removeClass('active');
+        $(this).addClass('active');
+    } 
     setWorkflow(workflowName);
-    item = $("#imagrworkflow").find('.workflows');
-    $(item).removeClass('active');
-    $(this).addClass('active');
 });
 
 // reset url on modal close
