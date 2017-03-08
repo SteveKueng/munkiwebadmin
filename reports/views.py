@@ -99,7 +99,7 @@ def index(request, computer_serial=None):
                 if IMAGR_URL:
                     try:
                         config = urllib2.urlopen(IMAGR_URL)
-                    except:
+                    except Exception as error:
                         imagr_plist = "Can't reach server!"
                     else:
                         plist = config.read()

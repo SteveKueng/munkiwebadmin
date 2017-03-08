@@ -630,6 +630,7 @@ def db_api(request, kind, serial_number=None):
 
                 report.runtype = submit.get('runtype', 'UNKNOWN')
                 
+                imagrReport = None
                 if submit.get('imagr_workflow'):
                     machine.imagr_workflow = submit.get('imagr_workflow')
                 if submit.get('status') and submit.get('message'):
