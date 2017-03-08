@@ -106,21 +106,6 @@ $(document).on('keyup','#listSearchField', function () {
   });
 });
 
-// reset url on modal close
-$(document).on('hide.bs.modal','#computerDetails', function () {
-  // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#computerDetails').data('bs.modal').isShown = false;
-      $("#saveOrCancelConfirmationModal").modal("show");
-      event.preventDefault();
-      return;
-  } else {
-    $('#computerDetails').data('bs.modal').isShown = true;
-    window.location.hash = '';
-    current_pathname = "";
-  }
-});
-
 $(document).on('click','.manifestItem', function (e) {
     e.preventDefault()
     if($(this).hasClass('active')) {
@@ -135,6 +120,34 @@ $(document).on('click','.manifestItem', function (e) {
             $(this).addClass('active');
         }
     }
+});
+
+$(document).on('click','.form-control', function (e) {
+    $('.manifestItem').removeClass('active');
+    removeDeleteButton('.manifestItem');
+});
+
+$(document).on('click','.workflows', function (e) {
+    workflowName = $(this).find(':first-child').text();
+    setWorkflow(workflowName);
+    item = $("#imagrworkflow").find('.workflows');
+    $(item).removeClass('active');
+    $(this).addClass('active');
+});
+
+// reset url on modal close
+$(document).on('hide.bs.modal','#computerDetails', function () {
+  // check for unsaved changes
+  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+      $('#computerDetails').data('bs.modal').isShown = false;
+      $("#saveOrCancelConfirmationModal").modal("show");
+      event.preventDefault();
+      return;
+  } else {
+    $('#computerDetails').data('bs.modal').isShown = true;
+    window.location.hash = '';
+    current_pathname = "";
+  }
 });
 
 $(document).ready(function() {
@@ -160,7 +173,6 @@ $(document).ready(function() {
         }
     });
 });
-
 
 function getDeviceIcon(serial, iconid) {
     var image_url = "https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
@@ -200,7 +212,7 @@ function getComputerItem(pathname) {
             // load date
             $('#computer_detail').html(data);
             getManifest(getManifestName());
-            getImagrReports(pathname);
+            //getImagrReports(pathname);
 
             current_pathname = pathname;
             requested_pathname = "";
@@ -446,7 +458,7 @@ function addElementToList(item, listid, event) {
                     if (listid.indexOf("catalogs") == -1) {
                         getIncludedManifest(itemValue);
                     } else {
-
+                        //getManifest(manifest);
                     }
                 },
                 error: function(){
@@ -479,6 +491,12 @@ function removeElementFromList(item, listid) {
         contentType: 'application/json',
         success: function(data){ 
             $("#"+listid+"_"+itemValue).remove();
+            if (listid.indexOf("catalogs") == -1) {
+                getIncludedManifest(itemValue);
+            } else {
+
+                //getManifest(manifest);
+            }
         },
         error: function(){
             alert("could not remove "+item+"!");
@@ -680,4 +698,32 @@ function deleteManifest() {
 function deleteMachineAndManifest() {
     deleteManifest();
     deleteMachine();
+}
+
+function setWorkflow(workflow) {
+    event.preventDefault();
+    var machineURL = '/api/report/' + current_pathname;
+    $.ajax({
+        method: 'POST',
+        url: machineURL,
+        data: { imagr_workflow : workflow },
+        success: function(data) {
+            //set active
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("workflow set error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
+        }
+    });;
 }

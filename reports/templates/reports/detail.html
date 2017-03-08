@@ -270,7 +270,7 @@
 										{% else %}
 										<div class="list-group" id="imagrworkflow">
 											{% for workflow in imagr_plist.workflows %}
-											<a href="#" class="list-group-item">
+											<a href="#" class="list-group-item workflows{% if machine.imagr_workflow == workflow.name %} active{% endif %}">
 												<h4 class="list-group-item-heading">{{ workflow.name }}</h4>
 												<p class="list-group-item-text">{{ workflow.description }}</p>
 											</a>
@@ -290,6 +290,9 @@
 											</tr>
 										</thead>
 									</table>
+									<script type='text/javascript'>
+										getImagrReports("{{machine.serial_number}}");
+									</script>
 									</div>
 								</div>
 							</div>
