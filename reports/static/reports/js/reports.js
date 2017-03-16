@@ -1,3 +1,10 @@
+//global var
+var imagrReportsTable = ""
+var interval = ""
+
+
+
+
 // resize modal content to max windows height
 function do_resize() {
     if ($(window).width() < 768) {
@@ -150,6 +157,7 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
       return;
   } else {
     $('#computerDetails').data('bs.modal').isShown = true;
+    stopRefresh();
     window.location.hash = '';
     current_pathname = "";
   }
@@ -230,6 +238,9 @@ function getComputerItem(pathname) {
                 $("#computerDetails").modal("show");
             }
             hideProgressBar();
+
+            //start refresh
+            startRefresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -583,7 +594,7 @@ function hideProgressBar() {
 }
 
 function getImagrReports(serial) {
-    $('#imagrreports').DataTable( {
+        imagrReportsTable = $('#imagrreports').DataTable( {
         "sAjaxSource": "/api/imagr/"+serial,
         "sAjaxDataProp": "",
         "aoColumns": [
@@ -731,4 +742,18 @@ function setWorkflow(workflow) {
             $("#errorModal").modal("show");
         }
     });;
+}
+
+function startRefresh() {
+    // 1 second interval
+    interval = setInterval (function () {
+        //imagr workflow
+        imagrReportsTable.ajax.reload();
+    }, 2000);
+}
+
+function stopRefresh() {
+    try{
+        clearInterval(interval);
+    }catch(err){}
 }

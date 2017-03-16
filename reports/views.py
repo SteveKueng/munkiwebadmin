@@ -233,6 +233,8 @@ def index(request, computer_serial=None):
                 reports = reports.filter(munkireport__timestamp__range=(three_months_ago,month_ago))
             elif show == 'notquarter':
                 reports = reports.exclude(munkireport__timestamp__gte=three_months_ago)
+            elif show == 'inprogress':
+                reports = reports.filter(current_status="in_progress")
 
         if hardware:
             if hardware == 'macbook':
