@@ -22,7 +22,11 @@ function getRunningMachine() {
                 }
                 //console.log(JSON.stringify(data[i]));
             }
-            $(".imagrInprogress").append('<li class="divider"></li><li><a href="/reports/?show=inprogress" class="text-center"><strong>See All </strong><i class="fa fa-angle-right"></i></a></li>')
+            if(run > 0) {
+                $(".imagrInprogress").append('<li class="divider"></li><li><a href="/reports/?show=inprogress" class="text-center"><strong>See All </strong><i class="fa fa-angle-right"></i></a></li>')
+            } else {
+                $(".imagrInprogress").append('<li><a class="text-center">no machine in progress</a></li>');
+            }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             // on error

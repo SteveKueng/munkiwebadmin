@@ -525,11 +525,7 @@ def db_api(request, kind, serial_number=None):
         else:
             api_fields = None
 
-        if kind == "report":
-            response = dict()
-        elif kind == "imagr":
-            response = list()
-        
+        response = list()
         if serial_number:
             try:
                 if kind == "report":
@@ -547,14 +543,14 @@ def db_api(request, kind, serial_number=None):
                 item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
             elif kind == "imagr":
                 item_list = serializers.serialize('python', ImagrReport.objects.all(), fields=(api_fields))
-        
+
         for item in item_list:
             if serial_number == item["pk"]:
                 response = item['fields']
-            elif kind == "imagr":
-                response.append(item['fields'])
             else:
-                response[item["pk"]] = item['fields']
+                if api_fields and 'serial' in api_fields:
+                    item['fields']['serial'] = item['pk']
+                response.append(item['fields'])
 
         if response_type == 'json':
             response = convert_dates_to_strings(response)

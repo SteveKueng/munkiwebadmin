@@ -5,6 +5,8 @@
 	<!-- Morris -->
 	<script src="{% get_static_prefix %}js/morrisjs/morris.min.js"></script>
 	<script src="{% get_static_prefix %}js/raphael/raphael-min.js"></script>
+    <link rel="stylesheet" href='{% get_static_prefix %}css/morris/morris.css' type="text/css" media="all" />
+
 {% endblock %}
 
 {% block page_title %}<a href="{% url 'reports.views.dashboard' %}" class="navbar-brand" >Dashboard</a>{% endblock %}
@@ -145,24 +147,37 @@ $('#SearchField').prop('disabled', true);
             <div class="panel-heading">
                 <h3 class="panel-title">OS breakdown</h3>
             </div>
-						<div id="osbreakdown" style="height: 300px; cursor: pointer;"></div>
-						<script>
-						new Morris.Donut({
-						  // ID of the element in which to draw the chart.
-						  element: 'osbreakdown',
-						  // Chart data records -- each entry in this array corresponds to a point on
-						  // the chart.
-						  data: [
-								{% for item in os_info|dictsort:'os_version' %}
-						    { label: '{{ item.os_version }}', value: {{ item.count }} },
-								{% endfor %}
-						  ],
-						}).on('click', function(i, row){
-							{% if perms.reports.can_view_reports %}
-							window.location.href = "{% url 'reports.views.index' %}?os_version="+row.label;
-							{% endif %}
-						});
-						</script>
+            <div id="osbreakdown" style="height: 300px; cursor: pointer;"></div>
+            <script>
+                $.ajax({
+                    type: 'GET',
+                    url: "/api/report?api_fields=os_version",
+                    dataType: "json",
+                    async: true,
+                    contentType: "application/json",
+                    success: function (json) {
+                        var result = {};
+                        for(var i = 0; i < json.length; i++){
+                            for(var item in json[i]){
+                                if(!result[json[i][item]]){
+                                    result[json[i][item]] = 0;
+                                }
+                                result[json[i][item]]++;
+                            }
+                        }
+                        var data = {};
+                        for(var item in result) {
+                            data["label"] = item
+                            data["value"] = result[item]
+                        }
+                        Morris.Donut({
+                            element: 'osbreakdown',
+                            data: [data],
+                            resize: true
+                        });
+                    }
+                });
+            </script>
         </div>
     </div>
     <div class="col-md-8">
@@ -170,31 +185,42 @@ $('#SearchField').prop('disabled', true);
             <div class="panel-heading">
                 <h3 class="panel-title">Hardware breakdown</h3>
             </div>
-						<div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
-						<script>
-						new Morris.Bar({
-						  // ID of the element in which to draw the chart.
-						  element: 'hardwarebreakdown',
-						  // Chart data records -- each entry in this array corresponds to a point on
-						  // the chart.
-						  data: [
-								{% for item in machine_info|dictsort:'machine_model' %}
-						    { y: '{{ item.machine_model }}', model: {{ item.count }} },
-								{% endfor %}
-						  ],
-							stacked: true,
-							gridTextSize: 10,
-							resize: true,
-							xLabelAngle: 30,
-							xkey: 'y',
-							ykeys: ['model'],
-  						labels: ['Amount']
-						}).on('click', function(i, row){
-							{% if perms.reports.can_view_reports %}
-							window.location.href = "{% url 'reports.views.index' %}?model="+row.y;
-							{% endif %}
-						});
-						</script>
+            <div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
+            <script>
+                $.ajax({
+                    type: 'GET',
+                    url: "/api/report?api_fields=machine_model",
+                    dataType: "json",
+                    async: true,
+                    contentType: "application/json",
+                    success: function (json) {
+                        var result = {};
+                        for(var i = 0; i < json.length; i++){
+                            for(var item in json[i]){
+                                if(!result[json[i][item]]){
+                                    result[json[i][item]] = 0;
+                                }
+                                result[json[i][item]]++;
+                            }
+                        }
+                        var data = {};
+                        for(var item in result) {
+                            data["label"] = item
+                            data["value"] = result[item]
+                        }
+                        Morris.Bar({
+                            element: 'hardwarebreakdown',
+                            data: [data],
+                            xkey: 'label',
+                            ykeys: ['value'],
+                            labels: ['Machine Model'],
+                            hideHover: true,
+                            stacked: true,
+                            resize: true
+                        });
+                    }
+                });
+            </script>
         </div>
     </div>
 		{% if low_disk_machines %}
