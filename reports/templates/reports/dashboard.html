@@ -165,15 +165,19 @@ $('#SearchField').prop('disabled', true);
                                 result[json[i][item]]++;
                             }
                         }
-                        var data = {};
+                        var data = []
                         for(var item in result) {
-                            data["label"] = item
-                            data["value"] = result[item]
+                            dataItems = {}
+                            dataItems["label"] = item
+                            dataItems["value"] = result[item]
+                            data.push(dataItems)
                         }
                         Morris.Donut({
                             element: 'osbreakdown',
-                            data: [data],
+                            data: data,
                             resize: true
+                        }).on('click', function(i, row){
+                            window.location.href = "/reports?os_version="+row.label;
                         });
                     }
                 });
@@ -203,20 +207,24 @@ $('#SearchField').prop('disabled', true);
                                 result[json[i][item]]++;
                             }
                         }
-                        var data = {};
+                        var data = [];
                         for(var item in result) {
-                            data["label"] = item
-                            data["value"] = result[item]
+                            dataItems = {}
+                            dataItems["label"] = item
+                            dataItems["value"] = result[item]
+                            data.push(dataItems)
                         }
                         Morris.Bar({
                             element: 'hardwarebreakdown',
-                            data: [data],
+                            data: data,
                             xkey: 'label',
                             ykeys: ['value'],
                             labels: ['Machine Model'],
                             hideHover: true,
                             stacked: true,
                             resize: true
+                        }).on('click', function(i, row){
+                            window.location.href = "/reports?model="+row.label;
                         });
                     }
                 });
