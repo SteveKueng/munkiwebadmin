@@ -82,7 +82,7 @@ def convert_strings_to_dates(jdata):
 @logged_in_or_basicauth()
 def plist_api(request, kind, filepath=None):
     '''Basic API calls for working with Munki plist files'''
-    if kind not in ['manifests', 'pkgsinfo']:
+    if kind not in ['manifests', 'pkgsinfo', 'catalogs']:
         return HttpResponse(status=404)
 
     response_type = 'json'
