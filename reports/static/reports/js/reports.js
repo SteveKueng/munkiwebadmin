@@ -231,7 +231,7 @@ function getComputerItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#computerDetails').hasClass('in')){
-                //do_resize();              
+                do_resize();              
                 $("#computerDetails").modal("show");
             }
             hideProgressBar();
