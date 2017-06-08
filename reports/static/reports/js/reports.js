@@ -14,7 +14,7 @@ function do_resize() {
         $('#detail_content').height($(window).height() - 220);
     }
 }
-$(window).resize(do_resize);
+//$(window).resize(do_resize);
 
 // using jQuery
 function getCookie(name) {
@@ -234,7 +234,7 @@ function getComputerItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#computerDetails').hasClass('in')){
-                do_resize();              
+                //do_resize();              
                 $("#computerDetails").modal("show");
             }
             hideProgressBar();

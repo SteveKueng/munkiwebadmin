@@ -2,10 +2,48 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-          <img src="{{ icon_url }}" class='pkginfo-icon pull-left' height='32' style="margin-top:3px; margin-right:10px;"/>
-          <h4 id='pathname' data-installer-item-path='{{ installer_item_path }}'>{{ pathname }}</h4>
-          {% if perms.pkgsinfo.delete_pkginfofile %}
-          <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()" style="margin-top:-40px;">Delete</button>
+        <div class="row">
+          <div class="col-md-1">
+            <img src="{{ icon_url }}" class='pkginfo-icon' height='40'/>
+          </div>
+          <div class="col-md-8">
+            <h4 id='pathname' data-installer-item-path='{{ installer_item_path }}'>{{ pathname }}</h4>
+            {% if perms.pkgsinfo.delete_pkginfofile %}
+          </div>
+          <div class="col-md-3">
+           <!-- <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()">Delete</button>
+            <div class='pull-right hidden' id='save_and_cancel'>
+            <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
+            </div>-->
+   <script>
+          importx
+          $('a').webuiPopover();
+          $('a').webuiPopover({trigger:'manual'});
+          
+          function closeid() {
+              WebuiPopovers.hide('#discard');
+              }
+          
+          </script>
+             {% if perms.pkgsinfo.change_pkginfofile %}
+        <div class='pull-right hidden' id='save_and_cancel'>
+          <a  href="#" class="htmlpopover" data-toggle="" ><button type="button" class="btn btn-danger" data-toggle="modal">Cancel</button></a>
+           <div   class="webui-popover-content">
+               <h4>There are unsafed Changes!</h4>
+               <button class="btn btn-danger" onClick="cancelEdit()">Discard</button>
+               <button class="btn btn-success" onClick="savePkginfoItem()">Save</button>
+               <button class="btn btn-default" onClick="closeid()">Cancel</button>
+            </div>
+       
+          <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
+        </div>
+        {% endif %}
+        <div class='pull-right' id='cancel'>
+        {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
+          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
+        </div>
+          </div>
+        </div>
           {% endif %}
       </div>
       <!-- Nav tabs -->
@@ -23,27 +61,19 @@
       <div role="tabpanel" class="modal-body" >
         <!-- Tab panes -->
         <div class="tab-content" id="item_editor">
-          <div role="tabpanel" class="tab-pane active" id="basicstab">
+          <div role="tabpanel" class="tab-pane panel-body active" id="basicstab">
               <div id="basics" class="plist-editor"></div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="detailtab">
+          <div role="tabpanel" class="tab-pane panel-body" id="detailtab">
               <div id="detail" class="plist-editor"></div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="plisttab">
+          <div role="tabpanel" class="tab-pane panel-body" id="plisttab">
               <div id='plist'>{{ plist_text }}</div>
           </div>
          </div>
       </div>
       <div class="modal-footer">
-        {% if perms.pkgsinfo.change_pkginfofile %}
-        <div class='pull-right hidden' id='save_and_cancel'>
-          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
-          <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
-        </div>
-        {% endif %}
-        <div class='pull-right' id='cancel'>
-        {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
+       
         </div>
 
       </div>
@@ -119,3 +149,9 @@ Bootstrap modal for saving or canceling when loading a different pkginfo
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover(); 
+});
+$('.htmlpopover').popover({ html : true});
+</script>
