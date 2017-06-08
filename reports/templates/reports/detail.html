@@ -3,6 +3,7 @@
 <div class="modal fade" id="computerDetails">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
+			<div class="header-wrapper">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<div class="col-sm-3 text-center machineIcon">
@@ -40,9 +41,11 @@
 						<li role="presentation"><a href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
 						{% endif %}
 					</ul>
+					</div>
+			</div>
 					<!-- Tab panes -->
 					<div class="tab-content" id="detail_content">
-						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="overflow-x:auto; height:100%;">
+						<div role="tabpanel" class="tab-pane tabDetail active" id='Software'>
 							<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
 							<div class="panel-body" id="SoftwareView">
 								<!-- Manifests / Catalog -->
@@ -263,20 +266,24 @@
 									<!-- panel -->
 									<div class='col-md-5'>
 										<div class="section_label"><h4>Workflows</h4></div>
-										{% if imagr_plist == "Can't reach server!" %}
+										{% if not imagr_plist == "Can't reach server!" %}
 										<div class="alert alert-danger">
 											{{ imagr_plist }}
 										</div>
 										{% else %}
 										<div class="list-group" id="imagrworkflow">
 											{% for workflow in imagr_plist.workflows %}
-											<a href="#" class="list-group-item workflows{% if machine.imagr_workflow == workflow.name %} active{% endif %}">
-												<h4 class="list-group-item-heading">{{ workflow.name }}</h4>
-												<p class="list-group-item-text">{{ workflow.description }}</p>
+											<a href="#" class="list-group-item workflows workflow-parent{% if machine.imagr_workflow == workflow.name %} active{% endif %}">
+												<h4 class="list-group-item-heading workflow-content">Test{{ workflow.name }}</h4>
+												<p class="list-group-item-text workflow-content">asdflkj saldfj aslkdjfasdjfl alsdjf{{ workflow.description }}</p>
+												<p class="workflow-button"><i class="fa fa-play" aria-hidden="true"></i></p>
 											</a>
 											{% endfor %}
 										</div>
 										{% endif %}
+										
+											
+										
 									</div>
 									<!-- reports -->
 									<div class='col-md-7'>
