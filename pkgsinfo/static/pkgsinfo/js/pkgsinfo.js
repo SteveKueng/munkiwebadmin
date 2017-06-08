@@ -1,7 +1,7 @@
 function do_resize() {
-    $('#item_editor').height($(window).height() - 220);
+    $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 220);
+    $('#plist').height($(window).height() - 230);
     //$('#item_list').height($(window).height() - 90);
     //$('.dataTables_scrollBody').height($(window).height() - 170);
 }
