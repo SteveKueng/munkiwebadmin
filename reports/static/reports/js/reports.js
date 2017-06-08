@@ -221,7 +221,9 @@ function getComputerItem(pathname) {
                 $.when(getSoftwareList(data.catalogs)).done(
                     getListElement(pathname, "included_manifests"),
                     getListElement(pathname, "catalogs"),
-                    getManagedInstalls(pathname, "managed_installs")
+                    getSoftwareElemnts(pathname, "managed_installs"),
+                    getSoftwareElemnts(pathname, "managed_uninstalls"),
+                    getSoftwareElemnts(pathname, "optional_installs")
                 );
             })  
 
@@ -268,7 +270,6 @@ function getSoftwareList(catalogList) {
     catalogData = ""
     $.ajax({
         type:"POST",
-        async: false,
         url:"/reports/_catalogJson",
         data: {catalogList},
         dataType: 'json',
@@ -286,13 +287,20 @@ function getListElement(manifest, listid) {
 }
 
 // managed installs
-function getManagedInstalls(manifest, listid) {
+function getSoftwareElemnts(manifest, listid) {
     getManifest(manifest, function(data) {
-        loopSoftwareElements(data[listid], listid)
+        loopSoftwareElements(data[listid], listid+"_local");
+        getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
     })
 }
-
-
+function getSoftwareElemntsIncludedManifest(manifests, listid) {
+    $.each(manifests, function( index, manifest ) {
+        getManifest(manifest, function(data) {
+            loopSoftwareElements(data[listid], listid+"_remote", manifest);
+            getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
+        })
+    });
+}
 
 // edit list
 function createListElements(elements, listid) {
@@ -384,53 +392,15 @@ function removeElementFromList(item, listid) {
 
 // edit software
 function loopSoftwareElements(elements, listid, require_update) {
-    $( "#"+listid ).empty()
-    if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
+    $( "#"+listid).empty()
+    if ($("#"+listid).length < 1){
+        $( "#"+listid ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
     }
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
         createSoftwareElement(value, listid, require_update);
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getIncludedManifest(manifest) {
-    $.ajax({
-        method: 'GET',
-        url: "/reports/_getManifest/"+manifest,
-        timeout: 10000,
-        async: true,
-        cache: false,
-        success: function(data) {
-            loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
-            loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls", manifest),
-            loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
-            loopManifests(JSON.parse(data).included_manifests)
-        },
-        error: function() {
-            $("#included_manifests_"+manifest).addClass("list-group-item-danger");
-        },
-        dataType: 'html'
-    });
-}
-
 
 var softwareElementCount = 0
 function createSoftwareElement(element, addTo, require_update) {
@@ -484,17 +454,44 @@ function createSoftwareElement(element, addTo, require_update) {
       softwareElementCount++;
 }
 
-function loopManifests(manifests) {
-    $.each(manifests, function( index, manifest ) {
-        //alert(manifest);
-        getIncludedManifest(manifest);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getIncludedManifest(manifest) {
+    $.ajax({
+        method: 'GET',
+        url: "/reports/_getManifest/"+manifest,
+        timeout: 10000,
+        cache: false,
+        success: function(data) {
+            loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
+            loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls", manifest),
+            loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
+            loopManifests(JSON.parse(data).included_manifests)
+        },
+        error: function() {
+            $("#included_manifests_"+manifest).addClass("list-group-item-danger");
+        },
+        dataType: 'html'
     });
 }
 
 function getStatus(item, serial, id) {
     $.ajax({
         type:"POST",
-        async: true,
         url:"/reports/_status",
         data: {item : item, serial: serial},
         dataType: 'json',
@@ -560,7 +557,6 @@ function getClientTable(filter) {
                 return xhr;
             },
         method: 'GET',
-        async: true,
         url: manifestItemURL,
         timeout: 10000,
         cache: false,
