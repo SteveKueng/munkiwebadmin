@@ -5,13 +5,13 @@ var interval = ""
 // resize modal content to max windows height
 function do_resize() {
     if ($(window).width() < 768) {
-        $('#detail_content').height($(window).height() - 270);
+        $('#detail_content').height($(window).height() - 280);
         $('#clientTab').tabdrop();
     } else {
-        $('#detail_content').height($(window).height() - 220);
+        $('#detail_content').height($(window).height() - 230);
     }
 }
-//$(window).resize(do_resize);
+$(window).resize(do_resize);
 
 // using jQuery
 function getCookie(name) {
