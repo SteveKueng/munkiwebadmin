@@ -5,6 +5,7 @@
 	<!-- Morris -->
 	<script src="{% get_static_prefix %}js/morrisjs/morris.min.js"></script>
 	<script src="{% get_static_prefix %}js/raphael/raphael-min.js"></script>
+    <script src="{% get_static_prefix %}reports/js/dashboard.js"></script>
     <link rel="stylesheet" href='{% get_static_prefix %}css/morris/morris.css' type="text/css" media="all" />
 
 {% endblock %}
@@ -148,40 +149,6 @@ $('#SearchField').prop('disabled', true);
                 <h3 class="panel-title">OS breakdown</h3>
             </div>
             <div id="osbreakdown" style="height: 300px; cursor: pointer;"></div>
-            <script>
-                $.ajax({
-                    type: 'GET',
-                    url: "/api/report?api_fields=os_version",
-                    dataType: "json",
-                    async: true,
-                    contentType: "application/json",
-                    success: function (json) {
-                        var result = {};
-                        for(var i = 0; i < json.length; i++){
-                            for(var item in json[i]){
-                                if(!result[json[i][item]]){
-                                    result[json[i][item]] = 0;
-                                }
-                                result[json[i][item]]++;
-                            }
-                        }
-                        var data = []
-                        for(var item in result) {
-                            dataItems = {}
-                            dataItems["label"] = item
-                            dataItems["value"] = result[item]
-                            data.push(dataItems)
-                        }
-                        Morris.Donut({
-                            element: 'osbreakdown',
-                            data: data,
-                            resize: true
-                        }).on('click', function(i, row){
-                            window.location.href = "/reports?os_version="+row.label;
-                        });
-                    }
-                });
-            </script>
         </div>
     </div>
     <div class="col-md-8">
@@ -190,45 +157,6 @@ $('#SearchField').prop('disabled', true);
                 <h3 class="panel-title">Hardware breakdown</h3>
             </div>
             <div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
-            <script>
-                $.ajax({
-                    type: 'GET',
-                    url: "/api/report?api_fields=machine_model",
-                    dataType: "json",
-                    async: true,
-                    contentType: "application/json",
-                    success: function (json) {
-                        var result = {};
-                        for(var i = 0; i < json.length; i++){
-                            for(var item in json[i]){
-                                if(!result[json[i][item]]){
-                                    result[json[i][item]] = 0;
-                                }
-                                result[json[i][item]]++;
-                            }
-                        }
-                        var data = [];
-                        for(var item in result) {
-                            dataItems = {}
-                            dataItems["label"] = item
-                            dataItems["value"] = result[item]
-                            data.push(dataItems)
-                        }
-                        Morris.Bar({
-                            element: 'hardwarebreakdown',
-                            data: data,
-                            xkey: 'label',
-                            ykeys: ['value'],
-                            labels: ['Machine Model'],
-                            hideHover: true,
-                            stacked: true,
-                            resize: true
-                        }).on('click', function(i, row){
-                            window.location.href = "/reports?model="+row.label;
-                        });
-                    }
-                });
-            </script>
         </div>
     </div>
 		{% if low_disk_machines %}

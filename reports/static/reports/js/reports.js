@@ -2,9 +2,6 @@
 var imagrReportsTable = ""
 var interval = ""
 
-
-
-
 // resize modal content to max windows height
 function do_resize() {
     if ($(window).width() < 768) {
@@ -468,14 +465,7 @@ function addElementToList(item, listid, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
-                    //add new item
-                    $(item).before("<a class='list-group-item manifestItem' id='"+listid+"_"+itemValue+"'>"+itemValue+"</a>");
-                    item.value = "";
-                    if (listid.indexOf("catalogs") == -1) {
-                        getIncludedManifest(itemValue);
-                    } else {
-                        //getManifest(manifest);
-                    }
+                    getManifest(manifest);
                 },
                 error: function(){
                     alert("could not save "+itemValue+"!");
@@ -487,10 +477,10 @@ function addElementToList(item, listid, event) {
 
 function removeElementFromList(item, listid) {
     manifest = getManifestName();
-
+    elementToRemove = $(item).parent().attr('id')
     itemValue = $(item).parent().attr('id').split(/[_ ]+/).pop()
-    if($.isNumeric(itemValue)) {
-        length = $(item).parent().attr('id').split(/[_ ]+/).pop().length
+    if($.isNumeric(parseInt(itemValue))) {
+        length = $(item).parent().attr('id').length - $(item).parent().attr('id').split(/[_ ]+/).pop().length - 1
         itemValue = $(item).parent().attr('id').substring(0, length);
     }
 
@@ -505,10 +495,10 @@ function removeElementFromList(item, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
-        success: function(data){ 
-            $("#"+listid+"_"+itemValue).remove();
-            if (listid.indexOf("catalogs") == -1) {
-                getIncludedManifest(itemValue);
+        success: function(data){
+            $("#"+elementToRemove).remove();
+            if (listid.indexOf("included_manifest") !== -1) {
+                //getIncludedManifest(itemValue);
             } else {
 
                 //getManifest(manifest);
@@ -522,7 +512,7 @@ function removeElementFromList(item, listid) {
 
 function getItemsToSave(listid) {
     //get items to save
-    itemList = $('#'+listid).children('a').map(function() {
+    itemList = $('#'+listid).children('.manifestItem').map(function() {
         if(this.id.match("^"+listid)) { 
             return this.id.substring(listid.length + 1); 
         } 
