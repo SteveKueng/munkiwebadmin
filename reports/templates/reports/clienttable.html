@@ -4,7 +4,8 @@
 		<ul id="deviceList" class="grid">
 			{% for report in reports %}
 			<li onClick="window.location.hash = '#{{ report.serial_number }}'" class="col-xs-4 col-md-4 col-lg-2 col-xl-1" data-state="all">
-			  <img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
+			  <div class="border-div">
+				<img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
         <script type='text/javascript'>
           getDeviceIcon("{{report.serial_number}}", "_icon");
         </script>
@@ -15,6 +16,7 @@
         <h4 class='detail'>{{ report.console_user }}</h4>
         <!-- <h4 class='detail'>{{ report.remote_ip }}</h4> -->
         <h4 class="detail">{{ report.report_time|date:"Y-m-d H:i" }}</h4>
+			  </div>
 		  </li>
 			{% endfor %}
 		</ul>

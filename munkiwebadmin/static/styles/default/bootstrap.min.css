@@ -29,19 +29,18 @@
 
 .grid li {
   float: left;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  background-color: #eeeeee;
+  padding-left: 0 !important;
+  padding-right: 5px !important;
+  padding-bottom: 5px !important;
   text-align: center;
-  box-sizing: border-box;
+  box-sizing: border-box; }
+
+.border-div {
+  background-color: #eeeeee;
   border: 1px solid #c5c5c5; }
 
-.grid li:hover, .list li:hover {
-  background-color: #d4d4d4;
+.border-div:hover {
+  background-color: #d5d5d5;
   border: 1px solid #af001d; }
 
 .grid li .detail {
@@ -102,6 +101,9 @@
   /*border: none;*/
   /* width: 100%;*/ }
 
+.grid-list {
+  margin-right: 5px !important; }
+
 .profile-image {
   margin: -10px 10px;
   height: 40px; }
@@ -137,6 +139,9 @@ table {
   height: auto;
   min-height: 100%;
   border-radius: 0; }
+
+.fix-margin-list-btn {
+  margin-right: 5px; }
 
 #wrapper {
   width: 100%; }
