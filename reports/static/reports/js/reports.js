@@ -289,7 +289,7 @@ function getListElement(manifest, listid) {
 // managed installs
 function getSoftwareElemnts(manifest, listid) {
     getManifest(manifest, function(data) {
-        loopSoftwareElements(data[listid], listid+"_local");
+        loopSoftwareElements(data[listid], listid);
         getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
     })
 }
@@ -393,11 +393,8 @@ function removeElementFromList(item, listid) {
 // edit software
 function loopSoftwareElements(elements, listid, require_update) {
     $( "#"+listid).empty()
-    if ($("#"+listid).length < 1){
-        $( "#"+listid ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
-    }
+    $( "#"+listid ).append("<input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
     $.each(elements, function( index, value ) {
-        //alert( index + ": " + value );
         createSoftwareElement(value, listid, require_update);
     });
 }
@@ -425,7 +422,7 @@ function createSoftwareElement(element, addTo, require_update) {
             var icon = catalogData[element].icon
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box pull-right'><div class='led-grey'></div></div></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -454,40 +451,47 @@ function createSoftwareElement(element, addTo, require_update) {
       softwareElementCount++;
 }
 
+function addSoftwareToList(item, listid, event) {
+    if (event.which == '13' && item.value != "") {
+        manifest = getManifestName()
+        itemValue = item.value
 
+        //get items to save
+        itemList = getItemsToSave(listid)
 
+        //check if item already in list
+        if(jQuery.inArray(itemValue, itemList) == -1) {
+            itemList.push(itemValue);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getIncludedManifest(manifest) {
-    $.ajax({
-        method: 'GET',
-        url: "/reports/_getManifest/"+manifest,
-        timeout: 10000,
-        cache: false,
-        success: function(data) {
-            loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
-            loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls", manifest),
-            loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
-            loopManifests(JSON.parse(data).included_manifests)
-        },
-        error: function() {
-            $("#included_manifests_"+manifest).addClass("list-group-item-danger");
-        },
-        dataType: 'html'
-    });
+            itemList = JSON.stringify(itemList);
+            $.ajax({
+                type:"POST",
+                url:"/api/manifests/"+manifest,
+                method: "PATCH",
+                data: '{ "'+[listid]+'": '+itemList+' }',
+                contentType: 'application/json',
+                success: function(data){
+                    loopSoftwareElements(data[listid], listid);
+                },
+                error: function(){
+                    alert("could not save "+itemValue+"!");
+                }
+            });
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function getStatus(item, serial, id) {
     $.ajax({
@@ -529,7 +533,6 @@ function getManifestName() {
 }
 
 //edit software
-
 function getItemsToSave(listid) {
     //get items to save
     itemList = $('#'+listid).children('.manifestItem').map(function() {
