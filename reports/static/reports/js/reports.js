@@ -354,12 +354,12 @@ function addElementToList(item, listid, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
-                    if (listid === 'included_manifests'){
+                    if (listid === 'included_manifests') {
                         getListElement(manifest, listid);
                         getSoftwareElemntsIncludedManifest([itemValue], "managed_installs")
                         getSoftwareElemntsIncludedManifest([itemValue], "managed_uninstalls")
                         getSoftwareElemntsIncludedManifest([itemValue], "optional_installs")
-                    } else {
+                    } else if (listid === 'catalogs') {
                         $.when(getSoftwareList(data.catalogs)).done(
                             getListElement(manifest, "included_manifests"),
                             getListElement(manifest, "catalogs"),
@@ -367,6 +367,9 @@ function addElementToList(item, listid, event) {
                             getSoftwareElemnts(manifest, "managed_uninstalls"),
                             getSoftwareElemnts(manifest, "optional_installs")
                         );
+                    } else {
+                        $( "#"+listid).empty()
+                        loopSoftwareElements(data[listid], listid);
                     }
                 },
                 error: function(){
