@@ -481,18 +481,6 @@ function addSoftwareToList(item, listid, event) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 function getStatus(item, serial, id) {
     $.ajax({
         type:"POST",
@@ -500,7 +488,7 @@ function getStatus(item, serial, id) {
         data: {item : item, serial: serial},
         dataType: 'json',
         success: function(data){
-            $('#'+id).find('.status').text(data);
+            $('#'+id).find('.led-box').children().removeClass().addClass( data );
         }
     }); 
 }
@@ -521,6 +509,18 @@ function loadStatus() {
         getStatus(item, serial, id)
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function getSerial() {
     var serial = window.location.hash
