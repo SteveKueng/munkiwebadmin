@@ -240,7 +240,7 @@ function getComputerItem(pathname) {
             hideProgressBar();
 
             //start refresh
-            //startRefresh();
+            startRefresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -289,10 +289,14 @@ function getListElement(manifest, listid) {
 // managed installs
 function getSoftwareElemnts(manifest, listid) {
     getManifest(manifest, function(data) {
+        $( "#"+listid).empty()
         loopSoftwareElements(data[listid], listid);
+
+        $( "#"+listid+"_remote").empty()
         getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
     })
 }
+
 function getSoftwareElemntsIncludedManifest(manifests, listid) {
     $.each(manifests, function( index, manifest ) {
         getManifest(manifest, function(data) {
@@ -350,7 +354,23 @@ function addElementToList(item, listid, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
-                    getListElement(manifest, listid);
+                    if (listid === 'included_manifests') {
+                        getListElement(manifest, listid);
+                        getSoftwareElemntsIncludedManifest([itemValue], "managed_installs")
+                        getSoftwareElemntsIncludedManifest([itemValue], "managed_uninstalls")
+                        getSoftwareElemntsIncludedManifest([itemValue], "optional_installs")
+                    } else if (listid === 'catalogs') {
+                        $.when(getSoftwareList(data.catalogs)).done(
+                            getListElement(manifest, "included_manifests"),
+                            getListElement(manifest, "catalogs"),
+                            getSoftwareElemnts(manifest, "managed_installs"),
+                            getSoftwareElemnts(manifest, "managed_uninstalls"),
+                            getSoftwareElemnts(manifest, "optional_installs")
+                        );
+                    } else {
+                        $( "#"+listid).empty()
+                        loopSoftwareElements(data[listid], listid);
+                    }
                 },
                 error: function(){
                     alert("could not save "+itemValue+"!");
@@ -381,7 +401,23 @@ function removeElementFromList(item, listid) {
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
         success: function(data){
-            getListElement(manifest, listid);
+            if (listid === 'included_manifests'){
+                getListElement(manifest, listid);
+                $( "#managed_installs_remote").empty()
+                getSoftwareElemntsIncludedManifest(data.included_manifests, "managed_installs")
+                $( "#managed_uninstalls_remote").empty()
+                getSoftwareElemntsIncludedManifest(data.included_manifests, "managed_uninstalls")
+                $( "#optional_installs_remote").empty()
+                getSoftwareElemntsIncludedManifest(data.included_manifests, "optional_installs")
+            }  else {
+                $.when(getSoftwareList(data.catalogs)).done(
+                    getListElement(manifest, "included_manifests"),
+                    getListElement(manifest, "catalogs"),
+                    getSoftwareElemnts(manifest, "managed_installs"),
+                    getSoftwareElemnts(manifest, "managed_uninstalls"),
+                    getSoftwareElemnts(manifest, "optional_installs")
+                );
+            }
         },
         error: function(){
             alert("could not remove "+item+"!");
@@ -392,8 +428,10 @@ function removeElementFromList(item, listid) {
 
 // edit software
 function loopSoftwareElements(elements, listid, require_update) {
-    $( "#"+listid).empty()
-    $( "#"+listid ).append("<input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+    var match = listid.match("remote");
+    if(!match) {
+        $( "#"+listid ).append("<input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+    }
     $.each(elements, function( index, value ) {
         createSoftwareElement(value, listid, require_update);
     });
@@ -461,7 +499,7 @@ function addSoftwareToList(item, listid, event) {
 
         //check if item already in list
         if(jQuery.inArray(itemValue, itemList) == -1) {
-            itemList.push(itemValue);
+            itemList.unshift(itemValue);
 
             itemList = JSON.stringify(itemList);
             $.ajax({
@@ -471,6 +509,7 @@ function addSoftwareToList(item, listid, event) {
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
                 success: function(data){
+                    $( "#"+listid).empty()
                     loopSoftwareElements(data[listid], listid);
                 },
                 error: function(){
@@ -481,18 +520,6 @@ function addSoftwareToList(item, listid, event) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 function getStatus(item, serial, id) {
     $.ajax({
         type:"POST",
@@ -500,7 +527,7 @@ function getStatus(item, serial, id) {
         data: {item : item, serial: serial},
         dataType: 'json',
         success: function(data){
-            $('#'+id).find('.status').text(data);
+            $('#'+id).find('.led-box').children().removeClass().addClass( data );
         }
     }); 
 }

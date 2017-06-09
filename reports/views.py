@@ -374,7 +374,7 @@ def getStatus(request):
     if request.is_ajax() and serial and item:
         machine = None
         report_plist = None
-        status = "set"
+        status = "led-grey"
         try:
             machine = Machine.objects.get(serial_number=serial)
         except Machine.DoesNotExist, err:
@@ -389,7 +389,17 @@ def getStatus(request):
 
         if report_plist:
             if "InstalledItems" in report_plist and item in report_plist.InstalledItems:
-                status = "installed"
+                status = "led-green"
+            elif "RemovedItems" in report_plist and item in report_plist.RemovedItems:
+                status = "led-red"
+            elif "ItemsToInstall" in report_plist:
+                for itemToInstall in report_plist.ItemsToInstall:
+                    if itemToInstall.name == item:
+                        status = "led-orange"
+            elif "ItemsToRemove" in report_plist:
+                for itemToRemove in report_plist.ItemsToRemove:
+                    if itemToRemove.name == item:
+                        status = "led-orange"
 
             return HttpResponse(json.dumps(status),
                             content_type='application/json')
