@@ -240,7 +240,7 @@ function getComputerItem(pathname) {
             hideProgressBar();
 
             //start refresh
-            //startRefresh();
+            startRefresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -548,18 +548,6 @@ function loadStatus() {
         getStatus(item, serial, id)
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 function getSerial() {
     var serial = window.location.hash
