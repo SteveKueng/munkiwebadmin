@@ -390,6 +390,14 @@ def getStatus(request):
         if report_plist:
             if "InstalledItems" in report_plist and item in report_plist.InstalledItems:
                 status = "led-green"
+            elif "ItemsToInstall" in report_plist:
+                for itemToInstall in report_plist.ItemsToInstall:
+                    if itemToInstall.name == item:
+                        status = "led-yellow"
+            elif "ItemsToRemove" in report_plist:
+                for itemToRemove in report_plist.ItemsToRemove:
+                    if itemToRemove.name == item:
+                        status = "led-yellow"
 
             return HttpResponse(json.dumps(status),
                             content_type='application/json')
