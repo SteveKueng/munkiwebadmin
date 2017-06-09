@@ -1,4 +1,33 @@
 {% load report_extras %}
+{% block extra_style %}
+<style>
+.led-box {
+  height: 20px;
+  margin: 3px 0;
+  margin-left: 10px;
+  float: right;
+}
+
+.led-green {
+  margin: 0 auto;
+  width: 15px;
+  height: 15px;
+  background-color: rgb(90,190,70);
+  border-radius: 50%;
+}
+
+.led-grey {
+  margin: 0 auto;
+  width: 15px;
+  height: 15px;
+  background-color: #A4A4A4;
+  border-radius: 50%;
+}
+
+
+</style>
+{% endblock %}
+
 {% load static %}
 <div class="modal fade" id="computerDetails">
 	<div class="modal-dialog modal-lg">
@@ -44,28 +73,61 @@
 					</div>
 			</div>
 					<!-- Tab panes -->
-					<div class="tab-content" id="detail_content">
-						<div role="tabpanel" class="tab-pane tabDetail active" id='Software'>
+					<div class="tab-content" id="detail_content" >
+						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="overflow-x:auto; height:100%;">
 							<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
 							<div class="panel-body" id="SoftwareView">
 								<!-- Manifests / Catalog -->
-								<div class="row hidden" id="manifestTop">
+								<div class="row" id="manifestTop">
 									<!-- Manifests -->
 									<div class='col-md-6'>
 										<div class="section_label"><h4>Included Manifests</h4></div>
 										<div id='included_manifests' class='included_manifests_section list-group unstyled'>
+											<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 										</div>
 									</div>
 									<!-- Catalogs -->
 									<div class='col-md-6'>
 										<div class="section_label"><h4>Catalogs</h4></div>
 										<div id='catalogs' class='list-group unstyled'>
+											<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 										</div>
 									</div>
 								</div>
 								<!-- Software -->
 								<div class="row">
-									<div class='col-md-12' id='SoftwareList'>
+									<div class='col-md-12'>
+										<div class="section_label"><h4>Managed Installs</h4></div>
+										<div class='list-group list-group-root unstyled'>
+											<div id='managed_installs'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+											<div id='managed_installs_remote'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+										</div>
+									</div>
+									<div class='col-md-12'>
+										<div class="section_label"><h4>Managed Uninstalls</h4></div>
+										<div class='list-group list-group-root unstyled'>
+											<div id='managed_uninstalls'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+											<div id='managed_uninstalls_remote'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+										</div>
+									</div>
+									<div class='col-md-12'>
+										<div class="section_label"><h4>Optional Uninstalls</h4></div>
+										<div class='list-group list-group-root unstyled'>
+											<div id='optional_installs'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+											<div id='optional_installs_remote'>
+												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>

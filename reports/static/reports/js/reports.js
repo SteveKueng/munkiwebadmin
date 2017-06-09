@@ -196,12 +196,6 @@ function getDeviceIcon(serial, iconid) {
 
 var current_pathname = "";
 function getComputerItem(pathname) {
-    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-        requested_pathname = pathname;
-        $("#saveOrCancelConfirmationModal").modal("show");
-        event.preventDefault();
-        return;
-    }
     $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
     showProgressBar();
     var manifestItemURL = '/reports/' + pathname;
@@ -221,8 +215,17 @@ function getComputerItem(pathname) {
         success: function(data) {
             // load date
             $('#computer_detail').html(data);
-            getManifest(getManifestName());
-            //getImagrReports(pathname);
+
+            //loading manifest data
+            getManifest(pathname, function(data) {
+                $.when(getSoftwareList(data.catalogs)).done(
+                    getListElement(pathname, "included_manifests"),
+                    getListElement(pathname, "catalogs"),
+                    getSoftwareElemnts(pathname, "managed_installs"),
+                    getSoftwareElemnts(pathname, "managed_uninstalls"),
+                    getSoftwareElemnts(pathname, "optional_installs")
+                );
+            })  
 
             current_pathname = pathname;
             requested_pathname = "";
@@ -231,13 +234,13 @@ function getComputerItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#computerDetails').hasClass('in')){
-                //do_resize();              
+                do_resize();              
                 $("#computerDetails").modal("show");
             }
             hideProgressBar();
 
             //start refresh
-            startRefresh();
+            //startRefresh();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#computer_detail').html("")
@@ -267,7 +270,6 @@ function getSoftwareList(catalogList) {
     catalogData = ""
     $.ajax({
         type:"POST",
-        async: false,
         url:"/reports/_catalogJson",
         data: {catalogList},
         dataType: 'json',
@@ -277,55 +279,32 @@ function getSoftwareList(catalogList) {
     }); 
 }
 
-function getManifest(manifest) {
-    $.ajax({
-        method: 'GET',
-        url: "/reports/_getManifest/"+manifest,
-        timeout: 10000,
-        async: true,
-        cache: false,
-        success: function(data) {
-            $("#manifestTop").removeClass("hidden");
-            $("#manifestWarning").remove()
-            $.when(getSoftwareList(JSON.parse(data).catalogs)).done(
-                createListElements(JSON.parse(data).included_manifests, "included_manifests"),
-                createListElements(JSON.parse(data).catalogs, "catalogs"),
-                loopElement(JSON.parse(data).managed_installs, "managed_installs"),
-                loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls"),
-                loopElement(JSON.parse(data).optional_installs, "optional_installs"),
-                loopManifests(JSON.parse(data).included_manifests)
-            );
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            //display error when manifest is not readable
-            $("#SoftwareView").append('<div class="row" id="manifestWarning"><div class="col-md-12"><div class="alert alert-warning">No manifest found! <a class="alert-link" onclick="newManifestItem();">create</a></div></div></div>');
-        },
-        dataType: 'html'
+// includet manifests and catalogs
+function getListElement(manifest, listid) {
+    getManifest(manifest, function(data) {
+        createListElements(data[listid], listid)
+    })
+}
+
+// managed installs
+function getSoftwareElemnts(manifest, listid) {
+    getManifest(manifest, function(data) {
+        loopSoftwareElements(data[listid], listid);
+        getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
+    })
+}
+function getSoftwareElemntsIncludedManifest(manifests, listid) {
+    $.each(manifests, function( index, manifest ) {
+        getManifest(manifest, function(data) {
+            loopSoftwareElements(data[listid], listid+"_remote", manifest);
+            getSoftwareElemntsIncludedManifest(data.included_manifests, listid);
+        })
     });
 }
 
-function getIncludedManifest(manifest) {
-    $.ajax({
-        method: 'GET',
-        url: "/reports/_getManifest/"+manifest,
-        timeout: 10000,
-        async: true,
-        cache: false,
-        success: function(data) {
-            loopElement(JSON.parse(data).managed_installs, "managed_installs", manifest),
-            loopElement(JSON.parse(data).managed_uninstalls, "managed_uninstalls", manifest),
-            loopElement(JSON.parse(data).optional_installs, "optional_installs", manifest),
-            loopManifests(JSON.parse(data).included_manifests)
-        },
-        error: function() {
-            $("#included_manifests_"+manifest).addClass("list-group-item-danger");
-        },
-        dataType: 'html'
-    });
-}
-
+// edit list
 function createListElements(elements, listid) {
-    //alert(JSON.stringify(catalogData))
+    $( "#"+listid ).empty()
     $.each(elements, function( index, value ) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
@@ -333,13 +312,89 @@ function createListElements(elements, listid) {
     $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
 }
 
-function loopElement(elements, listid, require_update) {
-    //alert(JSON.stringify(catalogData))
-    if ($("#"+listid ).length < 1){
-        $( "#SoftwareList" ).append("<div class='section_label'><h4>"+listid.replace('_', ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})+"</h4></div><div class='list-group list-group-root' id='"+listid+"'><input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'></div>" );
+function getManifest(manifest, handleData) {
+    $.ajax({
+        method: 'GET',
+        url: "/reports/_getManifest/"+manifest,
+        timeout: 10000,
+        cache: false,
+        success: function(data) {
+            handleData(JSON.parse(data));
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //display error when manifest is not readable
+            //$("#SoftwareView").append('<div class="row" id="manifestWarning"><div class="col-md-12"><div class="alert alert-warning">No manifest found! <a class="alert-link" onclick="newManifestItem();">create</a></div></div></div>');
+        },
+        dataType: 'html'
+    });
+}
+
+function addElementToList(item, listid, event) {
+    if (event.which == '13' && item.value != "") {
+        manifest = getManifestName()
+        itemValue = item.value
+
+        //get items to save
+        itemList = getItemsToSave(listid)
+
+        //check if item already in list
+        if(jQuery.inArray(itemValue, itemList) == -1) {
+            itemList.push(itemValue);
+
+            itemList = JSON.stringify(itemList);
+
+            $.ajax({
+                type:"POST",
+                url:"/api/manifests/"+manifest,
+                method: "PATCH",
+                data: '{ "'+[listid]+'": '+itemList+' }',
+                contentType: 'application/json',
+                success: function(data){
+                    getListElement(manifest, listid);
+                },
+                error: function(){
+                    alert("could not save "+itemValue+"!");
+                }
+            });
+        }
     }
+}
+
+function removeElementFromList(item, listid) {
+    manifest = getManifestName();
+    elementToRemove = $(item).parent().attr('id')
+    itemValue = $(item).parent().attr('id').split(/[_ ]+/).pop()
+    if($.isNumeric(parseInt(itemValue))) {
+        length = $(item).parent().attr('id').length - $(item).parent().attr('id').split(/[_ ]+/).pop().length - 1
+        itemValue = $(item).parent().attr('id').substring(0, length);
+    }
+
+    //get items to save
+    itemList = getItemsToSave(listid);
+    itemList.splice(itemList.indexOf(itemValue), 1);
+    itemList = JSON.stringify(itemList);
+
+    $.ajax({
+        type:"POST",
+        url:"/api/manifests/"+manifest,
+        method: "PATCH",
+        data: '{ "'+[listid]+'": '+itemList+' }',
+        contentType: 'application/json',
+        success: function(data){
+            getListElement(manifest, listid);
+        },
+        error: function(){
+            alert("could not remove "+item+"!");
+        }
+    });
+}
+
+
+// edit software
+function loopSoftwareElements(elements, listid, require_update) {
+    $( "#"+listid).empty()
+    $( "#"+listid ).append("<input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
     $.each(elements, function( index, value ) {
-        //alert( index + ": " + value );
         createSoftwareElement(value, listid, require_update);
     });
 }
@@ -367,7 +422,7 @@ function createSoftwareElement(element, addTo, require_update) {
             var icon = catalogData[element].icon
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+" <span class='label label-default status'>set</span></small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box pull-right'><div class='led-grey'></div></div></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -396,17 +451,51 @@ function createSoftwareElement(element, addTo, require_update) {
       softwareElementCount++;
 }
 
-function loopManifests(manifests) {
-    $.each(manifests, function( index, manifest ) {
-        //alert(manifest);
-        getIncludedManifest(manifest);
-    });
+function addSoftwareToList(item, listid, event) {
+    if (event.which == '13' && item.value != "") {
+        manifest = getManifestName()
+        itemValue = item.value
+
+        //get items to save
+        itemList = getItemsToSave(listid)
+
+        //check if item already in list
+        if(jQuery.inArray(itemValue, itemList) == -1) {
+            itemList.push(itemValue);
+
+            itemList = JSON.stringify(itemList);
+            $.ajax({
+                type:"POST",
+                url:"/api/manifests/"+manifest,
+                method: "PATCH",
+                data: '{ "'+[listid]+'": '+itemList+' }',
+                contentType: 'application/json',
+                success: function(data){
+                    loopSoftwareElements(data[listid], listid);
+                },
+                error: function(){
+                    alert("could not save "+itemValue+"!");
+                }
+            });
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function getStatus(item, serial, id) {
     $.ajax({
         type:"POST",
-        async: true,
         url:"/reports/_status",
         data: {item : item, serial: serial},
         dataType: 'json',
@@ -444,72 +533,6 @@ function getManifestName() {
 }
 
 //edit software
-function addElementToList(item, listid, event) {
-    if (event.which == '13' && item.value != "") {
-        manifest = getManifestName()
-        itemValue = item.value
-
-        //get items to save
-        itemList = getItemsToSave(listid)
-
-        //check if item already in list
-        if(jQuery.inArray(itemValue, itemList) == -1) {
-            itemList.push(itemValue);
-
-            itemList = JSON.stringify(itemList);
-
-            $.ajax({
-                type:"POST",
-                url:"/api/manifests/"+manifest,
-                method: "PATCH",
-                data: '{ "'+[listid]+'": '+itemList+' }',
-                contentType: 'application/json',
-                success: function(data){
-                    getManifest(manifest);
-                },
-                error: function(){
-                    alert("could not save "+itemValue+"!");
-                }
-            });
-        }
-    }
-}
-
-function removeElementFromList(item, listid) {
-    manifest = getManifestName();
-    elementToRemove = $(item).parent().attr('id')
-    itemValue = $(item).parent().attr('id').split(/[_ ]+/).pop()
-    if($.isNumeric(parseInt(itemValue))) {
-        length = $(item).parent().attr('id').length - $(item).parent().attr('id').split(/[_ ]+/).pop().length - 1
-        itemValue = $(item).parent().attr('id').substring(0, length);
-    }
-
-    //get items to save
-    itemList = getItemsToSave(listid);
-    itemList.splice(itemList.indexOf(itemValue), 1);
-    itemList = JSON.stringify(itemList);
-
-    $.ajax({
-        type:"POST",
-        url:"/api/manifests/"+manifest,
-        method: "PATCH",
-        data: '{ "'+[listid]+'": '+itemList+' }',
-        contentType: 'application/json',
-        success: function(data){
-            $("#"+elementToRemove).remove();
-            if (listid.indexOf("included_manifest") !== -1) {
-                //getIncludedManifest(itemValue);
-            } else {
-
-                //getManifest(manifest);
-            }
-        },
-        error: function(){
-            alert("could not remove "+item+"!");
-        }
-    });
-}
-
 function getItemsToSave(listid) {
     //get items to save
     itemList = $('#'+listid).children('.manifestItem').map(function() {
@@ -537,7 +560,6 @@ function getClientTable(filter) {
                 return xhr;
             },
         method: 'GET',
-        async: true,
         url: manifestItemURL,
         timeout: 10000,
         cache: false,
@@ -735,7 +757,7 @@ function setWorkflow(workflow) {
 }
 
 function startRefresh() {
-    // 1 second interval
+    // 2 second interval
     interval = setInterval (function () {
         //imagr workflow
         imagrReportsTable.ajax.reload();
