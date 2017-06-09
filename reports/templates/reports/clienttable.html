@@ -5,18 +5,18 @@
 			{% for report in reports %}
 			<li onClick="window.location.hash = '#{{ report.serial_number }}'" class="col-xs-4 col-md-4 col-lg-2 col-xl-1" data-state="all">
 			  <div class="border-div">
-				<img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
-        <script type='text/javascript'>
-          getDeviceIcon("{{report.serial_number}}", "_icon");
-        </script>
-  			{% if report.hostname %}
-				<h4>{{ report.hostname }}</h4>
-				{% endif %}
-				<h4 class="detail">{{ report.serial_number }}</h4>
-        <h4 class='detail'>{{ report.console_user }}</h4>
-        <!-- <h4 class='detail'>{{ report.remote_ip }}</h4> -->
-        <h4 class="detail">{{ report.report_time|date:"Y-m-d H:i" }}</h4>
-			  </div>
+						<img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
+						<script type='text/javascript'>
+						getDeviceIcon("{{report.serial_number}}", "_icon");
+						</script>
+						{% if report.hostname %}
+						<span class="important">{{ report.hostname }}</span>
+						{% endif %}
+						<span class="detail">{{ report.serial_number }}</span>
+						<span class='detail'>{{ report.console_user }}</span>
+						<!-- <h4 class='detail'>{{ report.remote_ip }}</h4> -->
+						<span class="detail">{{ report.report_time|date:"Y-m-d H:i" }}</span>
+				</div>
 		  </li>
 			{% endfor %}
 		</ul>
