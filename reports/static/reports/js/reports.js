@@ -441,7 +441,6 @@ function removeElementFromList(item, listid) {
 }
 
 function saveManifest(manifest, listid) {
-    alert("test")
     //get items to save
     itemList = getItemsToSave(listid);
     itemList = JSON.stringify(itemList);
