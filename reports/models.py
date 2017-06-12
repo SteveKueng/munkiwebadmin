@@ -23,7 +23,7 @@ class Machine(models.Model):
     hostname = models.CharField(max_length=64, default="unknown")
     username = models.CharField(max_length=256, blank=True)
     remote_ip = models.CharField(max_length=15, blank=True)
-    businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None)
+    businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None, on_delete=models.CASCADE)
     machine_model = models.CharField(max_length=64, blank=True)
     cpu_type = models.CharField(max_length=64, blank=True)
     cpu_speed = models.CharField(max_length=32, blank=True)
@@ -45,7 +45,7 @@ class Machine(models.Model):
         ordering = ['hostname']
 
 class MunkiReport(models.Model):
-    machine = models.ForeignKey(Machine)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=django.utils.timezone.now)
     runtype = models.CharField(max_length=64)
     runstate = models.CharField(max_length=16)
@@ -147,7 +147,7 @@ class MunkiReport(models.Model):
             self.console_user = unicode(plist["ConsoleUser"])
 
 class ImagrReport(models.Model):
-    machine = models.ForeignKey(Machine)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     status = models.CharField(max_length=200)
     message = models.CharField(max_length=512)
     date_added = models.DateTimeField(auto_now_add=True)

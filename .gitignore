@@ -17,6 +17,8 @@ db.sqlite3
 # ignore collectstatics
 /munkiwebadmin/collected_static
 
+/migrationd
+
 # ignore reposado links
 reposadolib
 preferences.plist

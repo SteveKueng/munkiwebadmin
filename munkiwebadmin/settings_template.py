@@ -92,6 +92,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
@@ -255,7 +256,6 @@ else:
 
 # https://docs.djangoproject.com/en/1.9/ref/settings/#login-url
 LOGIN_URL='/login/'
-LOGIN_REDIRECT_URL='/manifests/'
 
 # who gets code error notifcations when DEBUG is False
 # https://docs.djangoproject.com/en/1.9/ref/settings/#admins
