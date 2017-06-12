@@ -28,3 +28,4 @@ Web.config
 
 config.codekit3
 *.log
+/reports/migrations
