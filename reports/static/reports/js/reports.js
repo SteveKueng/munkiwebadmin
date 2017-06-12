@@ -236,6 +236,16 @@ function getComputerItem(pathname) {
             if (!$('#computerDetails').hasClass('in')){
                 do_resize();              
                 $("#computerDetails").modal("show");
+                $( "#catalogs" ).sortable({
+                    update: function( ) {
+                     saveManifest(pathname, "catalogs");
+                    }
+                });
+                $( "#included_manifests" ).sortable({
+                    update: function( ) {
+                     saveManifest(pathname, "included_manifests");
+                    }
+                });
             }
             hideProgressBar();
 
@@ -314,7 +324,7 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" )
 }
 
 function getManifest(manifest, handleData) {
@@ -426,6 +436,24 @@ function removeElementFromList(item, listid) {
         },
         error: function(){
             alert("could not remove "+item+"!");
+        }
+    });
+}
+
+function saveManifest(manifest, listid) {
+    alert("test")
+    //get items to save
+    itemList = getItemsToSave(listid);
+    itemList = JSON.stringify(itemList);
+
+    $.ajax({
+        type:"POST",
+        url:"/api/manifests/"+manifest,
+        method: "PATCH",
+        data: '{ "'+[listid]+'": '+itemList+' }',
+        contentType: 'application/json',
+        error: function(){
+            alert("could not save manifest "+manifest+"!");
         }
     });
 }
