@@ -420,7 +420,7 @@ function removeElementFromList(item, listid) {
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
         success: function(data){
-            if (listid === 'included_manifests'){
+            if (listid === 'included_manifests') {
                 getListElement(manifest, listid);
                 $( "#managed_installs_remote").empty()
                 getSoftwareElemntsIncludedManifest(data.included_manifests, "managed_installs")
@@ -428,7 +428,7 @@ function removeElementFromList(item, listid) {
                 getSoftwareElemntsIncludedManifest(data.included_manifests, "managed_uninstalls")
                 $( "#optional_installs_remote").empty()
                 getSoftwareElemntsIncludedManifest(data.included_manifests, "optional_installs")
-            }  else {
+            } else if (listid === 'catalogs') {
                 getManifest(manifest, function(data) {
                     getSoftwareList(data.catalogs, function() {
                         getListElement(manifest, "included_manifests");
@@ -438,6 +438,9 @@ function removeElementFromList(item, listid) {
                         getSoftwareElemnts(manifest, "optional_installs");
                     });
                 })
+            } else {
+                $( "#"+listid).empty()
+                loopSoftwareElements(data[listid], listid);
             }
         },
         error: function(){
