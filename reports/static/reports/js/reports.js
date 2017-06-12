@@ -324,7 +324,8 @@ function createListElements(elements, listid) {
         //alert( index + ": " + value );
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" )
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+    $( "#"+listid+" .software" ).focus()
 }
 
 function getManifest(manifest, handleData) {
@@ -462,7 +463,12 @@ function saveManifest(manifest, listid) {
 function loopSoftwareElements(elements, listid, require_update) {
     var match = listid.match("remote");
     if(!match) {
-        $( "#"+listid ).append("<input type='text' class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+        $( "#"+listid ).append("<input type='text' class='list-group-item form-control software' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+        $(".software").typeahead({
+            source: Object.keys(catalogData),
+            autoSelect: true
+        });
+        $( "#"+listid+" .software" ).focus()
     }
     $.each(elements, function( index, value ) {
         createSoftwareElement(value, listid, require_update);
