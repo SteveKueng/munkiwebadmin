@@ -321,11 +321,16 @@ function getSoftwareElemntsIncludedManifest(manifests, listid) {
 function createListElements(elements, listid) {
     $( "#"+listid ).empty()
     $.each(elements, function( index, value ) {
-        //alert( index + ": " + value );
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
-    $( "#"+listid+" .software" ).focus()
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control "+listid+"' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+
+    if(listid == "catalogs") {
+        getTypeahead("/api/catalogs?api_fields=filename", listid);
+    } else {
+        getTypeahead("/api/manifests?api_fields=filename", listid);
+    }
+    $( "."+listid+"" ).focus()
 }
 
 function getManifest(manifest, handleData) {
@@ -819,7 +824,27 @@ function setWorkflow(workflow) {
             $("#errorModalDetailText").text(errorThrown);
             $("#errorModal").modal("show");
         }
-    });;
+    });
+}
+
+function getTypeahead(url, listid) {
+    $.ajax({
+        method: 'GET',
+        url: url,
+        success: function(data) {
+            var sourceArr = [];
+            for (var i = 0; i < data.length; i++) {
+                sourceArr.push(data[i].filename);
+            }
+            $("."+listid).typeahead({
+                source: sourceArr,
+                autoSelect: true
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+        }
+    });
+    
 }
 
 function startRefresh() {
