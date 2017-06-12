@@ -218,13 +218,13 @@ function getComputerItem(pathname) {
 
             //loading manifest data
             getManifest(pathname, function(data) {
-                $.when(getSoftwareList(data.catalogs)).done(
-                    getListElement(pathname, "included_manifests"),
-                    getListElement(pathname, "catalogs"),
-                    getSoftwareElemnts(pathname, "managed_installs"),
-                    getSoftwareElemnts(pathname, "managed_uninstalls"),
-                    getSoftwareElemnts(pathname, "optional_installs")
-                );
+                getSoftwareList(data.catalogs, function() {
+                    getListElement(pathname, "included_manifests");
+                    getListElement(pathname, "catalogs");
+                    getSoftwareElemnts(pathname, "managed_installs");
+                    getSoftwareElemnts(pathname, "managed_uninstalls");
+                    getSoftwareElemnts(pathname, "optional_installs");
+                });
             })  
 
             current_pathname = pathname;
@@ -266,7 +266,7 @@ function getComputerItem(pathname) {
 
 //create software list
 var catalogData = ""
-function getSoftwareList(catalogList) {
+function getSoftwareList(catalogList, handleData) {
     catalogData = ""
     $.ajax({
         type:"POST",
@@ -275,8 +275,9 @@ function getSoftwareList(catalogList) {
         dataType: 'json',
         success: function(data){
             catalogData = data;
+            handleData(catalogData)
         }
-    }); 
+    });
 }
 
 // includet manifests and catalogs
@@ -360,13 +361,15 @@ function addElementToList(item, listid, event) {
                         getSoftwareElemntsIncludedManifest([itemValue], "managed_uninstalls")
                         getSoftwareElemntsIncludedManifest([itemValue], "optional_installs")
                     } else if (listid === 'catalogs') {
-                        $.when(getSoftwareList(data.catalogs)).done(
-                            getListElement(manifest, "included_manifests"),
-                            getListElement(manifest, "catalogs"),
-                            getSoftwareElemnts(manifest, "managed_installs"),
-                            getSoftwareElemnts(manifest, "managed_uninstalls"),
-                            getSoftwareElemnts(manifest, "optional_installs")
-                        );
+                        getManifest(manifest, function(data) {
+                            getSoftwareList(data.catalogs, function() {
+                                getListElement(manifest, "included_manifests");
+                                getListElement(manifest, "catalogs");
+                                getSoftwareElemnts(manifest, "managed_installs");
+                                getSoftwareElemnts(manifest, "managed_uninstalls");
+                                getSoftwareElemnts(manifest, "optional_installs");
+                            });
+                        });
                     } else {
                         $( "#"+listid).empty()
                         loopSoftwareElements(data[listid], listid);
@@ -410,13 +413,15 @@ function removeElementFromList(item, listid) {
                 $( "#optional_installs_remote").empty()
                 getSoftwareElemntsIncludedManifest(data.included_manifests, "optional_installs")
             }  else {
-                $.when(getSoftwareList(data.catalogs)).done(
-                    getListElement(manifest, "included_manifests"),
-                    getListElement(manifest, "catalogs"),
-                    getSoftwareElemnts(manifest, "managed_installs"),
-                    getSoftwareElemnts(manifest, "managed_uninstalls"),
-                    getSoftwareElemnts(manifest, "optional_installs")
-                );
+                getManifest(manifest, function(data) {
+                    getSoftwareList(data.catalogs, function() {
+                        getListElement(manifest, "included_manifests");
+                        getListElement(manifest, "catalogs");
+                        getSoftwareElemnts(manifest, "managed_installs");
+                        getSoftwareElemnts(manifest, "managed_uninstalls");
+                        getSoftwareElemnts(manifest, "optional_installs");
+                    });
+                })
             }
         },
         error: function(){
@@ -460,7 +465,7 @@ function createSoftwareElement(element, addTo, require_update) {
             var icon = catalogData[element].icon
         }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box pull-right'><div class='led-grey'></div></div></small></a>" );
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box status pull-right'><div class='led-grey'></div></div></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
         
         var serial = getSerial();
@@ -535,17 +540,18 @@ function getStatus(item, serial, id) {
 function loadStatus() {
     $('.status').each(function(i, obj) {
         //get id
-        var id = $(obj).parent().attr('id');
+        var id = $(obj).parent().parent().attr('id');
+        if (typeof id  !== "undefined") {
+            // item
+            var item = id.split('_')
+            item.pop()
+            item = item.join("_");
+        
+            //get serial
+            var serial = getSerial();
 
-        // item
-        var item = id.split('_')
-        item.pop()
-        item = item.join("_");
-    
-        //get serial
-        var serial = getSerial();
-
-        getStatus(item, serial, id)
+            getStatus(item, serial, id)
+        }
     });
 }
 
@@ -788,6 +794,7 @@ function startRefresh() {
     interval = setInterval (function () {
         //imagr workflow
         imagrReportsTable.ajax.reload();
+        loadStatus();
     }, 2000);
 }
 
