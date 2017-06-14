@@ -154,6 +154,9 @@ function initManifestsTable() {
             },
             global: false,
         },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            $('td', nRow).addClass('table-list-item');
+		},
          "columnDefs": [
           { "targets": 0,
             "render": render_name,
@@ -174,6 +177,13 @@ function initManifestsTable() {
      var thisTable = $('#list_items').DataTable();
      $('#listSearchField').keyup(function(){
           thisTable.search($(this).val()).draw();
+     });
+
+     $('#list_items').on('click', 'tbody td', function () {
+         var id = $(this).find('a').attr('href');
+         id = id.substring(1);
+         var url = window.location.href;
+         window.location.href = url + id;
      });
 }
 

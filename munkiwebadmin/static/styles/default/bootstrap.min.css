@@ -1,5 +1,8 @@
 @charset "UTF-8";
 /* ------------------- GENERAL -----------------------*/
+.fix-margin-list-btn {
+  margin-right: 5px; }
+
 #deviceList {
   list-style: none;
   margin-left: -40px; }
@@ -122,6 +125,7 @@
 table {
   border: 1px solid #c5c5c5; }
 
+/* -------------------- SETUP-WORKFLOW ----------------------*/
 .workflow-parent:hover .workflow-button {
   display: block;
   width: 20%;
@@ -137,6 +141,7 @@ table {
   font-size: 26px;
   text-align: center; }
 
+/* -------------------- MODAL ----------------------*/
 .modal-dialog {
   width: 100%;
   height: calc(100% - 70px);
@@ -148,10 +153,7 @@ table {
   min-height: 100%;
   border-radius: 0; }
 
-.fix-margin-list-btn {
-  margin-right: 5px; }
-
-/* LEDs */
+/* ------------------------ LEDs ---------------------------*/
 .led-box {
   height: 20px;
   margin: 3px 0;
@@ -189,6 +191,12 @@ table {
   background-color: #777777;
   border-radius: 50%;
   border: 1px solid #444444; }
+
+/* ------------------------ MANIFESTS-OWN ---------------------------*/
+.table-list-item:hover {
+  background-color: #d5d5d5;
+  border: 1px solid #af001d;
+  border-top: 1px solid #af001d; }
 
 #wrapper {
   width: 100%; }
