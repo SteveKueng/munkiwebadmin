@@ -8,9 +8,9 @@ import requests
 import urllib2
 import sys
 
-user = "{{user}}"
-password = "{{password}}"
-MWA_host = "{{mwa}}"
+user = "{user}"
+password = "{password}"
+MWA_host = "{mwa}"
 
 def MWA_available():
     try:
