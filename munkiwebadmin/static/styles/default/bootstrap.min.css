@@ -19,7 +19,8 @@
   text-align: center; }
 
 .tabDetail {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   height: 100%; }
 
 .border-div {
@@ -5627,7 +5628,8 @@ button.close {
 
 .modal-body {
   position: relative;
-  padding: 15px; }
+  padding: 15px;
+  overflow-y: auto; }
 
 .modal-footer {
   padding: 15px;
