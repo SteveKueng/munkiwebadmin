@@ -8,9 +8,9 @@ import requests
 import base64
 import bz2
 
-user = "admin"
-password = "Admin123"
-MWA_host = "http://localhost:8080"
+user = "{{user}}"
+password = "{{password}}"
+MWA_host = "{{mwa}}"
 
 def get_hardware_info():
     '''Uses system profiler to get hardware info for this machine'''

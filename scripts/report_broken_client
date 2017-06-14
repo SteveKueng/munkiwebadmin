@@ -8,10 +8,9 @@ import requests
 import urllib2
 import sys
 
-user = "admin"
-password = "Admin123"
-MWA_host = "http://localhost:8080"
-
+user = "{{user}}"
+password = "{{password}}"
+MWA_host = "{{mwa}}"
 
 def MWA_available():
     try:
@@ -51,15 +50,16 @@ def sendData(url, data, auth):
 
 def main():
     if MWA_available:
-        RUNTYPE = "unknown"
+        RUNTYPE = "reportbrokenclient"
         if len(sys.argv) == 2:
             RUNTYPE = sys.argv[1]
 
         serialNumber = get_hardware_info().serial_number
         clientName = get_comnputer_name()
 
-        url = MWA_host + "/api/report/" + serialNumber
-        data = {"runtype": RUNTYPE, "submission_type": "preflight", "name": clientName}
+        url = MWA_host + "/api/report"
+
+        data = {"runtype": RUNTYPE, "name": clientName, "serial": serialNumber}
         auth=requests.auth.HTTPBasicAuth(user, password)
 
         resc = sendData(url, data, auth)
