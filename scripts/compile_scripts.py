@@ -20,9 +20,9 @@ def main():
     postflight_script = path+'/postflight'
     report_broken_client_script = path+'/report_broken_client'
 
-    preflight_script_final = path+'/payload/preflight'
-    postflight_script_final = path+'/payload/postflight'
-    report_broken_client_script_final = path+'/payload/report_broken_client'
+    preflight_script_final = path+'/payload/preflight.d/preflight_submit.py'
+    postflight_script_final = path+'/payload/postflight.d/postflight_submit.py'
+    report_broken_client_script_final = path+'/payload/report_broken_client.d/report_broken_client.py'
 
     preflight_script_repl = preflight_script + "_repl"
     postflight_script_repl = postflight_script + "_repl"
