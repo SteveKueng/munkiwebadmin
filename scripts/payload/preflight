@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+import requests
+import sys
+import subprocess
+import plistlib
+import requests
+import urllib2
+import sys
+
+user = "admin"
+password = "Admin123"
+MWA_host = "http://localhost:8080"
+
+
+def MWA_available():
+    try:
+        urllib2.urlopen(MWA_host, timeout=1)
+        return True
+    except urllib2.URLError as err: 
+        return False
+
+def get_hardware_info():
+    '''Uses system profiler to get hardware info for this machine'''
+    cmd = ['/usr/sbin/system_profiler', 'SPHardwareDataType', '-xml']
+    proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (output, dummy_error) = proc.communicate()
+    try:
+        plist = plistlib.readPlistFromString(output)
+        # system_profiler xml is an array
+        sp_dict = plist[0]
+        items = sp_dict['_items']
+        sp_hardware_dict = items[0]
+        return sp_hardware_dict
+    except BaseException:
+        return {}
+
+def get_comnputer_name():
+    '''Uses system profiler to get hardware info for this machine'''
+    cmd = ['/usr/sbin/scutil', '--get', 'ComputerName']
+    proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (output, dummy_error) = proc.communicate()
+    return output
+
+def sendData(url, data, auth):
+    return requests.post(url, data=data, auth=auth)
+
+def main():
+    if MWA_available:
+        RUNTYPE = "unknown"
+        if len(sys.argv) == 2:
+            RUNTYPE = sys.argv[1]
+
+        serialNumber = get_hardware_info().serial_number
+        clientName = get_comnputer_name()
+
+        url = MWA_host + "/api/report/" + serialNumber
+        data = {"runtype": RUNTYPE, "submission_type": "preflight", "name": clientName}
+        auth=requests.auth.HTTPBasicAuth(user, password)
+
+        resc = sendData(url, data, auth)
+        if resc.status_code != 204:
+            raise BaseException
+    else:
+        print "munki not available"
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

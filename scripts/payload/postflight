@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+
+import requests
+import sys
+import subprocess
+import plistlib
+import requests
+import base64
+import bz2
+
+user = "admin"
+password = "Admin123"
+MWA_host = "http://localhost:8080"
+
+def get_hardware_info():
+    '''Uses system profiler to get hardware info for this machine'''
+    cmd = ['/usr/sbin/system_profiler', '-xml', 'SPHardwareDataType', 'SPSoftwareDataType', 'SPNetworkDataType', 'SPInstallHistoryDataType', 'SPDisplaysDataType', 'SPStorageDataType', 'SPPrintersDataType', 'SPNetworkVolumeDataType', 'SPThunderboltDataType', 'SPSerialATADataType', 'SPUSBDataType']
+    
+    proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (output, dummy_error) = proc.communicate()
+    try:
+        plist = plistlib.readPlistFromString(output)
+        # system_profiler xml is an array
+        newPlist = dict()
+        for plistDict in plist:
+            newPlist[plistDict['_dataType']] = plistDict['_items']
+        return newPlist
+    except BaseException:
+        return {}
+
+def get_comnputer_name():
+    '''Uses system profiler to get hardware info for this machine'''
+    cmd = ['/usr/sbin/scutil', '--get', 'ComputerName']
+    proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (output, dummy_error) = proc.communicate()
+    return output
+
+def sendData(url, data, auth):
+    return requests.post(url, data=data, auth=auth)
+
+def main():
+    RUNTYPE = "unknown"
+    if len(sys.argv) == 2:
+        RUNTYPE = sys.argv[1]
+
+
+    REPORTPATH = "/Library/Managed Installs/ManagedInstallReport.plist"
+    reportPlist = plistlib.readPlist(REPORTPATH)
+
+    hardwareinfo = get_hardware_info()
+
+    reportPlist["MachineInfo"]["SystemProfile"] = list()
+    reportPlist["MachineInfo"]["SystemProfile"] = [hardwareinfo]
+
+    bz2report = bz2.compress(plistlib.writePlistToString(reportPlist))
+    base64bz2report = base64.b64encode(bz2report)
+    report = base64bz2report.replace(" ", "+")
+    
+    serialNumber = hardwareinfo["SPHardwareDataType"][0]["serial_number"]
+    clientName = get_comnputer_name()
+    url = MWA_host + "/api/report/" + serialNumber
+
+    data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "base64bz2report": report}
+    
+    auth=requests.auth.HTTPBasicAuth(user, password)
+    resc = sendData(url, data, auth)
+    if resc.status_code != 204:
+        raise BaseException
+
+if __name__ == "__main__":
+    main()
