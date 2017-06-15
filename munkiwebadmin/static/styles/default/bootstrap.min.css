@@ -145,13 +145,10 @@ table {
 /* -------------------- MODAL ----------------------*/
 .modal-dialog {
   width: 100%;
-  height: calc(100% - 70px);
   margin: 0;
   padding: 0; }
 
 .modal-content {
-  height: auto;
-  min-height: 100%;
   border-radius: 0; }
 
 /* ------------------------ LEDs ---------------------------*/

@@ -4,7 +4,7 @@ function do_resize() {
     $('#plist').height($(window).height() - 300);
     $('#item_list').height($(window).height() - 90);
     $('.dataTables_scrollBody').height($(window).height() - 170);
-    $('.modal-body').height($(window).height() - 270);
+    //$('.modal-body').height($(window).height() - 270);
 }
 
 $(window).resize(do_resize);
