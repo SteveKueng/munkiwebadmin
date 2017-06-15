@@ -253,7 +253,7 @@ def index(request, computer_serial=None):
 
         if businessunit:
             reports = reports.filter(businessunit__exact=businessunit)
-
+        
         context = {'reports': reports,}
         return render(request, 'reports/clienttable.html', context=context)
     
