@@ -5,7 +5,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="header-wrapper">
-				<div class="modal-header client-warning">
+				<div class="modal-header {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<div class="col-sm-3 text-center machineIcon">
 						<img id="{{ machine.serial_number }}_iconDetail" src='{% get_static_prefix %}img/apple.png' alt="" width="100" />
@@ -33,10 +33,10 @@
 				</div>
 				<div role="tabpanel">
 					<!-- Nav tabs -->
-					<ul id="clientTab" class="nav nav-tabs client-warning" role="tablist">
+					<ul id="clientTab" class="nav nav-tabs {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}" role="tablist">
 						<li role="presentation" class="active"><a href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
 						<li role="presentation"><a href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
-						<li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System <i class="fa fa-exclamation-circle" aria-hidden="true"></i><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></a></li>
+						<li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
 				<!--	<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if imagr_plist %}
 						<li role="presentation"><a href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
@@ -128,15 +128,18 @@
 						</div>
 						<div role="tabpanel" class="tab-pane tabDetail" id="System">
 								<div class="panel-body">
+									{% if report_plist.Errors %}
 									<h4>Errors</h4>
 									<div class="alert alert-danger" role="alert">
-										<div class="pull-right"><i class="fa fa-times" aria-hidden="true"></i></div>
-										<div>Some Errors sldfjasldjfalsdjf asldkjfaklsdjf asldkjflasjdlf aösd fajslkdfjalsdjfas dfasdkfjalsdjfa sdfajsd faslkdjfasd falsdkfjasdfja sdfklasdf asdfjalsdfjas dflöajsdf asldkfj a</div>
+										<div>{{ report_plist.Errors.0 }}</div>
 									</div>
+									{% endif %}
+									{% if report_plist.Warnings %}
+									<h4>Warnings</h4>
 									<div class="alert alert-warning" role="alert">
-										<div class="pull-right"><i class="fa fa-times" aria-hidden="true"></i></div>
-										<div>Some Errors sldfjasldjfalsdjf asldkjfaklsdjf asldkjflasjdlf aösd fajslkdfjalsdjfas dfasdkfjalsdjfa sdfajsd faslkdjfasd falsdkfjasdfja sdfklasdf asdfjalsdfjas dflöajsdf asldkfj a</div>
+										<div>{{ report_plist.Warnings.0 }}</div>
 									</div>
+									{% endif %}
 								{% if report_plist %}
 								<h4>Basic</h4>
 								<div class="row">

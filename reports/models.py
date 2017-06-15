@@ -34,6 +34,12 @@ class Machine(models.Model):
     imagr_workflow = models.CharField(max_length=64, blank=True)
     simpleMDMID = models.CharField(max_length=16, blank=True)
 
+    def errors(self):
+        return MunkiReport.objects.get(machine=self).errors
+    
+    def warnings(self):
+        return MunkiReport.objects.get(machine=self).warnings
+
     def console_user(self):
         obj = MunkiReport.objects.get(machine=self)
         return obj.console_user
