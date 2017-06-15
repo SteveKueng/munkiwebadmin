@@ -49,7 +49,7 @@ def sendData(url, data, auth):
     return requests.post(url, data=data, auth=auth)
 
 def main():
-    if MWA_available:
+    if MWA_available():
         RUNTYPE = "unknown"
         if len(sys.argv) == 2:
             RUNTYPE = sys.argv[1]
@@ -59,7 +59,7 @@ def main():
 
         url = MWA_host + "/api/report/" + serialNumber
         data = {"runtype": RUNTYPE, "submission_type": "preflight", "name": clientName}
-        auth=requests.auth.HTTPBasicAuth(user, password)
+        auth = requests.auth.HTTPBasicAuth(user, password)
 
         resc = sendData(url, data, auth)
         if resc.status_code != 204:
