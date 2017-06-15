@@ -116,6 +116,13 @@
   float: left;
   width: 100%; }
 
+/* ------------------- CLIENT ERROR-REPORTING --------------------------*/
+.client-error {
+  background-color: #f2dede; }
+
+.client-warning {
+  background-color: #fcf8e3; }
+
 .profile-image {
   margin: -10px 10px;
   height: 40px; }
@@ -145,13 +152,10 @@ table {
 /* -------------------- MODAL ----------------------*/
 .modal-dialog {
   width: 100%;
-  height: calc(100% - 70px);
   margin: 0;
   padding: 0; }
 
 .modal-content {
-  height: auto;
-  min-height: 100%;
   border-radius: 0; }
 
 /* ------------------------ LEDs ---------------------------*/
@@ -5611,8 +5615,7 @@ button.close {
     filter: alpha(opacity=50); }
 
 .modal-header {
-  padding: 15px;
-  border-bottom: 1px solid #f8f8f8; }
+  padding: 15px; }
   .modal-header:before, .modal-header:after {
     content: " ";
     display: table; }
