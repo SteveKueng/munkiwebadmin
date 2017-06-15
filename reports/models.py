@@ -32,6 +32,7 @@ class Machine(models.Model):
     os_version = models.CharField(max_length=16, blank=True)
     current_status = models.CharField(max_length=200, blank=True)
     imagr_workflow = models.CharField(max_length=64, blank=True)
+    simpleMDMID = models.CharField(max_length=16, blank=True)
 
     def console_user(self):
         obj = MunkiReport.objects.get(machine=self)
