@@ -539,6 +539,9 @@ def db_api(request, kind, serial_number=None):
     if kind not in ['report', 'inventory', 'imagr']:
         return HttpResponse(status=404)
 
+    if serial_number == "report_broken_client":
+        serial_number = None
+
     response_type = 'json'
     if request.META.get('HTTP_ACCEPT') == 'application/xml':
         response_type = 'xml'
@@ -605,7 +608,6 @@ def db_api(request, kind, serial_number=None):
             submit = json.loads(request.body)
         except:
             submit = request.POST
-        
         submission_type = submit.get('submission_type')
 
         if not serial_number:
