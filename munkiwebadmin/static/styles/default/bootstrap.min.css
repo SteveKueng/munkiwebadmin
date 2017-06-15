@@ -116,6 +116,13 @@
   float: left;
   width: 100%; }
 
+/* ------------------- CLIENT ERROR-REPORTING --------------------------*/
+.client-error {
+  background-color: #f2dede; }
+
+.client-warning {
+  background-color: #fcf8e3; }
+
 .profile-image {
   margin: -10px 10px;
   height: 40px; }
@@ -5608,8 +5615,7 @@ button.close {
     filter: alpha(opacity=50); }
 
 .modal-header {
-  padding: 15px;
-  border-bottom: 1px solid #f8f8f8; }
+  padding: 15px; }
   .modal-header:before, .modal-header:after {
     content: " ";
     display: table; }
