@@ -406,8 +406,8 @@ def getStatus(request):
     # no ajax
     return HttpResponse(
         json.dumps({'result': 'failed',
-                    'exception_type': str(type(err)),
-                    'detail': str(err)}),
+                    'exception_type': "",
+                    'detail': ""}),
         content_type='application/json', status=404)
 
 def raw(request, serial):
