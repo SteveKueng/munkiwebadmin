@@ -16,6 +16,11 @@ def MWA_available():
     try:
         urllib2.urlopen(MWA_host, timeout=1)
         return True
+    except urllib2.HTTPError, e:
+        if str(e.code) == "401":
+            return True
+        else:
+            return False
     except urllib2.URLError as err: 
         return False
 

@@ -6,11 +6,24 @@ import subprocess
 import plistlib
 import requests
 import base64
+import urllib2
 import bz2
 
 user = "{user}"
 password = "{password}"
 MWA_host = "{mwa}"
+
+def MWA_available():
+    try:
+        urllib2.urlopen(MWA_host, timeout=1)
+        return True
+    except urllib2.HTTPError, e:
+        if str(e.code) == "401":
+            return True
+        else:
+            return False
+    except urllib2.URLError as err: 
+        return False
 
 def get_hardware_info():
     '''Uses system profiler to get hardware info for this machine'''
@@ -43,33 +56,37 @@ def sendData(url, data, auth):
     return requests.post(url, data=data, auth=auth)
 
 def main():
-    RUNTYPE = "unknown"
-    if len(sys.argv) == 2:
-        RUNTYPE = sys.argv[1]
+    if MWA_available():
+        RUNTYPE = "unknown"
+        if len(sys.argv) == 2:
+            RUNTYPE = sys.argv[1]
 
 
-    REPORTPATH = "/Library/Managed Installs/ManagedInstallReport.plist"
-    reportPlist = plistlib.readPlist(REPORTPATH)
+        REPORTPATH = "/Library/Managed Installs/ManagedInstallReport.plist"
+        reportPlist = plistlib.readPlist(REPORTPATH)
 
-    hardwareinfo = get_hardware_info()
+        hardwareinfo = get_hardware_info()
 
-    reportPlist["MachineInfo"]["SystemProfile"] = list()
-    reportPlist["MachineInfo"]["SystemProfile"] = [hardwareinfo]
+        reportPlist["MachineInfo"]["SystemProfile"] = list()
+        reportPlist["MachineInfo"]["SystemProfile"] = [hardwareinfo]
 
-    bz2report = bz2.compress(plistlib.writePlistToString(reportPlist))
-    base64bz2report = base64.b64encode(bz2report)
-    report = base64bz2report.replace(" ", "+")
-    
-    serialNumber = hardwareinfo["SPHardwareDataType"][0]["serial_number"]
-    clientName = get_comnputer_name()
-    url = MWA_host + "/api/report/" + serialNumber
+        bz2report = bz2.compress(plistlib.writePlistToString(reportPlist))
+        base64bz2report = base64.b64encode(bz2report)
+        report = base64bz2report.replace(" ", "+")
+        
+        serialNumber = hardwareinfo["SPHardwareDataType"][0]["serial_number"]
+        clientName = get_comnputer_name()
+        url = MWA_host + "/api/report/" + serialNumber
 
-    data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "base64bz2report": report}
-    
-    auth=requests.auth.HTTPBasicAuth(user, password)
-    resc = sendData(url, data, auth)
-    if resc.status_code != 204:
-        raise BaseException
+        data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "base64bz2report": report}
+        
+        auth=requests.auth.HTTPBasicAuth(user, password)
+        resc = sendData(url, data, auth)
+        if resc.status_code != 204:
+            raise BaseException
+    else:
+        print "munki not available"
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
