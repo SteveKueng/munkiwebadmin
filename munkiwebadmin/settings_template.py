@@ -14,15 +14,9 @@ APPNAME = 'MunkiWebAdmin2'
 MUNKI_REPO_DIR = '/Users/Shared/munkirepo'
 #MUNKI_REPO_DIR = '/Volumes/munkirepo'
 
-# if you want to display product icons, provide a base ICONS_URL
-# be sure to include trailing slash
+MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR)
 
-# for development work (Set DEBUG=True), you can set the ICONS_URL to MEDIA_URL.
-# This is not recommended for production.
-MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
-ICONS_URL = MEDIA_URL
-# For production, you can point to your Munki server
-#ICONS_URL = "http://localhost/munki_repo/icons/"
+ICONS_URL = "http://localhost/munki_repo/icons/"
 
 # path to the makecatalogs binary
 MAKECATALOGS_PATH = '/usr/local/munki/makecatalogs'
@@ -41,13 +35,8 @@ MODEL_LOOKUP_ENABLED = True
 #Define your style from styles-folder located in static
 STYLE = 'default'
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
