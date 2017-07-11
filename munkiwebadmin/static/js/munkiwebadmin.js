@@ -1,11 +1,3 @@
-$(document).ready(function() {
-    getRunningMachine();
-    setInterval (function () {
-        //reload imagr running machine
-        getRunningMachine();
-    }, 3000);
-});
-
 function getRunningMachine() {
     $.ajax({
         method: 'GET',

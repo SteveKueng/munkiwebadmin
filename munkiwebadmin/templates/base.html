@@ -229,5 +229,17 @@
     <!-- Metis Menu Plugin JavaScript -->
     <script src="{% get_static_prefix %}js/metisMenu/metisMenu.min.js"></script>
     <script src="{% get_static_prefix %}js/munkiwebadmin.js"></script>
+
+    {% if user.is_authenticated %}
+    <script>
+    $(document).ready(function() {
+        getRunningMachine();
+        setInterval (function () {
+            //reload imagr running machine
+            getRunningMachine();
+        }, 3000);
+    });
+    </script>
+    {% endif %}
   </body>
 </html>
