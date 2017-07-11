@@ -386,7 +386,7 @@ function getPkginfoItem(pathname) {
             })
             editor = initializeAceEditor('plist', plistChanged);
             hideSaveOrCancelBtns();
-            detectUnsavedChanges();
+            //detectUnsavedChanges();
             current_pathname = pathname;
             requested_pathname = "";
             $('#editortabs a[href="' + selected_tab_viewname + '"]').tab('show');
@@ -696,9 +696,7 @@ function massEditCatalogs() {
     var pkginfo_list = get_checked_items();
     var catalogs_to_add = ($("#catalogs_to_add").val() || []);
     var catalogs_to_delete = ($("#catalogs_to_delete").val() || []);
-    //alert(catalogs_to_add);
-    //alert(catalogs_to_delete);
-    //return;
+
     $.ajax({
         type: 'POST',
         url: '/pkgsinfo/',
