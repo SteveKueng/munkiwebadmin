@@ -243,8 +243,8 @@ else:
         'django.contrib.auth.backends.ModelBackend',
     )
 
-# https://docs.djangoproject.com/en/1.9/ref/settings/#login-url
 LOGIN_URL='/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # who gets code error notifcations when DEBUG is False
 # https://docs.djangoproject.com/en/1.9/ref/settings/#admins
