@@ -90,7 +90,6 @@ def plist_api(request, kind, filepath=None):
     response_type = 'json'
     if request.META.get('HTTP_ACCEPT') == 'application/xml':
         response_type = 'xml_plist'
-    request_type = 'json'
     if request.META.get('CONTENT_TYPE') == 'application/xml':
         request_type = 'xml_plist'
 
@@ -537,7 +536,7 @@ def file_api(request, kind, filepath=None):
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def db_api(request, kind, subclass=None):
+def db_api(request, kind, subclass=None, serial_number=None):
     if kind not in ['report', 'imagr', 'vault']:
         return HttpResponse(status=404)
 
@@ -547,7 +546,8 @@ def db_api(request, kind, subclass=None):
     except:
         submit = request.POST
     
-    serial_number = submit.get('serial', None)
+    if not serial_number:
+        serial_number = submit.get('serial', None)
     submission_type = submit.get('submission_type', None)
 
     # ----------- RESPONSE TYPE -----------------
@@ -653,7 +653,7 @@ def db_api(request, kind, subclass=None):
                 response = serializers.serialize('xml', access, fields=(api_fields), indent=2, use_natural_foreign_keys=True,  use_natural_primary_keys=True)
             return HttpResponse(
                 response,
-                content_type='application/xml', status=201)
+                content_type='application/'+response_type, status=201)
     
     # ----------- HTTP_X_METHODOVERRIDE -----------------
     if request.META.has_key('HTTP_X_METHODOVERRIDE'):

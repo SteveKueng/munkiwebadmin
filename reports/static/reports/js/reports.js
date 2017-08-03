@@ -247,6 +247,10 @@ function getComputerItem(pathname) {
                     }
                 });
             }
+
+            getDeviceIcon(current_pathname, "_iconDetail");
+            getImagrReports(current_pathname);
+            loadPasswordAccess(current_pathname);
             hideProgressBar();
 
             //start refresh
@@ -739,10 +743,11 @@ function newManifestItem() {
 }
 
 function deleteMachine() {
-    var machineURL = '/api/report/' + current_pathname;
+    var machineURL = '/api/report';
     $.ajax({
         method: 'POST',
         url: machineURL,
+        data: { 'serial': current_pathname },
         headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             getClientTable();
@@ -804,11 +809,11 @@ function deleteMachineAndManifest() {
 
 function setWorkflow(workflow) {
     event.preventDefault();
-    var machineURL = '/api/report/' + current_pathname;
+    var machineURL = '/api/report';
     $.ajax({
         method: 'POST',
         url: machineURL,
-        data: { imagr_workflow : workflow },
+        data: { imagr_workflow : workflow, 'serial': current_pathname },
         success: function(data) {
             //set active
         },
@@ -828,6 +833,22 @@ function setWorkflow(workflow) {
             $("#errorModal").modal("show");
         }
     });
+}
+
+function loadPasswordAccess(serial) {
+    var machineURL = '/api/vault/reasons/'+serial;
+
+    $('#passwordAccess').DataTable( {
+    ajax: {
+        url: machineURL,
+        dataSrc: ''
+    },
+    columns: [
+        { data: 'fields.user.0' },
+        { data: 'fields.reason' },
+        { data: 'fields.date' },
+    ]
+    } );
 }
 
 function getTypeahead(url, listid) {
@@ -864,3 +885,4 @@ function stopRefresh() {
         clearInterval(interval);
     }catch(err){}
 }
+
