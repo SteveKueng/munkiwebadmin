@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^delete_branch/(?P<branchname>.*$)', updates.views.delete_branch),
     url(r'^new_branch/(?P<branchname>.*$)', updates.views.new_branch),
     url(r'^__get_update_list_status$', updates.views.status),
-    url(r'^$', updates.views.index),
+    url(r'^$', updates.views.index, name='updates'),
 ]
