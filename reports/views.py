@@ -12,6 +12,7 @@ from django.conf import settings
 from django.db.models import Count
 from collections import OrderedDict
 from django.shortcuts import render
+from django.utils import timezone
 
 from models import Machine, MunkiReport, BusinessUnit
 from manifests.models import ManifestFile
@@ -23,7 +24,7 @@ import bz2
 import plistlib
 import re
 import urllib2
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from xml.etree import ElementTree
 import fnmatch
 import json
@@ -205,9 +206,9 @@ def index(request, computer_serial=None):
             reports = Machine.objects.all()
 
         if show is not None:
-            now = datetime.now()
+            now = timezone.now()
             hour_ago = now - timedelta(hours=1)
-            today = date.today()
+            today = now.date()
             tomorrow = today + timedelta(days=1)
             week_ago = today - timedelta(days=7)
             month_ago = today - timedelta(days=30)
@@ -230,7 +231,7 @@ def index(request, computer_serial=None):
             elif show == 'notweek':
                 reports = reports.filter(munkireport__timestamp__range=(month_ago, week_ago))
             elif show == 'notmonth':
-                reports = reports.filter(munkireport__timestamp__range=(three_months_ago,month_ago))
+                reports = reports.filter(munkireport__timestamp__range=(three_months_ago, month_ago))
             elif show == 'notquarter':
                 reports = reports.exclude(munkireport__timestamp__gte=three_months_ago)
             elif show == 'inprogress':
@@ -278,9 +279,9 @@ def dashboard(request):
     munki['warnings'] = reports.filter(warnings__gt=0).count()
     munki['activity'] = reports.filter(activity__isnull=False).count()
 
-    now = datetime.now()
+    now = timezone.now()
     hour_ago = now - timedelta(hours=1)
-    today = date.today()
+    today = now.date()
     week_ago = today - timedelta(days=7)
     month_ago = today - timedelta(days=30)
     three_months_ago = today - timedelta(days=90)
