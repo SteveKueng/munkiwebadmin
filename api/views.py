@@ -8,6 +8,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -15,6 +16,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine, MunkiReport, ImagrReport
+from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 import datetime
@@ -535,17 +537,25 @@ def file_api(request, kind, filepath=None):
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def db_api(request, kind, serial_number=None):
-    if kind not in ['report', 'inventory', 'imagr']:
+def db_api(request, kind, subclass=None):
+    if kind not in ['report', 'imagr', 'vault']:
         return HttpResponse(status=404)
 
-    if serial_number == "report_broken_client":
-        serial_number = None
+    # ------- get submit -------
+    try:
+        submit = json.loads(request.body)
+    except:
+        submit = request.POST
+    
+    serial_number = submit.get('serial', None)
+    submission_type = submit.get('submission_type', None)
 
+    # ----------- RESPONSE TYPE -----------------
     response_type = 'json'
     if request.META.get('HTTP_ACCEPT') == 'application/xml':
         response_type = 'xml'
-    
+
+    # ----------- GET -----------------
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
@@ -557,44 +567,95 @@ def db_api(request, kind, serial_number=None):
             del filter_terms['api_fields']
         else:
             api_fields = None
-
+        
         response = list()
-        if serial_number:
-            try:
+        if kind in ['report', 'imagr']:
+            if serial_number:
+                try:
+                    if kind == "report":
+                        item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
+                    elif kind == "imagr":
+                        item_list = serializers.serialize('python', ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
+                except Machine.DoesNotExist:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'MachineDoesNotExist',
+                                    'detail': '%s does not exist' % serial_number}),
+                        content_type='application/json', status=404)
+            else:
                 if kind == "report":
-                    item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
+                    item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
                 elif kind == "imagr":
-                    item_list = serializers.serialize('python', ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
+                    item_list = serializers.serialize('python', ImagrReport.objects.all(), fields=(api_fields))
+
+            for item in item_list:
+                if serial_number == item["pk"]:
+                    response = item['fields']
+                else:
+                    if api_fields and 'serial' in api_fields:
+                        item['fields']['serial'] = item['pk']
+                    response.append(item['fields'])
+
+            if response_type == 'json':
+                response = convert_dates_to_strings(response)
+                return HttpResponse(
+                    json.dumps(response) + '\n',
+                    content_type='application/json', status=201)
+            else:
+                return HttpResponse(
+                    response,
+                    content_type='application/xml', status=201)
+        
+        if kind in ['vault'] and subclass == "pass" and serial_number:
+            reason = submit.get('reason', None)
+            if reason:
+                try:
+                    localadmin = localAdmin.objects.get(machine=Machine.objects.get(serial_number=serial_number))
+                    password = localadmin.getPassword(request.user, reason)
+                except Machine.DoesNotExist:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'MachineDoesNotExist',
+                                    'detail': '%s does not exist' % serial_number}),
+                        content_type='application/json', status=404)
+                
+                response.append(password)
+                if response_type == 'json':
+                    response = convert_dates_to_strings(response)
+                    return HttpResponse(
+                        json.dumps(response) + '\n',
+                        content_type='application/json', status=201)
+                else:
+                    return HttpResponse(
+                        response,
+                        content_type='application/xml', status=201)
+            else:
+                return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'BadRequest',
+                                'detail': 'Missing reason'}),
+                    content_type='application/json', status=400)
+        
+        if kind in ['vault'] and subclass == "reasons" and serial_number:
+            try:
+                access = passwordAccess.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
             except Machine.DoesNotExist:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': 'MachineDoesNotExist',
                                 'detail': '%s does not exist' % serial_number}),
                     content_type='application/json', status=404)
-        else:
-            if kind == "report":
-                item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
-            elif kind == "imagr":
-                item_list = serializers.serialize('python', ImagrReport.objects.all(), fields=(api_fields))
+            
 
-        for item in item_list:
-            if serial_number == item["pk"]:
-                response = item['fields']
+            if response_type == 'json':
+                response = serializers.serialize('json', access, fields=(api_fields), indent=2, use_natural_foreign_keys=True,  use_natural_primary_keys=True)
             else:
-                if api_fields and 'serial' in api_fields:
-                    item['fields']['serial'] = item['pk']
-                response.append(item['fields'])
-
-        if response_type == 'json':
-            response = convert_dates_to_strings(response)
-            return HttpResponse(
-                json.dumps(response) + '\n',
-                content_type='application/json', status=201)
-        else:
+                response = serializers.serialize('xml', access, fields=(api_fields), indent=2, use_natural_foreign_keys=True,  use_natural_primary_keys=True)
             return HttpResponse(
                 response,
                 content_type='application/xml', status=201)
     
+    # ----------- HTTP_X_METHODOVERRIDE -----------------
     if request.META.has_key('HTTP_X_METHODOVERRIDE'):
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
@@ -603,99 +664,108 @@ def db_api(request, kind, serial_number=None):
             request.META['REQUEST_METHOD'] = 'DELETE'
             request.DELETE = QueryDict(request.body)
 
+    # ----------- POST -----------------
     if request.method == 'POST':
-        try:
-            submit = json.loads(request.body)
-        except:
-            submit = request.POST
-        submission_type = submit.get('submission_type')
-
-        if not serial_number:
-            serial_number = submit.get('serial')
-
         if serial_number:
             try:
                 machine = Machine.objects.get(serial_number=serial_number)
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial_number)
-            try:
-                report = MunkiReport.objects.get(machine=machine)
-            except MunkiReport.DoesNotExist:
-                report = MunkiReport(machine=machine)
+            if kind in ['report', 'inventory', 'imagr']:
+                try:
+                    report = MunkiReport.objects.get(machine=machine)
+                except MunkiReport.DoesNotExist:
+                    report = MunkiReport(machine=machine)
 
-            if machine and report:
-                machine.remote_ip = request.META['REMOTE_ADDR']
-                report.activity = ""
+                if machine and report:
+                    machine.remote_ip = request.META['REMOTE_ADDR']
+                    report.activity = ""
 
-                if 'name' in submit:
-                    machine.hostname = submit.get('name')
-                if 'username' in submit:
-                    machine.username = submit.get('username')
-                if 'unit' in submit:
-                    unit = BusinessUnit.objects.get(hash=submit.get('unit'))
-                    machine.businessunit = unit
+                    if 'name' in submit:
+                        machine.hostname = submit.get('name')
+                    if 'username' in submit:
+                        machine.username = submit.get('username')
+                    if 'unit' in submit:
+                        unit = BusinessUnit.objects.get(hash=submit.get('unit'))
+                        machine.businessunit = unit
 
-                if 'base64bz2report' in submit:
-                    #print submit.get('base64bz2report')
-                    report.update_report(submit.get('base64bz2report'))
+                    if 'base64bz2report' in submit:
+                        report.update_report(submit.get('base64bz2report'))
 
-                # extract machine data from the report
-                report_data = report.get_report()
-                if 'MachineInfo' in report_data:
-                    machine.os_version = report_data['MachineInfo'].get('os_vers', machine.os_version)
-                    machine.cpu_arch = report_data['MachineInfo'].get('arch', machine.cpu_arch)
+                    # extract machine data from the report
+                    report_data = report.get_report()
+                    if 'MachineInfo' in report_data:
+                        machine.os_version = report_data['MachineInfo'].get('os_vers', machine.os_version)
+                        machine.cpu_arch = report_data['MachineInfo'].get('arch', machine.cpu_arch)
 
-                hwinfo = {}
-                if 'SystemProfile' in report_data.get('MachineInfo', []):
-                    if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
-                        hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
+                    hwinfo = {}
+                    if 'SystemProfile' in report_data.get('MachineInfo', []):
+                        if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
+                            hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
-                if hwinfo:
-                    machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
-                    machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
-                    machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
-                    machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
+                    if hwinfo:
+                        machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
+                        machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
+                        machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
+                        machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
 
-                report.runtype = submit.get('runtype', 'UNKNOWN')
-                
-                imagrReport = None
-                if submit.get('imagr_workflow'):
-                    machine.imagr_workflow = submit.get('imagr_workflow')
-                if submit.get('status') and submit.get('message'):
-                    machine.current_status = submit.get('status')
-                    imagrReport = ImagrReport(machine=machine, message=submit.get('message'), status=submit.get('status'))
-                    report.runstate = u"imagr"
-                # delete pending workflow if successful ended
-                if submit.get('status') == 'success' or submit.get('status') == 'error':
-                    machine.imagr_workflow = ""
+                    report.runtype = submit.get('runtype', 'UNKNOWN')
+                    
+                    imagrReport = None
+                    if submit.get('imagr_workflow'):
+                        machine.imagr_workflow = submit.get('imagr_workflow')
+                    if submit.get('status') and submit.get('message'):
+                        machine.current_status = submit.get('status')
+                        imagrReport = ImagrReport(machine=machine, message=submit.get('message'), status=submit.get('status'))
+                        report.runstate = u"imagr"
+                    # delete pending workflow if successful ended
+                    if submit.get('status') == 'success' or submit.get('status') == 'error':
+                        machine.imagr_workflow = ""
 
-                if submission_type == 'postflight':
-                    report.runstate = u"done"
+                    if submission_type == 'postflight':
+                        report.runstate = u"done"
 
-                if submission_type == 'preflight':
-                    report.runstate = u"in progress"
-                    report.activity = report.encode({"Updating": "preflight"})
+                    if submission_type == 'preflight':
+                        report.runstate = u"in progress"
+                        report.activity = report.encode({"Updating": "preflight"})
 
-                if submission_type == 'report_broken_client':
-                    report.runstate = u"broken client"
-                    report.errors = 1
-                    report.warnings = 0
-                
-                # setting hostname if there isn't set one / prevent save issues
-                if machine.hostname == "unknown":
-                    machine.hostname = serial_number
+                    if submission_type == 'report_broken_client':
+                        report.runstate = u"broken client"
+                        report.errors = 1
+                        report.warnings = 0
+                    
+                    # setting hostname if there isn't set one / prevent save issues
+                    if machine.hostname == "unknown":
+                        machine.hostname = serial_number
 
-                report.timestamp = timezone.now()
-                machine.save()
-                report.save()
+                    report.timestamp = timezone.now()
+                    machine.save()
+                    report.save()
 
-                # save imagr report
-                if imagrReport:
-                    imagrReport.save()
-                
-                return HttpResponse(status=204)
-        return HttpResponse(status=404)
+                    # save imagr report
+                    if imagrReport:
+                        imagrReport.save()                 
+            elif kind in ['vault'] and subclass == "pass":
+                # set password
+                value = submit.get('value', None)
+                if value:
+                    try:
+                        localadmin = localAdmin.objects.get(machine=machine)
+                    except localAdmin.DoesNotExist:
+                        localadmin = localAdmin(machine=machine)
+                    localadmin.setPassword(value)
+                    localadmin.save()
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing value'}),
+                        content_type='application/json', status=400)
+            else:
+                return HttpResponse(status=404)
+            return HttpResponse(status=204)
 
+    # ----------- DELETE -----------------
     if request.method == 'DELETE':
         LOGGER.debug("Got API DELETE request for %s", kind)
         if not request.user.has_perm('reports.delete_machine'):
@@ -718,3 +788,6 @@ def db_api(request, kind, serial_number=None):
         else:
             # success
             return HttpResponse(status=204)
+    
+    # ----------- error 404 -----------------
+    return HttpResponse(status=404)

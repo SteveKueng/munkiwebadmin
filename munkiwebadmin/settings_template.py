@@ -69,8 +69,7 @@ INSTALLED_APPS = [
     'process',
     'reports',
     'updates',
-    # Uncomment the next line if you've installed django_wsgiserver
-    # and want to serve this Django app using it
+    'vault',
 ]
 
 MIDDLEWARE_CLASSES = [
