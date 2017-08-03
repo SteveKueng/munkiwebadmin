@@ -37,323 +37,326 @@
 						<li role="presentation" class="active"><a href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
 						<li role="presentation"><a href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 						<li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
-				<!--	<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
+						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
+						<li role="presentation"><a href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
 						{% if imagr_plist %}
 						<li role="presentation"><a href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
 						{% endif %}
 					</ul>
-					</div>
+				</div>
 			</div>
-					<!-- Tab panes -->
-					<div class="tab-content" id="detail_content" >
-						<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="height:100%;">
-							<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
-							<div class="panel-body" id="SoftwareView">
-								<!-- Manifests / Catalog -->
-								<div class="row" id="manifestTop">
-									<!-- Manifests -->
-									<div class='col-md-6'>
-										<div class="section_label"><h4>Included Manifests</h4></div>
-										<div id='included_manifests' class='included_manifests_section list-group unstyled'>
-											<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-										</div>
-									</div>
-									<!-- Catalogs -->
-									<div class='col-md-6'>
-										<div class="section_label"><h4>Catalogs</h4></div>
-										<div id='catalogs' class='list-group unstyled'>
-											<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-										</div>
-									</div>
+			<!-- Tab panes -->
+			<div class="tab-content" id="detail_content" >
+				<div role="tabpanel" class="tab-pane tabDetail active" id='Software' style="height:100%;">
+					<input class="hidden" id="manifestName" value="{% if report_plist.ManifestName %}{{report_plist.ManifestName}}{% else %}{{ machine.serial_number }}{% endif %}"/>
+					<div class="panel-body" id="SoftwareView">
+						<!-- Manifests / Catalog -->
+						<div class="row" id="manifestTop">
+							<!-- Manifests -->
+							<div class='col-md-6'>
+								<div class="section_label"><h4>Included Manifests</h4></div>
+								<div id='included_manifests' class='included_manifests_section list-group unstyled'>
+									<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 								</div>
-								<!-- Software -->
-								<div class="row">
-									<div class='col-md-12'>
-										<div class="section_label"><h4>Managed Installs</h4></div>
-										<div class='list-group list-group-root unstyled'>
-											<div id='managed_installs'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-											<div id='managed_installs_remote'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-										</div>
-									</div>
-									<div class='col-md-12'>
-										<div class="section_label"><h4>Managed Uninstalls</h4></div>
-										<div class='list-group list-group-root unstyled'>
-											<div id='managed_uninstalls'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-											<div id='managed_uninstalls_remote'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-										</div>
-									</div>
-									<div class='col-md-12'>
-										<div class="section_label"><h4>Optional Installs</h4></div>
-										<div class='list-group list-group-root unstyled'>
-											<div id='optional_installs'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-											<div id='optional_installs_remote'>
-												<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
-											</div>
-										</div>
-									</div>
+							</div>
+							<!-- Catalogs -->
+							<div class='col-md-6'>
+								<div class="section_label"><h4>Catalogs</h4></div>
+								<div id='catalogs' class='list-group unstyled'>
+									<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 								</div>
 							</div>
 						</div>
-						<div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
-							<div class="panel-body">
-								{% if report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType %}
-								<table class="table table-striped">
-									<tbody>
-										{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
-											{% if item.package_source == "package_source_apple"%}
-											<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}img/appleupdate.png' width="20"/></td>
-											<td>{{ item|get:"_name" }}</td><td>{{ item.install_version }}</td><td>{{ item.install_date|date:"d. F Y" }}</td><td><span class='label label-primary pull-right status'>intalled</span></td></tr>
-											{% endif %}
-										{% endfor %}
-									</tbody>
-								</table>
-								{% else %}
-								<div class="row">
-									<div class="col-md-12">
-										<div class="alert alert-info">No installed updates!</div>
+						<!-- Software -->
+						<div class="row">
+							<div class='col-md-12'>
+								<div class="section_label"><h4>Managed Installs</h4></div>
+								<div class='list-group list-group-root unstyled'>
+									<div id='managed_installs'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+									</div>
+									<div id='managed_installs_remote'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 									</div>
 								</div>
-								{% endif %}
 							</div>
-						</div>
-						<div role="tabpanel" class="tab-pane tabDetail" id="System">
-								<div class="panel-body">
-									{% if report_plist.Errors %}
-									<h4>Errors</h4>
-									<div class="alert alert-danger" role="alert">
-										<div>{{ report_plist.Errors.0 }}</div>
+							<div class='col-md-12'>
+								<div class="section_label"><h4>Managed Uninstalls</h4></div>
+								<div class='list-group list-group-root unstyled'>
+									<div id='managed_uninstalls'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 									</div>
-									{% endif %}
-									{% if report_plist.Warnings %}
-									<h4>Warnings</h4>
-									<div class="alert alert-warning" role="alert">
-										<div>{{ report_plist.Warnings.0 }}</div>
-									</div>
-									{% endif %}
-								{% if report_plist %}
-								<h4>Basic</h4>
-								<div class="row">
-									<div class="col-lg-6">
-										<ul class="list-group">
-											<li class="list-group-item"><b>Last User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
-											<li class="list-group-item"><b>Munki:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
-											<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
-											<li class="list-group-item"><b>Boot Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
-											<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
-											<script>
-												$('#osversion').popover();
-											</script>
-										</ul>
-									</div>
-									<div class="col-lg-6">
-										<ul class="list-group">
-											<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
-											<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
-											<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
-											<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
-										</ul>
-												</div>
-											</div>
-									<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
-								<ul class="list-group">
-										{% for device in disksList %}
-								<li class="list-group-item">
-										<div class="row">
-											<div class="col-lg-2" style="" >
-												<div class="row">
-													<div class="col-lg-12 text-center" >
-														<i class="fa fa-hdd-o" aria-hidden="true" style="font-size: 50px"></i>
-														{% if device.physicalDisk.is_internal_disk == 'no' %}
-																<div style="margin-left: 65px; margin-top: -28px"><i class="fa fa-plug" aria-hidden="true" style="font-size: 20px;"></i></div>
-														{% endif %}
-													</div>
-												</div>
-												<div class="row">
-													<div class="col-lg-12 text-center">{{ device.diskName }}</div>
-												</div>
-
-											</div>
-											<div class="col-lg-10" >
-												<div class="row" style="border-left: 1px solid #ddd">
-														<div class="col-lg-12">
-															<h5 style="margin-top: 0px">Basic</h5>
-																<div class="row">
-																	<div class="col-lg-6">
-
-																		<ul class="list-group">
-																		<li class="list-group-item"><b>Disk-Size:</b><span class="pull-right">{{device.diskSize|filesizeformat}}</span></li>
-																		<li class="list-group-item"><b>Protocol:</b><span class="pull-right">{{device.physicalDisk.protocol}}</span></li>
-																		</ul>
-																	</div>
-																	<div class="col-lg-6">
-																		<ul class="list-group">
-																			<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if device.physicalDisk.is_internal_disk == 'yes' %} <i class="fa fa-check" aria-hidden="true"></i> {% else %} <i class="fa fa-times" aria-hidden="true"></i> {% endif %}</span></li>
-																		</ul>
-																	</div>
-																</div>
-															</div>
-													</div>
-												{% for partition in device.partitions %}
-												<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
-													<div class="col-lg-12">
-														<span class="pull-right">{{ partition.partitionAtributes.free_space_in_bytes|filesizeformat }} / {{partition.partitionAtributes.size_in_bytes|filesizeformat}}</span>
-														<h5 style="margin-top: 0px">{{ partition.partitionName }}</h5>
-														<div class="progress" style="margin-bottom: 0px;">
-													<div class="progress-bar" role="progressbar" aria-valuenow="{{partition.partitionAtributes.percentFull}}" aria-valuemin="0" aria-valuemax="100" style="width: {{partition.partitionAtributes.percentFull}}%; ">
-												<span class="sr-only">60% Complete</span>
-													</div>
-													</div>
-													</div>
-												</div>
-												{% endfor %}
-													</div>
-										</div>
-									</li>
-									{% endfor %}
-								</ul>
-								<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Graphics</h4>
-								<ul class="list-group">
-								{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
-								<li class="list-group-item">
-										<div class="row">
-											<div class="col-lg-2" style="" >
-												<div class="row">
-													<div class="col-lg-12 text-center" >
-														{% if "Intel" in card.sppci_model %}
-														<img style="width: 70px;" src="{% static "img/Intel.gif" %}" />
-														{% elif "NVIDIA" in card.sppci_model %}
-														<img style="width: 70px;" src="{% static "img/nvidia.gif" %}" />
-														{% elif "amd" in card.sppci_model %}
-														<img style="width: 70px;" src="{% static "img/AMD.gif" %}" />
-														{% else %}
-														<img style="width: 70px;" src="{% static "img/Graphic-card-icon.png" %}" />
-														{% endif %}
-													</div>
-												</div>
-												<div class="row" style="margin-top: 5px">
-													<div class="col-lg-12 text-center">{{ card.sppci_model }}</div>
-												</div>
-
-											</div>
-											<div class="col-lg-10" >
-
-												<div class="row" style="border-left: 1px solid #ddd">
-													<div class="col-lg-12">
-
-													<div class="row">
-														<div class="col-lg-6">
-															<ul class="list-group">
-																<li class="list-group-item"><b>Video RAM:</b><span class="pull-right">{% if card.spdisplays_vram  %}{{ card.spdisplays_vram }}{% else %}{{ card|get:"_spdisplays_vram" }}{% endif %}</span></li>
-															</ul>
-														</div>
-														<div class="col-lg-6">
-															<ul class="list-group">
-															<li class="list-group-item"><b>Card Type:</b><span class="pull-right">{{ card.sppci_bus|slice:"11:"|replace }}</span></li>
-															</ul>
-														</div>
-														</div>
-													</div>
-												</div>
-
-												{% for screen in card.spdisplays_ndrvs %}
-												<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
-													<div class="col-lg-2">
-														{% if screen.spdisplays_builtin == "spdisplays_yes" %}
-															<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
-														{% else %}
-															<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
-														{% endif %}
-													</div>
-													<div class="col-lg-5">
-														<ul class="list-group">
-														<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
-														<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
-															<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
-														<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
-														</ul>
-													</div>
-													<div class="col-lg-5">
-														<ul class="list-group">
-															<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
-															<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
-															<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
-															<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
-														</ul>
-													</div>
-												</div>
-												{% endfor %}
-													</div>
-										</div>
-									</li>
-									{% endfor %}
-								</ul>
-								{% else %}
-								<div class="row">
-									<div class="col-md-12">
-										<div class="alert alert-warning">No system data found!</div>
+									<div id='managed_uninstalls_remote'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 									</div>
 								</div>
-								{% endif %}
 							</div>
-						</div>
-						<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
-							<div class="panel-body">
-								<div class="row">
-									<!-- panel -->
-									<div class='col-md-5'>
-										<div class="section_label"><h4>Workflows</h4></div>
-										{% if imagr_plist == "Can't reach server!" %}
-										<div class="alert alert-danger">
-											{{ imagr_plist }}
-										</div>
-										{% else %}
-										<div class="list-group" id="imagrworkflow">
-											{% for workflow in imagr_plist.workflows %}
-											<a href="#" class="list-group-item workflows workflow-parent{% if machine.imagr_workflow == workflow.name %} active{% endif %}">
-												<h4 class="list-group-item-heading workflow-content">{{ workflow.name }}</h4>
-												<p class="list-group-item-text workflow-content">{{ workflow.description }}</p>
-												<p class="workflow-button"><i class="fa fa-play" aria-hidden="true"></i></p>
-											</a>
-											{% endfor %}
-										</div>
-										{% endif %}
-										
-											
-										
+							<div class='col-md-12'>
+								<div class="section_label"><h4>Optional Installs</h4></div>
+								<div class='list-group list-group-root unstyled'>
+									<div id='optional_installs'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 									</div>
-									<!-- reports -->
-									<div class='col-md-7'>
-										<div class="section_label"><h4>Reports</h4></div>
-										<table id="imagrreports" class="table table-striped table-bordered" width="100%">
-										<thead>
-											<tr>
-												<th>Date</th>
-												<th>Message</th>
-												<th>Status</th>
-											</tr>
-										</thead>
-									</table>
-									<script type='text/javascript'>
-										getImagrReports("{{machine.serial_number}}");
-									</script>
+									<div id='optional_installs_remote'>
+										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div id="data">
+				<div role="tabpanel" class="tab-pane tabDetail" id="AppleUpdates">
+					<div class="panel-body">
+						{% if report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType %}
+						<table class="table table-striped">
+							<tbody>
+								{% for item in report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType|dictsortreversed:'install_date' %}
+									{% if item.package_source == "package_source_apple"%}
+									<tr><td class="text-center" style="width:25px;"><img src='{% get_static_prefix %}img/appleupdate.png' width="20"/></td>
+									<td>{{ item|get:"_name" }}</td><td>{{ item.install_version }}</td><td>{{ item.install_date|date:"d. F Y" }}</td><td><span class='label label-primary pull-right status'>intalled</span></td></tr>
+									{% endif %}
+								{% endfor %}
+							</tbody>
+						</table>
+						{% else %}
+						<div class="row">
+							<div class="col-md-12">
+								<div class="alert alert-info">No installed updates!</div>
+							</div>
+						</div>
+						{% endif %}
+					</div>
 				</div>
+				<div role="tabpanel" class="tab-pane tabDetail" id="System">
+					<div class="panel-body">
+						{% if report_plist.Errors %}
+						<h4>Errors</h4>
+						<div class="alert alert-danger" role="alert">
+							<div>{{ report_plist.Errors.0 }}</div>
+						</div>
+						{% endif %}
+						{% if report_plist.Warnings %}
+						<h4>Warnings</h4>
+						<div class="alert alert-warning" role="alert">
+							<div>{{ report_plist.Warnings.0 }}</div>
+						</div>
+						{% endif %}
+						{% if report_plist %}
+						<h4>Basic</h4>
+						<div class="row">
+							<div class="col-lg-6">
+								<ul class="list-group">
+									<li class="list-group-item"><b>Last User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
+									<li class="list-group-item"><b>Munki:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
+									<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
+									<li class="list-group-item"><b>Boot Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
+									<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
+									<script>
+										$('#osversion').popover();
+									</script>
+								</ul>
+							</div>
+							<div class="col-lg-6">
+								<ul class="list-group">
+									<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
+									<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
+									<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
+									<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
+								</ul>
+							</div>
+						</div>
+						<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
+						<ul class="list-group">
+								{% for device in disksList %}
+							<li class="list-group-item">
+								<div class="row">
+									<div class="col-lg-2" style="" >
+										<div class="row">
+											<div class="col-lg-12 text-center" >
+												<i class="fa fa-hdd-o" aria-hidden="true" style="font-size: 50px"></i>
+												{% if device.physicalDisk.is_internal_disk == 'no' %}
+														<div style="margin-left: 65px; margin-top: -28px"><i class="fa fa-plug" aria-hidden="true" style="font-size: 20px;"></i></div>
+												{% endif %}
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-lg-12 text-center">{{ device.diskName }}</div>
+										</div>
+
+									</div>
+									<div class="col-lg-10" >
+										<div class="row" style="border-left: 1px solid #ddd">
+												<div class="col-lg-12">
+													<h5 style="margin-top: 0px">Basic</h5>
+														<div class="row">
+															<div class="col-lg-6">
+
+																<ul class="list-group">
+																<li class="list-group-item"><b>Disk-Size:</b><span class="pull-right">{{device.diskSize|filesizeformat}}</span></li>
+																<li class="list-group-item"><b>Protocol:</b><span class="pull-right">{{device.physicalDisk.protocol}}</span></li>
+																</ul>
+															</div>
+															<div class="col-lg-6">
+																<ul class="list-group">
+																	<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if device.physicalDisk.is_internal_disk == 'yes' %} <i class="fa fa-check" aria-hidden="true"></i> {% else %} <i class="fa fa-times" aria-hidden="true"></i> {% endif %}</span></li>
+																</ul>
+															</div>
+														</div>
+													</div>
+											</div>
+										{% for partition in device.partitions %}
+										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+											<div class="col-lg-12">
+												<span class="pull-right">{{ partition.partitionAtributes.free_space_in_bytes|filesizeformat }} / {{partition.partitionAtributes.size_in_bytes|filesizeformat}}</span>
+												<h5 style="margin-top: 0px">{{ partition.partitionName }}</h5>
+												<div class="progress" style="margin-bottom: 0px;">
+											<div class="progress-bar" role="progressbar" aria-valuenow="{{partition.partitionAtributes.percentFull}}" aria-valuemin="0" aria-valuemax="100" style="width: {{partition.partitionAtributes.percentFull}}%; ">
+										<span class="sr-only">60% Complete</span>
+											</div>
+											</div>
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+							</li>
+							{% endfor %}
+						</ul>
+						<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Graphics</h4>
+						<ul class="list-group">
+							{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
+							<li class="list-group-item">
+								<div class="row">
+									<div class="col-lg-2" style="" >
+										<div class="row">
+											<div class="col-lg-12 text-center" >
+												{% if "Intel" in card.sppci_model %}
+												<img style="width: 70px;" src="{% static "img/Intel.gif" %}" />
+												{% elif "NVIDIA" in card.sppci_model %}
+												<img style="width: 70px;" src="{% static "img/nvidia.gif" %}" />
+												{% elif "amd" in card.sppci_model %}
+												<img style="width: 70px;" src="{% static "img/AMD.gif" %}" />
+												{% else %}
+												<img style="width: 70px;" src="{% static "img/Graphic-card-icon.png" %}" />
+												{% endif %}
+											</div>
+										</div>
+										<div class="row" style="margin-top: 5px">
+											<div class="col-lg-12 text-center">{{ card.sppci_model }}</div>
+										</div>
+									</div>
+									<div class="col-lg-10" >
+										<div class="row" style="border-left: 1px solid #ddd">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-lg-6">
+														<ul class="list-group">
+															<li class="list-group-item"><b>Video RAM:</b><span class="pull-right">{% if card.spdisplays_vram  %}{{ card.spdisplays_vram }}{% else %}{{ card|get:"_spdisplays_vram" }}{% endif %}</span></li>
+														</ul>
+													</div>
+													<div class="col-lg-6">
+														<ul class="list-group">
+														<li class="list-group-item"><b>Card Type:</b><span class="pull-right">{{ card.sppci_bus|slice:"11:"|replace }}</span></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{% for screen in card.spdisplays_ndrvs %}
+										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+											<div class="col-lg-2">
+												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
+													<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+												{% else %}
+													<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
+												{% endif %}
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+												<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
+												<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
+													<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
+												<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
+												</ul>
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
+													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
+													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+												</ul>
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+							</li>
+							{% endfor %}
+						</ul>
+						{% else %}
+						<div class="row">
+							<div class="col-md-12">
+								<div class="alert alert-warning">No system data found!</div>
+							</div>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+				<div role="tabpanel" class="tab-pane tabDetail" id="Admin">
+					<div class="panel-body">
+						<div class="row">
+						</div>
+					</div>
+				</div>
+				<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
+					<div class="panel-body">
+						<div class="row">
+							<!-- panel -->
+							<div class='col-md-5'>
+								<div class="section_label"><h4>Workflows</h4></div>
+								{% if imagr_plist == "Can't reach server!" %}
+								<div class="alert alert-danger">
+									{{ imagr_plist }}
+								</div>
+								{% else %}
+								<div class="list-group" id="imagrworkflow">
+									{% for workflow in imagr_plist.workflows %}
+									<a href="#" class="list-group-item workflows workflow-parent{% if machine.imagr_workflow == workflow.name %} active{% endif %}">
+										<h4 class="list-group-item-heading workflow-content">{{ workflow.name }}</h4>
+										<p class="list-group-item-text workflow-content">{{ workflow.description }}</p>
+										<p class="workflow-button"><i class="fa fa-play" aria-hidden="true"></i></p>
+									</a>
+									{% endfor %}
+								</div>
+								{% endif %}
+								
+									
+								
+							</div>
+							<!-- reports -->
+							<div class='col-md-7'>
+								<div class="section_label"><h4>Reports</h4></div>
+								<table id="imagrreports" class="table table-striped table-bordered" width="100%">
+								<thead>
+									<tr>
+										<th>Date</th>
+										<th>Message</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+							</table>
+							<script type='text/javascript'>
+								getImagrReports("{{machine.serial_number}}");
+							</script>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="data">
+			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
