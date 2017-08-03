@@ -177,37 +177,37 @@
           <div class="navbar-default sidebar" role="navigation">
                   <ul class="nav" id="side-menu">
                       <li {% if page == 'dashboard' %} class="active" {% endif %}>
-                          <a href="/reports/dashboard/"><i class="fa fa-tachometer fa-fw"></i> Dashboard</a>
+                          <a href="{% url 'dashboard' %}"><i class="fa fa-tachometer fa-fw"></i> Dashboard</a>
                       </li>
                       {% if perms.reports.can_view_reports %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
-                        <a href="{% url 'reports.views.index' %}"><i class="fa fa-desktop fa-fw"></i> Computer <span class="badge pull-right">{{ SumClients }}</span></a>
+                        <a href="{% url 'reports' %}"><i class="fa fa-desktop fa-fw"></i> Computer <span class="badge pull-right">{{ SumClients }}</span></a>
                       </li>
                       {% if business_units_enabled %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
-                        <a id="comp" href="{% url 'reports.views.index' %}"><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span></a>
+                        <a id="comp" href="{% url 'reports' %}"><i class="fa fa-building-o fa-fw"></i> Business Units <span class="badge pull-right">{{ SumClients }}</span></a>
                         <ul id="computers" class="collapse in">
                           {% for business_unit in business_units %}
                           <li>
-                            <a href="{% url 'reports.views.index' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
+                            <a href="{% url 'reports' %}?businessunit={{ business_unit.hash }}" {% if subpage == business_unit.hash %} class="active" {% endif %}>{{ business_unit.name }} <span class="badge pull-right">{{ business_unit.machines }}</span></a>
                           </li>
                           {% endfor %}
                           <li>
-                            <a href="{% url 'reports.views.index' %}?unknown=true" {% if subpage == "unknown" %} class="active" {% endif %}>Unknown<span class="badge pull-right">{{ sumUnkown }}</span></a>
+                            <a href="{% url 'reports' %}?unknown=true" {% if subpage == "unknown" %} class="active" {% endif %}>Unknown<span class="badge pull-right">{{ sumUnkown }}</span></a>
                           </li>
                         </ul>
                       </li>
                       {% endif %}
                       {% endif %}
                       <li {% if page == 'manifests' %} class="active" {% endif %}>
-                        <a href="/manifests/"><i class="fa fa-file-code-o fa-fw"></i> Manifests</a>
+                        <a href="{% url 'manifests' %}"><i class="fa fa-file-code-o fa-fw"></i> Manifests</a>
                       </li>
                       <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
-                        <a href="/pkgsinfo/"><i class="fa fa-file-code-o fa-fw"></i> Package Info</a>
+                        <a href="{% url 'pkginfo' %}"><i class="fa fa-file-code-o fa-fw"></i> Package Info</a>
                       </li>
                       {% if REPOSADOLIB %}
                       <li {% if page == 'updates' %} class="active" {% endif %}>
-                        <a href="/updates/"><i class="fa fa-refresh fa-fw"></i> Softwareupdate</a>
+                        <a href="{% url 'updates' %}"><i class="fa fa-refresh fa-fw"></i> Softwareupdate</a>
                       </li>
                       {% endif %}
                   </ul>
