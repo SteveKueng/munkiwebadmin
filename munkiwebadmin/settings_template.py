@@ -45,7 +45,7 @@ ENCRYPTED_FIELDS_KEYDIR = '/Users/Shared/mwa2test/fieldkeys'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx88*d1v+m$&)w1ur4-xvcqj(8as_$q'
+SECRET_KEY = 'x@hgx4r!1rm@c4lax96tx08*d1v+m$&)w1ur4-xvcqj(9as_$q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
