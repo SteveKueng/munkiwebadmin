@@ -35,6 +35,12 @@ MODEL_LOOKUP_ENABLED = True
 #Define your style from styles-folder located in static
 STYLE = 'default'
 
+#fieldkey for https://github.com/defrex/django-encrypted-fields
+# mkdir fieldkeys
+# keyczart create --location=fieldkeys --purpose=crypt
+# keyczart addkey --location=fieldkeys --status=primary --size=256
+ENCRYPTED_FIELDS_KEYDIR = '/Users/Shared/mwa2test/fieldkeys'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
