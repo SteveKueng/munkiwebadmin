@@ -75,6 +75,7 @@
                     </div>
                 </form>
                 <!-- /.dropdown -->
+                {% if perms.reports.can_view_reports %}
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>
@@ -86,66 +87,7 @@
                     </ul>
                     <!-- /.dropdown-tasks -->
                 </li>
-                <!-- /.dropdown 
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-alerts">
-                        <li>
-                            <a>
-                                <div>
-                                    <i class="fa fa-comment fa-fw"></i> New Comment
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a>
-                                <div>
-                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                    <span class="pull-right text-muted small">12 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a>
-                                <div>
-                                    <i class="fa fa-envelope fa-fw"></i> Message Sent
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a>
-                                <div>
-                                    <i class="fa fa-tasks fa-fw"></i> New Task
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a>
-                                <div>
-                                    <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a class="text-center">
-                                <strong>See All Alerts</strong>
-                                <i class="fa fa-angle-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                    /.dropdown-alerts -->
-                </li>
+                {% endif %}
                 <!-- /.dropdown -->
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -176,9 +118,11 @@
 
           <div class="navbar-default sidebar" role="navigation">
                   <ul class="nav" id="side-menu">
+                      {% if perms.reports.can_view_dashboard %}
                       <li {% if page == 'dashboard' %} class="active" {% endif %}>
                           <a href="{% url 'dashboard' %}"><i class="fa fa-tachometer fa-fw"></i> Dashboard</a>
                       </li>
+                      {% endif %}
                       {% if perms.reports.can_view_reports %}
                       <li {% if page == 'reports' %} class="active" {% endif %}>
                         <a href="{% url 'reports' %}"><i class="fa fa-desktop fa-fw"></i> Computer <span class="badge pull-right">{{ SumClients }}</span></a>
@@ -199,13 +143,17 @@
                       </li>
                       {% endif %}
                       {% endif %}
+                      {% if perms.reports.view_manifestfile %}
                       <li {% if page == 'manifests' %} class="active" {% endif %}>
                         <a href="{% url 'manifests' %}"><i class="fa fa-file-code-o fa-fw"></i> Manifests</a>
                       </li>
+                      {% endif %}
+                      {% if perms.reports.view_mpkginfofile %}
                       <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
                         <a href="{% url 'pkginfo' %}"><i class="fa fa-file-code-o fa-fw"></i> Package Info</a>
                       </li>
-                      {% if REPOSADOLIB %}
+                      {% endif %}
+                      {% if REPOSADOLIB and updates.view_updates %}
                       <li {% if page == 'updates' %} class="active" {% endif %}>
                         <a href="{% url 'updates' %}"><i class="fa fa-refresh fa-fw"></i> Softwareupdate</a>
                       </li>
@@ -230,7 +178,7 @@
     <script src="{% get_static_prefix %}js/metisMenu/metisMenu.min.js"></script>
     <script src="{% get_static_prefix %}js/munkiwebadmin.js"></script>
 
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and perms.reports.can_view_reports %}
     <script>
     $(document).ready(function() {
         getRunningMachine();
