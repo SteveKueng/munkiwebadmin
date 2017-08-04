@@ -634,6 +634,26 @@ def db_api(request, kind, subclass=None, serial_number=None):
             return HttpResponse(
                 response,
                 content_type='application/'+response_type, status=201)
+
+        if kind in ['vault'] and subclass == "expire" and serial_number:
+            if not request.user.has_perm('vault.view_expire_localAdmin'):
+                raise PermissionDenied
+            try:
+                localadmin = localAdmin.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
+            except Machine.DoesNotExist:
+                return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'MachineDoesNotExist',
+                                'detail': '%s does not exist' % serial_number}),
+                    content_type='application/json', status=404)
+                    
+            if response_type == 'json':
+                response = serializers.serialize('json', localadmin, fields=(['expireDate']))
+            else:
+                response = serializers.serialize('xml', localadmin, fields=(['expireDate']))
+            return HttpResponse(
+                response[1:-1],
+                content_type='application/'+response_type, status=201)
     
     # ----------- HTTP_X_METHODOVERRIDE -----------------
     if request.META.has_key('HTTP_X_METHODOVERRIDE'):

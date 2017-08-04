@@ -37,4 +37,5 @@ class localAdmin(models.Model):
     class Meta:
         permissions = (
             ('show', 'Show password'),
+            ('view_expire', 'view expire date'),
         )
