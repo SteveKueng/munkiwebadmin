@@ -34,7 +34,9 @@
 						<li role="presentation"><a href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 						<li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
 						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
+						{% if perms.vault.view_passwordAccess %}
 						<li role="presentation"><a href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
+						{% endif %}
 						{% if imagr_plist %}
 						<li role="presentation"><a href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
 						{% endif %}
@@ -300,6 +302,7 @@
 						{% endif %}
 					</div>
 				</div>
+				{% if perms.vault.view_passwordAccess %}
 				<div role="tabpanel" class="tab-pane tabDetail" id="Admin">
 					<div class="panel-body">
 						<div class="row">
@@ -328,6 +331,7 @@
 						</div>
 					</div>
 				</div>
+				{% endif %}
 				<div role="tabpanel" class="tab-pane tabDetail" id="Staging">
 					<div class="panel-body">
 						<div class="row">

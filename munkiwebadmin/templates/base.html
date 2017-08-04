@@ -143,12 +143,12 @@
                       </li>
                       {% endif %}
                       {% endif %}
-                      {% if perms.reports.view_manifestfile %}
+                      {% if perms.manifests.view_manifestfile %}
                       <li {% if page == 'manifests' %} class="active" {% endif %}>
                         <a href="{% url 'manifests' %}"><i class="fa fa-file-code-o fa-fw"></i> Manifests</a>
                       </li>
                       {% endif %}
-                      {% if perms.reports.view_mpkginfofile %}
+                      {% if perms.pkgsinfo.view_pkginfofile %}
                       <li {% if page == 'pkgsinfo' %} class="active" {% endif %}>
                         <a href="{% url 'pkginfo' %}"><i class="fa fa-file-code-o fa-fw"></i> Package Info</a>
                       </li>
@@ -162,7 +162,6 @@
               
               <!-- /.sidebar-collapse -->
           </div>
-          
           <!-- /.navbar-static-side -->
       </nav>
       

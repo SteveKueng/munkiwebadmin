@@ -49,7 +49,7 @@
         </div>
         {% endif %}
         <div class='pull-right' id='cancel'>
-          {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
+          {% if not perms.manifests.change_manifestfile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
           <button type="button" class="btn btn-default" onClick="cancelEdit()">Cancel</button>
         </div>
       </div>

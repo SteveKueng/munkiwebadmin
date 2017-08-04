@@ -109,6 +109,7 @@ def list_products(sort_order='date'):
 	return product_item
 
 @login_required
+@permission_required('updates.view_updates', login_url='/login/')
 def index(request):
 	if request.is_ajax():
 		response = list_products()
@@ -120,6 +121,7 @@ def index(request):
 	return render(request, 'updates/updates.html', context=context)
 
 @login_required
+@permission_required('updates.add_updates', login_url='/login/')
 def new_branch(request, branchname):
 	catalog_branches = reposadocommon.getCatalogBranches()
 	if branchname in catalog_branches:
@@ -133,6 +135,7 @@ def new_branch(request, branchname):
 	return HttpResponse("OK")
 
 @login_required
+@permission_required('updates.delete_updates', login_url='/login/')
 def delete_branch(request, branchname):
     catalog_branches = reposadocommon.getCatalogBranches()
     if not branchname in catalog_branches:
@@ -159,6 +162,7 @@ def delete_branch(request, branchname):
     return HttpResponse("OK")
 
 @login_required
+@permission_required('updates.change_updates', login_url='/login/')
 def add_all(request, branchname):
 	products = reposadocommon.getProductInfo()
 	catalog_branches = reposadocommon.getCatalogBranches()
@@ -171,6 +175,7 @@ def add_all(request, branchname):
 	return HttpResponse("OK")
 
 @login_required
+@permission_required('updates.change_updates', login_url='/login/')
 def add_product_to_branch(request):
 	'''Adds one product to a branch. Takes a list of strings.
 	The last string must be the name of a branch catalog. All other
@@ -222,6 +227,7 @@ def add_product_to_branch(request):
 	return HttpResponse(status=204)
 
 @login_required
+@permission_required('updates.change_updates', login_url='/login/')
 def remove_product_from_branch(request):
 	'''Removes one or more products from a branch. Takes a list of strings.
     The last string must be the name of a branch catalog. All other
@@ -267,6 +273,7 @@ def remove_product_from_branch(request):
 	return HttpResponse(status=204)
 
 @login_required
+@permission_required('updates.delete_updates', login_url='/login/')
 def purge_product(request, product_ids="all-deprecated", force=False):
     '''Removes products from the ProductInfo.plist and purges their local 
     replicas (if they exist). Warns and skips if a product is not deprecated

@@ -16,7 +16,7 @@ class passwordAccess(models.Model):
 
     class Meta:
         permissions = (
-            ('view', 'View content'),
+            ('view_passwordAccess', 'View content'),
         )
 
 class localAdmin(models.Model):
@@ -36,6 +36,6 @@ class localAdmin(models.Model):
     
     class Meta:
         permissions = (
-            ('show', 'Show password'),
-            ('view_expire', 'view expire date'),
+            ('show_password', 'Show password'),
+            ('view_expireDate', 'view expire date'),
         )

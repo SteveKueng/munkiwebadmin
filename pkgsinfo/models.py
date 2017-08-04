@@ -86,7 +86,7 @@ class PkginfoFile(models.Model):
     '''Placeholder so we get permissions entries in the admin database'''
     class Meta:
         permissions = (
-            ('view', 'View pkginfo'),
+            ('view_pkginfofile', 'View pkginfo'),
         )
     pass
 

@@ -90,6 +90,7 @@ def plist_api(request, kind, filepath=None):
     response_type = 'json'
     if request.META.get('HTTP_ACCEPT') == 'application/xml':
         response_type = 'xml_plist'
+    request_type = 'json'
     if request.META.get('CONTENT_TYPE') == 'application/xml':
         request_type = 'xml_plist'
 
@@ -576,7 +577,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
         
         response = list()
         if kind in ['report', 'imagr']:
-            if not request.user.has_perm('report.view_machine'):
+            if not request.user.has_perm('reports.can_view_reports'):
                 raise PermissionDenied
             if serial_number:
                 try:
@@ -636,7 +637,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 content_type='application/'+response_type, status=201)
 
         if kind in ['vault'] and subclass == "expire" and serial_number:
-            if not request.user.has_perm('vault.view_expire_localAdmin'):
+            if not request.user.has_perm('vault.view_expireDate'):
                 raise PermissionDenied
             try:
                 localadmin = localAdmin.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
@@ -671,7 +672,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 machine = Machine.objects.get(serial_number=serial_number)
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial_number)
-            if kind in ['report', 'inventory', 'imagr']:
+            if kind in ['report', 'imagr']:
                 if not request.user.has_perm('reports.change_machine'):
                     raise PermissionDenied
                 try:
@@ -748,7 +749,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     if imagrReport:
                         imagrReport.save()                 
             elif kind in ['vault'] and subclass == "set":
-                if not request.user.has_perm('vault.change_localAdmin'):
+                if not request.user.has_perm('vault.change_localadmin'):
                     raise PermissionDenied
                 # set password
                 value = submit.get('value', None)
@@ -767,7 +768,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         content_type='application/json', status=400)
 
             elif kind in ['vault'] and subclass == "show":
-                if not request.user.has_perm('vault.show_localAdmin'):
+                if not request.user.has_perm('vault.show_password'):
                     raise PermissionDenied
                 reason = submit.get('reason', None)
                 if reason:
