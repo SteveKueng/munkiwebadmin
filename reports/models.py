@@ -50,6 +50,9 @@ class Machine(models.Model):
 
     class Meta:
         ordering = ['hostname']
+        permissions = (
+            ('view', 'View machine'),
+        )
 
 class MunkiReport(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)

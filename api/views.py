@@ -95,6 +95,12 @@ def plist_api(request, kind, filepath=None):
 
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
+        if kind == 'manifests':
+            if not request.user.has_perm('manifests.view_manifestfile'):
+                raise PermissionDenied
+        if kind in ('catalogs', 'pkgsinfo'):
+            if not request.user.has_perm('pkgsinfo.view_pkginfofile'):
+                raise PermissionDenied
         if filepath:
             try:
                 response = Plist.read(kind, filepath)
@@ -415,6 +421,8 @@ def file_api(request, kind, filepath=None):
 
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
+        if not request.user.has_perm('pkgsinfo.view_pkginfofile'):
+            raise PermissionDenied
         if filepath:
             fullpath = MunkiFile.get_fullpath(kind, filepath)
             if not os.path.exists(fullpath):
@@ -489,7 +497,7 @@ def file_api(request, kind, filepath=None):
                 json.dumps({'filename': filename}),
                 content_type='application/json', status=200)
 
-    if request.method in ('PUT', 'PATCH'):
+    elif request.method in ('PUT', 'PATCH'):
         LOGGER.debug("Got API %s request for %s", request.method, kind)
         response = HttpResponse(
             json.dumps({'result': 'failed',
@@ -499,7 +507,7 @@ def file_api(request, kind, filepath=None):
         response['Allow'] = 'GET, POST, DELETE'
         return response
 
-    if request.method == 'DELETE':
+    elif request.method == 'DELETE':
         LOGGER.debug("Got API DELETE request for %s", kind)
         if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
             raise PermissionDenied
@@ -554,7 +562,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
         response_type = 'xml'
 
     # ----------- GET -----------------
-    if request.method == 'GET':
+    elif request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
         filter_terms = request.GET.copy()
@@ -568,6 +576,8 @@ def db_api(request, kind, subclass=None, serial_number=None):
         
         response = list()
         if kind in ['report', 'imagr']:
+            if not request.user.has_perm('report.view_machine'):
+                raise PermissionDenied
             if serial_number:
                 try:
                     if kind == "report":
@@ -605,6 +615,8 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     content_type='application/xml', status=201)
         
         if kind in ['vault'] and subclass == "reasons" and serial_number:
+            if not request.user.has_perm('vault.view_passwordAccess'):
+                raise PermissionDenied
             try:
                 access = passwordAccess.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
             except Machine.DoesNotExist:
@@ -640,6 +652,8 @@ def db_api(request, kind, subclass=None, serial_number=None):
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial_number)
             if kind in ['report', 'inventory', 'imagr']:
+                if not request.user.has_perm('reports.change_machine'):
+                    raise PermissionDenied
                 try:
                     report = MunkiReport.objects.get(machine=machine)
                 except MunkiReport.DoesNotExist:
@@ -713,7 +727,9 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     # save imagr report
                     if imagrReport:
                         imagrReport.save()                 
-            elif kind in ['vault'] and subclass == "pass":
+            elif kind in ['vault'] and subclass == "set":
+                if not request.user.has_perm('vault.change_localAdmin'):
+                    raise PermissionDenied
                 # set password
                 value = submit.get('value', None)
                 if value:
@@ -764,7 +780,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
             return HttpResponse(status=204)
 
     # ----------- DELETE -----------------
-    if request.method == 'DELETE':
+    elif request.method == 'DELETE':
         LOGGER.debug("Got API DELETE request for %s", kind)
         if not request.user.has_perm('reports.delete_machine'):
             raise PermissionDenied

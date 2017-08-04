@@ -14,6 +14,11 @@ class passwordAccess(models.Model):
     reason = models.CharField(max_length=140, editable=False)
     date = models.DateTimeField(default=django.utils.timezone.now, editable=False)
 
+    class Meta:
+        permissions = (
+            ('view', 'View content'),
+        )
+
 class localAdmin(models.Model):
     machine = models.OneToOneField(Machine, on_delete=models.CASCADE, primary_key=True, editable=False)
     password = EncryptedCharField(editable=False, max_length=12)
@@ -28,3 +33,8 @@ class localAdmin(models.Model):
     def setPassword(self, value):
         self.expireDate = django.utils.timezone.now() + timedelta(days=1)
         self.password = value
+    
+    class Meta:
+        permissions = (
+            ('show', 'Show password'),
+        )
