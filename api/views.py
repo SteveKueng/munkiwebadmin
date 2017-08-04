@@ -546,8 +546,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
     except:
         submit = request.POST
     
-    if not serial_number:
-        serial_number = submit.get('serial', None)
     submission_type = submit.get('submission_type', None)
 
     # ----------- RESPONSE TYPE -----------------
@@ -605,36 +603,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 return HttpResponse(
                     response,
                     content_type='application/xml', status=201)
-        
-        if kind in ['vault'] and subclass == "pass" and serial_number:
-            reason = submit.get('reason', None)
-            if reason:
-                try:
-                    localadmin = localAdmin.objects.get(machine=Machine.objects.get(serial_number=serial_number))
-                    password = localadmin.getPassword(request.user, reason)
-                except Machine.DoesNotExist:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'MachineDoesNotExist',
-                                    'detail': '%s does not exist' % serial_number}),
-                        content_type='application/json', status=404)
-                
-                response.append(password)
-                if response_type == 'json':
-                    response = convert_dates_to_strings(response)
-                    return HttpResponse(
-                        json.dumps(response) + '\n',
-                        content_type='application/json', status=201)
-                else:
-                    return HttpResponse(
-                        response,
-                        content_type='application/xml', status=201)
-            else:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'BadRequest',
-                                'detail': 'Missing reason'}),
-                    content_type='application/json', status=400)
         
         if kind in ['vault'] and subclass == "reasons" and serial_number:
             try:
@@ -760,6 +728,36 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         json.dumps({'result': 'failed',
                                     'exception_type': 'BadRequest',
                                     'detail': 'Missing value'}),
+                        content_type='application/json', status=400)
+
+            elif kind in ['vault'] and subclass == "show":
+                if not request.user.has_perm('vault.show_localAdmin'):
+                    raise PermissionDenied
+                reason = submit.get('reason', None)
+                if reason:
+                    try:
+                        localadmin = localAdmin.objects.get(machine=Machine.objects.get(serial_number=serial_number))
+                        password = localadmin.getPassword(request.user, reason)
+                    except Machine.DoesNotExist:
+                        return HttpResponse(
+                            json.dumps({'result': 'failed',
+                                        'exception_type': 'MachineDoesNotExist',
+                                        'detail': '%s does not exist' % serial_number}),
+                            content_type='application/json', status=404)
+                    
+                    if response_type == 'json':
+                        return HttpResponse(
+                            json.dumps(password) + '\n',
+                            content_type='application/json', status=201)
+                    else:
+                        return HttpResponse(
+                            password,
+                            content_type='application/xml', status=201)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing reason'}),
                         content_type='application/json', status=400)
             else:
                 return HttpResponse(status=404)

@@ -1,5 +1,6 @@
 //global var
 var imagrReportsTable = ""
+var passwordAccessTable = ""
 var interval = ""
 
 // resize modal content to max windows height
@@ -142,6 +143,17 @@ $(document).on('click','.workflows', function (e) {
         $(this).addClass('active');
     } 
     setWorkflow(workflowName);
+});
+
+$(document).on('click','#showPassButton', function (e) {
+    e.preventDefault()
+    reason = $('#showPass').find('textarea').val()
+    if (reason.length) {
+        showPassword(reason)
+    } else {
+        $("#errorModalDetailText").text("No reason submited");
+        $("#errorModal").modal("show");
+    }
 });
 
 // reset url on modal close
@@ -743,11 +755,10 @@ function newManifestItem() {
 }
 
 function deleteMachine() {
-    var machineURL = '/api/report';
+    var machineURL = '/api/report/'+current_pathname;
     $.ajax({
         method: 'POST',
         url: machineURL,
-        data: { 'serial': current_pathname },
         headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             getClientTable();
@@ -809,11 +820,11 @@ function deleteMachineAndManifest() {
 
 function setWorkflow(workflow) {
     event.preventDefault();
-    var machineURL = '/api/report';
+    var machineURL = '/api/report/'+current_pathname;
     $.ajax({
         method: 'POST',
         url: machineURL,
-        data: { imagr_workflow : workflow, 'serial': current_pathname },
+        data: { imagr_workflow : workflow },
         success: function(data) {
             //set active
         },
@@ -837,8 +848,7 @@ function setWorkflow(workflow) {
 
 function loadPasswordAccess(serial) {
     var machineURL = '/api/vault/reasons/'+serial;
-
-    $('#passwordAccess').DataTable( {
+    passwordAccessTable = $('#passwordAccess').DataTable( {
     ajax: {
         url: machineURL,
         dataSrc: ''
@@ -846,9 +856,27 @@ function loadPasswordAccess(serial) {
     columns: [
         { data: 'fields.user.0' },
         { data: 'fields.reason' },
-        { data: 'fields.date' },
-    ]
+        { data: 'fields.date', type: 'date' },
+    ],
+    "bPaginate": false,
+    "bInfo": false,
+    "bFilter": false
     } );
+}
+
+function showPassword(reason) {
+    var machineURL = '/api/vault/show/'+current_pathname;
+    $.ajax({
+        method: 'POST',
+        url: machineURL,
+        data: { "reason" : reason},
+        success: function(data) {
+            $("#showPass").html( "<h4>Admin login:</h4><p>User: <b>supermario</b><br>Password: <b>"+data+"</b></p>" );
+            passwordAccessTable.ajax.reload();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+        }
+    });
 }
 
 function getTypeahead(url, listid) {
@@ -868,7 +896,6 @@ function getTypeahead(url, listid) {
         error: function(jqXHR, textStatus, errorThrown) {
         }
     });
-    
 }
 
 function startRefresh() {
