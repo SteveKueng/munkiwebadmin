@@ -1,2 +1,9 @@
 from django.db import models
-from django.conf import settings
+
+class Updates(models.Model):
+    '''Placeholder so we get permissions entries in the admin database'''
+    class Meta:
+        permissions = (
+            ('view', 'View updates'),
+        )
+    pass
