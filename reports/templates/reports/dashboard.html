@@ -23,7 +23,7 @@ $('#SearchField').prop('disabled', true);
     {% if munki.errors %}
     <div class="col-md-4">
         {% if perms.reports.can_view_reports %}
-        <a class="alert-link" href='{% url 'reports.views.index' %}?show=errors'>
+        <a class="alert-link" href='{% url 'reports' %}?show=errors'>
         {% endif %}
         <div class="alert alert-danger">
             <div class="row">
@@ -44,7 +44,7 @@ $('#SearchField').prop('disabled', true);
     {% if munki.warnings %}
     <div class="col-md-4">
         {% if perms.reports.can_view_reports %}
-        <a class="alert-link" href='{% url 'reports.views.index' %}?show=warnings'>
+        <a class="alert-link" href='{% url 'reports' %}?show=warnings'>
         {% endif %}
         <div class="alert alert-warning">
             <div class="row">
@@ -65,7 +65,7 @@ $('#SearchField').prop('disabled', true);
     {% if munki.activity %}
     <div class="col-md-4">
         {% if perms.reports.can_view_reports %}
-        <a href='{% url 'reports.views.index' %}?show=activity'>
+        <a href='{% url 'reports' %}?show=activity'>
             {% endif %}
         <div class="alert alert-info">
             <div class="row">
@@ -91,19 +91,19 @@ $('#SearchField').prop('disabled', true);
             <h3 class="panel-title">Check-ins</h3>
         </div>
         <div class="list-group">
-                    <a class="list-group-item" href='{% url 'reports.views.index' %}?show=hour'>
+                    <a class="list-group-item" href='{% url 'reports' %}?show=hour'>
                     This hour
                     <span class="badge badge-info pull-right">
                         {{ munki.checked_in_this_hour }}
                     </span>
                 </a>
-                <a class="list-group-item" href='{% url 'reports.views.index' %}?show=today'>
+                <a class="list-group-item" href='{% url 'reports' %}?show=today'>
                     Today
                     <span class="badge badge-info pull-right">
                         {{ munki.checked_in_today }}
                     </span>
                 </a>
-                <a class="list-group-item" href='{% url 'reports.views.index' %}?show=week'>
+                <a class="list-group-item" href='{% url 'reports' %}?show=week'>
                     Past week
                     <span class="badge badge-info pull-right">
                         {{ munki.checked_in_past_week }}
@@ -118,20 +118,20 @@ $('#SearchField').prop('disabled', true);
             <h3 class="panel-title">No check-ins</h3>
         </div>
             <div class="list-group">
-                <a class="list-group-item" href='{% url 'reports.views.index' %}?show=notweek'>
+                <a class="list-group-item" href='{% url 'reports' %}?show=notweek'>
                     Past week
                     <span class="badge badge-info pull-right">
                         {{ munki.not_for_week }}
                     </span>
                 </a>
                     
-                <a class="list-group-item" href='{% url 'reports.views.index' %}?show=notmonth'>
+                <a class="list-group-item" href='{% url 'reports' %}?show=notmonth'>
                     Past month
                     <span class="badge badge-warning pull-right">
                         {{ munki.not_for_month }}
                     </span>
                 </a> 
-                <a class="list-group-item" href='{% url 'reports.views.index' %}?show=notquarter'>
+                <a class="list-group-item" href='{% url 'reports' %}?show=notquarter'>
                     Past three months
                     <span class="badge badge-important pull-right">
                         {{ munki.not_three_months }}
