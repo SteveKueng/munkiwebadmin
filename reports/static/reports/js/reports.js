@@ -860,7 +860,8 @@ function loadPasswordAccess(serial) {
     ],
     "bPaginate": false,
     "bInfo": false,
-    "bFilter": false
+    "bFilter": false,
+    "aaSorting": [[2,"desc"]]
     } );
 }
 
