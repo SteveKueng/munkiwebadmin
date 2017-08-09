@@ -1,7 +1,13 @@
 # Django settings for munkiwebadmin project.
 import os
 from django.conf import global_settings
+import socket
 
+try:
+    HOSTNAME = socket.gethostname()
+except:
+    HOSTNAME = 'localhost'
+    
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 

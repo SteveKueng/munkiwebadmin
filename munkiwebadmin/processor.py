@@ -9,14 +9,26 @@ from django.contrib.auth.models import User, Group
 import os
 import base64
 
+# get settings
 try:
     STYLE = settings.STYLE
-    APPNAME = settings.APPNAME
-    BASE_DIR = settings.BASE_DIR
 except:
     STYLE = 'default'
+
+try:
+    APPNAME = settings.APPNAME
+except:
     APPNAME = "MunkiWebAdmin"
+
+try:
+    BASE_DIR = settings.BASE_DIR
+except:
     BASE_DIR = ""
+
+try:
+    HOSTNAME = settings.HOSTNAME
+except:
+    HOSTNAME = "localhost"
 
 REPOSADOLIB = False
 if os.path.isdir(BASE_DIR + '/reposadolib'):
@@ -30,5 +42,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'userImage': imgString }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
 
