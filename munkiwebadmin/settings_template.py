@@ -58,11 +58,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_EXEMPT_URLS = ()
+
 ###########################################################################
 # munkiwebadmin-specific end
 ###########################################################################
-
-
 
 # Application definition
 
@@ -93,6 +93,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'munkiwebadmin.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'

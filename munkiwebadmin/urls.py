@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^catalogs/', include('catalogs.urls')),
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
     url(r'^makecatalogs/', include('process.urls')),
-    url(r'^$', django.contrib.auth.views.login, name='login'),
+    url(r'^$', include('reports.urls')),
 ]
 
 if os.path.isdir(BASE_DIR + '/reposadolib'):
