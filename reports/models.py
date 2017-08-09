@@ -162,5 +162,5 @@ class ImagrReport(models.Model):
         return "%s - %s - %s" % (self.date_added, self.machine, self.status)
 
     class Meta:
-      get_latest_by = 'date_added'
-      ordering = ['-date_added']
+        get_latest_by = 'date_added'
+        ordering = ['-date_added']
