@@ -1,6 +1,14 @@
 """
 api/views.py
 """
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.mixins import (
+    CreateModelMixin, 
+    DestroyModelMixin,
+    UpdateModelMixin
+)
+
+
 from django.http import HttpResponse
 from django.http import QueryDict
 from django.http import FileResponse
@@ -15,9 +23,19 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
+
+from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+
+
+
 from reports.models import Machine, MunkiReport, ImagrReport
 from vault.models import localAdmin, passwordAccess
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+
+from .serializers import (
+    MachineListSerializer, 
+    MachineDetailSerializer
+)
+
 
 import datetime
 import json
@@ -826,3 +844,26 @@ def db_api(request, kind, subclass=None, serial_number=None):
     
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
+
+
+class ReportsListAPIView(ListAPIView):
+    queryset = Machine.objects.all()
+    serializer_class = MachineListSerializer
+
+class ReportsDetailAPIView(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, RetrieveAPIView):
+    queryset = Machine.objects.all()
+    serializer_class = MachineDetailSerializer
+    
+    lookup_url_kwarg = "serial_number"
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)

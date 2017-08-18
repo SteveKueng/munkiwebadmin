@@ -52,7 +52,7 @@ class Machine(models.Model):
         ordering = ['hostname']
 
 class MunkiReport(models.Model):
-    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE, related_name='munkireport')
     timestamp = models.DateTimeField(default=django.utils.timezone.now)
     runtype = models.CharField(max_length=64)
     runstate = models.CharField(max_length=16)
