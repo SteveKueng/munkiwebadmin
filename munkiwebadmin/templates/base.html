@@ -154,7 +154,7 @@
                         <a href="{% url 'pkginfo' %}"><i class="fa fa-file-code-o fa-fw"></i> Package Info</a>
                         </li>
                         {% endif %}
-                        {% if REPOSADOLIB and updates.view_updates %}
+                        {% if REPOSADOLIB and perms.updates.view_updates %}
                         <li {% if page == 'updates' %} class="active" {% endif %}>
                         <a href="{% url 'updates' %}"><i class="fa fa-refresh fa-fw"></i> Softwareupdate</a>
                         </li>
