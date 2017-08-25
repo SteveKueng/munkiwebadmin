@@ -858,6 +858,15 @@ function loadPasswordAccess(serial) {
         { data: 'fields.reason' },
         { data: 'fields.date', type: 'date' },
     ],
+    "columnDefs": [
+        {
+            "render": function ( data, type, row ) {
+                return new Date(data)
+            },
+            "width": "100px",
+            "targets": 2
+        },
+    ],
     "bPaginate": false,
     "bInfo": false,
     "bFilter": false,
@@ -872,7 +881,9 @@ function showPassword(reason) {
         url: machineURL,
         data: { "reason" : reason},
         success: function(data) {
-            $("#showPass").html( "<h4>Admin login:</h4><p>User: <b>supermario</b><br>Password: <b>"+data+"</b></p>" );
+            $("#password").html( data );
+            $("#reasonForm").addClass("hidden")
+            $("#showPassTable").removeClass("hidden")
             passwordAccessTable.ajax.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {

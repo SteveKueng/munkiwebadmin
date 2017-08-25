@@ -28,6 +28,7 @@ class localAdmin(models.Model):
         self.expireDate = django.utils.timezone.now() + timedelta(hours=2)
         access = passwordAccess(machine=self.machine, user=user, reason=reason)
         access.save()
+        self.save()
         return self.password
 
     def setPassword(self, value):
