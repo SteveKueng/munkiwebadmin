@@ -307,8 +307,20 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class='col-md-12' id="showPass">
-								<div class="section_label"><h4>Show password</h4></div>
-								<form>
+								<h4>Admin login</h4>
+								<table id="showPassTable" class='table table-bordered hidden'>
+									<tbody>
+										<tr>
+											<td style='width: 90px;'><b>User</b></td>
+											<td>{{ vault_username }}</td>
+										</tr>
+										<tr>
+											<td style='width: 90px;'><b>Password</b></td>
+											<td id="password"></td>
+										</tr>
+									</tbody>
+								</table>
+								<form id="reasonForm">
 									<div class="form-group">
 										<label for="comment">Reason:</label>
 										<textarea class="form-control" rows="2"></textarea>

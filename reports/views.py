@@ -59,6 +59,11 @@ try:
 except:
     ICONS_URL = ""
 
+try:
+    VAULT_USERNAME = settings.VAULT_USERNAME
+except:
+    VAULT_USERNAME = "admin"
+
 proxies = {
     "http":  PROXY_ADDRESS,
     "https": PROXY_ADDRESS
@@ -166,6 +171,7 @@ def index(request, computer_serial=None):
                         diskInfoDict = {}
 
                     context = {'machine': machine,
+                            'vault_username': VAULT_USERNAME,
                             'report_plist': report_plist,
                             'disksList': disksList,
                             'time': time,
@@ -173,6 +179,7 @@ def index(request, computer_serial=None):
                             }
                 else:
                     context = {'machine': machine,
+                        'vault_username': VAULT_USERNAME,
                         'report_plist': report_plist,
                         'imagr_plist': imagr_plist,
                         }
