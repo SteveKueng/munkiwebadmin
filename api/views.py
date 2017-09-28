@@ -26,8 +26,14 @@ import os
 import mimetypes
 import plistlib
 import re
+import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
+
+try:
+    simpleMDMKey = settings.simpleMDMKey
+except:
+    simpleMDMKey = None
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -79,6 +85,22 @@ def convert_strings_to_dates(jdata):
                 value = convert_strings_to_dates(value)
         return jdata
 
+def getSimpleMDMID(apiKey, serial_number):
+    """ returns device ID for your device """
+    devices = simpleMDMpy.devices(apiKey)
+
+    for device in devices.getDevice()["data"]:
+        if device["attributes"]["serial_number"] == serial_number:
+            return device["id"]
+
+    return None
+
+def setSimpleMDMName(apiKey, deviceID, deviceName):
+    """ sets device name in simpleMDM """
+    devices = simpleMDMpy.devices(apiKey)
+    if devices.updateDevice(deviceName, str(deviceID)).status_code == 200:
+        return True
+    return False
 
 @csrf_exempt
 @logged_in_or_basicauth()
@@ -498,7 +520,34 @@ def file_api(request, kind, filepath=None):
                 json.dumps({'filename': filename}),
                 content_type='application/json', status=200)
 
-    elif request.method in ('PUT', 'PATCH'):
+    elif request.method == 'PUT':
+        LOGGER.debug("Got API PUT request for %s", kind)
+        if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
+            raise PermissionDenied
+        filename = request.POST.get('filename') or filepath
+        filedata = request.FILES.get('filedata')
+        LOGGER.debug("Filename is %s" % filename)
+        if not (filename and filedata):
+            # malformed request
+            return HttpResponse(
+                json.dumps({'result': 'failed',
+                            'exception_type': 'BadRequest',
+                            'detail': 'Missing filename or filedata'}),
+                content_type='application/json', status=400)
+        try:
+            MunkiFile.write(kind, filedata, filename, request.user)
+        except FileError, err:
+            return HttpResponse(
+                json.dumps({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)}),
+                content_type='application/json', status=403)
+        else:
+            return HttpResponse(
+                json.dumps({'filename': filename}),
+                content_type='application/json', status=200)
+    
+    elif request.method == 'PATCH':
         LOGGER.debug("Got API %s request for %s", request.method, kind)
         response = HttpResponse(
             json.dumps({'result': 'failed',
@@ -667,6 +716,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
 
     # ----------- POST -----------------
     if request.method == 'POST':
+        LOGGER.debug("Got API POST request for %s", kind)
         if serial_number:
             try:
                 machine = Machine.objects.get(serial_number=serial_number)
@@ -740,6 +790,16 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     # setting hostname if there isn't set one / prevent save issues
                     if machine.hostname == "unknown":
                         machine.hostname = serial_number
+
+                    # simpleMDM
+                    if simpleMDMKey:
+                        LOGGER.debug("simpleMDM connnect")
+                        if not machine.simpleMDMID:
+                            machine.simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
+                            LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
+                        
+                        if machine.simpleMDMID:
+                            setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
 
                     report.timestamp = timezone.now()
                     machine.save()

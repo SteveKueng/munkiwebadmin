@@ -33,6 +33,9 @@ IMAGR_URL = ''
 # username displayed with password
 VAULT_USERNAME = 'admin'
 
+# simpleMDM api key
+simpleMDMKey = ''
+
 # provide the path to the git binary if you want MunkiWebAdmin to add and commit
 # manifest edits to a git repo
 # if GITPATH is undefined or None MunkiWebAdmin will not attempt to do a git add
