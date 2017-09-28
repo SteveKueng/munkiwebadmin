@@ -13,6 +13,7 @@ from django.db.models import Count
 from collections import OrderedDict
 from django.shortcuts import render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 from models import Machine, MunkiReport, BusinessUnit
 from manifests.models import ManifestFile
@@ -341,6 +342,7 @@ def getManifest(request, manifest_path):
     return HttpResponse(json.dumps(plist),
                         content_type='application/json')
 
+@csrf_exempt
 @login_required
 def createRequired(request):
     """ returns catalog as json """
@@ -375,6 +377,7 @@ def createRequired(request):
     return HttpResponse(json.dumps(requiredDict),
                         content_type='application/json')
 
+@csrf_exempt
 @login_required
 def getStatus(request):
     serial = request.POST.getlist('serial')[0]
