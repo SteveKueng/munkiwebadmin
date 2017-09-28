@@ -197,7 +197,7 @@ $(document).ready(function() {
 });
 
 function getDeviceIcon(serial, iconid) {
-    var image_url = "https://km.support.apple.com.edgekey.net/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
+    var image_url = "https://support.apple.com/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
     var $image = $("#"+serial+iconid);
     var $downloadingImage = $("<img>");
     $downloadingImage.load(function(){
