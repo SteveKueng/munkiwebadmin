@@ -1,3 +1,5 @@
 django>=1.11,<2.0
+psycopg2
 django-encrypted-fields
+requests
 simpleMDMpy
