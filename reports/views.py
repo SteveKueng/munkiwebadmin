@@ -317,14 +317,14 @@ def dashboard(request):
                      'machine_model').annotate(
                        count=Count('machine_model')).order_by()
 
-    c = RequestContext(request,{'munki': munki,
-                                'os_info': os_info,
-                                'machine_info': machine_info,
-                                'user': request.user,
-                                'page': 'dashboard'})
+    context = { 'munki': munki,
+                'os_info': os_info,
+                'machine_info': machine_info,
+                'user': request.user,
+                'page': 'dashboard'}
 
-    c.update(csrf(request))
-    return render_to_response('reports/dashboard.html', c)
+    #c.update(csrf(request))
+    return render(request, 'reports/dashboard.html', context=context)
 
 @login_required
 def getManifest(request, manifest_path):

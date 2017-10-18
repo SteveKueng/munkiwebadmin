@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9.6
+    expose:
+      - 5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=munkiwebadmin_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - /Users/Shared/munkirepo:/munkirepo
+      - /Users/Shared/fieldkeys:/fieldkeys
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+volumes:
+  pg_data: {}
