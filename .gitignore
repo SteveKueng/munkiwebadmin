@@ -2,8 +2,7 @@
 *.pyc
 *.pyo
 
-# settings.py and default db
-settings.py
+# default db
 db.sqlite3
 
 # hidden mac settings
