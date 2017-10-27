@@ -47,7 +47,7 @@ class Machine(models.Model):
     def report_time(self):
         obj = MunkiReport.objects.get(machine=self)
         return obj.timestamp
-
+        
     class Meta:
         ordering = ['hostname']
 
@@ -112,7 +112,6 @@ class MunkiReport(models.Model):
             base64bz2report = base64bz2report.replace("-", "\n")
             base64bz2report = base64bz2report.replace(" ", "+")
             plist = self.b64bz_decode(base64bz2report)
-            #self.report = base64bz2report
             self.report = plistlib.writePlistToString(plist)
         except:
             plist = None
@@ -132,7 +131,6 @@ class MunkiReport(models.Model):
             if (section in plist) and len(plist[section]):
                 activity[section] = plist[section]
         if activity:
-            #self.activity = self.encode(activity)
             self.activity = plistlib.writePlistToString(activity)
         else:
             self.activity = None
