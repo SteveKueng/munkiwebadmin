@@ -496,59 +496,6 @@ def formatted_manafactured_date(year, week):
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
     return formatted_date
 
-def warranty(request, serial):
-    """Determines the warranty status of a machine, and it's expiry date"""
-    # Based on: https://github.com/chilcote/warranty
-
-    url = 'https://selfsolve.apple.com/wcResults.do'
-    values = {'sn' : str(serial),
-              'Continue' : 'Continue',
-              'cn' : '',
-              'locale' : '',
-              'caller' : '',
-              'num' : '0' }
-
-    data = urllib.urlencode(values)
-    req = urllib2.Request(url, data)
-    response = urllib2.urlopen(req)
-    the_page = response.read()
-
-    match_obj = re.search( r'Repairs and Service Coverage: (.*)<br/>', \
-                          the_page, re.M|re.I)
-    if match_obj:
-        if 'Active' in match_obj.group():
-            match_obj = re.search( r'Estimated Expiration Date: (.*)<br/>', \
-                                  match_obj.group(), re.M|re.I)
-            if match_obj:
-                expiry_date = match_obj.group().strip('<br/>')
-                return HttpResponse('<span style="color:green">Active</span>'\
-                    '<br/>%s<br/><a href="javascript:postwith(\'%s\',%s)">'\
-                    'More Information</a>' % (expiry_date, url, values))
-            else:
-                return HttpResponse('<span style="color:green">Active</span>'\
-                    '<br/><a href="javascript:postwith(\'%s\',%s)">'\
-                    'More Information</a>' % (expiry_date, url, values))
-        elif 'Expired' in match_obj.group():
-            return HttpResponse('<span>Expired</span>'
-                '<br/><a href="javascript:postwith(\'%s\',%s)">'\
-                'More Information</a>' % (url, values))
-
-        else:
-            return HttpResponse('<span>Unknown Status: Try clicking '
-                '<a href="javascript:postwith(\'%s\',%s)">here</a> to '
-                'manually check' % (url, values))
-    else:
-        match_obj = re.search( r'RegisterProduct.do\?productRegister', \
-                                  the_page, re.M|re.I)
-        if match_obj:
-            return HttpResponse('<span>Product Requires Validation<br/>'\
-                'Click <a href="javascript:postwith(\'%s\',%s)">here</a> '\
-                'for more information' % (url, values))
-        else:
-            return HttpResponse('<span>Unknown Status: Try clicking '\
-                '<a href="javascript:postwith(\'%s\',%s)">here</a> to '\
-                ' manually check' % (url, values))
-
 def model_description_lookup(serial):
     """Determines the models human readable description based off the serial
     number"""

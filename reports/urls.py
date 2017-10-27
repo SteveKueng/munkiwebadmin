@@ -11,5 +11,4 @@ urlpatterns = [
     url(r'^(?P<computer_serial>[^/]+)$', reports.views.index),
     
     url(r'^raw/(?P<serial>[^/]+)$', reports.views.raw),
-    url(r'^warranty/(?P<serial>[^/]+)$', reports.views.warranty),
 ]
