@@ -813,6 +813,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     raise PermissionDenied
                 # set password
                 value = submit.get('value', None)
+                value = base64.b64decode(value)
                 if value:
                     try:
                         localadmin = localAdmin.objects.get(machine=machine)
