@@ -8,6 +8,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from api.models import Plist, MunkiFile
@@ -26,14 +27,12 @@ import os
 import mimetypes
 import plistlib
 import re
+import base64
 import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-try:
-    simpleMDMKey = settings.simpleMDMKey
-except:
-    simpleMDMKey = None
+simpleMDMKey = settings.SIMPLEMDMKEY
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -88,12 +87,13 @@ def convert_strings_to_dates(jdata):
 def getSimpleMDMID(apiKey, serial_number):
     """ returns device ID for your device """
     devices = simpleMDMpy.devices(apiKey)
+    for data in devices.getDevice(search=serial_number)['data']:
+        return data.get('id')
 
-    for device in devices.getDevice()["data"]:
-        if device["attributes"]["serial_number"] == serial_number:
-            return device["id"]
-
-    return None
+def getSimpleMDMDevice(apiKey, ID):
+    """ returns device info for your device """
+    devices = simpleMDMpy.devices(apiKey)
+    return devices.getDevice(deviceID=ID)
 
 def setSimpleMDMName(apiKey, deviceID, deviceName):
     """ sets device name in simpleMDM """
@@ -612,7 +612,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
         response_type = 'xml'
 
     # ----------- GET -----------------
-    elif request.method == 'GET':
+    if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
         filter_terms = request.GET.copy()
@@ -794,12 +794,9 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     # simpleMDM
                     if simpleMDMKey:
                         LOGGER.debug("simpleMDM connnect")
-                        if not machine.simpleMDMID:
-                            machine.simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
-                            LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
-                        
-                        if machine.simpleMDMID:
-                            setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
+                        machine.simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
+                        LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
+                        setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
 
                     report.timestamp = timezone.now()
                     machine.save()
@@ -885,5 +882,45 @@ def db_api(request, kind, subclass=None, serial_number=None):
             # success
             return HttpResponse(status=204)
     
+    # ----------- error 404 -----------------
+    return HttpResponse(status=404)
+
+@csrf_exempt
+@logged_in_or_basicauth()
+def mdm_api(request, kind, serial_number=None):
+    if kind not in ['mdm']:
+        return HttpResponse(status=404)
+    
+    # ----------- RESPONSE TYPE -----------------
+    response_type = 'json'
+    if request.META.get('HTTP_ACCEPT') == 'application/xml':
+        response_type = 'xml'
+    
+    if request.method == 'GET':
+        LOGGER.debug("Got API GET request for %s", kind)
+
+        try:
+            machine = Machine.objects.get(serial_number=serial_number)
+        except Machine.DoesNotExist:
+            return HttpResponse(status=204)
+        
+        if not machine.simpleMDMID:
+            return HttpResponse(status=204)
+        
+        data = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)
+
+        if response_type == 'json':
+            request_data = convert_dates_to_strings(data)
+            return HttpResponse(
+                json.dumps(data) + '\n',
+                content_type='application/json')
+        else:
+            return HttpResponse(
+                plistlib.writePlistToString(data),
+                content_type='application/xml')
+    
+    if request.method == 'POST':
+        pass
+
     # ----------- error 404 -----------------
     return HttpResponse(status=404)

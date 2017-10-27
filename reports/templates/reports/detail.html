@@ -19,6 +19,8 @@
 						<h4>
 							<small>
 							<b id="machineModel">{{ machine.machine_model }}</b>
+							{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType %}
+							| <i class="fa fa-battery-{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbattery:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}" aria-hidden="true"></i> {{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbatteryprecent:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}%
 							{% endif %}
 							</small>
 						</h4>
@@ -27,15 +29,16 @@
 				<div role="tabpanel">
 					<!-- Nav tabs -->
 					<ul id="clientTab" class="nav nav-tabs {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}" role="tablist">
-						<li role="presentation" class="active"><a href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
-						<li role="presentation"><a href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
-						<li role="presentation"><a href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
+						<li role="presentation" class="active"><a class="tab" href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
+						<li role="presentation"><a class="tab" href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
+						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
+						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#MDM" aria-controls="MDM" role="tab" data-toggle="tab">MDM</a></li>
 						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if perms.vault.view_passwordAccess %}
-						<li role="presentation"><a href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
+						<li role="presentation"><a class="tab" href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
 						{% endif %}
 						{% if imagr_plist %}
-						<li role="presentation"><a href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
+						<li role="presentation"><a class="tab" href="#Staging" aria-controls="Staging" role="tab" data-toggle="tab">Staging</a></li>
 						{% endif %}
 					</ul>
 				</div>
@@ -146,6 +149,7 @@
 									<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
 									<li class="list-group-item"><b>Boot Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
 									<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
+									<li class="list-group-item"><b>Manifest:</b><span class="pull-right">{{ report_plist.ManifestName }}</span></li>
 									<script>
 										$('#osversion').popover();
 									</script>
@@ -157,6 +161,8 @@
 									<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
 									<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
 									<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
+									<li class="list-group-item"><b>Last Munki run:</b><span class="pull-right">{{ report_plist.EndTime }}</span></li>
+									<li class="list-group-item"><b>Runtype:</b><span class="pull-right">{{ report_plist.RunType }}</span></li>
 								</ul>
 							</div>
 						</div>
@@ -181,6 +187,77 @@
 							</div>
 						</div>
 						{% endif %}
+
+						<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Network</h4>
+						<ul class="list-group">
+							{% for interface in report_plist.MachineInfo.SystemProfile.0.SPNetworkDataType %}
+							<li class="list-group-item">
+								<div class="row">
+									<div class="col-lg-2" >
+										<div class="row">
+											<div class="col-lg-12 text-center" >
+													{% if "AirPort" in interface.type %}
+													<i class="fa fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
+													{% else %}
+													<i class="fa fa-globe" aria-hidden="true" style="font-size: 70px"></i>
+													{% endif %}
+											</div>
+										</div>
+										<div class="row" style="margin-top: 5px">
+											<div class="col-lg-12 text-center">{{ interface.type }}</div>
+										</div>
+									</div>
+									<div class="col-lg-10" >
+										<div class="row" style="border-left: 1px solid #ddd">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-lg-6">
+														<ul class="list-group">
+															<li class="list-group-item"><b>Video RAM:</b><span class="pull-right">{% if interface.spdisplays_vram  %}{{ interface.spdisplays_vram }}{% else %}{{ interface|get:"_spdisplays_vram" }}{% endif %}</span></li>
+														</ul>
+													</div>
+													<div class="col-lg-6">
+														<ul class="list-group">
+														<li class="list-group-item"><b>interface Type:</b><span class="pull-right">{{ interface.sppci_bus|slice:"11:"|replace }}</span></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{% for screen in interface.spdisplays_ndrvs %}
+										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+											<div class="col-lg-2">
+												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
+													<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+												{% else %}
+													<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
+												{% endif %}
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+												<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
+												<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
+													<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
+												<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
+												</ul>
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
+													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
+													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+												</ul>
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+							</li>
+							{% endfor %}
+						</ul>
+
 						<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
 						<ul class="list-group">
 								{% for device in disksList %}
@@ -318,6 +395,22 @@
 							</div>
 						</div>
 						{% endif %}
+					</div>
+				</div>
+				<div role="tabpanel" class="tab-pane tabDetail" id="MDM">
+					<div class="panel-body">
+						<h4>Actions</h4>
+						<div class="row" id="actions">
+							<div class="col-lg-12">
+								<button type="submit" class="btn btn-primary" id="">Reboot</button>
+								<button type="submit" class="btn btn-primary" id="">Lock</button>
+								<button type="submit" class="btn btn-primary" id="">Refresh</button>
+								<button type="submit" class="btn btn-primary" id="">Shutdown</button>
+								<button type="submit" class="btn btn-primary" id="">-Group-</button>
+							</div>
+						</div>
+						<h4>Detail</h4>
+						<div class="row" id="mdmDetail"></div>
 					</div>
 				</div>
 				{% if perms.vault.view_passwordAccess %}

@@ -111,6 +111,11 @@ $(document).on('keyup','#listSearchField', function () {
   });
 });
 
+$(document).on('click','.tab', function (e) {
+    hash = window.location.hash;
+    window.location.hash = hash.slice(1).split('#')[0] + $(event.target).context.hash
+});
+
 $(document).on('click','.manifestItem', function (e) {
     e.preventDefault()
     if($(this).hasClass('active')) {
@@ -166,6 +171,7 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
       return;
   } else {
     $('#computerDetails').data('bs.modal').isShown = true;
+    $('.modal-backdrop').hide();
     stopRefresh();
     window.location.hash = '';
     current_pathname = "";
@@ -188,13 +194,17 @@ $(document).ready(function() {
     $(window).on('hashchange', function() {
         hash = window.location.hash;
         if (hash.length > 1) {
-            if (hash.slice(1) != current_pathname) {
+            if (hash.slice(1).split('#')[0] != current_pathname) {
+                $('.modal-backdrop').hide();
                 getComputerItem(hash.slice(1));
-                
             }
         }
     });
 });
+
+function activaTab(tab){
+  $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+};
 
 function getDeviceIcon(serial, iconid) {
     var image_url = "https://support.apple.com/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
@@ -208,9 +218,12 @@ function getDeviceIcon(serial, iconid) {
 
 var current_pathname = "";
 function getComputerItem(pathname) {
+    var serial = pathname.split('#')[0];
+    var tab = pathname.split('#')[1];
+
     $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
     showProgressBar();
-    var manifestItemURL = '/reports/' + pathname;
+    var manifestItemURL = '/reports/' + serial;
     $.ajax({
         xhr: function() {
                 var xhr = new window.XMLHttpRequest();
@@ -229,17 +242,17 @@ function getComputerItem(pathname) {
             $('#computer_detail').html(data);
 
             //loading manifest data
-            getManifest(pathname, function(data) {
+            getManifest(serial, function(data) {
                 getSoftwareList(data.catalogs, function() {
-                    getListElement(pathname, "included_manifests");
-                    getListElement(pathname, "catalogs");
-                    getSoftwareElemnts(pathname, "managed_installs");
-                    getSoftwareElemnts(pathname, "managed_uninstalls");
-                    getSoftwareElemnts(pathname, "optional_installs");
+                    getListElement(serial, "included_manifests");
+                    getListElement(serial, "catalogs");
+                    getSoftwareElemnts(serial, "managed_installs");
+                    getSoftwareElemnts(serial, "managed_uninstalls");
+                    getSoftwareElemnts(serial, "optional_installs");
                 });
             })  
 
-            current_pathname = pathname;
+            current_pathname = serial;
             requested_pathname = "";
 
             window.history.replaceState({'computer_detail': data}, manifestItemURL, '/reports/');
@@ -250,19 +263,24 @@ function getComputerItem(pathname) {
                 $("#computerDetails").modal("show");
                 $( "#catalogs" ).sortable({
                     update: function( ) {
-                     saveManifest(pathname, "catalogs");
+                     saveManifest(serial, "catalogs");
                     }
                 });
                 $( "#included_manifests" ).sortable({
                     update: function( ) {
-                     saveManifest(pathname, "included_manifests");
+                     saveManifest(serial, "included_manifests");
                     }
                 });
             }
 
-            getDeviceIcon(current_pathname, "_iconDetail");
-            getImagrReports(current_pathname);
-            loadPasswordAccess(current_pathname);
+            getDeviceIcon(serial, "_iconDetail");
+            getImagrReports(serial);
+            loadPasswordAccess(serial);
+            getSimpleMDMDeviceInfo(serial);
+            get_model_description(serial);
+            if (tab) {
+                activaTab(tab);
+            }
             hideProgressBar();
 
             //start refresh
@@ -923,5 +941,72 @@ function stopRefresh() {
     try{
         clearInterval(interval);
     }catch(err){}
+}
+
+function get_model_description(serial) {
+    $.ajax({
+        url: '/reports/model/' + serial,
+        type: 'GET',
+        dataType: 'html',
+        success: function(data, textStatus, xhr) {
+            $('#machineModel').html(data)
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            //alert(errorThrown)
+        },
+        timeout: 1000
+    });
+}
+
+function getSimpleMDMDeviceInfo(serail) {
+    var machineURL = '/api/mdm/'+serail;
+    $.ajax({
+        method: 'GET',
+        url: machineURL,
+        success: function(data) {
+            if (data) {
+                var html = '';
+                var attributes = data['data']['attributes']
+                var element = 0;
+                html += '<div class="col-lg-6">';
+                html += '<ul class="list-group">';
+                $.each(attributes, function(key, value) {
+                    if(element == 9){
+                        html += '<div class="col-lg-6">';
+                        html += '<ul class="list-group">';
+                    }
+                    if(value) {
+                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right">'+value+'</span></li>';
+                        element = element + 1;
+                    }
+                    if(element == 9) {
+                        html += '</ul>'
+                        html += '</div>'
+                    }
+                });
+                html += '<div class="col-lg-6">';
+                html += '<ul class="list-group">';
+                $('#mdmDetail').html(html);
+            } else {
+                var html = '';
+                html += '<div class="col-lg-6">'
+                html += '<ul class="list-group">'
+                html += '<li class="list-group-item">no data</li>'
+                html += '</ul>'
+                html += '</div>'
+                $('#mdmDetail').html(html);  
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            var html = '';
+            html += '<div class="col-lg-6">'
+            html += '<ul class="list-group">'
+            html += '<li class="list-group-item">no data</li>'
+            html += '</ul>'
+            html += '</div>'
+            $('#mdmDetail').html(html);
+        },
+        timeout: 3000
+    });
 }
 

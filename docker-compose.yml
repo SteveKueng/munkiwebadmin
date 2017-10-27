@@ -17,9 +17,12 @@ services:
     volumes:
       - /Users/Shared/munkirepo:/munkirepo
       - /Users/Shared/fieldkeys:/fieldkeys
+      - .:/munkiwebadmin
     ports:
       - "8000:8000"
     depends_on:
       - db
+    environment:
+      - SIMPLEMDMKEY=${SIMPLEMDMKEY}
 volumes:
   pg_data: {}
