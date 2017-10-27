@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^(?P<computer_serial>[^/]+)$', reports.views.index),
     
     url(r'^raw/(?P<serial>[^/]+)$', reports.views.raw),
+    url(r'^model/(?P<serial>[^/]+)$', reports.views.model_description_lookup),
 ]

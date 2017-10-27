@@ -18,10 +18,7 @@
 						<h2>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</h2>
 						<h4>
 							<small>
-							{% if additional_info.model_description|length > 1 %}
-								{{ additional_info.model_description }}
-							{% else %}
-								{{ machine.machine_model }}
+							<b id="machineModel">{{ machine.machine_model }}</b>
 							{% endif %}
 							</small>
 						</h4>

@@ -24,6 +24,7 @@ import base64
 import bz2
 import plistlib
 import re
+import urllib
 import urllib2
 from datetime import timedelta, date
 from xml.etree import ElementTree
@@ -496,7 +497,7 @@ def formatted_manafactured_date(year, week):
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
     return formatted_date
 
-def model_description_lookup(serial):
+def model_description_lookup(request, serial):
     """Determines the models human readable description based off the serial
     number"""
     # Based off https://github.com/MagerValp/MacModelShelf/
@@ -505,13 +506,12 @@ def model_description_lookup(serial):
     if (len(serial) == 12):
         snippet = serial[-4:]
     try:
-        response = urllib2.urlopen(
-            "http://support-sp.apple.com/sp/product?cc=%s&lang=en_US"
-            % snippet, timeout=2)
-        et = ElementTree.parse(response)
-        return et.findtext("configCode").decode("utf-8")
+        f = urllib2.urlopen("http://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
+        et = ElementTree.parse(f)
+        return HttpResponse(et.findtext("configCode").decode("utf-8"), content_type='application/xml', status=201)
     except:
-        return ''
+        return HttpResponse(status=204)
+
 
 def getSoftwareList(catalogs):
     """return a dict with all catalogs consolidated"""
