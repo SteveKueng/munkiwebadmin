@@ -32,6 +32,8 @@ VAULT_USERNAME = 'admin'
 
 SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 
+PROXY_ADDRESS = None
+
 STYLE = 'default'
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
