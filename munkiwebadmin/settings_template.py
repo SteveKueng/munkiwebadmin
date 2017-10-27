@@ -30,7 +30,7 @@ MODEL_LOOKUP_ENABLED = True
 
 VAULT_USERNAME = 'admin'
 
-simpleMDMKey = ''
+SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 
 STYLE = 'default'
 
@@ -89,7 +89,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'munkiwebadmin.middleware.LoginRequiredMiddleware',
+    #'munkiwebadmin.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
@@ -107,7 +107,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 "munkiwebadmin.processor.index",
             ],
-            'debug': True,
+            'debug': DEBUG,
         },
     },
 ]
@@ -155,6 +155,10 @@ USE_L10N = True
 USE_TZ = True
 
 #### end basic Django settings
+if DEBUG:
+    LOGLEVEL = 'DEBUG'
+else:
+    LOGLEVEL = 'WARNING'
 
 LOGGING = {
     'version': 1,
@@ -183,11 +187,11 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': LOGLEVEL,
             'propagate': False
         },
         'munkiwebadmin': {
-            'level': 'INFO',
+            'level': LOGLEVEL,
             'handlers': ['console', 'file'],
             'propagate': False,
         },
