@@ -75,14 +75,14 @@
                     </div>
                 </form>
                 <!-- /.dropdown -->
-                {% if perms.reports.can_view_reports %}
+                {% if IMAGR_URL and perms.reports.can_view_reports %}
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" onclick="getRunningMachine();">
                         <i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-tasks imagrInprogress">
-                        <li>
-                            <i id="imagrInprogressSpin" class="fa fa-circle-o-notch fa-spin text-center" style="font-size:30px"></i>
+                        <li class="text-center">
+                            <i id="imagrInprogressSpin" class="fa fa-circle-o-notch fa-spin" style="font-size:20px"></i>
                         </li>
                     </ul>
                     <!-- /.dropdown-tasks -->
@@ -177,20 +177,6 @@
         <!-- Metis Menu Plugin JavaScript -->
         <script src="{% get_static_prefix %}js/metisMenu/metisMenu.min.js"></script>
         <script src="{% get_static_prefix %}js/munkiwebadmin.js"></script>
-
-
-
-        {% if user.is_authenticated and perms.reports.can_view_reports %}
-        <script>
-        $(document).ready(function() {
-            getRunningMachine();
-            setInterval (function () {
-                //reload imagr running machine
-                getRunningMachine();
-            }, 3000);
-        });
-        </script>
-        {% endif %}
     </div>
   </body>
 </html>
