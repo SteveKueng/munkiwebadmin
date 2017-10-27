@@ -18,6 +18,8 @@ db.sqlite3
 # ignore collectstatics
 /munkiwebadmin/collected_static
 
+settings.py
+
 # ignore reposado links
 reposadolib
 preferences.plist
@@ -26,7 +28,5 @@ preferences.plist
 Web.config
 
 config.codekit3
-*.log
+*.log*
 migrations
-
-scripts/payload
