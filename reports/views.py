@@ -34,35 +34,34 @@ import os
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-# Configure URLLIB2 to use a proxy.
 try:
     PROXY_ADDRESS = settings.PROXY_ADDRESS
-except:
+except AttributeError:
     PROXY_ADDRESS = ""
 
 try:
     BUSINESS_UNITS_ENABLED = settings.BUSINESS_UNITS_ENABLED
-except:
+except AttributeError:
     BUSINESS_UNITS_ENABLED = False
 
 try:
     MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
-except:
+except AttributeError:
     MUNKI_REPO_DIR = False
 
 try:
     IMAGR_URL = settings.IMAGR_URL
-except:
+except AttributeError:
     IMAGR_URL = ""
 
 try:
     ICONS_URL = settings.ICONS_URL
-except:
+except AttributeError:
     ICONS_URL = ""
 
 try:
     VAULT_USERNAME = settings.VAULT_USERNAME
-except:
+except AttributeError:
     VAULT_USERNAME = "admin"
 
 proxies = {
