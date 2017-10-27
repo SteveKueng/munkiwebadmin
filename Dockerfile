@@ -3,6 +3,7 @@ FROM python:2.7
 ENV PYTHONUNBUFFERED 1
 ENV APP_DIR /munkiwebadmin
 ENV DJANGO_ENV dev
+ENV SIMPLEMDMKEY ''
 
 RUN apt-get update && apt-get install -y zip git
 
@@ -16,6 +17,7 @@ RUN cp -r /munki-munki*/code/client/* /munkitools && rm -rf /munki-munki*
 
 WORKDIR ${APP_DIR}
 COPY . ${APP_DIR}/
+RUN cp munkiwebadmin/settings_template.py munkiwebadmin/settings.py 
 
 RUN pip install -r requirements.txt
 VOLUME [ "/munkirepo", "/fieldkeys" ]

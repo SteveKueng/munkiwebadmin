@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONBUFFERED 1
 ENV APP_DIR /munkiwebadmin
 ENV DJANGO_ENV prod
+ENV SIMPLEMDMKEY ''
 
 RUN apt-get update
 RUN apt-get install -y build-essential git
@@ -26,7 +27,8 @@ run echo "daemon off;" >> /etc/nginx/nginx.conf
 run rm /etc/nginx/sites-enabled/default
 run cp docker/nginx-app.conf /etc/nginx/sites-enabled/
 run cp docker/supervisor-app.conf /etc/supervisor/conf.d/
-run cp docker/local_settings.py /code/munkiwebadmin
+
+RUN cp munkiwebadmin/settings_template.py munkiwebadmin/settings.py 
 
 RUN pip install uwsgi
 RUN pip install -r requirements.txt
