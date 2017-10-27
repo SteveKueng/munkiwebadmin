@@ -30,6 +30,11 @@ try:
 except:
     HOSTNAME = "localhost"
 
+try:
+    IMAGR_URL = settings.IMAGR_URL
+except:
+    IMAGR_URL = ""
+
 REPOSADOLIB = False
 if os.path.isdir(BASE_DIR + '/reposadolib'):
     REPOSADOLIB = True
@@ -42,5 +47,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'HOSTNAME': HOSTNAME, 'userImage': imgString, 'IMAGR_URL': IMAGR_URL }
 
