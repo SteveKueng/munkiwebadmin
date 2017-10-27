@@ -43,3 +43,15 @@ def loopDict(itemDict, parent):
             table += '</div>'
 
     return table
+
+@register.filter
+def calcbattery(current_value, max_value):
+    return int(float(current_value)/max_value*4)
+
+@register.filter
+def calcbatteryprecent(current_value, max_value):
+    return int(float(current_value)/max_value*100)
+
+@register.filter
+def get_type(value):
+    return type(value)
