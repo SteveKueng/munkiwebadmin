@@ -54,4 +54,4 @@ def calcbatteryprecent(current_value, max_value):
 
 @register.filter
 def get_type(value):
-    return type(value)
+    return type(value).__name__

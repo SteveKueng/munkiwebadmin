@@ -87,13 +87,27 @@ def convert_strings_to_dates(jdata):
 def getSimpleMDMID(apiKey, serial_number):
     """ returns device ID for your device """
     devices = simpleMDMpy.devices(apiKey)
-    for data in devices.getDevice(search=serial_number)['data']:
-        return data.get('id')
+    response = devices.getDevice(search=serial_number)
+    if response.status_code in range(200,207):
+        for data in response.json()['data']:
+            return data.get('id')
+    return None
 
 def getSimpleMDMDevice(apiKey, ID):
     """ returns device info for your device """
     devices = simpleMDMpy.devices(apiKey)
-    return devices.getDevice(deviceID=ID)
+    response = devices.getDevice(deviceID=ID)
+    if response.status_code in range(200,207):
+        return response.json()
+    return None
+
+def getSimpleMDMDeviceGroups(apiKey):
+    """ returns device info for your device """
+    deviceGroups = simpleMDMpy.deviceGroups(apiKey)
+    response = deviceGroups.getDeviceGroup()
+    if response.status_code in range(200,207):
+        return response.json()
+    return None
 
 def setSimpleMDMName(apiKey, deviceID, deviceName):
     """ sets device name in simpleMDM """
@@ -887,7 +901,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def mdm_api(request, kind, serial_number=None):
+def mdm_api(request, kind, item):
     if kind not in ['mdm']:
         return HttpResponse(status=404)
     
@@ -899,28 +913,115 @@ def mdm_api(request, kind, serial_number=None):
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
-        try:
-            machine = Machine.objects.get(serial_number=serial_number)
-        except Machine.DoesNotExist:
-            return HttpResponse(status=204)
+        if not request.user.has_perm('reports.can_view_reports'):
+            raise PermissionDenied
         
-        if not machine.simpleMDMID:
-            return HttpResponse(status=204)
-        
-        data = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)
+        if item == "device_groups":
+            data = getSimpleMDMDeviceGroups(simpleMDMKey)
 
-        if response_type == 'json':
-            request_data = convert_dates_to_strings(data)
-            return HttpResponse(
-                json.dumps(data) + '\n',
-                content_type='application/json')
+            if response_type == 'json':
+                request_data = convert_dates_to_strings(data)
+                return HttpResponse(
+                    json.dumps(data) + '\n',
+                    content_type='application/json')
+            else:
+                return HttpResponse(
+                    plistlib.writePlistToString(data),
+                    content_type='application/xml')
         else:
-            return HttpResponse(
-                plistlib.writePlistToString(data),
-                content_type='application/xml')
+            try:
+                machine = Machine.objects.get(serial_number=item)
+            except Machine.DoesNotExist:
+                return HttpResponse(status=204)
+            
+            if not machine.simpleMDMID:
+                return HttpResponse(status=204)
+            
+            data = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)
+
+            if response_type == 'json':
+                request_data = convert_dates_to_strings(data)
+                return HttpResponse(
+                    json.dumps(data) + '\n',
+                    content_type='application/json')
+            else:
+                return HttpResponse(
+                    plistlib.writePlistToString(data),
+                    content_type='application/xml')
+        
+
     
     if request.method == 'POST':
-        pass
+        LOGGER.debug("Got API POST request for %s", kind)
+
+        if not request.user.has_perm('reports.change_machine'):
+            raise PermissionDenied
+
+        # ------- get submit -------
+        try:
+            submit = json.loads(request.body)
+        except:
+            submit = request.POST
+
+        try:
+            machine = Machine.objects.get(serial_number=item)
+        except Machine.DoesNotExist:
+            return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'MachineDoesNotExist',
+                                'detail': '%s does not exist' % serial_number}),
+                    content_type='application/json', status=404)
+        
+        if not machine.simpleMDMID:
+            return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'MachineDoesNotExist',
+                                'detail': '%s has no simplMDM ID' % serial_number}),
+                    content_type='application/json', status=404)
+
+        action = submit.get('action', None)
+        if action:
+            devices = simpleMDMpy.devices(simpleMDMKey)
+            response = None
+
+            if action == "restart":
+                response = devices.restcartDevice(deviceID=machine.simpleMDMID)
+            
+            if action == "shutdown":
+                response = devices.shutdownDevice(deviceID=machine.simpleMDMID)
+                
+            if action == "lock":
+                message = submit.get('additional1', None)
+                phone_number = submit.get('phone_number', None)
+                pin = submit.get('additional2', None)
+                response = devices.lockDevice(deviceID=machine.simpleMDMID, phone_number=phone_number, pin=pin)
+
+            if action == "refresh":
+                response = devices.refreshDevice(deviceID=machine.simpleMDMID)
+
+            if action == "changeGroup":
+                group = submit.get('additional1', None)
+                if group:
+                    deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
+                    response = deviceGroups.assignDevice(deviceID=machine.simpleMDMID, deviceGoupID=group)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
+
+            if response:
+                try:
+                    content_type = response.headers['Content-Type']
+                except:
+                    content_type = None
+                    
+                return HttpResponse(
+                            content=response.content,
+                            status=response.status_code,
+                            content_type=content_type
+                        )
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)

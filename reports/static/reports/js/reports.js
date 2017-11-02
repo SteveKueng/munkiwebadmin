@@ -3,6 +3,15 @@ var imagrReportsTable = ""
 var passwordAccessTable = ""
 var interval = ""
 
+window.confirm = function(message, cb) {
+    $("#confirmationModal .modal-body").html(message);
+    $("#confirmationModal").modal('show');
+    $("#confirmYes").unbind('click').on("click", function () {
+        cb(true);
+    });
+    cb(false);
+};
+
 // resize modal content to max windows height
 function do_resize() {
     if ($(window).width() < 768) {
@@ -274,9 +283,9 @@ function getComputerItem(pathname) {
             }
 
             getDeviceIcon(serial, "_iconDetail");
-            getImagrReports(serial);
+            //getImagrReports(serial);
             loadPasswordAccess(serial);
-            getSimpleMDMDeviceInfo(serial);
+            getMDMDeviceInfo(serial);
             get_model_description(serial);
             if (tab) {
                 activaTab(tab);
@@ -690,7 +699,7 @@ function getClientTable(filter) {
              }
              $("#errorModalDetailText").text(errorThrown);
              $("#errorModal").modal("show");
-                hideProgressBar();
+            hideProgressBar();
         },
         dataType: 'html'
     })
@@ -932,7 +941,7 @@ function startRefresh() {
     // 2 second interval
     interval = setInterval (function () {
         //imagr workflow
-        imagrReportsTable.ajax.reload();
+        //imagrReportsTable.ajax.reload();
         loadStatus();
     }, 2000);
 }
@@ -958,7 +967,7 @@ function get_model_description(serial) {
     });
 }
 
-function getSimpleMDMDeviceInfo(serail) {
+function getMDMDeviceInfo(serail) {
     var machineURL = '/api/mdm/'+serail;
     $.ajax({
         method: 'GET',
@@ -986,6 +995,11 @@ function getSimpleMDMDeviceInfo(serail) {
                 });
                 html += '<div class="col-lg-6">';
                 html += '<ul class="list-group">';
+                
+                //get device groups
+                getMDMDeviceGroupInfo(data['data']['relationships']['device_group']['data']['id']);
+                
+                //add html
                 $('#mdmDetail').html(html);
             } else {
                 var html = '';
@@ -1010,3 +1024,70 @@ function getSimpleMDMDeviceInfo(serail) {
     });
 }
 
+function getMDMDeviceGroupInfo(ID) {
+    var machineURL = '/api/mdm/device_groups';
+    $.ajax({
+        method: 'GET',
+        url: machineURL,
+        success: function(data) {
+            if (data) {
+                var html = '';
+                var list = '';
+                var buttonName = '';
+                $.each(data['data'], function(key, value) {
+                    list += '<li' 
+                    if (ID == value['id']) {
+                        buttonName = value['attributes']['name']
+                        list += ' class="disabled"'
+                    } 
+                    list += '><a onclick="setMDM(\'changeGroup\', \''+value['id']+'}\', )">'+value['attributes']['name']+'</a></li>';
+                });
+
+                html += '<div class="dropdown pull-right"> \
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="groupDrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+buttonName+'<span class="caret"></span></button> \
+                    <ul class="dropdown-menu" aria-labelledby="groupDrop">'+list+'</ul></div>'
+                $('#mdmSubmit').html(html);
+            }
+            
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+        },
+        timeout: 3000
+    });
+}
+
+function setMDM(action, additional1, additional2) {
+    var url = '/api/mdm/'+current_pathname;
+    confirm("<h4>"+ action +" "+current_pathname+"?</h4>", function(result) { 
+        if (result) {
+            $("#process_progress").modal("show");
+            $.ajax({
+                method: 'POST',
+                url: url,
+                data: { "action" : action, "additional1" : additional1, "additional2" : additional2 },
+                success: function(data) {
+                    getMDMDeviceInfo(current_pathname);
+                    $("#process_progress").modal("hide");
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $("#errorModalTitleText").text("MDM post error");
+                    try {
+                        var json_data = $.parseJSON(jqXHR.responseText)
+                        if (json_data['result'] == 'failed') {
+                            $("#errorModalDetailText").text(json_data['detail']);
+                            $("#process_progress").modal("hide");
+                            $("#errorModal").modal("show");
+                            return;
+                        }
+                    } catch(err) {
+                        // do nothing
+                    }
+                    $("#errorModalDetailText").text(errorThrown);
+                    $("#process_progress").modal("hide");
+                    $("#errorModal").modal("show");
+                },
+                timeout: 5000
+            });
+        }
+    }); 
+}
