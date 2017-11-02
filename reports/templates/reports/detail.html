@@ -196,32 +196,37 @@
 									<div class="col-lg-2" >
 										<div class="row">
 											<div class="col-lg-12 text-center" >
-													{% if "AirPort" in interface.type %}
-													<i class="fa fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
-													{% else %}
-													<i class="fa fa-globe" aria-hidden="true" style="font-size: 70px"></i>
-													{% endif %}
+												{% if "AirPort" in interface.type %}
+												<i class="fa fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
+												{% else %}
+												<i class="fa fa-globe" aria-hidden="true" style="font-size: 70px"></i>
+												{% endif %}
 											</div>
 										</div>
 										<div class="row" style="margin-top: 5px">
-											<div class="col-lg-12 text-center">{{ interface.type }}</div>
+											<div class="col-lg-12 text-center">{{ interface|get:"_name" }}</div>
 										</div>
 									</div>
 									<div class="col-lg-10" >
 										<div class="row" style="border-left: 1px solid #ddd">
 											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-lg-6">
-														<ul class="list-group">
-															<li class="list-group-item"><b>Video RAM:</b><span class="pull-right">{% if interface.spdisplays_vram  %}{{ interface.spdisplays_vram }}{% else %}{{ interface|get:"_spdisplays_vram" }}{% endif %}</span></li>
-														</ul>
-													</div>
-													<div class="col-lg-6">
-														<ul class="list-group">
-														<li class="list-group-item"><b>interface Type:</b><span class="pull-right">{{ interface.sppci_bus|slice:"11:"|replace }}</span></li>
-														</ul>
-													</div>
-												</div>
+												<ul class="list-group">
+													{% for key,value in interface.items %}
+														{% if not key in "_name,spnetwork_service_order,type" %}
+															{% if value|get_type == 'str' %}
+															<li class="list-group-item"><b>{{key|replace}}:</b><span class="pull-right">{{value}}</span></li>
+															{% elif value|get_type == '_InternalDict' %}
+															<li class="list-group-item"><b>{{key}}:</b><span class="pull-right"></span>
+																<ul class="list-group">
+																	{% for subkey,subvalue in value.items %}
+																	<li class="list-group-item"><b>{{subkey|replace}}:</b><span class="pull-right">{{ subvalue }}</span></li>
+																	{% endfor %}
+																</ul>
+															</span></li>
+															{% endif %}
+														{% endif %}
+													{% endfor %}
+												</ul>
 											</div>
 										</div>
 
@@ -257,7 +262,6 @@
 							</li>
 							{% endfor %}
 						</ul>
-
 						<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
 						<ul class="list-group">
 								{% for device in disksList %}
@@ -401,12 +405,13 @@
 					<div class="panel-body">
 						<h4>Actions</h4>
 						<div class="row" id="actions">
-							<div class="col-lg-12">
-								<button type="submit" class="btn btn-primary" id="">Reboot</button>
-								<button type="submit" class="btn btn-primary" id="">Lock</button>
-								<button type="submit" class="btn btn-primary" id="">Refresh</button>
-								<button type="submit" class="btn btn-primary" id="">Shutdown</button>
-								<button type="submit" class="btn btn-primary" id="">-Group-</button>
+							<div class="col-md-7">
+								<button type="submit" class="btn btn-primary" onclick="setMDM('shutdown')">Shutdown</button>
+								<button type="submit" class="btn btn-primary" onclick="setMDM('restart')">Reboot</button>
+								<button type="submit" class="btn btn-primary" onclick="setMDM('lock')">Lock</button>
+								<button type="submit" class="btn btn-primary" onclick="setMDM('refresh')">Refresh</button>
+							</div>
+							<div class="col-md-5" id="mdmSubmit">
 							</div>
 						</div>
 						<h4>Detail</h4>
@@ -509,7 +514,7 @@ Bootstrap modal for confirming manifest deletion
 			<div class="modal-header">
 				<h4 class="modal-title">Delete computer?</h4>
 			</div>
-			<div class="modal-body">
+			<div class="modal-body"k
 				<p>Really delete <strong>{% if machine.hostname %}{{ machine.hostname }}{% else %}{{ machine.serial_number }}{% endif %}</strong>?</p>
 				<p>This action cannot be undone.</p>
 				<br>
@@ -521,3 +526,45 @@ Bootstrap modal for confirming manifest deletion
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!--
+Bootstrap modal for confirming actions
+-->
+<div class="modal fade" id="confirmationModal" data-backdrop="false">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title text-danger">
+						<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						<span id="confirmationModalTitleText">Warning</span>
+					</h4>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal" id="confirmYes">OK</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+<!--
+Bootstrap modal for showing process progress
+-->
+<div class="modal fade" data-backdrop="false" id="process_progress">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title" id="process_progress_title_text">Processing...</h4>
+		</div>
+		<div class="modal-body">
+			<div class="progress">
+			  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+				<span class="sr-only">Indeterminate progress</span>
+				<div id='process_progress_status_text'>&nbsp;</div>
+			  </div>
+			</div>
+		</div>
+	  </div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
