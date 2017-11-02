@@ -414,6 +414,8 @@ def getStatus(request):
 
             return HttpResponse(json.dumps(status),
                             content_type='application/json')
+        else:
+            return HttpResponse(status=200)
     # no ajax
     return HttpResponse(
         json.dumps({'result': 'failed',
