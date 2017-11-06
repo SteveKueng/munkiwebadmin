@@ -908,7 +908,8 @@ function showPassword(reason) {
         url: machineURL,
         data: { "reason" : reason},
         success: function(data) {
-            $("#password").html( data );
+            var html = data + ' <button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard(\'' + data + '\');"><i class="fa fa-clipboard" aria-hidden="true"></i></button>'
+            $("#password").html( html );
             $("#reasonForm").addClass("hidden")
             $("#showPassTable").removeClass("hidden")
             passwordAccessTable.ajax.reload();
