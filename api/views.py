@@ -154,7 +154,7 @@ def plist_api(request, kind, filepath=None):
                                 'detail': str(err)}),
                     content_type='application/json', status=403)
             if response_type == 'json':
-                response = convert_dates_to_strings(response)
+                response = [convert_dates_to_strings(response)]
         else:
             filter_terms = request.GET.copy()
             if '_' in filter_terms.keys():
