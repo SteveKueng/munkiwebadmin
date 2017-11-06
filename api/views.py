@@ -645,9 +645,9 @@ def db_api(request, kind, subclass=None, serial_number=None):
             if serial_number:
                 try:
                     if kind == "report":
-                        item_list = serializers.serialize('python', Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
+                        item_list = serializers.serialize(response_type, Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
                     elif kind == "imagr":
-                        item_list = serializers.serialize('python', ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
+                        item_list = serializers.serialize(response_type, ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
                 except Machine.DoesNotExist:
                     return HttpResponse(
                         json.dumps({'result': 'failed',
@@ -656,27 +656,13 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         content_type='application/json', status=404)
             else:
                 if kind == "report":
-                    item_list = serializers.serialize('python', Machine.objects.all(), fields=(api_fields))
+                    item_list = serializers.serialize(response_type, Machine.objects.all(), fields=(api_fields))
                 elif kind == "imagr":
-                    item_list = serializers.serialize('python', ImagrReport.objects.all(), fields=(api_fields))
+                    item_list = serializers.serialize(response_type, ImagrReport.objects.all(), fields=(api_fields))
 
-            for item in item_list:
-                if serial_number == item["pk"]:
-                    response = item['fields']
-                else:
-                    if api_fields and 'serial' in api_fields:
-                        item['fields']['serial'] = item['pk']
-                    response.append(item['fields'])
-
-            if response_type == 'json':
-                response = convert_dates_to_strings(response)
-                return HttpResponse(
-                    json.dumps(response) + '\n',
-                    content_type='application/json', status=201)
-            else:
-                return HttpResponse(
-                    response,
-                    content_type='application/xml', status=201)
+            return HttpResponse(
+                item_list,
+                content_type='application/'+response_type, status=201)
         
         if kind in ['vault'] and subclass == "reasons" and serial_number:
             if not request.user.has_perm('vault.view_passwordAccess'):

@@ -24,11 +24,11 @@ function getAjaxData(url, callback) {
 function createMorrisData(json) {
   var result = {};
   for(var i = 0; i < json.length; i++){
-      for(var item in json[i]){
-          if(!result[json[i][item]]){
-              result[json[i][item]] = 0;
+      for(var item in json[i]['fields']){
+          if(!result[json[i]['fields'][item]]){
+              result[json[i]['fields'][item]] = 0;
           }
-          result[json[i][item]]++;
+          result[json[i]['fields'][item]]++;
       }
   }
   var data = [];
@@ -63,8 +63,7 @@ function createHardwareBreakdown() {
 
 function createOSBreakdown() {
     getAjaxData("/api/report?api_fields=os_version", function(data){
-        var response = data;
-        response = createMorrisData(response);
+        var response = createMorrisData(data);
         //console.log(response)
         osChart = Morris.Donut({
             element: 'osbreakdown',
@@ -78,14 +77,12 @@ function createOSBreakdown() {
 
 function updateCharts() {
   getAjaxData("/api/report?api_fields=os_version", function(data){
-    var response = data;
-    response = createMorrisData(response);
+    var response = createMorrisData(data);
     osChart.setData(response);
   })
 
   getAjaxData("/api/report?api_fields=machine_model", function(data){
-    var response = data;
-    response = createMorrisData(response);
+    var response = createMorrisData(data);
     hardwareChart.setData(response);
   })
 }
