@@ -120,7 +120,7 @@ def setSimpleMDMName(apiKey, deviceID, deviceName):
 @logged_in_or_basicauth()
 def plist_api(request, kind, filepath=None):
     '''Basic API calls for working with Munki plist files'''
-    if kind not in ['manifests', 'pkgsinfo', 'catalogs']:
+    if kind not in ['manifests', 'pkgsinfo', 'catalogs', 'icons']:
         return HttpResponse(status=404)
 
     response_type = 'json'
@@ -135,7 +135,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.view_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo'):
+        if kind in ('catalogs', 'pkgsinfo', 'icons'):
             if not request.user.has_perm('pkgsinfo.view_pkginfofile'):
                 raise PermissionDenied
         if filepath:
@@ -229,7 +229,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo'):
+        if kind in ('catalogs', 'pkgsinfo', 'icons'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         request_data = {}
@@ -296,7 +296,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo'):
+        if kind in ('catalogs', 'pkgsinfo', 'icons'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -324,7 +324,7 @@ def plist_api(request, kind, filepath=None):
             # perhaps support rename here in the future, but for now,
             # ignore it
             del request_data['filename']
-
+            
         try:
             data = plistlib.writePlistToString(request_data)
             Plist.write(data, kind, filepath, request.user)
@@ -350,7 +350,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo'):
+        if kind in ('catalogs', 'pkgsinfo', 'icons'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -410,7 +410,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'catalogs':
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
-        if kind == 'pkgsinfo':
+        if kind in ('pkgsinfo', 'icons'):
             if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -514,6 +514,7 @@ def file_api(request, kind, filepath=None):
         filename = request.POST.get('filename') or filepath
         filedata = request.FILES.get('filedata')
         LOGGER.debug("Filename is %s" % filename)
+        LOGGER.debug("filedata is %s" % filedata)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
@@ -541,6 +542,7 @@ def file_api(request, kind, filepath=None):
         filename = request.POST.get('filename') or filepath
         filedata = request.FILES.get('filedata')
         LOGGER.debug("Filename is %s" % filename)
+        LOGGER.debug("filedata2 is %s" % filedata)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
