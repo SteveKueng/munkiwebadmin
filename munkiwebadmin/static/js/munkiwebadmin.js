@@ -37,7 +37,6 @@ function copyTextToClipboard(text) {
     // Avoid flash of white box if rendered for any reason.
     textArea.style.background = 'transparent';
   
-  
     textArea.value = text;
   
     document.body.appendChild(textArea);
