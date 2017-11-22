@@ -387,7 +387,19 @@ function getManifest(manifest, handleData) {
         },
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
-            //$("#SoftwareView").append('<div class="row" id="manifestWarning"><div class="col-md-12"><div class="alert alert-warning">No manifest found! <a class="alert-link" onclick="newManifestItem();">create</a></div></div></div>');
+            $("#errorModalTitleText").text("manifest list read error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
         },
         dataType: 'html'
     });
@@ -434,9 +446,22 @@ function addElementToList(item, listid, event) {
                         loopSoftwareElements(data[listid], listid);
                     }
                 },
-                error: function(){
-                    alert("could not save "+itemValue+"!");
-                }
+                error: function(jqXHR, textStatus, errorThrown) {
+                    //display error when manifest is not readable
+                    $("#errorModalTitleText").text("save error");
+                    try {
+                        var json_data = $.parseJSON(jqXHR.responseText)
+                        if (json_data['result'] == 'failed') {
+                            $("#errorModalDetailText").text(json_data['detail']);
+                            $("#errorModal").modal("show");
+                            return;
+                        }
+                    } catch(err) {
+                        // do nothing
+                    }
+                    $("#errorModalDetailText").text(errorThrown);
+                    $("#errorModal").modal("show");
+                },
             });
         }
     }
@@ -486,9 +511,22 @@ function removeElementFromList(item, listid) {
                 loopSoftwareElements(data[listid], listid);
             }
         },
-        error: function(){
-            alert("could not remove "+item+"!");
-        }
+        error: function(jqXHR, textStatus, errorThrown) {
+            //display error when manifest is not readable
+            $("#errorModalTitleText").text("remove error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
+        },
     });
 }
 
@@ -503,9 +541,22 @@ function saveManifest(manifest, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
-        error: function(){
-            alert("could not save manifest "+manifest+"!");
-        }
+        error: function(jqXHR, textStatus, errorThrown) {
+            //display error when manifest is not readable
+            $("#errorModalTitleText").text("manifest save error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
+        },
     });
 }
 
@@ -601,9 +652,22 @@ function addSoftwareToList(item, listid, event) {
                     $( "#"+listid).empty()
                     loopSoftwareElements(data[listid], listid);
                 },
-                error: function(){
-                    alert("could not save "+itemValue+"!");
-                }
+                error: function(jqXHR, textStatus, errorThrown) {
+                    //display error when manifest is not readable
+                    $("#errorModalTitleText").text("save error");
+                    try {
+                        var json_data = $.parseJSON(jqXHR.responseText)
+                        if (json_data['result'] == 'failed') {
+                            $("#errorModalDetailText").text(json_data['detail']);
+                            $("#errorModal").modal("show");
+                            return;
+                        }
+                    } catch(err) {
+                        // do nothing
+                    }
+                    $("#errorModalDetailText").text(errorThrown);
+                    $("#errorModal").modal("show");
+                },
             });
         }
     }
