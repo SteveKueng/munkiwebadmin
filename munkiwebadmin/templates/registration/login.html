@@ -17,7 +17,7 @@ $(document).ready(function() {
 
 {% block content %}
 {% if user.is_authenticated %}
-    <meta http-equiv="refresh" content="1; url={% url 'reports.views.dashboard' %}">
+    <meta http-equiv="refresh" content="1; url={% url 'dashboard' %}">
 {% else %}
 <!--
 Bootstrap modal

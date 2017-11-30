@@ -2,8 +2,8 @@ from django.conf.urls import url
 import reports.views
 
 urlpatterns = [
-    url(r'^dashboard', reports.views.dashboard, name='dashboard'),
     url(r'^$', reports.views.index, name='reports'),
+    url(r'^dashboard', reports.views.dashboard, name='dashboard'),
 
     url(r'^_catalogJson$', reports.views.createRequired),
     url(r'^_status$', reports.views.getStatus),
