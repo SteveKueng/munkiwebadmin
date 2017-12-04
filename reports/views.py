@@ -41,6 +41,11 @@ except AttributeError:
     PROXY_ADDRESS = ""
 
 try:
+    DEFAULT_MANIFEST = settings.DEFAULT_MANIFEST
+except AttributeError:
+    DEFAULT_MANIFEST = "serial_number"
+
+try:
     BUSINESS_UNITS_ENABLED = settings.BUSINESS_UNITS_ENABLED
 except AttributeError:
     BUSINESS_UNITS_ENABLED = False
@@ -177,12 +182,14 @@ def index(request, computer_serial=None):
                             'disksList': disksList,
                             'time': time,
                             'imagr_plist': imagr_plist,
+                            'defaultManifest': DEFAULT_MANIFEST,
                             }
                 else:
                     context = {'machine': machine,
                         'vault_username': VAULT_USERNAME,
                         'report_plist': report_plist,
                         'imagr_plist': imagr_plist,
+                        'defaultManifest': DEFAULT_MANIFEST,
                         }
 
                 return render(request, 'reports/detail.html', context=context)
@@ -268,7 +275,8 @@ def index(request, computer_serial=None):
     
     # no ajax
     context = {'filterDevices': request.GET.urlencode(),
-    'page': 'reports',}
+    'page': 'reports',
+    'defaultManifestType': DEFAULT_MANIFEST,}
     return render(request, 'reports/index.html', context=context)
 
 @login_required
