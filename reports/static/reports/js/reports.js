@@ -232,89 +232,91 @@ function getComputerItem(pathname) {
 
     $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
     showProgressBar();
-    var manifestItemURL = '/reports/' + serial;
-    $.ajax({
-        xhr: function() {
-                var xhr = new window.XMLHttpRequest();
-                xhr.addEventListener("progress", function(e) {
-                    var pro = (e.loaded / e.total) * 100;
-                    $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
-                }, false);
-                return xhr;
+    getInitialManifest(serial, function(manifest) {
+        var reportItemURL = '/reports/' + serial;
+        $.ajax({
+            xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.addEventListener("progress", function(e) {
+                        var pro = (e.loaded / e.total) * 100;
+                        $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
+                    }, false);
+                    return xhr;
+                },
+            method: 'GET',
+            url: reportItemURL,
+            timeout: 10000,
+            cache: false,
+            success: function(data) {
+                // load date
+                $('#computer_detail').html(data);
+    
+                //loading manifest data
+                getManifest(manifest, function(data) {
+                    getSoftwareList(data.catalogs, function() {
+                        getListElement(manifest, "included_manifests");
+                        getListElement(manifest, "catalogs");
+                        getSoftwareElemnts(manifest, "managed_installs");
+                        getSoftwareElemnts(manifest, "managed_uninstalls");
+                        getSoftwareElemnts(manifest, "optional_installs");
+                    });
+                })  
+    
+                current_pathname = serial;
+                requested_pathname = "";
+    
+                window.history.replaceState({'computer_detail': data}, reportItemURL, '/reports/');
+                window.location.hash = pathname;
+    
+                if (!$('#computerDetails').hasClass('in')){
+                    do_resize();              
+                    $("#computerDetails").modal("show");
+                    $( "#catalogs" ).sortable({
+                        update: function( ) {
+                        saveManifest(manifest, "catalogs");
+                        }
+                    });
+                    $( "#included_manifests" ).sortable({
+                        update: function( ) {
+                        saveManifest(manifest, "included_manifests");
+                        }
+                    });
+                }
+    
+                getDeviceIcon(serial, "_iconDetail");
+                //getImagrReports(serial);
+                loadPasswordAccess(serial);
+                getMDMDeviceInfo(serial);
+                get_model_description(serial);
+                if (tab) {
+                    activaTab(tab);
+                }
+                hideProgressBar();
+    
+                //start refresh
+                startRefresh();
             },
-        method: 'GET',
-        url: manifestItemURL,
-        timeout: 10000,
-        cache: false,
-        success: function(data) {
-            // load date
-            $('#computer_detail').html(data);
-
-            //loading manifest data
-            getManifest(serial, function(data) {
-                getSoftwareList(data.catalogs, function() {
-                    getListElement(serial, "included_manifests");
-                    getListElement(serial, "catalogs");
-                    getSoftwareElemnts(serial, "managed_installs");
-                    getSoftwareElemnts(serial, "managed_uninstalls");
-                    getSoftwareElemnts(serial, "optional_installs");
-                });
-            })  
-
-            current_pathname = serial;
-            requested_pathname = "";
-
-            window.history.replaceState({'computer_detail': data}, manifestItemURL, '/reports/');
-            window.location.hash = pathname;
-
-            if (!$('#computerDetails').hasClass('in')){
-                do_resize();              
-                $("#computerDetails").modal("show");
-                $( "#catalogs" ).sortable({
-                    update: function( ) {
-                     saveManifest(serial, "catalogs");
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#computer_detail').html("")
+                current_pathname = "";
+                $("#errorModalTitleText").text("computer read error");
+                try {
+                    var json_data = $.parseJSON(jqXHR.responseText)
+                    if (json_data['result'] == 'failed') {
+                        $("#errorModalDetailText").text(json_data['detail']);
+                        $("#errorModal").modal("show");
+                        return;
                     }
-                });
-                $( "#included_manifests" ).sortable({
-                    update: function( ) {
-                     saveManifest(serial, "included_manifests");
-                    }
-                });
-            }
-
-            getDeviceIcon(serial, "_iconDetail");
-            //getImagrReports(serial);
-            loadPasswordAccess(serial);
-            getMDMDeviceInfo(serial);
-            get_model_description(serial);
-            if (tab) {
-                activaTab(tab);
-            }
-            hideProgressBar();
-
-            //start refresh
-            startRefresh();
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#computer_detail').html("")
-            current_pathname = "";
-            $("#errorModalTitleText").text("computer read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
-			hideProgressBar();
-        },
-        dataType: 'html'
-    })
+                } catch(err) {
+                    // do nothing
+                }
+                $("#errorModalDetailText").text(errorThrown);
+                $("#errorModal").modal("show");
+                hideProgressBar();
+            },
+            dataType: 'html'
+        })
+    });
 }
 
 //create software list
@@ -730,7 +732,7 @@ function getItemsToSave(listid) {
 
 function getClientTable(filter) {
     showProgressBar();
-    var manifestItemURL = '/reports/?'+filter;
+    var reportItemURL = '/reports/?'+filter;
     $.ajax({
         xhr: function() {
                 var xhr = new window.XMLHttpRequest();
@@ -741,7 +743,7 @@ function getClientTable(filter) {
                 return xhr;
             },
         method: 'GET',
-        url: manifestItemURL,
+        url: reportItemURL,
         timeout: 10000,
         cache: false,
         success: function(data) {
@@ -934,6 +936,46 @@ function setWorkflow(workflow) {
             $("#errorModalDetailText").text(errorThrown);
             $("#errorModal").modal("show");
         }
+    });
+}
+
+function getInitialManifest(serial, handleData) {
+    var defautlManifestTyp = $("#defaultManifestType").attr('value');
+    if (defautlManifestTyp == "hostname") {
+        getHostname(serial, function(hostname){
+            handleData(hostname)
+        })
+    } else {
+        handleData(serial)
+    }
+}
+
+function getHostname(serial, handleData) {
+    $.ajax({
+        method: 'GET',
+        url: "/api/report/"+serial+"?api_fields=hostname",
+        timeout: 2000,
+        cache: false,
+        success: function(data) {
+            handleData(JSON.parse(data)[0]["fields"]["hostname"])
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //display error when manifest is not readable
+            $("#errorModalTitleText").text("could not get hostname");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
+        },
+        dataType: 'html'
     });
 }
 
