@@ -83,3 +83,14 @@ function getRunningMachine() {
         },
     })
 }
+
+$(document).ready(function () {
+    $('#sidebarCollapse').on('click', function () {
+        $('#sidebar').toggleClass('active');
+    });
+
+    if ($(window).width() < 768) {
+        $('#sidebarCollapse').removeClass('hidden');
+        $('#sidebar').toggleClass('active');
+     }
+});
