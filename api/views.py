@@ -120,7 +120,7 @@ def setSimpleMDMName(apiKey, deviceID, deviceName):
 @logged_in_or_basicauth()
 def plist_api(request, kind, filepath=None):
     '''Basic API calls for working with Munki plist files'''
-    if kind not in ['manifests', 'pkgsinfo', 'catalogs', 'icons']:
+    if kind not in ['manifests', 'pkgsinfo', 'catalogs']:
         return HttpResponse(status=404)
 
     response_type = 'json'
@@ -229,7 +229,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo', 'icons'):
+        if kind in ('catalogs', 'pkgsinfo'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         request_data = {}
@@ -296,7 +296,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo', 'icons'):
+        if kind in ('catalogs', 'pkgsinfo'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -350,7 +350,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'manifests':
             if not request.user.has_perm('manifests.change_manifestfile'):
                 raise PermissionDenied
-        if kind in ('catalogs', 'pkgsinfo', 'icons'):
+        if kind in ('catalogs', 'pkgsinfo'):
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -410,7 +410,7 @@ def plist_api(request, kind, filepath=None):
         if kind == 'catalogs':
             if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
                 raise PermissionDenied
-        if kind in ('pkgsinfo', 'icons'):
+        if kind == 'pkgsinfo':
             if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
                 raise PermissionDenied
         if not filepath:
@@ -507,14 +507,17 @@ def file_api(request, kind, filepath=None):
             request.META['REQUEST_METHOD'] = 'PATCH'
             request.PATCH = QueryDict(request.body)
 
-    if request.method == 'POST':
-        LOGGER.debug("Got API POST request for %s", kind)
+    if request.method in ('POST', 'PUT'):
+        LOGGER.debug("Got API %s request for %s", request.method, kind)
         if not request.user.has_perm('pkgsinfo.create_pkginfofile'):
             raise PermissionDenied
-        filename = request.POST.get('filename') or filepath
-        filedata = request.FILES.get('filedata')
+        if request.method == 'POST':
+            filename = request.POST.get('filename') or filepath
+            filedata = request.FILES.get('filedata')
+        else:
+            filename = filepath
+            filedata = request.body
         LOGGER.debug("Filename is %s" % filename)
-        LOGGER.debug("filedata is %s" % filedata)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
@@ -523,7 +526,10 @@ def file_api(request, kind, filepath=None):
                             'detail': 'Missing filename or filedata'}),
                 content_type='application/json', status=400)
         try:
-            MunkiFile.new(kind, filedata, filename, request.user)
+            if request.method == 'POST':
+                MunkiFile.new(kind, filedata, filename, request.user)
+            else:
+                MunkiFile.writedata(kind, filedata, filename, request.user)
         except FileError, err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
@@ -535,45 +541,17 @@ def file_api(request, kind, filepath=None):
                 json.dumps({'filename': filename}),
                 content_type='application/json', status=200)
 
-    elif request.method == 'PUT':
-        LOGGER.debug("Got API PUT request for %s", kind)
-        if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
-            raise PermissionDenied
-        filename = request.POST.get('filename') or filepath
-        filedata = request.FILES.get('filedata')
-        LOGGER.debug("Filename is %s" % filename)
-        LOGGER.debug("filedata2 is %s" % filedata)
-        if not (filename and filedata):
-            # malformed request
-            return HttpResponse(
-                json.dumps({'result': 'failed',
-                            'exception_type': 'BadRequest',
-                            'detail': 'Missing filename or filedata'}),
-                content_type='application/json', status=400)
-        try:
-            MunkiFile.write(kind, filedata, filename, request.user)
-        except FileError, err:
-            return HttpResponse(
-                json.dumps({'result': 'failed',
-                            'exception_type': str(type(err)),
-                            'detail': str(err)}),
-                content_type='application/json', status=403)
-        else:
-            return HttpResponse(
-                json.dumps({'filename': filename}),
-                content_type='application/json', status=200)
-    
-    elif request.method == 'PATCH':
-        LOGGER.debug("Got API %s request for %s", request.method, kind)
+    if request.method == 'PATCH':
+        LOGGER.debug("Got API PATCH request for %s", kind)
         response = HttpResponse(
             json.dumps({'result': 'failed',
                         'exception_type': 'NotAllowed',
                         'detail': 'This method is not supported'}),
             content_type='application/json', status=405)
-        response['Allow'] = 'GET, POST, DELETE'
+        response['Allow'] = 'GET, POST, PUT, DELETE'
         return response
 
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         LOGGER.debug("Got API DELETE request for %s", kind)
         if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
             raise PermissionDenied
