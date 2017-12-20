@@ -1,4 +1,189 @@
 @charset "UTF-8";
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+.wrapper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+}
+
+#sidebar {
+  min-width: 250px;
+  max-width: 250px;
+  height: 100%;
+  background: #333;
+  color: #f8f8f8;
+  transition: all 0.3s;
+}
+
+#sidebar.active {
+  min-width: 80px;
+  max-width: 80px;
+  text-align: center;
+}
+
+#sidebar.active .sidebar-header h3, #sidebar.active .CTAs {
+  display: none;
+}
+
+#sidebar.active .sidebar-header strong {
+  display: block;
+}
+
+#sidebar ul li a {
+  text-align: left;
+}
+
+#sidebar.active ul li a {
+  padding: 20px 10px;
+  text-align: center;
+  font-size: 0.85em;
+}
+
+#sidebar.active ul li a i {
+  margin-right:  0;
+  display: block;
+  font-size: 1.8em;
+  margin-bottom: 5px;
+}
+
+#sidebar.active ul ul a {
+  padding: 10px !important;
+}
+
+#sidebar.active a[aria-expanded="false"]::before, #sidebar.active a[aria-expanded="true"]::before {
+  top: auto;
+  bottom: 5px;
+  right: 50%;
+  -webkit-transform: translateX(50%);
+  -ms-transform: translateX(50%);
+  transform: translateX(50%);
+}
+
+#sidebar .sidebar-header {
+  padding: 20px;
+  background: #333;
+}
+
+#sidebar .sidebar-header strong {
+  display: none;
+  font-size: 1.2em;
+}
+
+#sidebar ul li a {
+  padding: 10px;
+  font-size: 1.1em;
+  display: block;
+  color:#f8f8f8;
+}
+#sidebar ul li a:hover {
+  color: #af001d;
+  background: #f8f8f8;
+}
+#sidebar ul li a i {
+  margin-right: 10px;
+}
+
+#sidebar ul li.active > a, a[aria-expanded="true"] {
+  color: #333;
+  background: #f8f8f8;
+}
+
+
+a[data-toggle="collapse"] {
+  position: relative;
+}
+
+a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+  display: block;
+  position: absolute;
+  right: 20px;
+  font-family: 'Glyphicons Halflings';
+  font-size: 0.6em;
+}
+
+
+ul ul > a {
+  font-size: 0.9em !important;
+  padding-left: 30px !important;
+}
+
+ul.CTAs {
+  padding: 20px;
+}
+
+ul.CTAs a {
+  text-align: center;
+  font-size: 0.9em !important;
+  display: block;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+----------------------------------------------------- */
+@media (max-width: 768px) {
+  #sidebar {
+      min-width: 80px;
+      max-width: 80px;
+      text-align: center;
+      margin-left: -80px !important ;
+  }
+  a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+      top: auto;
+      bottom: 5px;
+      right: 50%;
+      -webkit-transform: translateX(50%);
+      -ms-transform: translateX(50%);
+      transform: translateX(50%);
+  }
+  #sidebar.active {
+      margin-left: 0 !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      /* top layer */
+      z-index: 9999;
+  }
+
+  #sidebar .sidebar-header h3, #sidebar .CTAs {
+      display: none;
+  }
+
+  #sidebar .sidebar-header strong {
+      display: block;
+  }
+
+  #sidebar ul li a {
+      padding: 20px 10px;
+  }
+
+  #sidebar ul li a span {
+      font-size: 0.85em;
+  }
+  #sidebar ul li a i {
+      margin-right:  0;
+      display: block;
+  }
+
+  #sidebar ul ul a {
+      padding: 10px !important;
+  }
+
+  #sidebar ul li a i {
+      font-size: 1.8em;
+  }
+  #sidebar {
+      margin-left: 0;
+  }
+  #sidebarCollapse span {
+      display: none;
+  }
+}
+
 /* ------------------- GENERAL -----------------------*/
 .fix-margin-list-btn {
   margin-right: 5px; }
@@ -203,23 +388,12 @@ table {
   border: 1px solid #af001d;
   border-top: 1px solid #af001d; }
 
-#wrapper {
-  width: 100%; }
-
 #page-wrapper {
   padding: 15px;
   min-height: 568px;
-  background-color: transparent; }
+  width: 100%;
+  background-color: transparent;}
 
-@media (min-width: 768px) {
-  body {
-    padding-top: 50px; }
-
-  #page-wrapper {
-    position: inherit;
-    margin: 0 0 0 250px;
-    padding: 15px;
-    background-color: transparent; } }
 .navbar-top-links {
   margin-right: 0; }
 
@@ -502,10 +676,13 @@ table.dataTable thead .sorting:after {
 html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%; }
+  -webkit-text-size-adjust: 100%;
+  height: 100%; }
 
 body {
-  margin: 0; }
+  padding-top: 50px;
+  margin: 0;
+  height: 100%; }
 
 article,
 aside,
