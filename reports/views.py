@@ -24,7 +24,6 @@ import base64
 import bz2
 import plistlib
 import re
-import urllib
 import urllib2
 from datetime import timedelta, date
 from xml.etree import ElementTree
@@ -508,7 +507,7 @@ def model_description_lookup(request, serial):
     if (len(serial) == 12):
         snippet = serial[-4:]
     try:
-        f = urllib2.urlopen("http://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
+        f = urllib2.urlopen("https://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
         et = ElementTree.parse(f)
         return HttpResponse(et.findtext("configCode").decode("utf-8"), content_type='application/xml', status=201)
     except:
