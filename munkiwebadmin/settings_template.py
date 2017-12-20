@@ -34,6 +34,8 @@ SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 
 PROXY_ADDRESS = None
 
+DEFAULT_MANIFEST = 'serail_number' # serial_number or hostname
+
 STYLE = 'default'
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
