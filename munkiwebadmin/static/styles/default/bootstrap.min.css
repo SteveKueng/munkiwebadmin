@@ -16,6 +16,9 @@
   background: #333;
   color: #f8f8f8;
   transition: all 0.3s;
+  position: fixed;
+  left:0;
+  top:50px;
 }
 
 #sidebar.active {
@@ -683,6 +686,12 @@ body {
   padding-top: 50px;
   margin: 0;
   height: 100%; }
+
+@media (min-width: 768px) {
+  body {
+    padding-left: 80px;
+  }
+}
 
 article,
 aside,
