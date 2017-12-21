@@ -32,7 +32,21 @@ import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-simpleMDMKey = settings.SIMPLEMDMKEY
+
+try:
+    simpleMDMKey = settings.SIMPLEMDMKEY
+except AttributeError:
+    simpleMDMKey = ""
+
+try:
+    PROXY_ADDRESS = settings.PROXY_ADDRESS
+except AttributeError:
+    PROXY_ADDRESS = ""
+
+proxies = {
+    "http":  PROXY_ADDRESS,
+    "https": PROXY_ADDRESS
+}
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
