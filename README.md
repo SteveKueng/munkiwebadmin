@@ -4,8 +4,8 @@ This is version 2 of MunkiWebAdmin, a web-based administration tool for Munki.
 [report scripts](https://github.com/SteveKueng/mwa2_scripts)
 
 ## Getting started
-docker run -d --name db -e POSTGRES_DB=munkiwebadmin_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.6
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -h $HOSTNAME --link db munkiwebadmin
+docker run -d --name postgres_db -e POSTGRES_DB=munkiwebadmin_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.6
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h $HOSTNAME munkiwebadmin
 
 ### create superuser
 docker exec -it munkiwebadmin bash
@@ -20,12 +20,15 @@ docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkir
 
 #custom style
 docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /Users/Shared/styles:/munkiwebadmin/munkiwebadmin/static/styles -h $HOSTNAME --link db munkiwebadmin
-create a folder in your styles folder.
+create a folder in your styles directory.
 
 restart the munkiwebadmin docker image
 
 ## permissions
 
+
+## create docker image
+docker build -t munkiwebadmin:latest .
 
 
 ## API
