@@ -2,7 +2,6 @@
 api/models.py
 """
 from django.conf import settings
-from django.core.files.storage import default_storage
 
 import os
 import logging
@@ -227,7 +226,7 @@ class MunkiFile(object):
         '''Retreives a file upload and saves it to pathname'''
         filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
         try:
-            with default_storage.open(filepath, 'wb+') as fileref:
+            with open(filepath, 'w') as fileref:
                 for chunk in fileupload.chunks():
                     fileref.write(chunk)
             LOGGER.info('Wrote %s/%s', kind, pathname)
@@ -260,4 +259,3 @@ class MunkiFile(object):
         except (IOError, OSError), err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)
-        
