@@ -1,0 +1,6 @@
+
+# Remove all dynamic contents created by the app
+**/*.sock
+**/*.pyc
+db.sqlite3
+static_root

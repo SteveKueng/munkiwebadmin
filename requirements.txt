@@ -1,5 +1,10 @@
 django>=1.11,<2.0
+uwsgi
+
 psycopg2
+mysqlclient
+
 django-encrypted-fields
+django-generate-secret-key
 requests
 simpleMDMpy

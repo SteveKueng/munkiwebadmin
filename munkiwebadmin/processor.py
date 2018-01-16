@@ -35,9 +35,9 @@ try:
 except:
     IMAGR_URL = ""
 
-REPOSADOLIB = False
-if os.path.isdir(BASE_DIR + '/reposadolib'):
-    REPOSADOLIB = True
+REPOSADO = False
+if os.listdir('/reposado') != []:
+    REPOSADO = True
 
 def index(request):
     try:
@@ -47,5 +47,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADOLIB': REPOSADOLIB, 'HOSTNAME': HOSTNAME, 'userImage': imgString, 'IMAGR_URL': IMAGR_URL }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADO': REPOSADO, 'HOSTNAME': HOSTNAME, 'userImage': imgString, 'IMAGR_URL': IMAGR_URL }
 

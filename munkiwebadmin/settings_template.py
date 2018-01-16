@@ -7,7 +7,8 @@ try:
     HOSTNAME = socket.gethostname()
 except:
     HOSTNAME = 'localhost'
-    
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 
@@ -15,16 +16,16 @@ MEDIA_URL = "/media/"
 # munkiwebadmin-specific
 ###########################################################################
 # APPNAME is user-visible web app name
-APPNAME = 'MunkiWebAdmin'
+APPNAME = os.getenv('APPNAME')
 
 MUNKI_REPO_DIR = '/munkirepo'
 MAKECATALOGS_PATH = '/munkitools/makecatalogs'
 
-if os.getenv('DJANGO_ENV') == 'prod':
-    ICONS_URL = "/icons/"
-else:
-    MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
-    ICONS_URL = MEDIA_URL
+#if os.getenv('DJANGO_ENV') == 'prod':
+#    ICONS_URL = "/icons/"
+#else:
+MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
+ICONS_URL = MEDIA_URL
 
 MODEL_LOOKUP_ENABLED = True
 
@@ -32,9 +33,9 @@ VAULT_USERNAME = 'admin'
 
 SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 
-PROXY_ADDRESS = None
+PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 
-DEFAULT_MANIFEST = 'serail_number' # serial_number or hostname
+DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST') # serial_number or hostname
 
 STYLE = 'default'
 
@@ -47,15 +48,13 @@ if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
 # keyczart addkey --location=fieldkeys --status=primary --size=256
 ENCRYPTED_FIELDS_KEYDIR = '/fieldkeys'
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = open('/secretkey').read().strip()
-
-if os.getenv('DJANGO_ENV') == 'prod':
-    DEBUG = False
-    ALLOWED_HOSTS = ['.example.com']
+if os.getenv('SECRET_KEY'):
+    SECRET_KEY = os.getenv('SECRET_KEY')
 else:
-    DEBUG = True
-    ALLOWED_HOSTS = []
+    SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
+
+DEBUG = os.getenv('DEBUG')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
 LOGIN_EXEMPT_URLS = ()
 
@@ -118,16 +117,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'munkiwebadmin.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'munkiwebadmin_db',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
+
+if os.getenv('DB') == 'postgres':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASS'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -203,7 +204,7 @@ LOGGING = {
 }
 
 # needed by django-wsgiserver when using staticserve=collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, 'munkiwebadmin/collected_static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -220,7 +221,7 @@ STATICFILES_FINDERS = (
 )
 
 # django ldap auth
-USE_LDAP = False
+USE_LDAP = os.getenv('USE_LDAP')
 # LDAP authentication support
 if USE_LDAP:
     import ldap
