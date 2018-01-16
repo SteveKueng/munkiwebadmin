@@ -4,14 +4,11 @@ ENV APP_DIR /munkiwebadmin
 
 #munkiwebadmin config
 ENV APPNAME 'MunkiWebAdmin'
-ENV DEBUG False
 ENV SIMPLEMDMKEY ''
-ENV ALLOWED_HOSTS []
+ENV ALLOWED_HOSTS '[*]'
 ENV DEFAULT_MANIFEST 'serail_number'
 ENV PROXY_ADDRESS ''
-
-#ldap
-ENV USE_LDAP False
+ENV STYLE 'default'
 
 #database
 ENV DB 'postgres'
