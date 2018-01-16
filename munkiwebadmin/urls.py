@@ -24,9 +24,10 @@ urlpatterns = [
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
     url(r'^makecatalogs/', include('process.urls')),
     url(r'^$', include('reports.urls')),
+
 ]
 
-if os.path.isdir(BASE_DIR + '/reposadolib'):
+if os.listdir('/reposado') != []:
     urlpatterns += [url(r'^updates/', include('updates.urls'))]
 
 # comment out the following if you are serving

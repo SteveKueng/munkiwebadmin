@@ -1,11 +1,40 @@
-FROM python:2.7
+FROM python:2.7-slim
 
-ENV PYTHONUNBUFFERED 1
 ENV APP_DIR /munkiwebadmin
-ENV DJANGO_ENV dev
-ENV SIMPLEMDMKEY ''
 
-RUN apt-get update && apt-get install -y zip git
+#munkiwebadmin config
+ENV APPNAME 'MunkiWebAdmin'
+ENV DEBUG False
+ENV SIMPLEMDMKEY ''
+ENV ALLOWED_HOSTS []
+ENV DEFAULT_MANIFEST 'serail_number'
+ENV PROXY_ADDRESS ''
+
+#ldap
+ENV USE_LDAP False
+
+#database
+ENV DB 'postgres'
+ENV DB_NAME 'munkiwebadmin_db'
+ENV DB_USER 'postgres'
+ENV DB_PASS 'postgres'
+ENV DB_HOST 'db'
+ENV DB_PORT '5432'
+
+# Install all debian packages
+RUN apt-get update && apt-get install -y \
+		gcc \
+		mysql-client \
+		libmysqlclient-dev \
+		libpq-dev \
+		sqlite3 \
+		net-tools \
+		supervisor \
+		unzip \
+		git \
+		curl \
+		nginx \
+	--no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir ${APP_DIR}
 RUN mkdir /munkirepo
@@ -15,10 +44,23 @@ RUN mkdir /fieldkeys
 RUN curl -Lk -o munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip munkitools.zip -d . && rm -rf /munkitools.zip 
 RUN cp -r /munki-munki*/code/client/* /munkitools && rm -rf /munki-munki*
 
+# Copy all source files to the container's working directory
+COPY . ${APP_DIR}
 WORKDIR ${APP_DIR}
-COPY . ${APP_DIR}/
-RUN cp munkiwebadmin/settings_template.py munkiwebadmin/settings.py 
 
+COPY munkiwebadmin/settings_template.py munkiwebadmin/settings.py 
+
+# Install all python dependency libs
 RUN pip install -r requirements.txt
-VOLUME [ "/munkirepo", "/fieldkeys" ]
+
+# Configure Nginx, uWSGI and supervisord
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+RUN mkdir /var/log/uwsgi
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
+
+# Exposed port
+EXPOSE 80
 ENTRYPOINT ["/bin/sh", "docker/run.sh"]
+CMD ["/usr/bin/supervisord"]

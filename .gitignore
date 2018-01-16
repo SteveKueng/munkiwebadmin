@@ -4,6 +4,8 @@
 
 .env
 
+.sock
+
 # default db
 db.sqlite3
 

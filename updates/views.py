@@ -8,6 +8,7 @@ import json
 import os
 import logging
 import re
+import sys
 
 from operator import itemgetter
 
@@ -16,7 +17,8 @@ try:
 except:
 	BASE_DIR = ""
 
-if os.path.isdir(BASE_DIR + '/reposadolib'):
+if os.listdir('/reposado') != []:
+	sys.path.append('/reposado/code')
 	from reposadolib import reposadocommon
 
 LOGGER = logging.getLogger('munkiwebadmin')
@@ -116,7 +118,10 @@ def index(request):
 		return HttpResponse(json.dumps(response),
                                 content_type='application/json')
 	
-	catalog_branches = reposadocommon.getCatalogBranches().keys()
+	try:
+		catalog_branches = reposadocommon.getCatalogBranches().keys()
+	except:
+		catalog_branches = []
 	context = {'branches': sorted(catalog_branches)}
 	return render(request, 'updates/updates.html', context=context)
 

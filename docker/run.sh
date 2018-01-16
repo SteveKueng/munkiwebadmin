@@ -7,10 +7,8 @@ if ! test "$(ls -A "/fieldkeys")"; then
   keyczart addkey --location=/fieldkeys --status=primary --size=256
 fi
 
-if [ ! -f /secretkey ]; then
-    python -c "import string,random; uni=string.ascii_letters+string.digits+string.punctuation; print repr(''.join([random.SystemRandom().choice(uni) for i in range(random.randint(45,50))]))" > /secretkey
-fi
-
+python manage.py generate_secret_key --replace
+python manage.py collectstatic --noinput
 python manage.py makemigrations manifests pkgsinfo process reports updates vault
 python manage.py migrate --noinput
 
