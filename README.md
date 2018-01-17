@@ -1,38 +1,82 @@
 ## Introduction
 This is version 2 of MunkiWebAdmin, a web-based administration tool for Munki.
 
-[report scripts](https://github.com/SteveKueng/mwa2_scripts)
-
 ## Getting started
+install docker
+
+run postgres container:
 ```bash
 docker run -d --name postgres_db -e POSTGRES_DB=munkiwebadmin_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.6
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h $HOSTNAME munkiwebadmin
 ```
 
-### create superuser
+run munkiwebadmin container
+```bash
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h $HOSTNAME stevekueng/munkiwebadmin
+```
+
+#### create superuser
 ```bash
 docker exec -it munkiwebadmin bash
 python manage.py createsuperuser
 exit
 ```
 
-### reposado
+#### munkireport scripts
+[report scripts](https://github.com/SteveKueng/mwa2_scripts)
+
+## Munkiwebadmin with reposado
 ```bash
 docker run --name reposado -d -p 8088:8088 -v Reposado:/reposado mscottblake/reposado
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link db munkiwebadmin
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link db stevekueng/munkiwebadmin
 ```
 
 
-#custom style
+## Munkiwebadmin custom style
+create a local folder for your styles: 
 ```bash
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /Users/Shared/styles:/munkiwebadmin/munkiwebadmin/static/styles -h $HOSTNAME --link db munkiwebadmin
+mkdir /path/to/styles
 ```
-create a folder in your styles directory.
+clone munkiwebadmin styles repo:
+```bash
+git clone /path/to/styles
+```
+rename the folder in styles
+```bash
+mv /path/to/styles/default /path/to/styles/myCorp
+```
+
+start munkiwebadmin with custom style:
+```bash
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /path/to/styles:/munkiwebadmin/munkiwebadmin/static/styles -e STYLE="myCorp" -h $HOSTNAME --link db stevekueng/munkiwebadmin
+```
+
 
 restart the munkiwebadmin docker image
 
-## permissions
+## use ngnix proxy
+more infos about ngnix proxy: https://github.com/jwilder/nginx-proxy
 
+```bash
+docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -e VIRTUAL_HOST=munkiwebadmin.example.com -h $HOSTNAME stevekueng/munkiwebadmin
+```
+
+## docker variables
+
+| Variable      | Usage         | Default|
+| ------------- |-------------|:------:|
+| APPNAME      | Django app name | _MunkiWebAdmin_ |
+| SIMPLEMDMKEY  | simpleMDM API key. Needed for use with simpleMDM ||
+| ALLOWED_HOSTS | django allowed hosts. e.g. _[ munkiwebadmin.example.com ]_ |_[ * ]_|
+| DEFAULT_MANIFEST | default manifest to use. _serail_number_ or _hostname_     |_serial_number_ |
+| PROXY_ADDRESS | proxy server address     ||
+| STYLE | style munkiwebadmin should use. Style varable is the name of your style folder: _Munkiwebadmin custom style_ |_default_ |
+| DB | Database type. currently only postgres possible | postgres |
+| DB_NAME | Database name | _munkiwebadmin_db_ |
+| DB_USER | Database user     | _postgres_ |
+| DB_PASS | Database password | _postgres_ |
+| DB_HOST | Database host     | _db_       |
+| DB_PORT | Database port     | _5432_     |
 
 ## create docker image
 ```bash
