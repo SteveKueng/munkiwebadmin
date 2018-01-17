@@ -27,7 +27,7 @@ exit
 ## Munkiwebadmin with reposado
 ```bash
 docker run --name reposado -d -p 8088:8088 -v Reposado:/reposado mscottblake/reposado
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link db stevekueng/munkiwebadmin
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link postgres_db stevekueng/munkiwebadmin
 ```
 
 
@@ -47,7 +47,7 @@ mv /path/to/styles/default /path/to/styles/myCorp
 
 start munkiwebadmin with custom style:
 ```bash
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /path/to/styles:/munkiwebadmin/munkiwebadmin/static/styles -e STYLE="myCorp" -h $HOSTNAME --link db stevekueng/munkiwebadmin
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /path/to/styles:/munkiwebadmin/munkiwebadmin/static/styles -e STYLE="myCorp" -h $HOSTNAME --link postgres_db stevekueng/munkiwebadmin
 ```
 
 
