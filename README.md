@@ -38,7 +38,8 @@ mkdir /path/to/styles
 ```
 clone munkiwebadmin styles repo:
 ```bash
-git clone /path/to/styles
+cd /path/to/styles
+git clone https://github.com/SteveKueng/mwa2-style.git default
 ```
 rename the folder in styles
 ```bash
@@ -50,8 +51,11 @@ start munkiwebadmin with custom style:
 docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /path/to/styles:/munkiwebadmin/munkiwebadmin/static/styles -e STYLE="myCorp" -h $HOSTNAME --link postgres_db stevekueng/munkiwebadmin
 ```
 
+if you change somting in your styles folder restart the munkiwebadmin contrainer
+```bash
+docker restart munkiwebadmin
+```
 
-restart the munkiwebadmin docker image
 
 ## use ngnix proxy
 more infos about ngnix proxy: https://github.com/jwilder/nginx-proxy
