@@ -129,6 +129,26 @@ if os.getenv('DB') == 'postgres':
             'PORT': os.getenv('DB_PORT'),
         }
     }
+if os.getenv('DB') == 'mssql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASS'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+
+            'OPTIONS': {
+                'driver': 'FreeTDS',
+                'host_is_server': True,
+            },
+        }
+    }
+
+
+    
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

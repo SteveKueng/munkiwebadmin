@@ -21,6 +21,8 @@ ENV DB_PORT '5432'
 # Install all debian packages
 RUN apt-get update && apt-get install -y \
 		gcc \
+		g++ \
+		unixodbc-dev \
 		mysql-client \
 		libmysqlclient-dev \
 		libpq-dev \
@@ -28,6 +30,7 @@ RUN apt-get update && apt-get install -y \
 		net-tools \
 		supervisor \
 		unzip \
+		tdsodbc \
 		git \
 		curl \
 		nginx \
