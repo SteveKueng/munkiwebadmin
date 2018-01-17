@@ -3,6 +3,8 @@ uwsgi
 
 psycopg2
 mysqlclient
+pyodbc
+django-pyodbc-azure
 
 django-encrypted-fields
 django-generate-secret-key
