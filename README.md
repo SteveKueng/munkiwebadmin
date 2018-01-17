@@ -4,22 +4,29 @@ This is version 2 of MunkiWebAdmin, a web-based administration tool for Munki.
 [report scripts](https://github.com/SteveKueng/mwa2_scripts)
 
 ## Getting started
+```bash
 docker run -d --name postgres_db -e POSTGRES_DB=munkiwebadmin_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.6
 docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h $HOSTNAME munkiwebadmin
+```
 
 ### create superuser
+```bash
 docker exec -it munkiwebadmin bash
 python manage.py createsuperuser
-
-
+exit
+```
 
 ### reposado
+```bash
 docker run --name reposado -d -p 8088:8088 -v Reposado:/reposado mscottblake/reposado
 docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link db munkiwebadmin
+```
 
 
 #custom style
+```bash
 docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /Users/Shared/styles:/munkiwebadmin/munkiwebadmin/static/styles -h $HOSTNAME --link db munkiwebadmin
+```
 create a folder in your styles directory.
 
 restart the munkiwebadmin docker image
@@ -28,8 +35,9 @@ restart the munkiwebadmin docker image
 
 
 ## create docker image
+```bash
 docker build -t munkiwebadmin:latest .
-
+```
 
 ## API
 MWA2 supports a basic API for reading from and writing to the Munki repo.
@@ -41,7 +49,7 @@ pkgs and icons endpoints are also supported: for these only GET, POST and DELETE
 Authentication is shared with the rest of MWA2. Currently only HTTP BASIC auth is supported. You should use this only over https. Consider creating special API users with only those rights that are needed (if you only need to read from the repo, use a user with read-only rights, etc)
 
 Create a Base64-encoded value to use with an authorization header:   
-```
+```bash
 python -c 'import base64; print "Authorization: Basic %s" % base64.b64encode("username:password")'
 Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
 ```
@@ -51,7 +59,7 @@ Note: this encoding is easily reversible, thus the recommendation to use https a
 Some examples of interacting with the API (where the server is running at http://localhost:8080):
 
 #### GET:
-```
+```bash
 ##Get all manifests##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" http://localhost:8080/api/manifests
 
@@ -81,7 +89,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
 ```
 
 #### POST:
-```
+```bash
 ##Create a new pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -H "Content-Type: application/json" \
@@ -90,7 +98,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgsinfo
 ```
 alternately:
-```
+```bash
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -H "Content-Type: application/json" \
      -X POST \
@@ -99,7 +107,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
 ```
 
 #### PUT:
-```
+```bash
 ##Replace an existing pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -H "Content-Type: application/json" \
@@ -109,7 +117,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
 ```
 
 #### PATCH:
-```
+```bash
 ##Change the value of specific keys in an existing pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -H "Content-Type: application/json" \
@@ -119,7 +127,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
 ```
 
 #### DELETE:
-```
+```bash
 ##Delete a pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -X DELETE \
@@ -127,7 +135,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
 ```
 
 #### UPLOADING A NEW PKG OR ICON:
-```
+```bash
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -X POST \
      -F filename=apps/Firefox-52-0.dmg \
@@ -135,7 +143,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgs
 ```
 alternately:
-```
+```bash
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -X POST \
      -F filedata=@/path/to/local_file.png \
