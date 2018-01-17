@@ -35,6 +35,7 @@ def view_or_basicauth(view, request, test_func, realm="", *args, **kwargs):
                 try:
                     uname, passwd = base64.b64decode(
                         auth[1]).decode('utf-8').split(':', 1)
+                    uname = uname.split('\\', 1)[-1]
                     user = authenticate(username=uname, password=passwd)
                     if user is not None:
                         if user.is_active:
