@@ -52,7 +52,7 @@ COPY munkiwebadmin/settings_template.py munkiwebadmin/settings.py
 
 #load default style
 RUN curl -Lk -o /tmp/mwa2-style.zip https://github.com/SteveKueng/mwa2-style/archive/master.zip && unzip /tmp/mwa2-style.zip -d /tmp && rm -rf /tmp/mwa2-style.zip
-RUN cp -r /tmp/mwa2-style-master /munkiwebadmin/munkiwebadmin/static/styles/default  && rm -rf /tmp/mwa2-style-master
+RUN cp -r /tmp/mwa2-style-master /munkiwebadmin/munkiwebadmin/static/styles/default && rm -rf /tmp/mwa2-style-master
 
 # Install all python dependency libs
 RUN pip install -r requirements.txt
