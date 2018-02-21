@@ -4,6 +4,8 @@ ENV APP_DIR /munkiwebadmin
 
 #munkiwebadmin config
 ENV APPNAME 'MunkiWebAdmin'
+ENV TIME_ZONE 'UTC'
+ENV LANGUAGE_CODE 'en-us'
 ENV SIMPLEMDMKEY ''
 ENV ALLOWED_HOSTS '[*]'
 ENV DEFAULT_MANIFEST 'serail_number'
