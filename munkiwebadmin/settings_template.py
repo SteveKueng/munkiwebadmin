@@ -149,10 +149,8 @@ if os.getenv('DB') == 'mssql':
             'PASSWORD': os.getenv('DB_PASS'),
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
-
             'OPTIONS': {
-                'driver': 'FreeTDS',
-                'host_is_server': True,
+                'driver': 'Microsoft ODBC Driver 17 for SQL Server',
             },
         }
     }

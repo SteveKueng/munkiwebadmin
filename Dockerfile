@@ -20,10 +20,6 @@ ENV DB_PASS 'postgres'
 ENV DB_HOST 'db'
 ENV DB_PORT '5432'
 
-
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list
-
 # Install all debian packages
 RUN apt-get update && apt-get install -y \
 		gcc \
@@ -40,8 +36,13 @@ RUN apt-get update && apt-get install -y \
 		git \
 		curl \
 		nginx \
-		msodbcsql \
+		apt-transport-https \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list
+
+RUN apt-get update && ACCEPT_EULA=Y apt-get install msodbcsql
 
 RUN mkdir ${APP_DIR}
 RUN mkdir /munkirepo
