@@ -150,7 +150,7 @@ if os.getenv('DB') == 'mssql':
             'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
             'OPTIONS': {
-                'driver': 'Microsoft ODBC Driver 17 for SQL Server',
+                'driver': 'ODBC Driver 13 for SQL Server',
             },
         }
     }

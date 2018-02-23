@@ -39,16 +39,24 @@ RUN apt-get update && apt-get install -y \
 		apt-transport-https \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
 
+# install necessary locales
+RUN apt-get clean && apt-get update && apt-get install -y locales
+RUN sed -i '/^#.* en_US.* /s/^#//' /etc/locale.gen
+RUN locale-gen
+
+# install mssql
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list
 
 RUN apt-get update && ACCEPT_EULA=Y apt-get install msodbcsql
 
+# create dirs
 RUN mkdir ${APP_DIR}
 RUN mkdir /munkirepo
 RUN mkdir /munkitools
 RUN mkdir /fieldkeys
 
+# download munkitools
 RUN curl -Lk -o munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip munkitools.zip -d . && rm -rf /munkitools.zip 
 RUN cp -r /munki-munki*/code/client/* /munkitools && rm -rf /munki-munki*
 
