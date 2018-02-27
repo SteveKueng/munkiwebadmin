@@ -13,21 +13,8 @@ db.sqlite3
 .DS_Store
 .vscode/settings.json
 
-# ignore styles exept of Default
-!/munkiwebadmin/static/styles/Default
-/munkiwebadmin/static/styles/*
-
 # ignore collectstatics
 /munkiwebadmin/collected_static
-
-settings.py
-
-# ignore reposado links
-reposadolib
-preferences.plist
-
-# ignore webconfig
-Web.config
 
 config.codekit3
 *.log*
