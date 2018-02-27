@@ -5,6 +5,7 @@ mysqlclient
 pyodbc
 django-pyodbc-azure<2.0
 django-encrypted-fields
+python-ldap
 django-auth-ldap
 requests
 simpleMDMpy
