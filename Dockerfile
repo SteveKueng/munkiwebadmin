@@ -54,6 +54,7 @@ RUN apt-get update && ACCEPT_EULA=Y apt-get install msodbcsql
 RUN mkdir ${APP_DIR}
 RUN mkdir /munkirepo
 RUN mkdir /munkitools
+RUN mkdir /config
 RUN mkdir /fieldkeys
 
 # download munkitools
@@ -63,8 +64,6 @@ RUN cp -r /munki-munki*/code/client/* /munkitools && rm -rf /munki-munki*
 # Copy all source files to the container's working directory
 COPY . ${APP_DIR}
 WORKDIR ${APP_DIR}
-
-COPY munkiwebadmin/settings_template.py munkiwebadmin/settings.py 
 
 #load default style
 RUN curl -Lk -o /tmp/mwa2-style.zip https://github.com/SteveKueng/mwa2-style/archive/master.zip && unzip /tmp/mwa2-style.zip -d /tmp && rm -rf /tmp/mwa2-style.zip
