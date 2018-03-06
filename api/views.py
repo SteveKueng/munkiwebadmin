@@ -740,7 +740,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         report.update_report(submit.get('base64bz2report'))
 
                     # extract machine data from the report
-                    report_data = report.get_report()
+                    report_data = report.get_report() 
                     if 'MachineInfo' in report_data:
                         machine.os_version = report_data['MachineInfo'].get('os_vers', machine.os_version)
                         machine.cpu_arch = report_data['MachineInfo'].get('arch', machine.cpu_arch)
@@ -794,7 +794,10 @@ def db_api(request, kind, subclass=None, serial_number=None):
 
                     report.timestamp = timezone.now()
                     machine.save()
-                    report.save()
+                    try:
+                        report.save()
+                    except Exception as e:
+                        LOGGER.error("report save error: %s", e)
 
                     # save imagr report
                     if imagrReport:
