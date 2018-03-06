@@ -109,9 +109,9 @@ class MunkiReport(models.Model):
     def update_report(self, base64bz2report):
         # Save report.
         try:
-            base64bz2report = base64bz2report.replace("-", "\n")
             base64bz2report = base64bz2report.replace(" ", "+")
             plist = self.b64bz_decode(base64bz2report)
+            #self.report = base64bz2report
             self.report = plistlib.writePlistToString(plist)
         except:
             plist = None
@@ -119,8 +119,11 @@ class MunkiReport(models.Model):
 
         if plist is None:
             self.activity = None
+            self.errors = 0
+            self.warnings = 0
             return
 
+    
         # Check activity.
         activity = dict()
         for section in ("ItemsToInstall",
