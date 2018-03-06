@@ -82,6 +82,10 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 RUN mkdir /var/log/uwsgi
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+#munkilog
+RUN touch /var/log/munkiwebadmin.log
+RUN chown www-data /var/log/munkiwebadmin.log
+
 VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
 
 # Exposed port

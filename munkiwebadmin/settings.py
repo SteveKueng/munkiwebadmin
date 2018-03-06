@@ -220,7 +220,7 @@ LOGGING = {
         },
         'file': {
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': APPNAME+'.log',
+            'filename': '/var/log/munkiwebadmin.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter': 'verbose'
