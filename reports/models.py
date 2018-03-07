@@ -101,7 +101,7 @@ class MunkiReport(models.Model):
             return {}
 
     def get_report(self):
-        return self.decode(self.report)
+        return self.b64bz_decode(self.report)
 
     def get_activity(self):
         return self.decode(self.activity)
@@ -112,7 +112,7 @@ class MunkiReport(models.Model):
             base64bz2report = base64bz2report.replace(" ", "+")
             plist = self.b64bz_decode(base64bz2report)
             #self.report = base64bz2report
-            self.report = plistlib.writePlistToString(plist)
+            self.report = base64bz2report
         except:
             plist = None
             self.report = ''
@@ -123,7 +123,6 @@ class MunkiReport(models.Model):
             self.warnings = 0
             return
 
-    
         # Check activity.
         activity = dict()
         for section in ("ItemsToInstall",
