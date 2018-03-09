@@ -229,6 +229,8 @@ class MunkiFile(object):
             with open(filepath, 'w') as fileref:
                 for chunk in fileupload.chunks():
                     fileref.write(chunk)
+            if user and GIT and kind == "icons":
+                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -241,6 +243,8 @@ class MunkiFile(object):
         try:
             with open(filepath, 'w') as fileref:
                 fileref.write(filedata)
+            if user and GIT and kind == "icons":
+                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -255,6 +259,8 @@ class MunkiFile(object):
                 '%s/%s does not exist' % (kind, pathname))
         try:
             os.unlink(filepath)
+            if user and GIT and kind == "icons":
+                MunkiGit().delete_file_at_path(filepath, user)
             LOGGER.info('Deleted %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
