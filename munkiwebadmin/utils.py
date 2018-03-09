@@ -91,7 +91,7 @@ class MunkiGit(object):
                    % (author_name, action, itempath, APPNAME))
         LOGGER.info("Doing git commit for %s", itempath)
         LOGGER.debug(log_msg)
-        self.run_git(['commit', '-m', log_msg, '--author', author_info])
+        self.run_git(['commit', '-m', log_msg, '--author', author_info, a_path])
         if self.results['returncode'] != 0:
             LOGGER.info("Failed to commit changes to %s", a_path)
             LOGGER.info(self.results['error'])
