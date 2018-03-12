@@ -23,6 +23,11 @@ if os.listdir('/reposado') != []:
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
+def prefsFilePath():
+	return os.path.join('/reposado/code', 'preferences.plist')
+
+reposadocommon.prefsFilePath = prefsFilePath
+
 @login_required
 def status(request):
     	'''Returns status of long-running process'''
