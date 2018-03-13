@@ -79,6 +79,8 @@ function fixDropdown() {
 
 // ---
 function initUpdatesTable() {
+    // start our monitoring timer loop
+    monitor_update_list();
 	var columns = dataTableCols('.table-header');
     var table = $('#list_items').DataTable({
         ajax: {
@@ -115,15 +117,16 @@ function initUpdatesTable() {
 		],
          "sDom": "<t>",
          "bPaginate": false,
-         "scrollY": '80vh',
+         "scrollY": '100%',
+         drawCallback: function () { // this gets rid of duplicate headers
+            $('.dataTables_scrollBody thead tr').css({ display: 'none' }); 
+        },
          //"bScrollCollapse": true,
          "bInfo": false,
          "bFilter": true,
          "bStateSave": false,
          "aaSorting": [[2,'desc']]
      });
-     // start our monitoring timer loop
-     monitor_update_list();
      // tie our search field to the table
      var thisTable = $('#list_items').DataTable();
      $('#listSearchField').keyup(function(){
