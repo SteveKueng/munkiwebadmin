@@ -1045,12 +1045,12 @@ function getTypeahead(url, listid) {
 }
 
 function startRefresh() {
-    // 2 second interval
+    // 5 second interval
     interval = setInterval (function () {
         //imagr workflow
         //imagrReportsTable.ajax.reload();
         loadStatus();
-    }, 2000);
+    }, 5000);
 }
 
 function stopRefresh() {
