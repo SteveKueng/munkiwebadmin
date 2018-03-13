@@ -27,8 +27,9 @@ Bootstrap modal
     <div class="modal-content">
       <form method="post" action="{% url "login" %}">
       <div class="modal-header">
-        <img src="{% get_static_prefix %}styles/{{ style }}/logo.png" width="100" style="margin-left:100px;">
-        <!--<h3 class="modal-title text-primary">Please log in.</h3>-->
+        <img src="{% get_static_prefix %}styles/{{ style }}/logo.png" width="100" style="display: block; margin-left: auto; margin-right: auto;">
+        <br>
+        <h4 class="modal-title text-primary" style="text-align:center">MunkiWebAdmin</h4>
       </div>
       <div class="modal-body">
         {% if form.errors %}
