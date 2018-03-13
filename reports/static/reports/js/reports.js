@@ -46,7 +46,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $.ajaxSetup({
-    timeout:1000,
+    timeout:10000,
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -245,7 +245,6 @@ function getComputerItem(pathname) {
                 },
             method: 'GET',
             url: reportItemURL,
-            timeout: 10000,
             cache: false,
             success: function(data) {
                 // load date
@@ -382,7 +381,6 @@ function getManifest(manifest, handleData) {
     $.ajax({
         method: 'GET',
         url: "/reports/_getManifest/"+manifest,
-        timeout: 10000,
         cache: false,
         success: function(data) {
             handleData(JSON.parse(data));
@@ -427,7 +425,6 @@ function addElementToList(item, listid, event) {
                 method: "PATCH",
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
-                timeout: 3000,
                 success: function(data){
                     if (listid === 'included_manifests') {
                         getListElement(manifest, listid);
@@ -490,7 +487,6 @@ function removeElementFromList(item, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
-        timeout: 3000,
         success: function(data){
             if (listid === 'included_manifests') {
                 getListElement(manifest, listid);
@@ -545,7 +541,6 @@ function saveManifest(manifest, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
-        timeout: 3000,
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
             $("#errorModalTitleText").text("manifest save error");
@@ -747,7 +742,6 @@ function getClientTable(filter) {
             },
         method: 'GET',
         url: reportItemURL,
-        timeout: 10000,
         cache: false,
         success: function(data) {
             $('#clienttable').html(data);
@@ -829,7 +823,6 @@ function newManifestItem() {
     $.ajax({
         method: 'POST',
         url: manifestItemURL,
-        timeout: 10000,
         cache: false,
         success: function(data) {
             getManifest(pathname);
@@ -957,7 +950,6 @@ function getHostname(serial, handleData) {
     $.ajax({
         method: 'GET',
         url: "/api/report/"+serial+"?api_fields=hostname",
-        timeout: 2000,
         cache: false,
         success: function(data) {
             handleData(JSON.parse(data)[0]["fields"]["hostname"])
@@ -1052,7 +1044,7 @@ function startRefresh() {
     interval = setInterval (function () {
         //imagr workflow
         //imagrReportsTable.ajax.reload();
-        loadStatus();
+        //loadStatus();
     }, 5000);
 }
 
@@ -1073,7 +1065,6 @@ function get_model_description(serial) {
         error: function(xhr, textStatus, errorThrown) {
             //alert(errorThrown)
         },
-        timeout: 2000
     });
 }
 
@@ -1129,8 +1120,7 @@ function getMDMDeviceInfo(serail) {
             html += '</ul>'
             html += '</div>'
             $('#mdmDetail').html(html);
-        },
-        timeout: 6000
+        }
     });
 }
 
@@ -1161,8 +1151,7 @@ function getMDMDeviceGroupInfo(ID) {
             
         },
         error: function(jqXHR, textStatus, errorThrown) {
-        },
-        timeout: 6000
+        }
     });
 }
 
@@ -1195,8 +1184,7 @@ function setMDM(action, additional1, additional2) {
                     $("#errorModalDetailText").text(errorThrown);
                     $("#process_progress").modal("hide");
                     $("#errorModal").modal("show");
-                },
-                timeout: 6000
+                }
             });
         }
     }); 
