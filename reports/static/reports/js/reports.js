@@ -46,7 +46,7 @@ function csrfSafeMethod(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 }
 $.ajaxSetup({
-    timeout:500,
+    timeout:1000,
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -427,6 +427,7 @@ function addElementToList(item, listid, event) {
                 method: "PATCH",
                 data: '{ "'+[listid]+'": '+itemList+' }',
                 contentType: 'application/json',
+                timeout: 3000,
                 success: function(data){
                     if (listid === 'included_manifests') {
                         getListElement(manifest, listid);
@@ -489,6 +490,7 @@ function removeElementFromList(item, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
+        timeout: 3000,
         success: function(data){
             if (listid === 'included_manifests') {
                 getListElement(manifest, listid);
@@ -543,6 +545,7 @@ function saveManifest(manifest, listid) {
         method: "PATCH",
         data: '{ "'+[listid]+'": '+itemList+' }',
         contentType: 'application/json',
+        timeout: 3000,
         error: function(jqXHR, textStatus, errorThrown) {
             //display error when manifest is not readable
             $("#errorModalTitleText").text("manifest save error");
@@ -1070,7 +1073,7 @@ function get_model_description(serial) {
         error: function(xhr, textStatus, errorThrown) {
             //alert(errorThrown)
         },
-        timeout: 1000
+        timeout: 2000
     });
 }
 
