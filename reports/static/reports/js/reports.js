@@ -1127,7 +1127,7 @@ function getMDMDeviceInfo(serail) {
             html += '</div>'
             $('#mdmDetail').html(html);
         },
-        timeout: 3000
+        timeout: 6000
     });
 }
 
@@ -1159,7 +1159,7 @@ function getMDMDeviceGroupInfo(ID) {
         },
         error: function(jqXHR, textStatus, errorThrown) {
         },
-        timeout: 3000
+        timeout: 6000
     });
 }
 
@@ -1193,7 +1193,7 @@ function setMDM(action, additional1, additional2) {
                     $("#process_progress").modal("hide");
                     $("#errorModal").modal("show");
                 },
-                timeout: 5000
+                timeout: 6000
             });
         }
     }); 
