@@ -106,16 +106,6 @@ def index(request, computer_serial=None):
                         report_plist = None
                         pass
 
-                imagr_plist = None
-                if IMAGR_URL:
-                    try:
-                        config = urllib2.urlopen(IMAGR_URL)
-                    except Exception as error:
-                        imagr_plist = "Can't reach server!"
-                    else:
-                        plist = config.read()
-                        imagr_plist = plistlib.readPlistFromString(plist)
-
                 if report_plist:
                     time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
                     time = time[3:].split(':')

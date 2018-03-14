@@ -101,6 +101,7 @@ def convert_strings_to_dates(jdata):
 def getSimpleMDMID(apiKey, serial_number):
     """ returns device ID for your device """
     devices = simpleMDMpy.devices(apiKey)
+    devices.proxyDict = proxies
     response = devices.getDevice(search=serial_number)
     if response.status_code in range(200,207):
         for data in response.json()['data']:
@@ -110,6 +111,7 @@ def getSimpleMDMID(apiKey, serial_number):
 def getSimpleMDMDevice(apiKey, ID):
     """ returns device info for your device """
     devices = simpleMDMpy.devices(apiKey)
+    devices.proxyDict = proxies
     response = devices.getDevice(deviceID=ID)
     if response.status_code in range(200,207):
         return response.json()
@@ -118,6 +120,7 @@ def getSimpleMDMDevice(apiKey, ID):
 def getSimpleMDMDeviceGroups(apiKey):
     """ returns device info for your device """
     deviceGroups = simpleMDMpy.deviceGroups(apiKey)
+    deviceGroups.proxyDict = proxies
     response = deviceGroups.getDeviceGroup()
     if response.status_code in range(200,207):
         return response.json()
@@ -126,6 +129,7 @@ def getSimpleMDMDeviceGroups(apiKey):
 def setSimpleMDMName(apiKey, deviceID, deviceName):
     """ sets device name in simpleMDM """
     devices = simpleMDMpy.devices(apiKey)
+    devices.proxyDict = proxies
     if devices.updateDevice(deviceName, str(deviceID)).status_code == 200:
         return True
     return False
@@ -965,6 +969,7 @@ def mdm_api(request, kind, item):
         action = submit.get('action', None)
         if action:
             devices = simpleMDMpy.devices(simpleMDMKey)
+            devices.proxyDict = proxies
             response = None
 
             if action == "restart":
@@ -986,6 +991,7 @@ def mdm_api(request, kind, item):
                 group = submit.get('additional1', None)
                 if group:
                     deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
+                    deviceGroups.proxyDict = proxies
                     response = deviceGroups.assignDevice(deviceID=machine.simpleMDMID, deviceGoupID=group)
                 else:
                     return HttpResponse(
