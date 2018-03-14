@@ -170,14 +170,12 @@ def index(request, computer_serial=None):
                             'report_plist': report_plist,
                             'disksList': disksList,
                             'time': time,
-                            'imagr_plist': imagr_plist,
                             'defaultManifest': DEFAULT_MANIFEST,
                             }
                 else:
                     context = {'machine': machine,
                         'vault_username': VAULT_USERNAME,
                         'report_plist': report_plist,
-                        'imagr_plist': imagr_plist,
                         'defaultManifest': DEFAULT_MANIFEST,
                         }
 

@@ -30,11 +30,6 @@ try:
 except:
     HOSTNAME = "localhost"
 
-try:
-    IMAGR_URL = settings.IMAGR_URL
-except:
-    IMAGR_URL = ""
-
 REPOSADO = False
 if os.listdir('/reposado') != []:
     REPOSADO = True
@@ -47,5 +42,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADO': REPOSADO, 'HOSTNAME': HOSTNAME, 'userImage': imgString, 'IMAGR_URL': IMAGR_URL }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADO': REPOSADO, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
 
