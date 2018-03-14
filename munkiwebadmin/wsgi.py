@@ -15,10 +15,6 @@ cert = os.path.join('/usr/local/share/ca-certificates','ca-certificates.crt')
 if os.path.exists(cert):
     os.environ['REQUESTS_CA_BUNDLE'] = cert
 
-os.environ['http_proxy'] = os.getenv('PROXY_ADDRESS')
-os.environ['https_proxy'] = os.getenv('PROXY_ADDRESS')
-os.environ['no_proxy'] = os.getenv('NO_PROXY')
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "munkiwebadmin.settings")
 
 application = get_wsgi_application()
