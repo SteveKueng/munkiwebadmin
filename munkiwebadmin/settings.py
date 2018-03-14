@@ -33,7 +33,7 @@ VAULT_USERNAME = 'admin'
 
 SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 
-PROXY_ADDRESS = ''
+PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST') # serial_number or hostname
 
