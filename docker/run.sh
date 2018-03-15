@@ -7,6 +7,8 @@ if ! test "$(ls -A "/fieldkeys")"; then
   keyczart addkey --location=/fieldkeys --status=primary --size=256
 fi
 
+update-ca-certificates
+
 #seret key
 python manage.py generate_secret_key --replace
 
