@@ -32,7 +32,6 @@ import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-
 try:
     simpleMDMKey = settings.SIMPLEMDMKEY
 except AttributeError:
@@ -44,8 +43,8 @@ except AttributeError:
     PROXY_ADDRESS = ""
 
 proxies = {
-    "http":  PROXY_ADDRESS,
-    "https": PROXY_ADDRESS
+    "http": 'http://'+PROXY_ADDRESS,
+    "https": 'https://'+PROXY_ADDRESS
 }
 
 def normalize_value_for_filtering(value):
