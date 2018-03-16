@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y \
 		python-dev \
 		libldap2-dev \
 		libssl-dev \
+		dnsutils \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # install necessary locales
