@@ -16,7 +16,7 @@ from process.utils import record_status
 from catalogs.models import Catalog
 from api.models import Plist, MunkiFile, \
                        FileReadError, FileWriteError, FileDeleteError
-
+from munkiwebadmin.utils import MunkiGit
 
 try:
     GIT = settings.GIT_PATH
