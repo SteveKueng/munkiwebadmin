@@ -18,6 +18,11 @@ from api.models import Plist, MunkiFile, \
                        FileReadError, FileWriteError, FileDeleteError
 
 
+try:
+    GIT = settings.GIT_PATH
+except AttributeError:
+    GIT = None
+
 REPO_DIR = settings.MUNKI_REPO_DIR
 CATALOGS_PATH = os.path.join(REPO_DIR, 'catalogs')
 PKGSINFO_PATH = os.path.join(REPO_DIR, 'pkgsinfo')

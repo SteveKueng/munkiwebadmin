@@ -39,7 +39,7 @@ def get_icon_url(pkginfo_plist):
             icon_name += '.png'
         icon_path = os.path.join(ICONS_DIR, icon_name)
         if os.path.isfile(icon_path):
-            return ICONS_URL + urllib2.quote(icon_name.encode('UTF-8'))
+            return ICONS_URL + "/" + urllib2.quote(icon_name.encode('UTF-8'))
     return STATIC_URL + 'img/GenericPkg.png'
 
 
