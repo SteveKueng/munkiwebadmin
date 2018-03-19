@@ -11,6 +11,7 @@ ENV ALLOWED_HOSTS '[*]'
 ENV DEFAULT_MANIFEST 'serail_number'
 ENV PROXY_ADDRESS ''
 ENV STYLE 'default'
+ENV VAULT_USERNAME 'admin'
 
 #database
 ENV DB 'postgres'
