@@ -31,7 +31,6 @@ PKGSINFO_STATUS_TAG = 'pkgsinfo_list_process'
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
-
 def pkg_ref_count(pkginfo_path, catalog_items):
     '''Returns the number of pkginfo items containing a reference to
     the installer_item_location in pkginfo_path and the relative path to

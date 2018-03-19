@@ -114,7 +114,6 @@ def run(request):
 
         if request.user and GIT:
             MunkiGit().commit_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
-            run_git(['commit', '-m', log_msg, '--author', author_info, "--"])
         record.statustext = 'Done'
         record.exited = True
         record.exitcode = proc.returncode
