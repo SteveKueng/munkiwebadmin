@@ -526,7 +526,8 @@ def file_api(request, kind, filepath=None):
 
     if request.method in ('POST', 'PUT'):
         LOGGER.debug("Got API %s request for %s", request.method, kind)
-        if not request.user.has_perm('pkgsinfo.create_pkginfofile'):
+        if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
+            LOGGER.error("permission denied")
             raise PermissionDenied
         if request.method == 'POST':
             filename = request.POST.get('filename') or filepath
