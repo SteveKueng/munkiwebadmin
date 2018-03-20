@@ -6,6 +6,7 @@ utilities used by other apps
 import logging
 import os
 import subprocess
+import time
 from django.conf import settings
 
 APPNAME = settings.APPNAME
@@ -30,6 +31,8 @@ class MunkiGit(object):
         returns a dictionary with the keys 'output', 'error', and
         'returncode'. You can optionally pass an array into customArgs to
         override the self.args value without overwriting them."""
+        while os.path.exists(os.path.join(self.git_repo_dir, '.git', 'index.lock')):
+            time.sleep(0.5)
         custom_args = self.args if custom_args is None else custom_args
         proc = subprocess.Popen([self.cmd] + custom_args,
                                 shell=False,
