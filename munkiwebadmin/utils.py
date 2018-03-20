@@ -38,9 +38,9 @@ class MunkiGit(object):
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
-        #(output, error) = proc.communicate()
-        self.results = {"output": "",
-                        "error": "", "returncode": 0}
+        (output, error) = proc.communicate()
+        self.results = {"output": output,
+                    "error": error, "returncode": proc.returncode}                 
         return self.results
 
     def path_is_gitignored(self, a_path):
