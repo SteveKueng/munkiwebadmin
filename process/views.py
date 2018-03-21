@@ -10,6 +10,7 @@ import logging
 import os
 import subprocess
 import time
+import threading
 
 from django.conf import settings
 from munkiwebadmin.utils import MunkiGit
@@ -113,7 +114,8 @@ def run(request):
                 break
 
         if request.user and GIT:
-            MunkiGit().add_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
+            thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (os.path.join(REPO_DIR, "catalogs"), request.user))
+            thread.start()
         record.statustext = 'Done'
         record.exited = True
         record.exitcode = proc.returncode

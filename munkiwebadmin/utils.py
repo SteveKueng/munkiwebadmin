@@ -34,8 +34,6 @@ class MunkiGit(object):
         returns a dictionary with the keys 'output', 'error', and
         'returncode'. You can optionally pass an array into customArgs to
         override the self.args value without overwriting them."""
-        while os.path.exists(os.path.join(self.git_repo_dir, '.git', 'index.lock')):
-            time.sleep(1)
         custom_args = self.args if custom_args is None else custom_args
         proc = subprocess.Popen([self.cmd] + custom_args,
                                 shell=False,
@@ -97,7 +95,7 @@ class MunkiGit(object):
                    % (author_name, action, itempath, APPNAME))
         LOGGER.info("Doing git commit for %s", itempath)
         LOGGER.debug(log_msg)
-        self.run_git(['commit', '-m', log_msg, '--author', author_info, a_path])
+        self.run_git(['commit', '-m', log_msg, '--author', author_info])
         if self.results['returncode'] != 0:
             LOGGER.info("Failed to commit changes to %s", a_path)
             LOGGER.info(self.results['error'])
