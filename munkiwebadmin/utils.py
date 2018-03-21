@@ -7,12 +7,15 @@ import logging
 import os
 import subprocess
 import time
+import threading
 from django.conf import settings
 
 APPNAME = settings.APPNAME
 REPO_DIR = settings.MUNKI_REPO_DIR
 
 LOGGER = logging.getLogger('munkiwebadmin')
+
+lock = threading.Lock()
 
 try:
     GIT = settings.GIT_PATH
@@ -32,7 +35,7 @@ class MunkiGit(object):
         'returncode'. You can optionally pass an array into customArgs to
         override the self.args value without overwriting them."""
         while os.path.exists(os.path.join(self.git_repo_dir, '.git', 'index.lock')):
-            time.sleep(0.5)
+            time.sleep(1)
         custom_args = self.args if custom_args is None else custom_args
         proc = subprocess.Popen([self.cmd] + custom_args,
                                 shell=False,
@@ -103,6 +106,8 @@ class MunkiGit(object):
 
     def add_file_at_path(self, a_path, committer):
         """Commits a file to the Git repo."""
+        global lock
+        lock.acquire()
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
                 self.git_repo_dir = os.path.dirname(a_path)
@@ -113,9 +118,12 @@ class MunkiGit(object):
                     LOGGER.info("Git error: %s", self.results['error'])
         else:
             LOGGER.debug("%s is not in a git repo.", a_path)
+        lock.release()
 
     def delete_file_at_path(self, a_path, committer):
         """Deletes a file from the filesystem and Git repo."""
+        global lock
+        lock.acquire()
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
                 self.git_repo_dir = os.path.dirname(a_path)
@@ -126,3 +134,4 @@ class MunkiGit(object):
                     LOGGER.info("Git error: %s", self.results['error'])
         else:
             LOGGER.debug("%s is not in a git repo.", a_path)
+        lock.release()

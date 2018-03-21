@@ -113,7 +113,7 @@ def run(request):
                 break
 
         if request.user and GIT:
-            MunkiGit().commit_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
+            MunkiGit().add_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
         record.statustext = 'Done'
         record.exited = True
         record.exitcode = proc.returncode
