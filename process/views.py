@@ -114,8 +114,7 @@ def run(request):
                 break
 
         if request.user and GIT:
-            thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (os.path.join(REPO_DIR, "catalogs"), request.user))
-            thread.start()
+            MunkiGit().add_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
         record.statustext = 'Done'
         record.exited = True
         record.exitcode = proc.returncode

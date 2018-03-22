@@ -6,7 +6,6 @@ from django.conf import settings
 import os
 import logging
 import plistlib
-import threading
 from xml.parsers.expat import ExpatError
 
 from munkiwebadmin.utils import MunkiGit
@@ -114,8 +113,7 @@ class Plist(object):
                 fileref.write(data.encode('utf-8'))
             LOGGER.info('Created %s/%s', kind, pathname)
             if user and GIT:
-                thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().add_file_at_path(filepath, user)
         except (IOError, OSError), err:
             LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
@@ -154,8 +152,7 @@ class Plist(object):
                 fileref.write(data)
             LOGGER.info('Wrote %s/%s', kind, pathname)
             if user and GIT:
-                thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().add_file_at_path(filepath, user)
         except (IOError, OSError), err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
@@ -171,8 +168,7 @@ class Plist(object):
             os.unlink(filepath)
             LOGGER.info('Deleted %s/%s', kind, pathname)
             if user and GIT:
-                thread = threading.Thread(target = MunkiGit().delete_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().delete_file_at_path(filepath, user)
         except (IOError, OSError), err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)
@@ -232,8 +228,7 @@ class MunkiFile(object):
                 for chunk in fileupload.chunks():
                     fileref.write(chunk)
             if user and GIT and kind == "icons":
-                thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -247,8 +242,7 @@ class MunkiFile(object):
             with open(filepath, 'w') as fileref:
                 fileref.write(filedata)
             if user and GIT and kind == "icons":
-                thread = threading.Thread(target = MunkiGit().add_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -264,8 +258,7 @@ class MunkiFile(object):
         try:
             os.unlink(filepath)
             if user and GIT and kind == "icons":
-                thread = threading.Thread(target = MunkiGit().delete_file_at_path, args = (filepath, user))
-                thread.start()
+                MunkiGit().delete_file_at_path(filepath, user)
             LOGGER.info('Deleted %s/%s', kind, pathname)
         except (IOError, OSError), err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)

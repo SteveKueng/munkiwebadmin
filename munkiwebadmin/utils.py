@@ -6,16 +6,12 @@ utilities used by other apps
 import logging
 import os
 import subprocess
-import time
-import threading
 from django.conf import settings
 
 APPNAME = settings.APPNAME
 REPO_DIR = settings.MUNKI_REPO_DIR
 
 LOGGER = logging.getLogger('munkiwebadmin')
-
-lock = threading.Lock()
 
 try:
     GIT = settings.GIT_PATH
@@ -95,7 +91,7 @@ class MunkiGit(object):
                    % (author_name, action, itempath, APPNAME))
         LOGGER.info("Doing git commit for %s", itempath)
         LOGGER.debug(log_msg)
-        self.run_git(['commit', '-m', log_msg, '--author', author_info])
+        self.run_git(['commit', '-m', log_msg, '--author', author_info, a_path])
         if self.results['returncode'] != 0:
             LOGGER.info("Failed to commit changes to %s", a_path)
             LOGGER.info(self.results['error'])
@@ -104,8 +100,6 @@ class MunkiGit(object):
 
     def add_file_at_path(self, a_path, committer):
         """Commits a file to the Git repo."""
-        global lock
-        lock.acquire()
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
                 self.git_repo_dir = os.path.dirname(a_path)
@@ -116,12 +110,9 @@ class MunkiGit(object):
                     LOGGER.info("Git error: %s", self.results['error'])
         else:
             LOGGER.debug("%s is not in a git repo.", a_path)
-        lock.release()
 
     def delete_file_at_path(self, a_path, committer):
         """Deletes a file from the filesystem and Git repo."""
-        global lock
-        lock.acquire()
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
                 self.git_repo_dir = os.path.dirname(a_path)
@@ -132,4 +123,3 @@ class MunkiGit(object):
                     LOGGER.info("Git error: %s", self.results['error'])
         else:
             LOGGER.debug("%s is not in a git repo.", a_path)
-        lock.release()
