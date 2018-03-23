@@ -41,6 +41,7 @@ $(document).ready(function() {
     $('#mass_delete').on('click', confirmMassDelete);
     $('#massaction_dropdown').on('click', enableMassActionMenuItems);
     $('#mass_edit_catalogs').on('click', openMassEditModal);
+    $('#makecatalogs').on('click', rebuildCatalogs());
     $(".chosen-select").chosen({width: "100%"});
 
     $(window).on('hashchange', function() {
