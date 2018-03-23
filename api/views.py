@@ -19,7 +19,6 @@ from api.models import FileError, FileWriteError, FileReadError, \
 from reports.models import Machine, MunkiReport, ImagrReport
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
-import process.views
 
 import datetime
 import json
@@ -1015,9 +1014,3 @@ def mdm_api(request, kind, item):
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
-
-@csrf_exempt
-@logged_in_or_basicauth()
-def makecatalogs(request):
-    LOGGER.debug("Makecatalogs")
-    process.run()
