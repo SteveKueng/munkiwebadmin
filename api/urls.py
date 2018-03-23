@@ -3,7 +3,6 @@ import api.views
 
 urlpatterns = [
     url(r'^(?P<kind>catalogs$)', api.views.plist_api),
-    url(r'^(?P<kind>catalogs)/make$', api.views.makecatalogs),
     url(r'^(?P<kind>catalogs)/(?P<filepath>.*$)', api.views.plist_api),
     url(r'^(?P<kind>manifests$)', api.views.plist_api),
     url(r'^(?P<kind>manifests)/(?P<filepath>.*$)', api.views.plist_api),
