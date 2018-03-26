@@ -24,17 +24,19 @@
     <div id='item_list'>
         <div class="form-inline">
             <div class="form-group">
-                <div class="btn-group">
-                      <button type="button" id="catalog_dropdown"
-                              class="btn btn-default dropdown-toggle" data-value="{{catalog}}" data-toggle="dropdown"
-                              aria-haspopup="true" aria-expanded="false">
-                          {{catalog}} <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" id="catalog_dropdown_list">
-                          <li><a href="#">all</a></li>
-                      </ul>
-                      <button type="button" id="makecatalogs" class="btn btn-primary">Makecatalogs</button>
-                  </div>
+              <div class="btn-group">
+                <button type="button" id="catalog_dropdown"
+                        class="btn btn-default dropdown-toggle" data-value="{{catalog}}" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    {{catalog}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="catalog_dropdown_list">
+                    <li><a href="#">all</a></li>
+                </ul>
+              </div>
+              <div class="btn-group" role="group">
+                <button type="button" id="makecatalogs" class="btn btn-primary">Makecatalogs</button>
+              </div>
             </div>
             <div class="form-group pull-right">
               <div class="btn-group">
