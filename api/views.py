@@ -760,18 +760,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
                         machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
 
-                    report.runtype = submit.get('runtype', 'UNKNOWN')
-                    
-                    imagrReport = None
-                    if submit.get('imagr_workflow'):
-                        machine.imagr_workflow = submit.get('imagr_workflow')
-                    if submit.get('status') and submit.get('message'):
-                        machine.current_status = submit.get('status')
-                        imagrReport = ImagrReport(machine=machine, message=submit.get('message'), status=submit.get('status'))
-                        report.runstate = u"imagr"
-                    # delete pending workflow if successful ended
-                    if submit.get('status') == 'success' or submit.get('status') == 'error':
-                        machine.imagr_workflow = ""
+                    report.runtype = submit.get('runtype', 'UNKNOWN')"
 
                     if submission_type == 'postflight':
                         report.runstate = u"done"
