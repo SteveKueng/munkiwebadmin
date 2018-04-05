@@ -53,12 +53,7 @@ try:
     MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
 except AttributeError:
     MUNKI_REPO_DIR = False
-
-try:
-    IMAGR_URL = settings.IMAGR_URL
-except AttributeError:
-    IMAGR_URL = ""
-
+    
 try:
     ICONS_URL = settings.ICONS_URL
 except AttributeError:

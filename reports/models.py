@@ -152,15 +152,3 @@ class MunkiReport(models.Model):
         self.console_user = "unknown"
         if "ConsoleUser" in plist:
             self.console_user = unicode(plist["ConsoleUser"])
-
-class ImagrReport(models.Model):
-    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
-    status = models.CharField(max_length=200)
-    message = models.CharField(max_length=512)
-    date_added = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "%s - %s - %s" % (self.date_added, self.machine, self.status)
-
-    class Meta:
-      get_latest_by = 'date_added'
-      ordering = ['-date_added']
