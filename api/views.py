@@ -760,7 +760,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
                         machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
 
-                    report.runtype = submit.get('runtype', 'UNKNOWN')"
+                    report.runtype = submit.get('runtype', 'UNKNOWN')
 
                     if submission_type == 'postflight':
                         report.runstate = u"done"
