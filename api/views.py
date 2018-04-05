@@ -720,7 +720,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 machine = Machine.objects.get(serial_number=serial_number)
             except Machine.DoesNotExist:
                 machine = Machine(serial_number=serial_number)
-            if kind in ['report', 'imagr']:
+            if kind in ['report']:
                 if not request.user.has_perm('reports.change_machine'):
                     raise PermissionDenied
                 try:
@@ -732,7 +732,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     machine.remote_ip = request.META['REMOTE_ADDR']
                     report.activity = ""
 
-                    if 'name' in submit:
+                    if not machine.hostname and 'name' in submit:
                         machine.hostname = submit.get('name')
                     if 'username' in submit:
                         machine.username = submit.get('username')
@@ -773,10 +773,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         report.runstate = u"broken client"
                         report.errors = 1
                         report.warnings = 0
-                    
-                    # setting hostname if there isn't set one / prevent save issues
-                    if machine.hostname == "unknown":
-                        machine.hostname = serial_number
 
                     # simpleMDM
                     if simpleMDMKey:
@@ -847,6 +843,21 @@ def db_api(request, kind, subclass=None, serial_number=None):
             else:
                 return HttpResponse(status=404)
             return HttpResponse(status=204)
+
+    # ----------- PUT -----------------
+    if request.method == 'PUT  ':
+        LOGGER.debug("Got API PUT request for %s", kind)
+        if not request.user.has_perm('reports.change_machine'):
+            raise PermissionDenied
+        if serial_number:
+            try:
+                machine = Machine.objects.get(serial_number=serial_number)
+            except Machine.DoesNotExist:
+                machine = Machine(serial_number=serial_number)
+
+            if 'name' in submit:
+                machine.hostname = submit.get('name')
+                machine.save()
 
     # ----------- DELETE -----------------
     elif request.method == 'DELETE':

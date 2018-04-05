@@ -20,7 +20,7 @@ class BusinessUnit(models.Model):
 
 class Machine(models.Model):
     serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
-    hostname = models.CharField(max_length=64, default="unknown")
+    hostname = models.CharField(max_length=64, blank=True)
     username = models.CharField(max_length=256, blank=True)
     remote_ip = models.CharField(max_length=15, blank=True)
     businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None, on_delete=models.CASCADE)
@@ -31,7 +31,6 @@ class Machine(models.Model):
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
     current_status = models.CharField(max_length=200, blank=True)
-    imagr_workflow = models.CharField(max_length=64, blank=True)
     simpleMDMID = models.CharField(max_length=16, blank=True)
 
     def errors(self):
