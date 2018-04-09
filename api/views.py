@@ -607,7 +607,7 @@ def file_api(request, kind, filepath=None):
 @csrf_exempt
 @logged_in_or_basicauth()
 def db_api(request, kind, subclass=None, serial_number=None):
-    if kind not in ['report', 'imagr', 'vault']:
+    if kind not in ['report', 'vault']:
         return HttpResponse(status=404)
 
     # ------- get submit -------
@@ -637,15 +637,12 @@ def db_api(request, kind, subclass=None, serial_number=None):
             api_fields = None
         
         response = list()
-        if kind in ['report', 'imagr']:
+        if kind in ['report']:
             if not request.user.has_perm('reports.can_view_reports'):
                 raise PermissionDenied
             if serial_number:
                 try:
-                    if kind == "report":
-                        item_list = serializers.serialize(response_type, Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
-                    elif kind == "imagr":
-                        item_list = serializers.serialize(response_type, ImagrReport.objects.filter(machine=Machine.objects.get(serial_number=serial_number)), fields=(api_fields))
+                    item_list = serializers.serialize(response_type, Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
                 except Machine.DoesNotExist:
                     return HttpResponse(
                         json.dumps({'result': 'failed',
@@ -653,10 +650,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                                     'detail': '%s does not exist' % serial_number}),
                         content_type='application/json', status=404)
             else:
-                if kind == "report":
-                    item_list = serializers.serialize(response_type, Machine.objects.all(), fields=(api_fields))
-                elif kind == "imagr":
-                    item_list = serializers.serialize(response_type, ImagrReport.objects.all(), fields=(api_fields))
+                item_list = serializers.serialize(response_type, Machine.objects.all(), fields=(api_fields))
 
             return HttpResponse(
                 item_list,
@@ -782,15 +776,15 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
 
                     report.timestamp = timezone.now()
-                    machine.save()
+                    try:
+                        machine.save()
+                    except Exception as e:
+                        LOGGER.error("machine save error: %s", e)
                     try:
                         report.save()
                     except Exception as e:
                         LOGGER.error("report save error: %s", e)
 
-                    # save imagr report
-                    if imagrReport:
-                        imagrReport.save()                 
             elif kind in ['vault'] and subclass == "set":
                 if not request.user.has_perm('vault.change_localadmin'):
                     raise PermissionDenied
