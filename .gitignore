@@ -20,3 +20,5 @@ munkiwebadmin/static/styles
 config.codekit3
 *.log*
 migrations
+
+favicon.ico

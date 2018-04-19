@@ -5,3 +5,9 @@
 db.sqlite3
 static_root
 munkiwebadmin/static/styles
+
+favicon.ico
+
+# hidden mac settings
+.DS_Store
+.vscode/settings.json
