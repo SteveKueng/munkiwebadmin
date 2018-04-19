@@ -197,3 +197,11 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -F filedata=@/path/to/local_file.png \
      http://localhost:8080/api/icons/Firefox.png
 ```
+
+# Dev Server
+run startDevSServer.sh
+
+if there is no admin user create one:
+```bash
+docker exec -it munkiwebadmin_web_1 /bin/bash -c "python manage.py createsuperuser"
+```
