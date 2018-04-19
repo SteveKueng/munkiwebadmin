@@ -14,7 +14,8 @@ db.sqlite3
 .vscode/settings.json
 
 # ignore collectstatics
-/munkiwebadmin/collected_static
+static_root
+munkiwebadmin/static/styles
 
 config.codekit3
 *.log*
