@@ -839,7 +839,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
             return HttpResponse(status=204)
 
     # ----------- PUT -----------------
-    if request.method == 'PUT  ':
+    if request.method == 'PUT':
         LOGGER.debug("Got API PUT request for %s", kind)
         if not request.user.has_perm('reports.change_machine'):
             raise PermissionDenied
