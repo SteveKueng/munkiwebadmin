@@ -852,6 +852,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
             if 'name' in submit:
                 machine.hostname = submit.get('name')
                 machine.save()
+                return HttpResponse(status=201)
 
     # ----------- DELETE -----------------
     elif request.method == 'DELETE':
