@@ -89,7 +89,9 @@ function initUpdatesTable() {
             dataSrc: function ( json ) {
                 var column_rows = [];
                 for ( var i=0 ; i < json.length; i++ ) {
-                    column_rows.push(json[i]);
+                    if (json[i] != "") {
+                        column_rows.push(json[i]);
+                    }
 				}
 				//console.log(column_rows);
                 return column_rows;

@@ -749,10 +749,16 @@ def db_api(request, kind, subclass=None, serial_number=None):
                             hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
                     if hwinfo:
-                        machine.machine_model = hwinfo.get('machine_model') and hwinfo.get('machine_model') or machine.machine_model
-                        machine.cpu_type = hwinfo.get('cpu_type') and hwinfo.get('cpu_type') or machine.cpu_type
-                        machine.cpu_speed = hwinfo.get('current_processor_speed') and hwinfo.get('current_processor_speed') or machine.cpu_speed
-                        machine.ram = hwinfo.get('physical_memory') and hwinfo.get('physical_memory') or machine.ram
+                        machine.machine_model = hwinfo.get('machine_model', machine.machine_model)
+                        machine.cpu_type = hwinfo.get('cpu_type', machine.cpu_type)
+                        machine.cpu_speed = hwinfo.get('current_processor_speed', machine.cpu_speed)
+                        machine.ram = hwinfo.get('physical_memory', machine.ram)
+                    
+                    # 
+                    if not machine.os_version:
+                        machine.os_version = "unknown"
+                    if not machine.machine_model:
+                        machine.machine_model = "unknown"
 
                     report.runtype = submit.get('runtype', 'UNKNOWN')
 
