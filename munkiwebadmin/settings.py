@@ -53,7 +53,7 @@ if os.getenv('SECRET_KEY'):
 else:
     SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
 
-DEBUG = os.getenv('DEBUG')
+DEBUG = False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
 LOGIN_EXEMPT_URLS = ()
