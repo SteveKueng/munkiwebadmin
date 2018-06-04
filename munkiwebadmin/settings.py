@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'process',
     'reports',
     'updates',
+    'santa',
     'vault',
 ]
 
@@ -228,7 +229,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['console', 'file'],
             'level': LOGLEVEL,
             'propagate': False
         },

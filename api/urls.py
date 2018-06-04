@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^(?P<kind>vault)/(?P<subclass>[a-zA-Z]+$)', api.views.db_api),
     url(r'^(?P<kind>vault)/(?P<subclass>[a-zA-Z]+)/(?P<serial_number>[a-zA-Z0-9]+$)', api.views.db_api),
     url(r'^(?P<kind>mdm)/(?P<item>.[a-zA-Z0-9_]+$)', api.views.mdm_api),
+    url(r'^(?P<kind>santa)(?:/(?P<submission_type>[a-zA-Z]+))(?:/(?P<machine_id>[a-zA-Z0-9]+))?', api.views.santa_api),
     url(r'^(?P<kind>[a-zA-Z]+$)', api.views.db_api),
     url(r'^(?P<kind>[a-zA-Z]+)/(?P<serial_number>.[a-zA-Z0-9]+$)', api.views.db_api),
 ]

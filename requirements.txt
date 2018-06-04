@@ -1,6 +1,6 @@
 django>=1.11,<2.0
 uwsgi
-psycopg2
+psycopg2-binary
 mysqlclient
 pyodbc
 django-pyodbc-azure<2.0

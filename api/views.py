@@ -28,6 +28,7 @@ import mimetypes
 import plistlib
 import re
 import base64
+import zlib
 import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
@@ -97,6 +98,7 @@ def convert_strings_to_dates(jdata):
                 value = convert_strings_to_dates(value)
         return jdata
 
+
 def getSimpleMDMID(apiKey, serial_number):
     """ returns device ID for your device """
     devices = simpleMDMpy.devices(apiKey)
@@ -107,6 +109,7 @@ def getSimpleMDMID(apiKey, serial_number):
             return data.get('id')
     return None
 
+
 def getSimpleMDMDevice(apiKey, ID):
     """ returns device info for your device """
     devices = simpleMDMpy.devices(apiKey)
@@ -115,6 +118,7 @@ def getSimpleMDMDevice(apiKey, ID):
     if response.status_code in range(200,207):
         return response.json()
     return None
+
 
 def getSimpleMDMDeviceGroups(apiKey):
     """ returns device info for your device """
@@ -125,6 +129,7 @@ def getSimpleMDMDeviceGroups(apiKey):
         return response.json()
     return None
 
+
 def setSimpleMDMName(apiKey, deviceID, deviceName):
     """ sets device name in simpleMDM """
     devices = simpleMDMpy.devices(apiKey)
@@ -132,6 +137,7 @@ def setSimpleMDMName(apiKey, deviceID, deviceName):
     if devices.updateDevice(deviceName, str(deviceID)).status_code == 200:
         return True
     return False
+
 
 @csrf_exempt
 @logged_in_or_basicauth()
@@ -461,7 +467,6 @@ def plist_api(request, kind, filepath=None):
             # success
             return HttpResponse(status=204)
 
-
 @csrf_exempt
 @logged_in_or_basicauth()
 def file_api(request, kind, filepath=None):
@@ -536,6 +541,7 @@ def file_api(request, kind, filepath=None):
             filename = filepath
             filedata = request.body
         LOGGER.debug("Filename is %s" % filename)
+        LOGGER.debug("Filedata is %s" % filedata)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
@@ -1015,3 +1021,43 @@ def mdm_api(request, kind, item):
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
+
+@csrf_exempt
+@logged_in_or_basicauth()
+def santa_api(request, kind, submission_type, machine_id):
+    LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, machine_id))
+
+
+    payload = request.body
+    content_encoding = request.META.get('HTTP_CONTENT_ENCODING', None)
+    if content_encoding:
+        payload = json.loads(zlib.decompress(payload))
+
+    LOGGER.debug(payload)
+
+    if submission_type == "preflight":
+        contend = { 'machine_id': machine_id,
+                'batch_size': 20,
+                #'upload_logs_url': 'http://localhost:8000/api/santa/log/' + payload["serial_num"]
+                }
+        return HttpResponse(
+                            json.dumps(contend) + '\n',
+                            content_type='application/json', status=200)
+
+    if submission_type == "log":
+        contend = {'machine_id': machine_id }
+        return HttpResponse(
+                            json.dumps(contend),
+                            content_type='application/json', status=200)
+
+    if submission_type == "ruledownload":
+        contend = { "client_mode": "MONITOR", "rules": { "rule_type": "BINARY", "policy": "BLACKLIST", "sha256": "0494fb788198359df09179bc4ce32b8e93b59e64f518c001cd64a7f2ff1e5c38", "custom_msg": "blacklist SourceTree" } }
+        return HttpResponse(
+                            json.dumps(contend),
+                            content_type='application/json', status=200)
+
+    if submission_type == "eventupload":
+        return HttpResponse(status=200)
+
+    if submission_type == "postflight":
+        return HttpResponse(status=200)
