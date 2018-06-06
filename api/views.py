@@ -349,8 +349,9 @@ def plist_api(request, kind, filepath=None):
             del request_data['filename']
             
         try:
-            data = plistlib.writePlistToString(request_data)
-            Plist.write(data, kind, filepath, request.user)
+            #data = plistlib.writePlistToString(request_data)
+            #Plist.write(data, kind, filepath, request.user)
+            Plist.write(request_data, kind, filepath, request.user)
         except FileError, err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
