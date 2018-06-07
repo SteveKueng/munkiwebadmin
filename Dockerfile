@@ -35,6 +35,7 @@ RUN apt-get update && apt-get install -y \
 		unzip \
 		tdsodbc \
 		git \
+		gnupg \
 		curl \
 		nginx \
 		apt-transport-https \
