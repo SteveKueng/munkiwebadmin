@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
 		unixodbc-dev \
 		mysql-client \
 		#libmysqlclient-dev \
+		libmariadbclient-dev \
 		libpq-dev \
 		sqlite3 \
 		net-tools \
