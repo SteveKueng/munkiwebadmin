@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
 		g++ \
 		unixodbc-dev \
 		mysql-client \
-		#libmysqlclient-dev \
+		libmysqlclient-dev \
 		libmariadbclient-dev \
 		libpq-dev \
 		sqlite3 \
