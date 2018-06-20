@@ -109,9 +109,8 @@ class Plist(object):
                 }
         data = plistlib.writePlistToString(plist)
         try:
-            #with open(filepath, 'w') as fileref:
-            #    fileref.write(data.encode('utf-8'))
-            plistlib.writePlist(plist, filepath)
+            with open(filepath, 'w') as fileref:
+                fileref.write(data.encode('utf-8'))
             LOGGER.info('Created %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)
@@ -149,9 +148,8 @@ class Plist(object):
                 LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
                 raise FileWriteError(err)
         try:
-            #with open(filepath, 'w') as fileref:
-            #    fileref.write(data)
-            plistlib.writePlist(data, filepath)
+            with open(filepath, 'w') as fileref:
+                fileref.write(data)
             LOGGER.info('Wrote %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)
