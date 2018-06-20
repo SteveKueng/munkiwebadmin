@@ -82,12 +82,14 @@ class MunkiGit(object):
             action = 'did something with'
 
         # determine the path relative to REPO_DIR for the file at a_path
+        LOGGER.debug("path: %s", a_path)
         itempath = a_path
         if a_path.startswith(REPO_DIR):
             itempath = a_path[len(REPO_DIR)+1:]
         
         while not os.path.exists(itempath):
             itempath = os.path.dirname(itempath)
+        LOGGER.debug("path: %s", itempath)
 
         # generate the log message
         log_msg = ('%s %s \'%s\' via %s'
