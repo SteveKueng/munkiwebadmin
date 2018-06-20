@@ -85,15 +85,18 @@ class MunkiGit(object):
         itempath = a_path
         if a_path.startswith(REPO_DIR):
             itempath = a_path[len(REPO_DIR)+1:]
+        
+        while not os.path.exists(itempath):
+            itempath = os.path.dirname(itempath)
 
         # generate the log message
         log_msg = ('%s %s \'%s\' via %s'
                    % (author_name, action, itempath, APPNAME))
         LOGGER.info("Doing git commit for %s", itempath)
         LOGGER.debug(log_msg)
-        self.run_git(['commit', '-m', log_msg, '--author', author_info, a_path])
+        self.run_git(['commit', '-m', log_msg, '--author', author_info, itempath])
         if self.results['returncode'] != 0:
-            LOGGER.info("Failed to commit changes to %s", a_path)
+            LOGGER.info("Failed to commit changes to %s", itempath)
             LOGGER.info(self.results['error'])
             return -1
         return 0
