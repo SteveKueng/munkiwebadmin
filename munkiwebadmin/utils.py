@@ -21,7 +21,7 @@ except AttributeError:
 class MunkiGit(object):
     """A simple interface for some common interactions with the git binary"""
     cmd = GIT
-    git_repo_dir = os.getcwd()
+    git_repo_dir = os.path.join(REPO_DIR)
     args = []
     results = {}
 
@@ -46,13 +46,13 @@ class MunkiGit(object):
     def path_is_gitignored(self, a_path):
         """Returns True if path will be ignored by Git (usually due to being
         in a .gitignore file)"""
-        self.git_repo_dir = os.path.dirname(a_path)
+        #self.git_repo_dir = os.path.dirname(a_path)
         self.run_git(['check-ignore', a_path])
         return self.results['returncode'] == 0
 
     def path_is_in_git_repo(self, a_path):
         """Returns True if the path is in a Git repo, false otherwise."""
-        self.git_repo_dir = os.path.dirname(a_path)
+        #self.git_repo_dir = os.path.dirname(a_path)
         self.run_git(['status', a_path])
         return self.results['returncode'] == 0
 
@@ -69,7 +69,7 @@ class MunkiGit(object):
         author_info = '%s <%s>' % (author_name, author_email)
 
         # get the status of the file at a_path
-        self.git_repo_dir = os.path.dirname(a_path)
+        #self.git_repo_dir = os.path.dirname(a_path)
         status_results = self.run_git(['status', a_path])
         status_output = status_results['output']
         if status_output.find("new file:") != -1:
@@ -95,12 +95,12 @@ class MunkiGit(object):
 
         # generate the log message
         log_msg = ('%s %s \'%s\' via %s'
-                   % (author_name, action, a_path, APPNAME))
-        LOGGER.info("Doing git commit for %s", a_path)
+                   % (author_name, action, itempath, APPNAME))
+        LOGGER.info("Doing git commit for %s", itempath)
         LOGGER.debug(log_msg)
         self.run_git(['commit', '-m', log_msg, '--author', author_info, a_path])
         if self.results['returncode'] != 0:
-            LOGGER.info("Failed to commit changes to %s", a_path)
+            LOGGER.info("Failed to commit changes to %s", itempath)
             LOGGER.info(self.results['error'])
             return -1
         return 0
@@ -109,7 +109,7 @@ class MunkiGit(object):
         """Commits a file to the Git repo."""
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
-                self.git_repo_dir = os.path.dirname(a_path)
+                #self.git_repo_dir = os.path.dirname(a_path)
                 self.run_git(['add', a_path])
                 if self.results['returncode'] == 0:
                     self.commit_file_at_path(a_path, committer)
@@ -122,7 +122,7 @@ class MunkiGit(object):
         """Deletes a file from the filesystem and Git repo."""
         if self.path_is_in_git_repo(a_path):
             if not self.path_is_gitignored(a_path):
-                self.git_repo_dir = os.path.dirname(a_path)
+                #self.git_repo_dir = os.path.dirname(a_path)
                 self.run_git(['rm', a_path])
                 if self.results['returncode'] == 0:
                     self.commit_file_at_path(a_path, committer)
