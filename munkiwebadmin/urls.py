@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^reports/', include('reports.urls')),
     url(r'^catalogs/', include('catalogs.urls')),
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
+    url(r'^icons/', include('icons.urls')),
     url(r'^santa/', include('santa.urls')),
     url(r'^makecatalogs/', include('process.urls')),
     url(r'^\Z', include('reports.urls')),
