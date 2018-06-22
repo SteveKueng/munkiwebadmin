@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'manifests',
     'process',
     'reports',
+    'icons',
     'updates',
     'santa',
     'vault',

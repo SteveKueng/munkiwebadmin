@@ -143,6 +143,12 @@
                         Package Info
                     </a>
                 </li>
+                <li {% if page == 'icons' %} class="active" {% endif %}>
+                    <a href="{% url 'icons' %}">
+                        <i class="fa fa-file-image-o"></i>
+                        Icons
+                    </a>
+                </li>
                 {% endif %}
                 {% if REPOSADO and perms.updates.view_updates %}
                 <li {% if page == 'updates' %} class="active" {% endif %}>

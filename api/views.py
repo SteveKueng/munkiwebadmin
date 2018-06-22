@@ -349,6 +349,7 @@ def plist_api(request, kind, filepath=None):
             del request_data['filename']
             
         try:
+            LOGGER.debug("plist data %s", request_data)
             data = plistlib.writePlistToString(request_data)
             Plist.write(data, kind, filepath, request.user)
         except FileError, err:
@@ -540,8 +541,9 @@ def file_api(request, kind, filepath=None):
         else:
             filename = filepath
             filedata = request.body
-        LOGGER.debug("Filename is %s" % filename)
-        LOGGER.debug("Filedata is %s" % filedata)
+            if "data:image/png;base64" in filedata:
+                img = filedata.split(',')[1]
+                filedata = img.decode('base64')
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
