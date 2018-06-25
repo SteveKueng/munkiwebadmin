@@ -3,7 +3,7 @@ manifests/views.py
 """
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 from api.models import Plist, FileDoesNotExistError, FileReadError
 from process.models import Process
@@ -29,7 +29,7 @@ def status(request):
     return HttpResponse(json.dumps(status_response),
                         content_type='application/json')
 
-@login_required
+@logged_in_or_basicauth()
 def index(request, manifest_path=None):
     '''Returns manifest list or detail'''
     if manifest_path and request.is_ajax():
