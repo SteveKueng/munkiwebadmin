@@ -86,6 +86,11 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 RUN mkdir /var/log/uwsgi
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# configure git
+RUN git config --global core.preloadindex true
+RUN git config --global core.fscache true
+RUN git config --global gc.auto 256
+
 VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
 
 # Exposed port
