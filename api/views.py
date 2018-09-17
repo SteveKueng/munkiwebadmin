@@ -957,7 +957,7 @@ def mdm_api(request, kind, item):
             
             if CONVERT_TO_QWERTZ:
                 # layout fix
-                firmwarePasswort = data['data']['attributes'].get('firmware_password')
+                firmware_password = data['data']['attributes'].get('firmware_password')
                 if firmware_password:
                     data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
 
