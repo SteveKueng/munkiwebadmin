@@ -12,6 +12,7 @@ ENV DEFAULT_MANIFEST 'serail_number'
 ENV PROXY_ADDRESS ''
 ENV STYLE 'default'
 ENV VAULT_USERNAME 'admin'
+ENV CONVERT_TO_QWERTZ ''
 
 #database
 ENV DB 'postgres'
