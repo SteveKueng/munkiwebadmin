@@ -43,6 +43,11 @@ try:
 except AttributeError:
     PROXY_ADDRESS = ""
 
+try:
+    CONVERT_TO_QWERTZ = settings.CONVERT_TO_QWERTZ
+except AttributeError:
+    CONVERT_TO_QWERTZ = False
+
 proxies = {
     "http": 'http://'+PROXY_ADDRESS,
     "https": 'https://'+PROXY_ADDRESS
@@ -97,6 +102,21 @@ def convert_strings_to_dates(jdata):
             if isinstance(value, (list, dict)):
                 value = convert_strings_to_dates(value)
         return jdata
+
+
+def convert_to_qwertz(string):
+    newString = ""
+    for c in string:
+        if c == "z":
+            c = "y"
+        if c == "Z":
+            c = "Y"
+        if c == "y":
+            c = "z"
+        if c == "Y":
+            c = "Z"
+        newString = newString + c
+    return newString
 
 
 def getSimpleMDMID(apiKey, serial_number):
@@ -934,6 +954,12 @@ def mdm_api(request, kind, item):
                 return HttpResponse(status=204)
             
             data = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)
+            
+            if CONVERT_TO_QWERTZ:
+                # layout fix
+                firmwarePasswort = data['data']['attributes'].get('firmware_password')
+                if firmware_password:
+                    data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
 
             if response_type == 'json':
                 request_data = convert_dates_to_strings(data)

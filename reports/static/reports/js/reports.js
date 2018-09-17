@@ -1086,7 +1086,10 @@ function getMDMDeviceInfo(serail) {
                         html += '<ul class="list-group">';
                     }
                     if(value) {
-                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right">'+value+'</span></li>';
+                        if(key == "Firmware Password" && key == "Filevault Recovery Key") {
+                            codeStyle = 'font-family: Menlo, Monaco, "Droid Sans Mono", Consolas, "Lucida Console", "Courier New", monospace;';
+                        }
+                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right; text-transform: none; '+codeStyle+'">'+value+'</span></li>';
                         element = element + 1;
                     }
                     if(element == 9) {
