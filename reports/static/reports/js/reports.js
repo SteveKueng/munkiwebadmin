@@ -1086,6 +1086,7 @@ function getMDMDeviceInfo(serail) {
                         html += '<ul class="list-group">';
                     }
                     if(value) {
+                        codeStyle = ""
                         if(key == "Firmware Password" && key == "Filevault Recovery Key") {
                             codeStyle = 'font-family: Menlo, Monaco, "Droid Sans Mono", Consolas, "Lucida Console", "Courier New", monospace;';
                         }
