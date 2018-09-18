@@ -1081,19 +1081,19 @@ function getMDMDeviceInfo(serail) {
                 html += '<div class="col-lg-6">';
                 html += '<ul class="list-group">';
                 $.each(attributes, function(key, value) {
-                    if(element == 9){
+                    if(element == 12){
                         html += '<div class="col-lg-6">';
                         html += '<ul class="list-group">';
                     }
                     if(value) {
                         codeStyle = ""
-                        if(key == "Firmware Password" && key == "Filevault Recovery Key") {
+                        if(key == "firmware_password" && key == "filevault_recovery_key") {
                             codeStyle = 'font-family: Menlo, Monaco, "Droid Sans Mono", Consolas, "Lucida Console", "Courier New", monospace;';
                         }
-                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right;" style="text-transform: none; '+codeStyle+'">'+value+'</span></li>';
+                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right" style="text-transform: none; '+codeStyle+'">'+value+'</span></li>';
                         element = element + 1;
                     }
-                    if(element == 9) {
+                    if(element == 12) {
                         html += '</ul>'
                         html += '</div>'
                     }
