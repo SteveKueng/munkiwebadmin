@@ -1087,7 +1087,7 @@ function getMDMDeviceInfo(serail) {
                     }
                     if(value) {
                         codeStyle = ""
-                        if(key == "firmware_password" && key == "filevault_recovery_key") {
+                        if(key == "firmware_password" || key == "filevault_recovery_key") {
                             codeStyle = 'font-family: Menlo, Monaco, "Droid Sans Mono", Consolas, "Lucida Console", "Courier New", monospace;';
                         }
                         html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right" style="text-transform: none; '+codeStyle+'">'+value+'</span></li>';
