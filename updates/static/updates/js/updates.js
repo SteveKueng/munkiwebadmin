@@ -127,7 +127,10 @@ function initUpdatesTable() {
          "bInfo": false,
          "bFilter": true,
          "bStateSave": false,
-         "aaSorting": [[2,'desc']]
+         "aaSorting": [[2,'desc']],
+         "initComplete" : function () {
+            $('.dataTables_scrollBody thead tr').addClass('hidden');
+        }
      });
      // tie our search field to the table
      var thisTable = $('#list_items').DataTable();
