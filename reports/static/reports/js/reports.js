@@ -1074,12 +1074,11 @@ function getMDMDeviceInfo(serail) {
         method: 'GET',
         url: machineURL,
         success: function(data) {
+            var html = '<div class="col-lg-6">';
+            html += '<ul class="list-group">';
             if (data) {
-                var html = '';
                 var attributes = data['data']['attributes']
                 var element = 0;
-                html += '<div class="col-lg-6">';
-                html += '<ul class="list-group">';
                 $.each(attributes, function(key, value) {
                     if(element == 12){
                         html += '<div class="col-lg-6">';
@@ -1098,23 +1097,20 @@ function getMDMDeviceInfo(serail) {
                         html += '</div>'
                     }
                 });
-                html += '<div class="col-lg-6">';
-                html += '<ul class="list-group">';
                 
                 //get device groups
                 getMDMDeviceGroupInfo(data['data']['relationships']['device_group']['data']['id']);
-                
-                //add html
-                $('#mdmDetail').html(html);
+
+                //get app groups
+                getAppGroups(data['data']['id']);    
             } else {
-                var html = '';
-                html += '<div class="col-lg-6">'
-                html += '<ul class="list-group">'
                 html += '<li class="list-group-item">no data</li>'
-                html += '</ul>'
-                html += '</div>'
-                $('#mdmDetail').html(html);  
             }
+            html += '</ul>'
+            html += '</div>'
+            
+            //add html
+            $('#mdmDetail').html(html);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             var html = '';
@@ -1158,6 +1154,33 @@ function getMDMDeviceGroupInfo(ID) {
         }
     });
 }
+
+function getAppGroups(id) {
+    var machineURL = '/api/mdm/app_groups';
+    $.ajax({
+        method: 'GET',
+        url: machineURL,
+        success: function(data) {
+            if (data) {
+                var html = '<div class="col-lg-12">';
+                html += '<ul class="list-group">';
+                $.each(data['data'], function(key, value) {
+                    value['relationships']['devices']['data'].some(function(el) {
+                        if (el['id'] == id){
+                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b></li>';
+                        }
+                    });
+                });
+                html += '</ul>'
+                html += '</div>'
+                $('#vppDetail').html(html);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+        }
+    });
+}
+
 
 function setMDM(action, additional1, additional2) {
     var url = '/api/mdm/'+current_pathname;
