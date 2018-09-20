@@ -151,6 +151,15 @@ def getSimpleMDMDeviceGroups(apiKey):
         return response.json()
     return None
 
+def getSimpleMDMAppGroups(apiKey):
+    """ returns device info for your device """
+    appGroups = simpleMDMpy.appGroups(apiKey)
+    appGroups.proxyDict = proxies
+    response = appGroups.getAppGroup()
+    if response.status_code in range(200,207):
+        return response.json()
+    return None
+
 
 def setSimpleMDMName(apiKey, deviceID, deviceName):
     """ sets device name in simpleMDM """
@@ -936,16 +945,8 @@ def mdm_api(request, kind, item):
         
         if item == "device_groups":
             data = getSimpleMDMDeviceGroups(simpleMDMKey)
-
-            if response_type == 'json':
-                request_data = convert_dates_to_strings(data)
-                return HttpResponse(
-                    json.dumps(data) + '\n',
-                    content_type='application/json')
-            else:
-                return HttpResponse(
-                    plistlib.writePlistToString(data),
-                    content_type='application/xml')
+        elif item == "app_groups":
+            data = getSimpleMDMAppGroups(simpleMDMKey)
         else:
             try:
                 machine = Machine.objects.get(serial_number=item)
@@ -962,31 +963,26 @@ def mdm_api(request, kind, item):
                 firmware_password = data['data']['attributes'].get('firmware_password')
                 if firmware_password:
                     data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
-
-            if response_type == 'json':
-                request_data = convert_dates_to_strings(data)
-                return HttpResponse(
-                    json.dumps(data) + '\n',
-                    content_type='application/json')
-            else:
-                return HttpResponse(
-                    plistlib.writePlistToString(data),
-                    content_type='application/xml')
-        
-
-    
+        if response_type == 'json':
+            request_data = convert_dates_to_strings(data)
+            return HttpResponse(
+                json.dumps(data) + '\n',
+                content_type='application/json')
+        else:
+            return HttpResponse(
+                plistlib.writePlistToString(data),
+                content_type='application/xml')
+         
     if request.method == 'POST':
         LOGGER.debug("Got API POST request for %s", kind)
-
         if not request.user.has_perm('reports.change_machine'):
             raise PermissionDenied
-
+        
         # ------- get submit -------
         try:
             submit = json.loads(request.body)
         except:
             submit = request.POST
-
         try:
             machine = Machine.objects.get(serial_number=item)
         except Machine.DoesNotExist:
@@ -1037,6 +1033,34 @@ def mdm_api(request, kind, item):
                                     'detail': 'Missing group'}),
                         content_type='application/json', status=400)
 
+            if action == "addAppGroup":
+                groupID = submit.get('additional1', None)
+                LOGGER.debug("%s", groupID)
+                if groupID:
+                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                    appGroups.proxyDict = proxies
+                    response = appGroups.assignDevice(appGroupID=groupID, deviceID=machine.simpleMDMID)
+                    LOGGER.debug(response)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
+
+            if action == "removeAppGroup":
+                groupID = submit.get('additional1', None)
+                if groupID:
+                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                    appGroups.proxyDict = proxies
+                    response = appGroups.unAssignDevice(appGroupID=groupID, deviceID=machine.simpleMDMID)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
+            
             if response:
                 try:
                     content_type = response.headers['Content-Type']
