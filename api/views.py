@@ -48,10 +48,12 @@ try:
 except AttributeError:
     CONVERT_TO_QWERTZ = False
 
-proxies = {
-    "http": 'http://'+PROXY_ADDRESS,
-    "https": 'https://'+PROXY_ADDRESS
-}
+proxies = {}
+if PROXY_ADDRESS != "":
+    proxies = {
+        "http": 'http://'+PROXY_ADDRESS,
+        "https": 'https://'+PROXY_ADDRESS
+    }
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
