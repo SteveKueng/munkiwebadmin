@@ -1,7 +1,7 @@
 //global var
-var imagrReportsTable = ""
 var passwordAccessTable = ""
 var interval = ""
+var selectedGroupID = ""
 
 window.confirm = function(message, cb) {
     $("#confirmationModal .modal-body").html(message);
@@ -785,38 +785,6 @@ function hideProgressBar() {
      $("#site-loading-bar").fadeOut(1000);
 }
 
-function getImagrReports(serial) {
-        imagrReportsTable = $('#imagrreports').DataTable( {
-        "sAjaxSource": "/api/imagr/"+serial,
-        "sAjaxDataProp": "",
-        "aoColumns": [
-            { "mDataProp": "date_added", "sWidth": "155px", "mRender": function (data) {
-                var date = new Date(data);
-                var month = date.getMonth() + 1;
-                return date.getDate() + "." + (month.length > 1 ? month : "0" + month) + "." + date.getFullYear() + " - " + (date.getHours() < 10 ? '0' : '') + date.getHours()+":"+(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()+":"+(date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
-            }},
-            { "mDataProp": "message" },
-            { "mDataProp": "status", "sWidth": "80px", },
-        ],
-        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-			if ( aData['status'] == "in_progress" ) {
-				$('td', nRow).addClass('info');
-			} else if ( aData['status'] == "success" ) {
-				$('td', nRow).addClass('success');
-			} else if ( aData['status'] == "error" ) {
-				$('td', nRow).addClass('danger');
-			} 
-		},
-        "bAutoWidth": false,
-        "sDom": "<t>",
-         "bPaginate": false,
-         "bInfo": false,
-         "bFilter": true,
-         "bStateSave": false,
-         "aaSorting": [[0,'desc']]
-    } );
-}
-
 function newManifestItem() {
     var pathname = getManifestName();
     var manifestItemURL = '/api/manifests/' + pathname;
@@ -1042,9 +1010,7 @@ function getTypeahead(url, listid) {
 function startRefresh() {
     // 5 second interval
     interval = setInterval (function () {
-        //imagr workflow
-        //imagrReportsTable.ajax.reload();
-        //loadStatus();
+        loadStatus();
     }, 5000);
 }
 
@@ -1069,7 +1035,7 @@ function get_model_description(serial) {
 }
 
 function getMDMDeviceInfo(serail) {
-    var machineURL = '/api/mdm/'+serail;
+    var machineURL = '/api/mdm/devices/'+serail;
     $.ajax({
         method: 'GET',
         url: machineURL,
@@ -1099,7 +1065,7 @@ function getMDMDeviceInfo(serail) {
                 });
                 
                 //get device groups
-                getMDMDeviceGroupInfo(data['data']['relationships']['device_group']['data']['id']);
+                getMDMDeviceGroupInfo(data['data']['id'], data['data']['relationships']['device_group']['data']['id']);
 
                 //get app groups
                 getAppGroups(data['data']['id']);    
@@ -1124,7 +1090,7 @@ function getMDMDeviceInfo(serail) {
     });
 }
 
-function getMDMDeviceGroupInfo(ID) {
+function getMDMDeviceGroupInfo(clientID, currentGroupID) {
     var machineURL = '/api/mdm/device_groups';
     $.ajax({
         method: 'GET',
@@ -1136,11 +1102,11 @@ function getMDMDeviceGroupInfo(ID) {
                 var buttonName = '';
                 $.each(data['data'], function(key, value) {
                     list += '<li' 
-                    if (ID == value['id']) {
+                    if (currentGroupID == value['id']) {
                         buttonName = value['attributes']['name']
                         list += ' class="disabled"'
                     } 
-                    list += '><a onclick="setMDM(\'changeGroup\', \''+value['id']+'}\', )">'+value['attributes']['name']+'</a></li>';
+                    list += '><a onclick="changeGroup( \''+clientID+'\', \''+value['id']+'\' )">'+value['attributes']['name']+'</a></li>';
                 });
 
                 html += '<div class="dropdown pull-right"> \
@@ -1155,25 +1121,41 @@ function getMDMDeviceGroupInfo(ID) {
     });
 }
 
-function getAppGroups(id) {
+function getAppGroups(deviceID) {
     var machineURL = '/api/mdm/app_groups';
     $.ajax({
         method: 'GET',
         url: machineURL,
         success: function(data) {
             if (data) {
+                var source = [];
+                var map = {};
                 var html = '<div class="col-lg-12">';
                 html += '<ul class="list-group">';
                 $.each(data['data'], function(key, value) {
+                    source.push(value['attributes']['name']);
+                    map[value['attributes']['name']] = value['id'];
+                    
                     value['relationships']['devices']['data'].some(function(el) {
-                        if (el['id'] == id){
-                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b></li>';
+                        if (el['id'] == deviceID){
+                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b><span class="pull-right"><button class="btn btn-danger btn-xs" onclick="removeDeviceFromAppGroup('+value['id']+', '+deviceID+')" ><i class="fa fa-trash" aria-hidden="true"></i></button></span></li>';
                         }
                     });
                 });
                 html += '</ul>'
                 html += '</div>'
                 $('#vppDetail').html(html);
+
+
+                //typeahead
+                $(".vpp_app_groups").typeahead({
+                    source: source,
+                    autoSelect: true,
+                    updater: function (item) {
+                        selectedGroupID = map[item];
+                        return item;
+                    }
+                });
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -1181,16 +1163,14 @@ function getAppGroups(id) {
     });
 }
 
-
-function setMDM(action, additional1, additional2) {
-    var url = '/api/mdm/'+current_pathname;
-    confirm("<h4>"+ action +" "+current_pathname+"?</h4>", function(result) { 
+function changeGroup(device, group) {
+    var url = '/api/mdm/device_groups/'+group + "/devices/" + device;
+    confirm("<h4>Change group for device: "+current_pathname+"?</h4>", function(result) { 
         if (result) {
             $("#process_progress").modal("show");
             $.ajax({
                 method: 'POST',
                 url: url,
-                data: { "action" : action, "additional1" : additional1, "additional2" : additional2 },
                 success: function(data) {
                     getMDMDeviceInfo(current_pathname);
                     $("#process_progress").modal("hide");
@@ -1215,4 +1195,132 @@ function setMDM(action, additional1, additional2) {
             });
         }
     }); 
+}
+
+function clientActions(action) {
+    var url = '/api/mdm/devices/'+current_pathname + "/" + action ;
+    confirm("<h4>"+ action +" device: "+current_pathname+"?</h4>", function(result) { 
+        if (result) {
+            $("#process_progress").modal("show");
+            $.ajax({
+                method: 'POST',
+                url: url,
+                success: function(data) {
+                    getMDMDeviceInfo(current_pathname);
+                    $("#process_progress").modal("hide");
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $("#errorModalTitleText").text("MDM post error");
+                    try {
+                        var json_data = $.parseJSON(jqXHR.responseText)
+                        if (json_data['result'] == 'failed') {
+                            $("#errorModalDetailText").text(json_data['detail']);
+                            $("#process_progress").modal("hide");
+                            $("#errorModal").modal("show");
+                            return;
+                        }
+                    } catch(err) {
+                        // do nothing
+                    }
+                    $("#errorModalDetailText").text(errorThrown);
+                    $("#process_progress").modal("hide");
+                    $("#errorModal").modal("show");
+                }
+            });
+        }
+    }); 
+}
+
+function pushApps(groupID) {
+    var url = '/api/mdm/app_groups/'+groupID + "/push_apps" ;
+    $("#process_progress").modal("show");
+    $.ajax({
+        method: 'POST',
+        url: url,
+        success: function(data) {
+            $("#process_progress").modal("hide");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("MDM post error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#process_progress").modal("hide");
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#process_progress").modal("hide");
+            $("#errorModal").modal("show");
+        }
+    });
+}
+
+function addDeviceToAppGroup(deviceID) {
+    if (event.which == '13' && selectedGroupID != "" && deviceID != "") {
+        var url = '/api/mdm/app_groups/'+selectedGroupID + "/devices/" + deviceID;
+        $("#process_progress").modal("show");
+        $.ajax({
+            method: 'POST',
+            url: url,
+            success: function(data) {
+                getAppGroups(deviceID);
+                $("#process_progress").modal("hide");
+                pushApps(selectedGroupID);
+                selectedGroupID = "";
+                $('.vpp_app_groups').val('')
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $("#errorModalTitleText").text("MDM post error");
+                try {
+                    var json_data = $.parseJSON(jqXHR.responseText)
+                    if (json_data['result'] == 'failed') {
+                        $("#errorModalDetailText").text(json_data['detail']);
+                        $("#process_progress").modal("hide");
+                        $("#errorModal").modal("show");
+                        return;
+                    }
+                } catch(err) {
+                    // do nothing
+                }
+                $("#errorModalDetailText").text(errorThrown);
+                $("#process_progress").modal("hide");
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+}
+
+function removeDeviceFromAppGroup(groupID, deviceID) {
+    var url = '/api/mdm/app_groups/'+groupID + "/devices/" + deviceID;
+    $("#process_progress").modal("show");
+    $.ajax({
+        method: 'DELETE',
+        url: url,
+        success: function(data) {
+            getAppGroups(deviceID);
+            $("#process_progress").modal("hide");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#errorModalTitleText").text("MDM post error");
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#process_progress").modal("hide");
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#process_progress").modal("hide");
+            $("#errorModal").modal("show");
+        }
+    });
 }

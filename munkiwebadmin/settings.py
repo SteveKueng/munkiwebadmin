@@ -34,6 +34,10 @@ CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 
 SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
+# lock info
+#LOCK_MESSAGE = 'Locked by IT Support.'
+#IT_NUMBER = '0000'
+#PIN = '123456'
 
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 
