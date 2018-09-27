@@ -105,6 +105,13 @@
 				<div role="tabpanel" class="tab-pane tabDetail" id="VPP">
 					<div class="panel-body">
 						<h4>VPP Apps</h4>
+						<!---
+						<div class="row">
+							<div class="col-lg-12">
+								<button type="submit" class="btn btn-primary" onclick="clientActions('shutdown')">Push Apps</button>
+							</div>
+						</div>
+						-->
 						<div class="row" id="vppDetail">
 							<div class="col-lg-12">
 								<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
@@ -112,7 +119,7 @@
 						</div>
 						<div class="row">
 							<div class="col-lg-12">
-								<input type='text' autocomplete="off" class='list-group-item form-control' style='padding-bottom:19px; padding-top:20px;'>
+								<input type='text' autocomplete="off" class='list-group-item form-control vpp_app_groups' style='padding-bottom:19px; padding-top:20px;' onkeypress="addDeviceToAppGroup('{{ machine.simpleMDMID }}')">
 							</div>
 						</div>
 					</div>
@@ -420,10 +427,10 @@
 						<h4>Actions</h4>
 						<div class="row" id="actions">
 							<div class="col-md-7">
-								<button type="submit" class="btn btn-primary" onclick="setMDM('shutdown')">Shutdown</button>
-								<button type="submit" class="btn btn-primary" onclick="setMDM('restart')">Reboot</button>
-								<button type="submit" class="btn btn-primary" onclick="setMDM('lock')">Lock</button>
-								<button type="submit" class="btn btn-primary" onclick="setMDM('refresh')">Refresh</button>
+								<button type="submit" class="btn btn-primary" onclick="clientActions('shutdown')">Shutdown</button>
+								<button type="submit" class="btn btn-primary" onclick="clientActions('restart')">Reboot</button>
+								<button type="submit" class="btn btn-primary" onclick="clientActions('lock')">Lock</button>
+								<button type="submit" class="btn btn-primary" onclick="clientActions('refresh')">Refresh</button>
 							</div>
 							<div class="col-md-5" id="mdmSubmit">
 							</div>

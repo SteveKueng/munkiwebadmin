@@ -928,7 +928,8 @@ def db_api(request, kind, subclass=None, serial_number=None):
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def mdm_api(request, kind, item):
+def mdm_api(request, kind, submission_type, primary_id=None, action=None, secondary_id=None):
+    LOGGER.debug("Got API request for %s, %s, %s, %s" % (kind, submission_type, primary_id, secondary_id))
     if kind not in ['mdm']:
         return HttpResponse(status=404)
     
@@ -942,14 +943,17 @@ def mdm_api(request, kind, item):
 
         if not request.user.has_perm('reports.can_view_reports'):
             raise PermissionDenied
-        
-        if item == "device_groups":
+
+        data = None        
+        if submission_type == "device_groups":
             data = getSimpleMDMDeviceGroups(simpleMDMKey)
-        elif item == "app_groups":
+        
+        if submission_type == "app_groups":
             data = getSimpleMDMAppGroups(simpleMDMKey)
-        else:
+        
+        if submission_type == "devices" and primary_id:
             try:
-                machine = Machine.objects.get(serial_number=item)
+                machine = Machine.objects.get(serial_number=primary_id)
             except Machine.DoesNotExist:
                 return HttpResponse(status=204)
             
@@ -963,16 +967,34 @@ def mdm_api(request, kind, item):
                 firmware_password = data['data']['attributes'].get('firmware_password')
                 if firmware_password:
                     data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
-        if response_type == 'json':
-            request_data = convert_dates_to_strings(data)
-            return HttpResponse(
-                json.dumps(data) + '\n',
-                content_type='application/json')
-        else:
-            return HttpResponse(
-                plistlib.writePlistToString(data),
-                content_type='application/xml')
-         
+        
+        if data:
+            if response_type == 'json':
+                request_data = convert_dates_to_strings(data)
+                return HttpResponse(
+                    json.dumps(data) + '\n',
+                    content_type='application/json')
+            else:
+                return HttpResponse(
+                    plistlib.writePlistToString(data),
+                    content_type='application/xml')
+    
+    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+        # support browsers/libs that don't directly support the other verbs
+        http_method = request.META['HTTP_X_METHODOVERRIDE']
+        if http_method.lower() == 'put':
+            request.method = 'PUT'
+            request.META['REQUEST_METHOD'] = 'PUT'
+            request.PUT = QueryDict(request.body)
+        if http_method.lower() == 'delete':
+            request.method = 'DELETE'
+            request.META['REQUEST_METHOD'] = 'DELETE'
+            request.DELETE = QueryDict(request.body)
+        if http_method.lower() == 'patch':
+            request.method = 'PATCH'
+            request.META['REQUEST_METHOD'] = 'PATCH'
+            request.PATCH = QueryDict(request.body)
+
     if request.method == 'POST':
         LOGGER.debug("Got API POST request for %s", kind)
         if not request.user.has_perm('reports.change_machine'):
@@ -983,24 +1005,24 @@ def mdm_api(request, kind, item):
             submit = json.loads(request.body)
         except:
             submit = request.POST
-        try:
-            machine = Machine.objects.get(serial_number=item)
-        except Machine.DoesNotExist:
-            return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'MachineDoesNotExist',
-                                'detail': '%s does not exist' % serial_number}),
-                    content_type='application/json', status=404)
         
-        if not machine.simpleMDMID:
-            return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'MachineDoesNotExist',
-                                'detail': '%s has no simplMDM ID' % serial_number}),
-                    content_type='application/json', status=404)
+        if submission_type == "devices" and primary_id:
+            try:
+                machine = Machine.objects.get(serial_number=primary_id)
+            except Machine.DoesNotExist:
+                return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'MachineDoesNotExist',
+                                    'detail': '%s does not exist' % serial_number}),
+                        content_type='application/json', status=404)
+            
+            if not machine.simpleMDMID:
+                return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'MachineDoesNotExist',
+                                    'detail': '%s has no simplMDM ID' % serial_number}),
+                        content_type='application/json', status=404)
 
-        action = submit.get('action', None)
-        if action:
             devices = simpleMDMpy.devices(simpleMDMKey)
             devices.proxyDict = proxies
             response = None
@@ -1012,66 +1034,87 @@ def mdm_api(request, kind, item):
                 response = devices.shutdownDevice(deviceID=machine.simpleMDMID)
                 
             if action == "lock":
-                message = submit.get('additional1', None)
-                phone_number = submit.get('phone_number', None)
-                pin = submit.get('additional2', None)
-                response = devices.lockDevice(deviceID=machine.simpleMDMID, phone_number=phone_number, pin=pin)
+                try:
+                    LOCK_MESSAGE = settings.LOCK_MESSAGE
+                except AttributeError:
+                    LOCK_MESSAGE = ""
+                try:
+                    IT_NUMBER = settings.IT_NUMBER
+                except AttributeError:
+                    IT_NUMBER = ""
+                try:
+                    PIN = settings.PIN
+                except AttributeError:
+                    PIN = ""
+                response = devices.lockDevice(deviceID=machine.simpleMDMID, message=LOCK_MESSAGE, phone_number=IT_NUMBER, pin=PIN)
 
             if action == "refresh":
                 response = devices.refreshDevice(deviceID=machine.simpleMDMID)
 
-            if action == "changeGroup":
-                group = submit.get('additional1', None)
-                if group:
-                    deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
-                    deviceGroups.proxyDict = proxies
-                    response = deviceGroups.assignDevice(deviceID=machine.simpleMDMID, deviceGoupID=group)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-            if action == "addAppGroup":
-                groupID = submit.get('additional1', None)
-                LOGGER.debug("%s", groupID)
-                if groupID:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.assignDevice(appGroupID=groupID, deviceID=machine.simpleMDMID)
-                    LOGGER.debug(response)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-            if action == "removeAppGroup":
-                groupID = submit.get('additional1', None)
-                if groupID:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.unAssignDevice(appGroupID=groupID, deviceID=machine.simpleMDMID)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-            
-            if response:
-                try:
-                    content_type = response.headers['Content-Type']
-                except:
-                    content_type = None
-                    
+        if submission_type == "device_groups" and action == "devices":
+            if primary_id and secondary_id:
+                deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
+                deviceGroups.proxyDict = proxies
+                response = deviceGroups.assignDevice(deviceID=secondary_id, deviceGoupID=primary_id)
+            else:
                 return HttpResponse(
-                            content=response.content,
-                            status=response.status_code,
-                            content_type=content_type
-                        )
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'BadRequest',
+                                'detail': 'Missing group'}),
+                    content_type='application/json', status=400)
+
+        if submission_type == "app_groups": 
+            if action == "push_apps":
+                if primary_id:
+                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                    appGroups.proxyDict = proxies
+                    response = appGroups.pushApps(appGroupID=primary_id)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
+            if action == "devices":
+                if primary_id and secondary_id:
+                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                    appGroups.proxyDict = proxies
+                    response = appGroups.assignDevice(appGroupID=primary_id, deviceID=secondary_id)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
+
+    if request.method == 'DELETE':
+        LOGGER.debug("Got API DELETE request for %s", kind)
+        if not request.user.has_perm('reports.change_machine'):
+            raise PermissionDenied
+        if submission_type == "app_groups" and action == "devices":
+            if primary_id and secondary_id:
+                appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                appGroups.proxyDict = proxies
+                response = appGroups.unAssignDevice(appGroupID=primary_id, deviceID=secondary_id)
+                LOGGER.debug(response)
+            else:
+                return HttpResponse(
+                    json.dumps({'result': 'failed',
+                                'exception_type': 'BadRequest',
+                                'detail': 'Missing group'}),
+                    content_type='application/json', status=400)
+    
+    if response:
+        try:
+            content_type = response.headers['Content-Type']
+        except:
+            content_type = None
+            
+        return HttpResponse(
+                    content=response.content,
+                    status=response.status_code,
+                    content_type=content_type
+                )
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
