@@ -111,11 +111,11 @@ def convert_to_qwertz(string):
     for c in string:
         if c == "z":
             c = "y"
-        if c == "Z":
+        elif c == "Z":
             c = "Y"
-        if c == "y":
+        elif c == "y":
             c = "z"
-        if c == "Y":
+        elif c == "Y":
             c = "Z"
         newString = newString + c
     return newString
