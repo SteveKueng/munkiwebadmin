@@ -11,11 +11,11 @@
 						<img id="{{ machine.serial_number }}_iconDetail" src='{% get_static_prefix %}img/apple.png' alt="" width="100" />
 						{% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
 						<div class="overlay"></div>
-						<div class="button" data-toggle="modal" data-target="#deleteConfirmationModal"><i class="fa fa-trash" aria-hidden="true"></i></div>
+						<div class="button" data-toggle="modal" data-target="#deleteConfirmationModal"><i class="fas fa-trash"></i></div>
 						{% endif %} 
 					</div>
 					<div class="col-sm-6">
-						<h2>{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}<button type="button" class="btn btn-link" onclick="copyTextToClipboard('{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}');"><i class="fa fa-clipboard" aria-hidden="true"></i></button></h2>
+						<h2>{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}<button type="button" class="btn btn-link" onclick="copyTextToClipboard('{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}');"><i class="fas fa-copy"></i></button></h2>
 						<h4>
 							<small>
 							<b id="machineModel">{{ machine.machine_model }}</b>
@@ -33,7 +33,7 @@
 						<li role="presentation" class="active"><a class="tab" href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
 						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#VPP" aria-controls="VPP" role="tab" data-toggle="tab">VPP</a></li>
 						<li role="presentation"><a class="tab" href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
-						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fa fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
+						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fas fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
 						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#MDM" aria-controls="MDM" role="tab" data-toggle="tab">MDM</a></li>
 						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if perms.vault.view_passwordAccess %}
@@ -53,14 +53,14 @@
 							<div class='col-md-6'>
 								<div class="section_label"><h4>Included Manifests</h4></div>
 								<div id='included_manifests' class='included_manifests_section list-group unstyled'>
-									<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+									<i class="fas fa-spinner fa-pulse fa-1x"></i>
 								</div>
 							</div>
 							<!-- Catalogs -->
 							<div class='col-md-6'>
 								<div class="section_label"><h4>Catalogs</h4></div>
 								<div id='catalogs' class='list-group unstyled'>
-									<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+									<i class="fas fa-spinner fa-pulse fa-1x"></i>
 								</div>
 							</div>
 						</div>
@@ -70,10 +70,10 @@
 								<div class="section_label"><h4>Managed Installs</h4></div>
 								<div class='list-group list-group-root unstyled'>
 									<div id='managed_installs'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 									<div id='managed_installs_remote'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 								</div>
 							</div>
@@ -81,10 +81,10 @@
 								<div class="section_label"><h4>Managed Uninstalls</h4></div>
 								<div class='list-group list-group-root unstyled'>
 									<div id='managed_uninstalls'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 									<div id='managed_uninstalls_remote'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 								</div>
 							</div>
@@ -92,10 +92,10 @@
 								<div class="section_label"><h4>Optional Installs</h4></div>
 								<div class='list-group list-group-root unstyled'>
 									<div id='optional_installs'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 									<div id='optional_installs_remote'>
-										<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i>
+										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 								</div>
 							</div>
@@ -114,7 +114,7 @@
 						-->
 						<div class="row" id="vppDetail">
 							<div class="col-lg-12">
-								<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+								<i class="fas fa-spinner fa-pulse fa-2x"></i>
 							</div>
 						</div>
 						<div class="row">
@@ -167,7 +167,7 @@
 								<ul class="list-group">
 									<li class="list-group-item"><b>Last User:</b><span class="pull-right">{{ report_plist.ConsoleUser }}</span></li>
 									<li class="list-group-item"><b>Munki:</b><span class="pull-right">{{ report_plist.MachineInfo.munki_version }}</span></li>
-									<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fa fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
+									<li class="list-group-item"><b>OS:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }}  <i id="osversion" class="fas fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i></span></li>
 									<li class="list-group-item"><b>Boot Volume:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.boot_volume }}</span></li>
 									<li class="list-group-item"><b>Uptime:</b><span class="pull-right">{% if time.0 != "0" %}{{ time.0  }} days{% endif %} {% if time.1 != "0" %}{{ time.1 }} hours{% endif %} {% if time.2 != "0" %}{{ time.2 }} minutes{% endif %}</span></li>
 									<li class="list-group-item"><b>Manifest:</b><span class="pull-right">{{ report_plist.ManifestName }}</span></li>
@@ -179,7 +179,7 @@
 							<div class="col-lg-6">
 								<ul class="list-group">
 									<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
-									<li class="list-group-item"><b>Serial:</b><span class="pull-right"><button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard('{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}');"><i class="fa fa-clipboard" aria-hidden="true"></i></button> {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
+									<li class="list-group-item"><b>Serial:</b><span class="pull-right"><button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard('{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}');"><i class="fas fa-copy"></i></button> {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
 									<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
 									<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
 									<li class="list-group-item"><b>Last Munki run:</b><span class="pull-right">{{ report_plist.EndTime }}</span></li>
@@ -194,8 +194,8 @@
 								<ul class="list-group">
 									<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_model_info.sppower_battery_serial_number }}</span></li>
 									<li class="list-group-item"><b>Firmware:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_model_info.sppower_battery_firmware_version }}</span></li>
-									<li class="list-group-item"><b>Charging:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_is_charging == "TRUE" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</span></li>
-									<li class="list-group-item"><b>Charged:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_fully_charged == "TRUE" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</span></li>
+									<li class="list-group-item"><b>Charging:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_is_charging == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
+									<li class="list-group-item"><b>Charged:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_fully_charged == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
 									<li class="list-group-item"><b>Max capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }} mAh</span></li>
 									<li class="list-group-item"><b>Current capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity }} mAh ({{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbatteryprecent:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}%)</span></li>
 								</ul>
@@ -218,9 +218,9 @@
 										<div class="row">
 											<div class="col-lg-12 text-center" >
 												{% if "AirPort" in interface.type %}
-												<i class="fa fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
+												<i class="fas fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
 												{% else %}
-												<i class="fa fa-globe" aria-hidden="true" style="font-size: 70px"></i>
+												<i class="fas fa-globe-americas" aria-hidden="true" style="font-size: 70px"></i>
 												{% endif %}
 											</div>
 										</div>
@@ -255,9 +255,9 @@
 										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
 											<div class="col-lg-2">
 												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
-													<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+													<i class="fas fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
 												{% else %}
-													<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
+													<i class="fas fa-tv" aria-hidden="true" style="font-size: 70px"></i>
 												{% endif %}
 											</div>
 											<div class="col-lg-5">
@@ -272,8 +272,8 @@
 												<ul class="list-group">
 													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
 													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
-													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
-													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
 												</ul>
 											</div>
 										</div>
@@ -291,9 +291,9 @@
 									<div class="col-lg-2" style="" >
 										<div class="row">
 											<div class="col-lg-12 text-center" >
-												<i class="fa fa-hdd-o" aria-hidden="true" style="font-size: 50px"></i>
+												<i class="fas fa-hdd" aria-hidden="true" style="font-size: 50px"></i>
 												{% if device.physicalDisk.is_internal_disk == 'no' %}
-														<div style="margin-left: 65px; margin-top: -28px"><i class="fa fa-plug" aria-hidden="true" style="font-size: 20px;"></i></div>
+														<div style="margin-left: 65px; margin-top: -28px"><i class="fas fa-plug" aria-hidden="true" style="font-size: 20px;"></i></div>
 												{% endif %}
 											</div>
 										</div>
@@ -316,7 +316,7 @@
 															</div>
 															<div class="col-lg-6">
 																<ul class="list-group">
-																	<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if device.physicalDisk.is_internal_disk == 'yes' %} <i class="fa fa-check" aria-hidden="true"></i> {% else %} <i class="fa fa-times" aria-hidden="true"></i> {% endif %}</span></li>
+																	<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if device.physicalDisk.is_internal_disk == 'yes' %} <i class="fas fa-check" aria-hidden="true"></i> {% else %} <i class="fas fa-times" aria-hidden="true"></i> {% endif %}</span></li>
 																</ul>
 															</div>
 														</div>
@@ -385,9 +385,9 @@
 										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
 											<div class="col-lg-2">
 												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
-													<i class="fa fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+													<i class="fas fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
 												{% else %}
-													<i class="fa fa-television" aria-hidden="true" style="font-size: 70px"></i>
+													<i class="fas fa-tv" aria-hidden="true" style="font-size: 70px"></i>
 												{% endif %}
 											</div>
 											<div class="col-lg-5">
@@ -402,8 +402,8 @@
 												<ul class="list-group">
 													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
 													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
-													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
-													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fa fa-check" aria-hidden="true"></i>{% else %}<i class="fa fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
 												</ul>
 											</div>
 										</div>
@@ -438,7 +438,7 @@
 						<h4>Detail</h4>
 						<div class="row" id="mdmDetail">
 							<div class="col-lg-12">
-								<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+								<i class="fas fa-spinner fa-pulse fa-3x"></i>
 							</div>
 						</div>
 					</div>
@@ -522,7 +522,7 @@ Bootstrap modal for confirming actions
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title text-danger">
-						<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
 						<span id="confirmationModalTitleText">Warning</span>
 					</h4>
 				</div>

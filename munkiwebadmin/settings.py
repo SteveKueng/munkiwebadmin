@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'updates',
     'santa',
     'vault',
+    'vpp',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -108,6 +109,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #'munkiwebadmin.middleware.CorsMiddleware',
     #'munkiwebadmin.middleware.LoginRequiredMiddleware',
 ]
 
