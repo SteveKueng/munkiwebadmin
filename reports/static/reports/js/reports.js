@@ -16,7 +16,6 @@ window.confirm = function(message, cb) {
 function do_resize() {
     if ($(window).width() < 768) {
         $('#detail_content').height($(window).height() - 280);
-        $('#clientTab').tabdrop();
     } else {
         $('#detail_content').height($(window).height() - 230);
     }
@@ -1138,7 +1137,7 @@ function getAppGroups(deviceID) {
                     
                     value['relationships']['devices']['data'].some(function(el) {
                         if (el['id'] == deviceID){
-                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b><span class="pull-right"><button class="btn btn-danger btn-xs" onclick="removeDeviceFromAppGroup('+value['id']+', '+deviceID+')" ><i class="fa fa-trash" aria-hidden="true"></i></button></span></li>';
+                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b><span class="pull-right"><button class="btn btn-danger btn-xs" onclick="removeDeviceFromAppGroup('+value['id']+', '+deviceID+')" ><i class="fas fa-trash" aria-hidden="true"></i></button></span></li>';
                         }
                     });
                 });
