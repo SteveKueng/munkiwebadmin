@@ -1145,7 +1145,6 @@ function getAppGroups(deviceID) {
                 html += '</div>'
                 $('#vppDetail').html(html);
 
-
                 //typeahead
                 $(".vpp_app_groups").typeahead({
                     source: source,
