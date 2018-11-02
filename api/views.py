@@ -1172,12 +1172,14 @@ def spectre_api(request, kind, submission_type, id):
                     if SPECTRE_URLS.get('ADClient'):
                         ADClientURL = SPECTRE_URLS['ADClient'] + id
                         response = requests.get(ADClientURL)
-                        data['AD'] = response.text
+                        if response.status_code in [200, 201, 202, 203, 204]:
+                            data['AD'] = response.content
 
                     if SPECTRE_URLS.get('SCCM'):
                         SCCMClientURL = SPECTRE_URLS['SCCM'] + id
                         response = requests.get(SCCMClientURL)
-                        data['SCCM'] = response.text
+                        if response.status_code in [200, 201, 202, 203, 204]:
+                            data['SCCM'] = response.content
             
                 return HttpResponse(
                         content=json.dumps(data, ensure_ascii=False),
