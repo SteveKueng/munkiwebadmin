@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^(?P<kind>mdm)(?:/(?P<submission_type>.[a-zA-Z_]+))(?:/(?P<primary_id>[a-zA-Z0-9]+))(?:/(?P<action>[a-zA-Z_]+))?', api.views.mdm_api),
     url(r'^(?P<kind>mdm)(?:/(?P<submission_type>.[a-zA-Z_]+))(?:/(?P<primary_id>[a-zA-Z0-9]+))?', api.views.mdm_api),
     url(r'^(?P<kind>mdm)(?:/(?P<submission_type>[a-zA-Z_]+))?', api.views.mdm_api),
+    url(r'^(?P<kind>spectre)(?:/(?P<submission_type>.[a-zA-Z_]+))(?:/(?P<id>[a-zA-Z0-9]+))?', api.views.spectre_api),
     url(r'^(?P<kind>santa)(?:/(?P<submission_type>[a-zA-Z]+))(?:/(?P<machine_id>[a-zA-Z0-9]+))?', api.views.santa_api),
     url(r'^(?P<kind>[a-zA-Z]+$)', api.views.db_api),
     url(r'^(?P<kind>[a-zA-Z]+)/(?P<serial_number>.[a-zA-Z0-9]+$)', api.views.db_api),

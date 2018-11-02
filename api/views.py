@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.forms.models import model_to_dict
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -29,6 +30,7 @@ import plistlib
 import re
 import base64
 import zlib
+import requests
 import simpleMDMpy
 
 LOGGER = logging.getLogger('munkiwebadmin')
@@ -42,6 +44,11 @@ try:
     PROXY_ADDRESS = settings.PROXY_ADDRESS
 except AttributeError:
     PROXY_ADDRESS = ""
+
+try:
+    SPECTRE_URLS = settings.SPECTRE_URLS
+except AttributeError:
+    SPECTRE_URLS = ""
 
 try:
     CONVERT_TO_QWERTZ = settings.CONVERT_TO_QWERTZ
@@ -1115,6 +1122,69 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
                     status=response.status_code,
                     content_type=content_type
                 )
+
+    # ----------- error 404 -----------------
+    return HttpResponse(status=404)
+
+@csrf_exempt
+@logged_in_or_basicauth()
+def spectre_api(request, kind, submission_type, id):
+    LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, id))
+    if kind not in ['spectre']:
+        return HttpResponse(status=404)
+    
+    if request.method == 'GET':
+        LOGGER.debug("Got API GET request for %s", kind)
+
+        if not request.user.has_perm('spectre.can_view_reports'):
+            raise PermissionDenied
+
+        if SPECTRE_URLS != "":
+            if submission_type == "user" and id:
+                if SPECTRE_URLS['ADUser']:
+                    ADUserURL = SPECTRE_URLS['ADUser'] + id
+                    response = requests.get(ADUserURL)
+                    return HttpResponse(
+                            content=response.content,
+                            status=response.status_code,
+                            content_type='application/json'
+                        )
+            
+            if submission_type == "computer" and id:
+                data = {}
+                try:
+                    data['os'] =  "macOS"
+                    machine = Machine.objects.get(hostname=id)
+                    data['machine'] = model_to_dict(machine)
+                except Machine.DoesNotExist:
+                    machine = False
+                    data['os'] =  "Windows"
+
+                if data['os'] == "macOS" and machine:
+                    try:
+                        report = MunkiReport.objects.get(machine=machine)
+                        data['report'] = report.get_report()
+
+                    except MunkiReport.DoesNotExist:
+                        data['report'] = ''
+                
+                if data['os'] == "Windows":
+                    if SPECTRE_URLS.get('ADClient'):
+                        ADClientURL = SPECTRE_URLS['ADClient'] + id
+                        response = requests.get(ADClientURL)
+                        data['AD'] = response.content
+
+                    if SPECTRE_URLS.get('SCCM'):
+                        SCCMClientURL = SPECTRE_URLS['SCCM'] + id
+                        response = requests.get(SCCMClientURL)
+                        data['SCCM'] = response.content
+            
+                return HttpResponse(
+                                    content=json.dumps(unicode(data), ensure_ascii=False),
+                                    status=200,
+                                    content_type='application/json'
+                                )
+                
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
