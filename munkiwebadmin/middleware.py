@@ -27,8 +27,3 @@ class LoginRequiredMiddleware:
             path = request.path_info.lstrip('/')
             if not any(m.match(path) for m in EXEMPT_URLS):
                 return HttpResponseRedirect(settings.LOGIN_URL)
-
-class CorsMiddleware(object):
-    def process_response(self, req, resp):
-        resp["Access-Control-Allow-Origin"] = "*"
-        return resp
