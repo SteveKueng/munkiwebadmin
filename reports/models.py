@@ -151,3 +151,11 @@ class MunkiReport(models.Model):
         self.console_user = "unknown"
         if "ConsoleUser" in plist:
             self.console_user = unicode(plist["ConsoleUser"])
+
+class Spectre(models.Model):
+    '''Placeholder so we get permissions entries in the admin database'''
+    class Meta:
+        permissions = (
+            ('can_view_reports', 'View spectre reports'),
+        )
+    pass
