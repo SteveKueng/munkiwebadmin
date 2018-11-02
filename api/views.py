@@ -1145,7 +1145,7 @@ def spectre_api(request, kind, submission_type, id):
                     ADUserURL = SPECTRE_URLS['ADUser'] + id
                     response = requests.get(ADUserURL)
                     return HttpResponse(
-                            content=response.content,
+                            content=response.json(),
                             status=response.status_code,
                             content_type='application/json'
                         )
@@ -1172,18 +1172,18 @@ def spectre_api(request, kind, submission_type, id):
                     if SPECTRE_URLS.get('ADClient'):
                         ADClientURL = SPECTRE_URLS['ADClient'] + id
                         response = requests.get(ADClientURL)
-                        data['AD'] = response.content
+                        data['AD'] = response.text
 
                     if SPECTRE_URLS.get('SCCM'):
                         SCCMClientURL = SPECTRE_URLS['SCCM'] + id
                         response = requests.get(SCCMClientURL)
-                        data['SCCM'] = response.content
+                        data['SCCM'] = response.text
             
                 return HttpResponse(
-                                    content=json.dumps(unicode(data), ensure_ascii=False),
-                                    status=200,
-                                    content_type='application/json'
-                                )
+                        content=json.dumps(unicode(data), ensure_ascii=False),
+                        status=200,
+                        content_type='application/json'
+                    )
                 
 
     # ----------- error 404 -----------------
