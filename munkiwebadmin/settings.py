@@ -62,6 +62,9 @@ else:
 DEBUG = False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ORIGIN_WHITELIST = ()
+
 LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
@@ -86,6 +89,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'corsheaders',
+
     # our apps
     'api',
     'catalogs',
@@ -103,13 +108,13 @@ INSTALLED_APPS = [
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'munkiwebadmin.middleware.CorsMiddleware',
     #'munkiwebadmin.middleware.LoginRequiredMiddleware',
 ]
 
