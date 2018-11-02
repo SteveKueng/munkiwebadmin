@@ -1145,7 +1145,7 @@ def spectre_api(request, kind, submission_type, id):
                     ADUserURL = SPECTRE_URLS['ADUser'] + id
                     response = requests.get(ADUserURL)
                     return HttpResponse(
-                            content=response.json(),
+                            content=response.content,
                             status=response.status_code,
                             content_type='application/json'
                         )
@@ -1163,7 +1163,7 @@ def spectre_api(request, kind, submission_type, id):
                 if data['os'] == "macOS" and machine:
                     try:
                         report = MunkiReport.objects.get(machine=machine)
-                        data['report'] = report.get_report()
+                        data['report'] = unicode(report.get_report())
 
                     except MunkiReport.DoesNotExist:
                         data['report'] = ''
@@ -1180,7 +1180,7 @@ def spectre_api(request, kind, submission_type, id):
                         data['SCCM'] = response.text
             
                 return HttpResponse(
-                        content=json.dumps(unicode(data), ensure_ascii=False),
+                        content=json.dumps(data, ensure_ascii=False),
                         status=200,
                         content_type='application/json'
                     )
