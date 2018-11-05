@@ -1164,9 +1164,11 @@ def spectre_api(request, kind, submission_type, id):
                     try:
                         report = MunkiReport.objects.get(machine=machine)
                         data['report'] = unicode(report.get_report())
-
                     except MunkiReport.DoesNotExist:
                         data['report'] = ''
+                
+                if machine.simpleMDMID:
+                    data['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
                 
                 if data['os'] == "Windows":
                     if SPECTRE_URLS.get('ADClient'):
@@ -1182,7 +1184,7 @@ def spectre_api(request, kind, submission_type, id):
                             data['SCCM'] = response.content
             
                 return HttpResponse(
-                        content=json.dumps(data, ensure_ascii=False),
+                        content=json.dumps(data, ensure_ascii=False, sort_keys=True),
                         status=200,
                         content_type='application/json'
                     )
