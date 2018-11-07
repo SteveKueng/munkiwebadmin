@@ -18,7 +18,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
-from reports.models import Machine, MunkiReport
+from reports.models import Machine, MunkiReport, Spectre
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
