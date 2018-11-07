@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
+from django.core.serializers.json import DjangoJSONEncoder
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -1163,7 +1164,7 @@ def spectre_api(request, kind, submission_type, id):
                 if data['os'] == "macOS" and machine:
                     try:
                         report = MunkiReport.objects.get(machine=machine)
-                        data['report'] = unicode(report.get_report())
+                        data['report'] = report.get_report()
                     except MunkiReport.DoesNotExist:
                         data['report'] = ''
                 
@@ -1184,7 +1185,7 @@ def spectre_api(request, kind, submission_type, id):
                             data['SCCM'] = response.content
             
                 return HttpResponse(
-                        content=json.dumps(data, ensure_ascii=False, sort_keys=True),
+                        content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                         status=200,
                         content_type='application/json'
                     )
