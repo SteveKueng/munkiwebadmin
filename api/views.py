@@ -1158,10 +1158,10 @@ def spectre_api(request, kind, submission_type, id):
                     machine = Machine.objects.get(hostname=id)
                     data['machine'] = model_to_dict(machine)
                 except Machine.DoesNotExist:
-                    machine = False
+                    machine = {}
                     data['os'] =  "Windows"
 
-                if data['os'] == "macOS" and machine:
+                if data['os'] == "macOS":
                     try:
                         report = MunkiReport.objects.get(machine=machine)
                         data['report'] = report.get_report()
