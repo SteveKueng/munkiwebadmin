@@ -1137,7 +1137,7 @@ def spectre_api(request, kind, submission_type, id):
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
-        if not request.user.has_perm('spectre.can_view_reports'):
+        if not request.user.has_perm('reports.can_view_spectre'):
             raise PermissionDenied
 
         if SPECTRE_URLS != "":
@@ -1168,8 +1168,8 @@ def spectre_api(request, kind, submission_type, id):
                     except MunkiReport.DoesNotExist:
                         data['report'] = ''
                 
-                if machine.simpleMDMID:
-                    data['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
+                    if machine.simpleMDMID:
+                        data['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
                 
                 if data['os'] == "Windows":
                     if SPECTRE_URLS.get('ADClient'):
