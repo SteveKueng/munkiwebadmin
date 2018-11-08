@@ -156,6 +156,6 @@ class Spectre(models.Model):
     '''Placeholder so we get permissions entries in the admin database'''
     class Meta:
         permissions = (
-            ('can_view_reports', 'View spectre reports'),
+            ('can_view_spectre', 'View spectre reports'),
         )
     pass
