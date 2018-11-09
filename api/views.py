@@ -1148,15 +1148,26 @@ def spectre_api(request, kind, submission_type, id):
 
         if SPECTRE_URLS != "":
             if submission_type == "user" and id:
-                if SPECTRE_URLS['ADUser']:
-                    ADUserURL = SPECTRE_URLS['ADUser'] + id
-                    response = requests.get(ADUserURL)
-                    response.encoding = "utf-8-sig"
-                    return HttpResponse(
-                            content=json.dumps(convert_html_to_json(response.text), ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=response.status_code,
-                            content_type='application/json'
-                        )
+                data = {}
+                if SPECTRE_URLS.get('AD'):
+                    ADUserURL = SPECTRE_URLS['AD'] + "?username=" + id
+                    response = requests.get(ADUserURL, timeout=10)
+                    if response.status_code in [200, 201, 202, 203, 204]:
+                        response.encoding = "utf-8-sig"
+                        data['AD'] = convert_html_to_json(response.text)
+
+                if SPECTRE_URLS.get('SCSM'):
+                    SCSMURL = SPECTRE_URLS['SCSM'] + "?username=" + id
+                    response = requests.get(SCSMURL, timeout=10)
+                    if response.status_code in [200, 201, 202, 203, 204]:
+                        response.encoding = "utf-8-sig"
+                        data['SCSM'] = convert_html_to_json(response.text)
+
+                return HttpResponse(
+                        content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                        status=200,
+                        content_type='application/json'
+                    )
             
             if submission_type == "computer" and id:
                 data = {}
@@ -1179,20 +1190,27 @@ def spectre_api(request, kind, submission_type, id):
                         data['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
                 
                 if data['os'] == "Windows":
-                    if SPECTRE_URLS.get('ADClient'):
-                        ADClientURL = SPECTRE_URLS['ADClient'] + id
-                        response = requests.get(ADClientURL)
+                    if SPECTRE_URLS.get('AD'):
+                        ADClientURL = SPECTRE_URLS['AD'] + "?computername=" + id
+                        response = requests.get(ADClientURL, timeout=10)
                         if response.status_code in [200, 201, 202, 203, 204]:
                             response.encoding = "utf-8-sig"
                             data['AD'] = convert_html_to_json(response.text)
 
                     if SPECTRE_URLS.get('SCCM'):
-                        SCCMClientURL = SPECTRE_URLS['SCCM'] + id
-                        response = requests.get(SCCMClientURL)
+                        SCCMClientURL = SPECTRE_URLS['SCCM'] + "?computername=" + id
+                        response = requests.get(SCCMClientURL, timeout=10)
                         if response.status_code in [200, 201, 202, 203, 204]:
                             response.encoding = "utf-8-sig"
                             data['SCCM'] = convert_html_to_json(response.text)
             
+                if SPECTRE_URLS.get('SCSM'):
+                    SCSMClientURL = SPECTRE_URLS['SCSM'] + "?computername=" + id
+                    response = requests.get(SCSMClientURL, timeout=10)
+                    if response.status_code in [200, 201, 202, 203, 204]:
+                        response.encoding = "utf-8-sig"
+                        data['SCSM'] = convert_html_to_json(response.text)
+
                 return HttpResponse(
                         content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                         status=200,
