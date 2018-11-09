@@ -1153,7 +1153,7 @@ def spectre_api(request, kind, submission_type, id):
                     response = requests.get(ADUserURL)
                     response.encoding = "utf-8-sig"
                     return HttpResponse(
-                            content=convert_html_to_json(response.text),
+                            content=json.dumps(convert_html_to_json(response.text), ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                             status=response.status_code,
                             content_type='application/json'
                         )
