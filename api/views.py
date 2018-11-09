@@ -129,6 +129,12 @@ def convert_to_qwertz(string):
     return newString
 
 
+def convert_html_to_json(raw_html):
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return json.loads(cleantext.strip())
+
+
 def getSimpleMDMID(apiKey, serial_number):
     """ returns device ID for your device """
     devices = simpleMDMpy.devices(apiKey)
@@ -1145,8 +1151,9 @@ def spectre_api(request, kind, submission_type, id):
                 if SPECTRE_URLS['ADUser']:
                     ADUserURL = SPECTRE_URLS['ADUser'] + id
                     response = requests.get(ADUserURL)
+                    response.encoding = "utf-8-sig"
                     return HttpResponse(
-                            content=response.content,
+                            content=convert_html_to_json(response.text),
                             status=response.status_code,
                             content_type='application/json'
                         )
@@ -1176,13 +1183,15 @@ def spectre_api(request, kind, submission_type, id):
                         ADClientURL = SPECTRE_URLS['ADClient'] + id
                         response = requests.get(ADClientURL)
                         if response.status_code in [200, 201, 202, 203, 204]:
-                            data['AD'] = response.content
+                            response.encoding = "utf-8-sig"
+                            data['AD'] = convert_html_to_json(response.text)
 
                     if SPECTRE_URLS.get('SCCM'):
                         SCCMClientURL = SPECTRE_URLS['SCCM'] + id
                         response = requests.get(SCCMClientURL)
                         if response.status_code in [200, 201, 202, 203, 204]:
-                            data['SCCM'] = response.content
+                            response.encoding = "utf-8-sig"
+                            data['SCCM'] = convert_html_to_json(response.text)
             
                 return HttpResponse(
                         content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
