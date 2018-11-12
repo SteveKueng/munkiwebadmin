@@ -830,8 +830,9 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     # simpleMDM
                     if simpleMDMKey:
                         LOGGER.debug("simpleMDM connnect")
-                        machine.simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
-                        if machine.simpleMDMID:
+                        simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
+                        if simpleMDMID:
+                            machine.simpleMDMID = simpleMDMID
                             LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
                             setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
 
