@@ -513,6 +513,8 @@ def plist_api(request, kind, filepath=None):
             # success
             return HttpResponse(status=204)
 
+    return HttpResponse(status=404)
+
 @csrf_exempt
 @logged_in_or_basicauth()
 def file_api(request, kind, filepath=None):
@@ -830,8 +832,11 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     # simpleMDM
                     if simpleMDMKey:
                         LOGGER.debug("simpleMDM connnect")
-                        simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
-                        if simpleMDMID:
+                        try:
+                            simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
+                        except Exception as e:
+                            LOGGER.error(e)
+                        else:
                             machine.simpleMDMID = simpleMDMID
                             LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
                             setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
@@ -899,6 +904,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 return HttpResponse(status=404)
             return HttpResponse(status=204)
 
+        return HttpResponse(status=404)
     # ----------- PUT -----------------
     if request.method == 'PUT':
         LOGGER.debug("Got API PUT request for %s", kind)
