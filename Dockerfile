@@ -79,6 +79,9 @@ RUN curl -Lk -o /tmp/mwa2-style.zip https://github.com/SteveKueng/mwa2-style/arc
 RUN mkdir -p /munkiwebadmin/munkiwebadmin/static/styles/default
 RUN cp -r /tmp/mwa2-style-master/* /munkiwebadmin/munkiwebadmin/static/styles/default && rm -rf /tmp/mwa2-style-master
 
+# clean pyc
+RUN find ${APP_DIR} -name '*.pyc' -delete
+
 # Install all python dependency libs
 RUN pip install -r requirements.txt
 
