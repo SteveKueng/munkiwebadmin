@@ -132,7 +132,11 @@ def convert_to_qwertz(string):
 def convert_html_to_json(raw_html):
     cleanr = re.compile('<.*?>')
     cleantext = re.sub(cleanr, '', raw_html)
-    return json.loads(cleantext.strip())
+    try:
+        json =json.loads(cleantext.strip())
+    except (ValueError, KeyError, TypeError):
+        json = ""
+    return json
 
 
 def getSimpleMDMID(apiKey, serial_number):
@@ -1245,7 +1249,6 @@ def spectre_api(request, kind, submission_type, id):
                         status=200,
                         content_type='application/json'
                     )
-                
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
