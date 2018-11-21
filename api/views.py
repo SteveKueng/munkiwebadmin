@@ -1159,17 +1159,26 @@ def spectre_api(request, kind, submission_type, id):
                 data = {}
                 if SPECTRE_URLS.get('AD'):
                     ADUserURL = SPECTRE_URLS['AD'] + "?username=" + id
-                    response = requests.get(ADUserURL, timeout=10)
-                    if response.status_code in [200, 201, 202, 203, 204]:
-                        response.encoding = "utf-8-sig"
-                        data['AD'] = convert_html_to_json(response.text)
+                    try:
+                        response = requests.get(ADUserURL, timeout=10)
+                    except requests.exceptions.Timeout:
+                         pass
+                    else:
+                        if response.status_code in [200, 201, 202, 203, 204]:
+                            response.encoding = "utf-8-sig"
+                            data['AD'] = convert_html_to_json(response.text)
 
                 if SPECTRE_URLS.get('SCSM'):
                     SCSMURL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    response = requests.get(SCSMURL, timeout=10)
-                    if response.status_code in [200, 201, 202, 203, 204]:
-                        response.encoding = "utf-8-sig"
-                        data['SCSM'] = convert_html_to_json(response.text)
+                    try:
+                        response = requests.get(SCSMURL, timeout=10)
+                    except requests.exceptions.Timeout:
+                         pass
+                    else:
+                        if response.status_code in [200, 201, 202, 203, 204]:
+                            response.encoding = "utf-8-sig"
+                            data['SCSM'] = convert_html_to_json(response.text)
+                    
 
                 return HttpResponse(
                         content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
@@ -1200,24 +1209,36 @@ def spectre_api(request, kind, submission_type, id):
                 if data['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
                         ADClientURL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        response = requests.get(ADClientURL, timeout=10)
-                        if response.status_code in [200, 201, 202, 203, 204]:
-                            response.encoding = "utf-8-sig"
-                            data['AD'] = convert_html_to_json(response.text)
+                        try:
+                            response = requests.get(ADClientURL, timeout=10)
+                        except requests.exceptions.Timeout:
+                            pass
+                        else:
+                            if response.status_code in [200, 201, 202, 203, 204]:
+                                response.encoding = "utf-8-sig"
+                                data['AD'] = convert_html_to_json(response.text)
 
                     if SPECTRE_URLS.get('SCCM'):
                         SCCMClientURL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        response = requests.get(SCCMClientURL, timeout=10)
-                        if response.status_code in [200, 201, 202, 203, 204]:
-                            response.encoding = "utf-8-sig"
-                            data['SCCM'] = convert_html_to_json(response.text)
+                        try:
+                            response = requests.get(SCCMClientURL, timeout=10)
+                        except requests.exceptions.Timeout:
+                            pass
+                        else:
+                            if response.status_code in [200, 201, 202, 203, 204]:
+                                response.encoding = "utf-8-sig"
+                                data['SCCM'] = convert_html_to_json(response.text)
             
                 if SPECTRE_URLS.get('SCSM'):
                     SCSMClientURL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    response = requests.get(SCSMClientURL, timeout=10)
-                    if response.status_code in [200, 201, 202, 203, 204]:
-                        response.encoding = "utf-8-sig"
-                        data['SCSM'] = convert_html_to_json(response.text)
+                    try:
+                        response = requests.get(SCSMClientURL, timeout=10)
+                    except requests.exceptions.Timeout:
+                        pass
+                    else:
+                        if response.status_code in [200, 201, 202, 203, 204]:
+                            response.encoding = "utf-8-sig"
+                            data['SCSM'] = convert_html_to_json(response.text)
 
                 return HttpResponse(
                         content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
