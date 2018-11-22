@@ -33,7 +33,7 @@ import base64
 import zlib
 import requests
 import simpleMDMpy
-import thread
+from multiprocessing.pool import ThreadPool
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -63,8 +63,6 @@ if PROXY_ADDRESS != "":
         "http": 'http://'+PROXY_ADDRESS,
         "https": 'https://'+PROXY_ADDRESS
     }
-
-spectreData = {}
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -1176,15 +1174,22 @@ def spectre_api(request, kind, submission_type, id):
         if SPECTRE_URLS != "":
             if submission_type == "user" and id:
                 spectreData = {}
+                pool = ThreadPool(processes=2)
 
                 if SPECTRE_URLS.get('AD'):
                     URL = SPECTRE_URLS['AD'] + "?username=" + id
-                    spectreData["AD"] = getDataFromAPI(URL, "AD")
+                    AD = pool.apply_async(getDataFromAPI, (URL, "AD"))
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
-                    
+                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+
+                # wait for answer
+                if SPECTRE_URLS.get('AD'):
+                    spectreData["AD"] = AD.get()
+                if SPECTRE_URLS.get('SCSM'):
+                    spectreData["SCSM"] = SCSM.get()
+
                 return HttpResponse(
                         content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                         status=200,
