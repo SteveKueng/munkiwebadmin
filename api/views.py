@@ -145,7 +145,7 @@ def convert_html_to_json(raw_html):
 def getDataFromAPI(URL, key):
     global spectreData
     try:
-        response = requests.get(ADUserURL, timeout=10)
+        response = requests.get(URL, timeout=10)
     except requests.exceptions.Timeout:
         pass
     else:
