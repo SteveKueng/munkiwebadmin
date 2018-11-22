@@ -33,6 +33,7 @@ import base64
 import zlib
 import requests
 import simpleMDMpy
+import thread
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -62,6 +63,8 @@ if PROXY_ADDRESS != "":
         "http": 'http://'+PROXY_ADDRESS,
         "https": 'https://'+PROXY_ADDRESS
     }
+
+spectreData = {}
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -137,6 +140,19 @@ def convert_html_to_json(raw_html):
     except (ValueError, KeyError, TypeError):
         json = ""
     return json
+
+
+def getDataFromAPI(URL, key):
+    global spectreData
+    try:
+        response = requests.get(ADUserURL, timeout=10)
+    except requests.exceptions.Timeout:
+        pass
+    else:
+        if response.status_code in [200, 201, 202, 203, 204]:
+            response.encoding = "utf-8-sig"
+            spectreData[key] = convert_html_to_json(response.text)
+    spectreData[key] = ""
 
 
 def getSimpleMDMID(apiKey, serial_number):
@@ -1160,92 +1176,60 @@ def spectre_api(request, kind, submission_type, id):
 
         if SPECTRE_URLS != "":
             if submission_type == "user" and id:
-                data = {}
+                global spectreData
+                spectreData = {}
+
                 if SPECTRE_URLS.get('AD'):
-                    ADUserURL = SPECTRE_URLS['AD'] + "?username=" + id
-                    try:
-                        response = requests.get(ADUserURL, timeout=10)
-                    except requests.exceptions.Timeout:
-                         pass
-                    else:
-                        if response.status_code in [200, 201, 202, 203, 204]:
-                            response.encoding = "utf-8-sig"
-                            data['AD'] = convert_html_to_json(response.text)
+                    URL = SPECTRE_URLS['AD'] + "?username=" + id
+                    getDataFromAPI(URL, "AD")
 
                 if SPECTRE_URLS.get('SCSM'):
-                    SCSMURL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    try:
-                        response = requests.get(SCSMURL, timeout=10)
-                    except requests.exceptions.Timeout:
-                         pass
-                    else:
-                        if response.status_code in [200, 201, 202, 203, 204]:
-                            response.encoding = "utf-8-sig"
-                            data['SCSM'] = convert_html_to_json(response.text)
+                    URL = SPECTRE_URLS['SCSM'] + "?username=" + id
+                    getDataFromAPI(URL, "SCSM")
                     
-
                 return HttpResponse(
-                        content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                        content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                         status=200,
                         content_type='application/json'
                     )
             
             if submission_type == "computer" and id:
-                data = {}
+                global spectreData
+                spectreData = {}
+                
+                if SPECTRE_URLS.get('SCSM'):
+                    URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
+                    getDataFromAPI(URL, "SCSM")
+                
                 try:
-                    data['os'] =  "macOS"
+                    spectreData['os'] =  "macOS"
                     machine = Machine.objects.get(hostname=id)
-                    data['machine'] = model_to_dict(machine)
+                    spectreData['Munki'] = model_to_dict(machine)
                 except Machine.DoesNotExist:
                     machine = {}
-                    data['os'] =  "Windows"
+                    spectreData['os'] =  "Windows"
 
-                if data['os'] == "macOS":
+                if spectreData['os'] == "macOS":
                     try:
                         report = MunkiReport.objects.get(machine=machine)
-                        data['report'] = report.get_report()
+                        spectreData['Munki']['report'] = report.get_report()
                     except MunkiReport.DoesNotExist:
-                        data['report'] = ''
+                        spectreData['Munki']['report'] = ""
                 
                     if machine.simpleMDMID:
-                        data['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
+                        spectreData['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
                 
-                if data['os'] == "Windows":
+                if spectreData['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
-                        ADClientURL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        try:
-                            response = requests.get(ADClientURL, timeout=10)
-                        except requests.exceptions.Timeout:
-                            pass
-                        else:
-                            if response.status_code in [200, 201, 202, 203, 204]:
-                                response.encoding = "utf-8-sig"
-                                data['AD'] = convert_html_to_json(response.text)
+                        URL = SPECTRE_URLS['AD'] + "?computername=" + id
+                        getDataFromAPI(URL, "AD")
 
                     if SPECTRE_URLS.get('SCCM'):
-                        SCCMClientURL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        try:
-                            response = requests.get(SCCMClientURL, timeout=10)
-                        except requests.exceptions.Timeout:
-                            pass
-                        else:
-                            if response.status_code in [200, 201, 202, 203, 204]:
-                                response.encoding = "utf-8-sig"
-                                data['SCCM'] = convert_html_to_json(response.text)
-            
-                if SPECTRE_URLS.get('SCSM'):
-                    SCSMClientURL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    try:
-                        response = requests.get(SCSMClientURL, timeout=10)
-                    except requests.exceptions.Timeout:
-                        pass
-                    else:
-                        if response.status_code in [200, 201, 202, 203, 204]:
-                            response.encoding = "utf-8-sig"
-                            data['SCSM'] = convert_html_to_json(response.text)
+                        URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
+                        getDataFromAPI(URL, "SCCM")
 
                 return HttpResponse(
-                        content=json.dumps(data, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                        content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                         status=200,
                         content_type='application/json'
                     )
