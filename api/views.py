@@ -136,14 +136,13 @@ def convert_html_to_json(raw_html):
     cleanr = re.compile('<.*?>')
     cleantext = re.sub(cleanr, '', raw_html)
     try:
-        json =json.loads(cleantext.strip())
+        data = json.loads(cleantext.strip())
     except (ValueError, KeyError, TypeError):
-        json = ""
-    return json
+        data = ""
+    return data
 
 
 def getDataFromAPI(URL, key):
-    global spectreData
     try:
         response = requests.get(URL, timeout=10)
     except requests.exceptions.Timeout:
@@ -151,8 +150,8 @@ def getDataFromAPI(URL, key):
     else:
         if response.status_code in [200, 201, 202, 203, 204]:
             response.encoding = "utf-8-sig"
-            spectreData[key] = convert_html_to_json(response.text)
-    spectreData[key] = ""
+            return convert_html_to_json(response.text)
+    return None
 
 
 def getSimpleMDMID(apiKey, serial_number):
@@ -1176,16 +1175,15 @@ def spectre_api(request, kind, submission_type, id):
 
         if SPECTRE_URLS != "":
             if submission_type == "user" and id:
-                global spectreData
                 spectreData = {}
 
                 if SPECTRE_URLS.get('AD'):
                     URL = SPECTRE_URLS['AD'] + "?username=" + id
-                    getDataFromAPI(URL, "AD")
+                    spectreData["AD"] = getDataFromAPI(URL, "AD")
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    getDataFromAPI(URL, "SCSM")
+                    spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
                     
                 return HttpResponse(
                         content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
@@ -1194,12 +1192,11 @@ def spectre_api(request, kind, submission_type, id):
                     )
             
             if submission_type == "computer" and id:
-                global spectreData
                 spectreData = {}
                 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    getDataFromAPI(URL, "SCSM")
+                    spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
                 
                 try:
                     spectreData['os'] =  "macOS"
@@ -1222,11 +1219,11 @@ def spectre_api(request, kind, submission_type, id):
                 if spectreData['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
                         URL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        getDataFromAPI(URL, "AD")
+                        spectreData["AD"] = getDataFromAPI(URL, "AD")
 
                     if SPECTRE_URLS.get('SCCM'):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        getDataFromAPI(URL, "SCCM")
+                        spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
 
                 return HttpResponse(
                         content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
