@@ -694,6 +694,7 @@ function loadStatus() {
             //get serial
             var serial = getSerial();
             getStatus(item, serial, id)
+            await waiting(200);
         }
     });
 }
@@ -1006,7 +1007,7 @@ function startRefresh() {
     // 5 second interval
     interval = setInterval (function () {
         loadStatus();
-    }, 5000);
+    }, 30000);
 }
 
 function stopRefresh() {
