@@ -601,9 +601,6 @@ function createSoftwareElement(element, addTo, require_update) {
 
         $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box status pull-right'><div class='led-grey'></div></div></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
-        
-        var serial = getSerial();
-        getStatus(element, serial, itemID);
 
         //icon
         if (icon !== '') {
@@ -696,7 +693,6 @@ function loadStatus() {
         
             //get serial
             var serial = getSerial();
-
             getStatus(item, serial, id)
         }
     });
