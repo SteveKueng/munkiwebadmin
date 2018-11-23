@@ -183,6 +183,7 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
     stopRefresh();
     window.location.hash = '';
     current_pathname = "";
+    window.stop()
   }
 });
 
@@ -694,7 +695,6 @@ function loadStatus() {
             //get serial
             var serial = getSerial();
             getStatus(item, serial, id)
-            await waiting(200);
         }
     });
 }
