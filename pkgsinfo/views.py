@@ -4,7 +4,7 @@ pkgsinfo/views.py
 
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
 from pkgsinfo.models import Pkginfo, PKGSINFO_STATUS_TAG
@@ -60,7 +60,7 @@ def status(request):
                         content_type='application/json')
 
 
-@logged_in_or_basicauth()
+@login_required
 def getjson(request):
     '''Return pkgsinfo as json data -- used by the DataTable that
     displays the list of pkginfo items. Perhaps could be moved into the
@@ -72,7 +72,7 @@ def getjson(request):
                         content_type='application/json')
 
 
-@logged_in_or_basicauth()
+@login_required
 def index(request):
     '''Index methods: GET and POST'''
     if request.method == "GET":
@@ -142,7 +142,7 @@ def index(request):
                 content_type='application/json')
 
 
-@logged_in_or_basicauth()
+@login_required
 def detail(request, pkginfo_path):
     '''Return detail for a specific pkginfo'''
     if request.method == 'GET':

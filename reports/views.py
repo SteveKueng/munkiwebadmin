@@ -6,7 +6,6 @@ from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -75,7 +74,7 @@ if PROXY_ADDRESS:
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
 def index(request, computer_serial=None):
     '''Returns computer list or detail'''
@@ -262,7 +261,7 @@ def index(request, computer_serial=None):
     'defaultManifestType': DEFAULT_MANIFEST,}
     return render(request, 'reports/index.html', context=context)
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
     if BUSINESS_UNITS_ENABLED:
@@ -317,7 +316,7 @@ def dashboard(request):
     #c.update(csrf(request))
     return render(request, 'reports/dashboard.html', context=context)
 
-@logged_in_or_basicauth()
+@login_required
 def getManifest(request, manifest_path):
     """ returns json manifest """
     LOGGER.debug("Got read request for %s", manifest_path)
@@ -334,7 +333,7 @@ def getManifest(request, manifest_path):
                         content_type='application/json')
 
 @csrf_exempt
-@logged_in_or_basicauth()
+@login_required
 def createRequired(request):
     """ returns catalog as json """
     catalogList = request.POST.getlist('catalogList[]')
@@ -369,7 +368,7 @@ def createRequired(request):
                         content_type='application/json')
 
 @csrf_exempt
-@logged_in_or_basicauth()
+@login_required
 def getStatus(request):
     serial = request.POST.getlist('serial')[0]
     item = request.POST.getlist('item')[0]

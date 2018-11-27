@@ -1005,6 +1005,7 @@ function getTypeahead(url, listid) {
 
 function startRefresh() {
     // 5 second interval
+    loadStatus();
     interval = setInterval (function () {
         loadStatus();
     }, 30000);

@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from process.models import Process
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 import json
 import os
@@ -29,7 +28,7 @@ def prefsFilePath():
 
 reposadocommon.prefsFilePath = prefsFilePath
 
-@logged_in_or_basicauth()
+@login_required
 def status(request):
     	'''Returns status of long-running process'''
 	LOGGER.debug('got status request for update_list_process')
@@ -116,7 +115,7 @@ def list_products(sort_order='date'):
 			product_item.append(item)
 	return product_item
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.view_updates', login_url='/login/')
 def index(request):
 	if request.is_ajax():
@@ -131,7 +130,7 @@ def index(request):
 	context = {'branches': sorted(catalog_branches)}
 	return render(request, 'updates/updates.html', context=context)
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.add_updates', login_url='/login/')
 def new_branch(request, branchname):
 	catalog_branches = reposadocommon.getCatalogBranches()
@@ -145,7 +144,7 @@ def new_branch(request, branchname):
 	reposadocommon.writeCatalogBranches(catalog_branches)
 	return HttpResponse("OK")
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.delete_updates', login_url='/login/')
 def delete_branch(request, branchname):
     catalog_branches = reposadocommon.getCatalogBranches()
@@ -172,7 +171,7 @@ def delete_branch(request, branchname):
     
     return HttpResponse("OK")
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.change_updates', login_url='/login/')
 def add_all(request, branchname):
 	products = reposadocommon.getProductInfo()
@@ -185,7 +184,7 @@ def add_all(request, branchname):
 	
 	return HttpResponse("OK")
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.change_updates', login_url='/login/')
 def add_product_to_branch(request):
 	'''Adds one product to a branch. Takes a list of strings.
@@ -237,7 +236,7 @@ def add_product_to_branch(request):
 		reposadocommon.writeAllBranchCatalogs()
 	return HttpResponse(status=204)
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.change_updates', login_url='/login/')
 def remove_product_from_branch(request):
 	'''Removes one or more products from a branch. Takes a list of strings.
@@ -283,7 +282,7 @@ def remove_product_from_branch(request):
 		reposadocommon.writeAllBranchCatalogs()
 	return HttpResponse(status=204)
 
-@logged_in_or_basicauth()
+@login_required
 @permission_required('updates.delete_updates', login_url='/login/')
 def purge_product(request, product_ids="all-deprecated", force=False):
     '''Removes products from the ProductInfo.plist and purges their local 
