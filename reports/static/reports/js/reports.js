@@ -23,35 +23,35 @@ function do_resize() {
 $(window).resize(do_resize);
 
 // using jQuery
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-var csrftoken = getCookie('csrftoken');
+// function getCookie(name) {
+//     var cookieValue = null;
+//     if (document.cookie && document.cookie !== '') {
+//         var cookies = document.cookie.split(';');
+//         for (var i = 0; i < cookies.length; i++) {
+//             var cookie = jQuery.trim(cookies[i]);
+//             // Does this cookie string begin with the name we want?
+//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//     }
+//     return cookieValue;
+// }
+// var csrftoken = getCookie('csrftoken');
 
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-$.ajaxSetup({
-    timeout:10000,
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
+// function csrfSafeMethod(method) {
+//     // these HTTP methods do not require CSRF protection
+//     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+// }
+// $.ajaxSetup({
+//     timeout:10000,
+//     beforeSend: function(xhr, settings) {
+//         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+//             xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//         }
+//     }
+// });
 
 // grid/list view
 $(document).on('click','.grid_list', function (e) {
@@ -180,7 +180,6 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
   } else {
     $('#computerDetails').data('bs.modal').isShown = true;
     $('.modal-backdrop').hide();
-    stopRefresh();
     window.location.hash = '';
     current_pathname = "";
     window.stop()
@@ -291,9 +290,6 @@ function getComputerItem(pathname) {
                     activaTab(tab);
                 }
                 hideProgressBar();
-    
-                //start refresh
-                startRefresh();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#computer_detail').html("")
@@ -579,28 +575,40 @@ function loopSoftwareElements(elements, listid, require_update) {
 
 var softwareElementCount = 0
 function createSoftwareElement(element, addTo, require_update) {
-        var itemID = element + "_" + softwareElementCount
-        var listGroupID = element + "_" + softwareElementCount + "_" + addTo
-        var additionalClass = " "
+    var itemID = element + "_" + softwareElementCount
+    var listGroupID = element + "_" + softwareElementCount + "_" + addTo
+    var additionalClass = " "
 
-        //item infos
-        var display_name = element
-        var version = ""
-        var icon = ""
+    //item infos
+    var display_name = element
+    var version = ""
+    var icon = ""
 
-        if (typeof require_update === 'undefined') {
-            require_update = ""
-            additionalClass += "manifestItem"
-        }
-        if (typeof catalogData[element] === 'undefined') {
-            additionalClass += " list-group-item-danger"
-        } else {
-            display_name = catalogData[element].display_name
-            version = catalogData[element].version
-            var icon = catalogData[element].icon
-        }
+    if (typeof require_update === 'undefined') {
+        require_update = ""
+        additionalClass += "manifestItem"
+    }
+    if (typeof catalogData[element] === 'undefined') {
+        additionalClass += " list-group-item-danger"
+    } else {
+        display_name = catalogData[element].display_name
+        version = catalogData[element].version
+        var icon = catalogData[element].icon
+    }
 
-        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box status pull-right'><div class='led-grey'></div></div></small></a>" );
+    $.ajax({
+        type:"POST",
+        url:"/reports/_status",
+        data: {item : element, serial: current_pathname},
+        dataType: 'json',
+        success: function(data){
+            status = data
+        },
+        error: function(){
+            status = "led-grey"
+        },
+    }).done(function(){
+        $( "#"+addTo ).append( "<a href='#' class='list-group-item "+additionalClass+"' id="+itemID+"><img src='"+static_url+"img/GenericPkg.png' width='15' style='margin-top:-3px;' id="+itemID+'_icon'+">  "+display_name+" "+version+" <small class='pull-right'> "+require_update+"<div class='led-box status pull-right'><div class='" + status + "'></div></div></small></a>" );
         $( "#"+itemID ).after('<div class="list-group" style="padding-left:20px;" id="'+listGroupID+'"></div>');
 
         //icon
@@ -618,12 +626,15 @@ function createSoftwareElement(element, addTo, require_update) {
             });
         }
 
-       if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].updates !== 'undefined') {
-           $.each(catalogData[element].updates, function( index, element_updates ) {
-               createSoftwareElement(element_updates, listGroupID, "update for "+catalogData[element].display_name);
-           });
+        if (typeof catalogData[element] !== 'undefined' && typeof catalogData[element].updates !== 'undefined') {
+            $.each(catalogData[element].updates, function( index, element_updates ) {
+                createSoftwareElement(element_updates, listGroupID, "update for "+catalogData[element].display_name);
+            });
         }
-      softwareElementCount++;
+    }); 
+
+    
+    softwareElementCount++;
 }
 
 function addSoftwareToList(item, listid, event) {
@@ -668,35 +679,6 @@ function addSoftwareToList(item, listid, event) {
             });
         }
     }
-}
-
-function getStatus(item, serial, id) {
-    $.ajax({
-        type:"POST",
-        url:"/reports/_status",
-        data: {item : item, serial: serial},
-        dataType: 'json',
-        success: function(data){
-            $('#'+id).find('.led-box').children().removeClass().addClass( data );
-        }
-    }); 
-}
-
-function loadStatus() {
-    $('.status').each(function(i, obj) {
-        //get id
-        var id = $(obj).parent().parent().attr('id');
-        if (typeof id  !== "undefined") {
-            // item
-            var item = id.split('_')
-            item.pop()
-            item = item.join("_");
-        
-            //get serial
-            var serial = getSerial();
-            getStatus(item, serial, id)
-        }
-    });
 }
 
 function getSerial() {
@@ -1003,19 +985,6 @@ function getTypeahead(url, listid) {
     });
 }
 
-function startRefresh() {
-    // 5 second interval
-    loadStatus();
-    interval = setInterval (function () {
-        loadStatus();
-    }, 30000);
-}
-
-function stopRefresh() {
-    try{
-        clearInterval(interval);
-    }catch(err){}
-}
 
 function get_model_description(serial) {
     $.ajax({
