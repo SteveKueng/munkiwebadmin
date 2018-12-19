@@ -1199,6 +1199,7 @@ def spectre_api(request, kind, submission_type, id):
             
             if submission_type == "computer" and id:
                 spectreData = {}
+                pool = ThreadPool(processes=3)
                 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
