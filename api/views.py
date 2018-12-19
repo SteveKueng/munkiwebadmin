@@ -1190,11 +1190,12 @@ def spectre_api(request, kind, submission_type, id):
                 if SPECTRE_URLS.get('SCSM'):
                     spectreData["SCSM"] = SCSM.get()
 
-                return HttpResponse(
-                        content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                        status=200,
-                        content_type='application/json'
-                    )
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json'
+                        )
             
             if submission_type == "computer" and id:
                 spectreData = {}
@@ -1230,11 +1231,12 @@ def spectre_api(request, kind, submission_type, id):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
                         spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
 
-                return HttpResponse(
-                        content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                        status=200,
-                        content_type='application/json'
-                    )
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json'
+                        )
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
