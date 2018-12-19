@@ -1190,7 +1190,7 @@ def spectre_api(request, kind, submission_type, id):
                 if SPECTRE_URLS.get('SCSM'):
                     spectreData["SCSM"] = SCSM.get()
 
-                if spectreData:
+                if spectreData != {}:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                             status=200,
@@ -1231,7 +1231,7 @@ def spectre_api(request, kind, submission_type, id):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
                         spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
 
-                if spectreData:
+                if spectreData != {}:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                             status=200,
