@@ -1190,7 +1190,7 @@ def spectre_api(request, kind, submission_type, id):
                 if SPECTRE_URLS.get('SCSM'):
                     spectreData["SCSM"] = SCSM.get()
 
-                if spectreData != {}:
+                if spectreData:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                             status=200,
@@ -1202,7 +1202,8 @@ def spectre_api(request, kind, submission_type, id):
                 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
+                    #spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
+                    SCSM = pool.apply_async(getDataFromAPI(URL, "SCSM"))
                 
                 try:
                     spectreData['os'] =  "macOS"
@@ -1225,13 +1226,23 @@ def spectre_api(request, kind, submission_type, id):
                 if spectreData['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
                         URL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        spectreData["AD"] = getDataFromAPI(URL, "AD")
+                        #spectreData["AD"] = getDataFromAPI(URL, "AD")
+                        AD = pool.apply_async(getDataFromAPI(URL, "AD"))
 
                     if SPECTRE_URLS.get('SCCM'):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
+                        #spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
+                        SCCM = pool.apply_async(getDataFromAPI(URL, "SCCM"))
 
-                if spectreData != {}:
+                    if SPECTRE_URLS.get('AD'):
+                        spectreData["AD"] = AD.get()
+                    if SPECTRE_URLS.get('SCCM'):
+                        spectreData["SCCM"] = SCCM.get()
+
+                if SPECTRE_URLS.get('SCSM'):
+                    spectreData["SCSM"] = SCSM.get()
+
+                if spectreData:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
                             status=200,
