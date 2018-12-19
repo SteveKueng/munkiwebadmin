@@ -140,7 +140,7 @@ def convert_html_to_json(raw_html):
     return data
 
 
-def getDataFromAPI(URL, key):
+def getDataFromAPI(URL):
     try:
         response = requests.get(URL, timeout=10)
     except requests.exceptions.Timeout:
@@ -1178,11 +1178,11 @@ def spectre_api(request, kind, submission_type, id):
 
                 if SPECTRE_URLS.get('AD'):
                     URL = SPECTRE_URLS['AD'] + "?username=" + id
-                    AD = pool.apply_async(getDataFromAPI, (URL, "AD"))
+                    AD = pool.apply_async(getDataFromAPI, (URL))
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
 
                 # wait for answer
                 if SPECTRE_URLS.get('AD'):
@@ -1200,11 +1200,11 @@ def spectre_api(request, kind, submission_type, id):
             if submission_type == "computer" and id:
                 spectreData = {}
                 pool = ThreadPool(processes=3)
-                
+
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    #spectreData["SCSM"] = getDataFromAPI(URL, "SCSM")
-                    SCSM = pool.apply_async(getDataFromAPI(URL, "SCSM"))
+                    #spectreData["SCSM"] = getDataFromAPI(URL)
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
                 
                 try:
                     spectreData['os'] =  "macOS"
@@ -1227,13 +1227,13 @@ def spectre_api(request, kind, submission_type, id):
                 if spectreData['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
                         URL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        #spectreData["AD"] = getDataFromAPI(URL, "AD")
-                        AD = pool.apply_async(getDataFromAPI(URL, "AD"))
+                        #spectreData["AD"] = getDataFromAPI(URL)
+                        AD = pool.apply_async(getDataFromAPI, (URL))
 
                     if SPECTRE_URLS.get('SCCM'):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
                         #spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
-                        SCCM = pool.apply_async(getDataFromAPI(URL, "SCCM"))
+                        SCCM = pool.apply_async(getDataFromAPI, (URL))
 
                     if SPECTRE_URLS.get('AD'):
                         spectreData["AD"] = AD.get()
