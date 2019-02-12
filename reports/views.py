@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
@@ -313,7 +311,6 @@ def dashboard(request):
                 'user': request.user,
                 'page': 'dashboard'}
 
-    #c.update(csrf(request))
     return render(request, 'reports/dashboard.html', context=context)
 
 @login_required

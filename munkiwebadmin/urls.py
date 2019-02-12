@@ -3,6 +3,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 import django.contrib.auth.views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 from django.contrib import admin
 admin.autodiscover()
@@ -24,9 +25,10 @@ urlpatterns = [
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
     url(r'^icons/', include('icons.urls')),
     url(r'^vpp/', include('vpp.urls')),
+    url(r'^inventory/', include('inventory.urls')),
     url(r'^santa/', include('santa.urls')),
     url(r'^makecatalogs/', include('process.urls')),
-    url(r'^\Z', include('reports.urls')),
+    url(r'^$', RedirectView.as_view(url='/reports/')),
 ]
 
 if os.listdir('/reposado') != []:
