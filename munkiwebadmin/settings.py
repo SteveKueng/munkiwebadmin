@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'corsheaders',
 
     # our apps
@@ -96,6 +95,7 @@ INSTALLED_APPS = [
     'catalogs',
     'pkgsinfo',
     'manifests',
+    'inventory',
     'process',
     'reports',
     'icons',

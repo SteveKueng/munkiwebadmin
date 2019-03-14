@@ -1,12 +1,11 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import url
+import inventory.views
 
-urlpatterns = patterns('inventory.views',
-    url(r'^index/*$', 'index'),
-    url(r'^$', 'index'),
-    url(r'^submit/*$', 'submit'),
-    url(r'^hash/(?P<serial>[^/]+)$', 'inventory_hash'),
-    url(r'^detail/(?P<serial>[^/]+)$', 'detail'),
-    url(r'^items/*$', 'items'),
-    url(r'^items.json/*$', 'items_json'),
-    #url(r'^(?P<mac>[^/]+)$', 'detail'),
-)
+urlpatterns = [
+    url(r'^$', inventory.views.index, name='inventory'),
+    url(r'^hash/(?P<serial>[^/]+)$', inventory.views.inventory_hash),
+    url(r'^detail/(?P<serial>[^/]+)$', inventory.views.detail, name='inventory.detail'),
+    url(r'^items/*$', inventory.views.items, name='inventory.items'),
+    url(r'^items.json/*$', inventory.views.items_json),
+]
+    

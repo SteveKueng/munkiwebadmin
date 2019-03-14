@@ -1,10 +1,8 @@
 from django.db import models
 from reports.models import Machine
 
-# Create your models here.
-
 class Inventory(models.Model):
-    machine = models.ForeignKey(Machine)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     datestamp = models.DateTimeField(auto_now=True)
     sha256hash = models.CharField(max_length=64)
     class Meta:
@@ -13,7 +11,7 @@ class Inventory(models.Model):
 
 
 class InventoryItem(models.Model):
-    machine = models.ForeignKey(Machine)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
     name = models.CharField(max_length=256)
     version = models.CharField(max_length=32)
     bundleid = models.CharField(max_length=256)

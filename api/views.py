@@ -19,6 +19,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine, MunkiReport, Spectre
+from inventory.models import Inventory, InventoryItem
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
@@ -30,6 +31,8 @@ import mimetypes
 import plistlib
 import re
 import base64
+import bz2
+import hashlib
 import zlib
 import requests
 import simpleMDMpy
@@ -138,6 +141,16 @@ def convert_html_to_json(raw_html):
     except (ValueError, KeyError, TypeError):
         data = ""
     return data
+
+
+def decode_to_string(data):
+    '''Decodes an inventory submission, which is a plist-encoded
+    list, compressed via bz2 and base64 encoded.'''
+    try:
+        bz2data = base64.b64decode(data)
+        return bz2.decompress(bz2data)
+    except Exception:
+        return None
 
 
 def getDataFromAPI(URL, key):
@@ -679,7 +692,7 @@ def file_api(request, kind, filepath=None):
 @csrf_exempt
 @logged_in_or_basicauth()
 def db_api(request, kind, subclass=None, serial_number=None):
-    if kind not in ['report', 'vault']:
+    if kind not in ['report', 'vault', 'inventory']:
         return HttpResponse(status=404)
 
     # ------- get submit -------
@@ -867,6 +880,45 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         report.save()
                     except Exception as e:
                         LOGGER.error("report save error: %s", e)
+
+            elif kind in ['inventory']:
+                # list of bundleids to ignore
+                bundleid_ignorelist = [
+                    'com.apple.print.PrinterProxy'
+                ]
+                if machine:
+                    compressed_inventory = submit.get('base64bz2inventory')
+                    if compressed_inventory:
+                        compressed_inventory = compressed_inventory.replace(" ", "+")
+                        inventory_str = decode_to_string(compressed_inventory)
+                        try:
+                            inventory_list = plistlib.readPlistFromString(inventory_str)
+                        except Exception:
+                            inventory_list = None
+                        if inventory_list:
+                            LOGGER.debug(inventory_list)
+                            try:
+                                inventory_meta = Inventory.objects.get(machine=machine)
+                            except Inventory.DoesNotExist:
+                                inventory_meta = Inventory(machine=machine)
+                            inventory_meta.sha256hash = \
+                                hashlib.sha256(inventory_str).hexdigest()
+                            # clear existing inventoryitems
+                            machine.inventoryitem_set.all().delete()
+                            # insert current inventory items
+                            for item in inventory_list:
+                                # skip items in bundleid_ignorelist.
+                                if not item.get('bundleid') in bundleid_ignorelist:
+                                    i_item = machine.inventoryitem_set.create(
+                                        name=item.get('name', ''),
+                                        version=item.get('version', ''),
+                                        bundleid=item.get('bundleid', ''),
+                                        bundlename=item.get('CFBundleName', ''),
+                                        path=item.get('path', '')
+                                        )
+                            inventory_meta.save()
+                        return HttpResponse(status=200)
+                return HttpResponse(status=404)
 
             elif kind in ['vault'] and subclass == "set":
                 if not request.user.has_perm('vault.change_localadmin'):
@@ -1154,7 +1206,7 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def spectre_api(request, kind, submission_type, id):
+def spectre_api(request, kind, submission_type, id=None):
     LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, id))
     if kind not in ['spectre']:
         return HttpResponse(status=404)
@@ -1191,6 +1243,24 @@ def spectre_api(request, kind, submission_type, id):
                             content_type='application/json'
                         )
             
+            if submission_type == "users":
+                spectreData = {}
+                pool = ThreadPool(processes=2)
+
+                if SPECTRE_URLS.get('SCSM'):
+                    URL = SPECTRE_URLS['SCSM'] + "?username=all"
+                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+
+                if SPECTRE_URLS.get('SCSM'):
+                    spectreData["SCSM"] = SCSM.get()
+
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json'
+                        )
+
             if submission_type == "computer" and id:
                 spectreData = {}
                 pool = ThreadPool(processes=3)
@@ -1244,8 +1314,27 @@ def spectre_api(request, kind, submission_type, id):
                             content_type='application/json'
                         )
 
+            if submission_type == "computers":
+                spectreData = {}
+                pool = ThreadPool(processes=2)
+
+                if SPECTRE_URLS.get('SCSM'):
+                    URL = SPECTRE_URLS['SCSM'] + "?computername=all"
+                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+
+                if SPECTRE_URLS.get('SCSM'):
+                    spectreData["SCSM"] = SCSM.get()
+
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json'
+                        )
+                        
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
+
 
 @csrf_exempt
 @logged_in_or_basicauth()

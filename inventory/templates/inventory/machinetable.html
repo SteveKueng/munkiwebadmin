@@ -1,4 +1,3 @@
-{% load url from future %}
 {% if machine_list|length %}
   <p/>
   <table class='clientlist table table-condensed'>
@@ -17,7 +16,7 @@
       {% for machine in machine_list %}
           <tr>
               <td>
-                  <a href='{% url "inventory.views.detail" %}'>
+                  <a href="{% url 'inventory' %}detail/{{machine.serial_number}}">
                   {{ machine.hostname }}
                 </a>
               </td>

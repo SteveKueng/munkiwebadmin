@@ -1,8 +1,6 @@
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import Http404
 #from django.contrib.auth import authenticate, login, logout
@@ -13,9 +11,6 @@ from django.conf import settings
 from django import forms
 from django.db.models import Q
 from django.db.models import Count
-
-from tokenapi.decorators import token_required
-from tokenapi.http import JsonResponse, JsonError
 
 import plistlib
 import base64
@@ -30,79 +25,7 @@ from xml.etree import ElementTree
 from models import Inventory, InventoryItem
 from reports.models import Machine
 
-def decode_to_string(base64bz2data):
-    '''Decodes an inventory submission, which is a plist-encoded
-    list, compressed via bz2 and base64 encoded.'''
-    try:
-        bz2data = base64.b64decode(base64bz2data)
-        return bz2.decompress(bz2data)
-    except Exception:
-        return ''
 
-
-@token_required
-def submit(request):
-    if request.method != 'POST':
-        raise Http404
-    
-    # list of bundleids to ignore
-    bundleid_ignorelist = [
-        'com.apple.print.PrinterProxy'
-    ]
-    submission = request.POST
-    serial = submission.get('serial')
-    machine = None
-    if serial:
-        try:
-            machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist:
-            machine = Machine(serial_number=serial)
-    if machine:
-        if 'hostname' in submission:
-            machine.hostname = submission.get('hostname')
-        if 'username' in submission:
-            machine.username = submission.get('username')
-        if 'location' in submission:
-            machine.location = submission.get('location')
-        machine.remote_ip = request.META['REMOTE_ADDR']
-        compressed_inventory = submission.get('base64bz2inventory')
-        if compressed_inventory:
-            compressed_inventory = compressed_inventory.replace(" ", "+")
-            inventory_str = decode_to_string(compressed_inventory)
-            try:
-                inventory_list = plistlib.readPlistFromString(inventory_str)
-            except Exception:
-                inventory_list = None
-            if inventory_list:
-                try:
-                    inventory_meta = Inventory.objects.get(machine=machine)
-                except Inventory.DoesNotExist:
-                    inventory_meta = Inventory(machine=machine)
-                inventory_meta.sha256hash = \
-                    hashlib.sha256(inventory_str).hexdigest()
-                # clear existing inventoryitems
-                machine.inventoryitem_set.all().delete()
-                # insert current inventory items
-                for item in inventory_list:
-                    # skip items in bundleid_ignorelist.
-                    if not item.get('bundleid') in bundleid_ignorelist:
-                        i_item = machine.inventoryitem_set.create(
-                            name=item.get('name', ''),
-                            version=item.get('version', ''),
-                            bundleid=item.get('bundleid', ''),
-                            bundlename=item.get('CFBundleName', ''),
-                            path=item.get('path', '')
-                            )
-                machine.last_inventory_update = datetime.now()
-                inventory_meta.save()
-            machine.save()
-            return HttpResponse(
-                "Inventory submmitted for %s.\n" %
-                submission.get('hostname'))
-    
-    return HttpResponse("No inventory submitted.\n")
-
-@token_required
 def inventory_hash(request, serial):
     sha256hash = ''
     machine = None
@@ -123,11 +46,10 @@ def inventory_hash(request, serial):
 def index(request):
     all_machines = Machine.objects.all()
 
-    c = RequestContext(request,{'machines': all_machines,
-                               'user': request.user,
-                               'page': 'inventory'})
-    c.update(csrf(request))
-    return render_to_response('inventory/index.html', c)
+    context = {'machines': all_machines,
+                'user': request.user,
+                'page': 'inventory'}
+    return render(request, 'inventory/index.html', context=context)
 
 
 @login_required
@@ -150,12 +72,11 @@ def detail(request, serial):
         
     inventory_items = machine.inventoryitem_set.all()
     
-    c = RequestContext(request,{'machine': machine,
-                                'inventory_items': inventory_items,
-                                'user': request.user,
-                                'page': 'inventory'})
-    c.update(csrf(request))
-    return render_to_response('inventory/detail.html', c)
+    context = {'machine': machine,
+                'inventory_items': inventory_items,
+                'user': request.user,
+                'page': 'inventory'}
+    return render(request, 'inventory/detail.html', context=context)
 
 
 @login_required
@@ -190,7 +111,6 @@ def items(request):
         item_detail['instances'] = []
         for item in items:
             instance = {}
-            instance['mac'] = item.machine.mac
             instance['name'] = name
             instance['serial'] = item.machine.serial_number
             instance['hostname'] = item.machine.hostname
@@ -201,16 +121,14 @@ def items(request):
             instance['path'] = item.path
             item_detail['instances'].append(instance)
         
-        c = RequestContext(request,{'item_detail': item_detail,
-                                    'user': request.user,
-                                    'page': 'inventory'})
-        c.update(csrf(request))
-        return render_to_response('inventory/item_detail.html', c)
+        context = {'item_detail': item_detail,
+                    'user': request.user,
+                    'page': 'inventory'}
+        return render(request, 'inventory/item_detail.html', context=context)
     else:
-        c = RequestContext(request,{'user': request.user,
-                                       'page': 'inventory'})
-        c.update(csrf(request))
-        return render_to_response('inventory/items.html', c)
+        context = {'user': request.user,
+                    'page': 'inventory'}
+        return render(request, 'inventory/items.html', context=context)
 
 
 def items_json(request):
@@ -236,21 +154,3 @@ def items_json(request):
 
     # send it back in JSON format
     return HttpResponse(json.dumps(rows), content_type='application/json')
-
-
-def model_description_lookup(serial):
-    """Determines the models human readable description based off the serial
-    number"""
-    # Based off https://github.com/MagerValp/MacModelShelf/		
-    
-    snippet = serial[-3:]
-    if (len(serial) == 12):
-        snippet = serial[-4:]
-    try:
-        response = urllib2.urlopen(
-            "http://support-sp.apple.com/sp/product?cc=%s&lang=en_US" 
-            % snippet, timeout=2)
-        et = ElementTree.parse(response)
-        return et.findtext("configCode").decode("utf-8")
-    except:
-        return ''
