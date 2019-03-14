@@ -58,6 +58,7 @@ $(document).ready(function()
         "sAjaxSource": window.location.href + ".json",
         "fnServerData": process_json,
         "paging":false,
+        'sDom': '"top"i',
         "bStateSave": true,
         "aaSorting": [[1,'desc']],
         "aoColumns": [
@@ -70,24 +71,18 @@ $(document).ready(function()
         ]
     });
 
-    $('#SearchField').keyup(function(){
+    $('#listSearchField').keyup(function(){
         oTable.fnFilter( $(this).val() );       
     });
     $('#SearchFieldMobile').keyup(function(){
         oTable.fnFilter( $(this).val() );    
     });
 
-    $('#SearchField').change(function(){
-        $('#SearchField').keyup();
+    $('#listSearchField').change(function(){
+        $('#listSearchField').keyup();
     });
 
     $('#SearchFieldMobile').change(function(){
         $('#SearchFieldMobile').keyup();
     });
 });
-
-function sideSecific() {
-}
-
-function setview() {
-}

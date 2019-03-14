@@ -1,4 +1,3 @@
-{% load url from future %}
 <!--<span class="badge">{{ inventory_items|length }}</span>-->
 {% if inventory_items|length %}
 <p/>
@@ -14,11 +13,11 @@
       </thead>
       <tbody>
       {% for item in inventory_items %}
-          <tr {% if perms.reports.can_view_reports %}onclick="document.location = '{% url 'reports.views.detail' item.serial %}';"{% endif %}>
+          <tr {% if perms.reports.can_view_reports %}onclick="document.location = '{% url 'reports' %}#{{item.serial}}';"{% endif %}>
               <td>
                   {{ item.hostname }}
               </td>
-              <td><a href='{% url "inventory.views.items" %}?name={{ item.name|urlencode }}&version={{ item.version|urlencode }}'>
+              <td><a href='{% url "inventory.items" %}?name={{ item.name|urlencode }}&version={{ item.version|urlencode }}'>
                   {{ item.version }}
               </a></td>
               <td>{{ item.bundleid }}</td>
