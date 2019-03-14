@@ -1252,7 +1252,7 @@ def spectre_api(request, kind, submission_type, id=None):
                     SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
 
                 if SPECTRE_URLS.get('SCSM'):
-                    spectreData["SCSM"] = SCSM.get()
+                    spectreData = SCSM.get()
 
                 if spectreData:
                     return HttpResponse(
@@ -1323,7 +1323,7 @@ def spectre_api(request, kind, submission_type, id=None):
                     SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
 
                 if SPECTRE_URLS.get('SCSM'):
-                    spectreData["SCSM"] = SCSM.get()
+                    spectreData = SCSM.get()
 
                 if spectreData:
                     return HttpResponse(
