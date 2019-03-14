@@ -1009,7 +1009,6 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
         
         if data:
             if response_type == 'json':
-                request_data = convert_dates_to_strings(data)
                 return HttpResponse(
                     json.dumps(data) + '\n',
                     content_type='application/json')
@@ -1040,11 +1039,6 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
             raise PermissionDenied
         
         # ------- get submit -------
-        try:
-            submit = json.loads(request.body)
-        except:
-            submit = request.POST
-        
         if submission_type == "devices" and primary_id:
             try:
                 machine = Machine.objects.get(serial_number=primary_id)
