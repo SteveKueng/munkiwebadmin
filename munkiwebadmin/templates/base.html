@@ -131,6 +131,14 @@
                     </li>
                     {% endif %}
                 {% endif %}
+                {% if perms.reports.can_view_reports %}
+                <li {% if page == 'inventory' %} class="active" {% endif %}>
+                    <a href="{% url 'inventory' %}items">
+                        <i class="fas fa-database"></i>
+                        Inventory
+                    </a>
+                </li>
+                {% endif %}
                 {% if perms.manifests.view_manifestfile %}
                 <li {% if page == 'manifests' %} class="active" {% endif %}>
                     <a href="{% url 'manifests' %}">
