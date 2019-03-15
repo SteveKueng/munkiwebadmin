@@ -1356,15 +1356,18 @@ def spectre_api(request, kind, submission_type, id=None):
         
         if submission_type == "user" and id:
             backendTarget = submit.get("backendTarget")
+            LOGGER.debug("backendTarget: %s", backendTarget)
 
             SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
-            if backendTarget:
+            LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
+            if SPECTRE_URL:
                 URL = SPECTRE_URL + "?username=" + id
                 USERDATA = pool.apply_async(postDataAPI, (URL, submit))
 
                 # wait for answer
                 spectreData = USERDATA.get()
 
+                LOGGER.debug("spectreData: %s", spectreData)
                 if spectreData:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
