@@ -1361,6 +1361,9 @@ def spectre_api(request, kind, submission_type, id=None):
             SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
             LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
             if SPECTRE_URL:
+                spectreData = {}
+                pool = ThreadPool(processes=2)
+
                 URL = SPECTRE_URL + "?username=" + id
                 USERDATA = pool.apply_async(postDataAPI, (URL, submit))
 
@@ -1376,15 +1379,21 @@ def spectre_api(request, kind, submission_type, id=None):
 
         if submission_type == "computer" and id:
             backendTarget = submit.get("backendTarget")
+            LOGGER.debug("backendTarget: %s", backendTarget)
 
             SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
+            LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
             if backendTarget:
+                spectreData = {}
+                pool = ThreadPool(processes=2)
+                
                 URL = SPECTRE_URL + "?computer=" + id
                 COMPUTERDATA = pool.apply_async(postDataAPI, (URL, submit))
 
                 # wait for answer
                 spectreData = COMPUTERDATA.get()
 
+                LOGGER.debug("spectreData: %s", spectreData)
                 if spectreData:
                     return HttpResponse(
                             content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
