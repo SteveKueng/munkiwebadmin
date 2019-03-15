@@ -153,9 +153,21 @@ def decode_to_string(data):
         return None
 
 
-def getDataFromAPI(URL, key):
+def getDataFromAPI(URL):
     try:
         response = requests.get(URL, timeout=10)
+    except requests.exceptions.Timeout:
+        pass
+    else:
+        if response.status_code in [200, 201, 202, 203, 204]:
+            response.encoding = "utf-8-sig"
+            return convert_html_to_json(response.text)
+    return None
+
+
+def postDataAPI(URL, postData):
+    try:
+        response = requests.post(URL, timeout=10, data=json.dumps(postData))
     except requests.exceptions.Timeout:
         pass
     else:
@@ -1211,6 +1223,12 @@ def spectre_api(request, kind, submission_type, id=None):
     if kind not in ['spectre']:
         return HttpResponse(status=404)
     
+    # ------- get submit -------
+    try:
+        submit = json.loads(request.body)
+    except:
+        submit = request.POST
+
     if request.method == 'GET':
         LOGGER.debug("Got API GET request for %s", kind)
 
@@ -1224,11 +1242,11 @@ def spectre_api(request, kind, submission_type, id=None):
 
                 if SPECTRE_URLS.get('AD'):
                     URL = SPECTRE_URLS['AD'] + "?username=" + id
-                    AD = pool.apply_async(getDataFromAPI, (URL, "AD"))
+                    AD = pool.apply_async(getDataFromAPI, (URL))
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
 
                 # wait for answer
                 if SPECTRE_URLS.get('AD'):
@@ -1249,7 +1267,7 @@ def spectre_api(request, kind, submission_type, id=None):
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?username=all"
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
 
                 if SPECTRE_URLS.get('SCSM'):
                     spectreData = SCSM.get()
@@ -1267,8 +1285,7 @@ def spectre_api(request, kind, submission_type, id=None):
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    #spectreData["SCSM"] = getDataFromAPI(URL)
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
                 
                 try:
                     spectreData['os'] =  "macOS"
@@ -1291,13 +1308,11 @@ def spectre_api(request, kind, submission_type, id=None):
                 if spectreData['os'] == "Windows":
                     if SPECTRE_URLS.get('AD'):
                         URL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        #spectreData["AD"] = getDataFromAPI(URL)
-                        AD = pool.apply_async(getDataFromAPI, (URL, "AD"))
+                        AD = pool.apply_async(getDataFromAPI, (URL))
 
                     if SPECTRE_URLS.get('SCCM'):
                         URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        #spectreData["SCCM"] = getDataFromAPI(URL, "SCCM")
-                        SCCM = pool.apply_async(getDataFromAPI, (URL, "SCCM"))
+                        SCCM = pool.apply_async(getDataFromAPI, (URL))
 
                     if SPECTRE_URLS.get('AD'):
                         spectreData["AD"] = AD.get()
@@ -1320,7 +1335,7 @@ def spectre_api(request, kind, submission_type, id=None):
 
                 if SPECTRE_URLS.get('SCSM'):
                     URL = SPECTRE_URLS['SCSM'] + "?computername=all"
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, "SCSM"))
+                    SCSM = pool.apply_async(getDataFromAPI, (URL))
 
                 if SPECTRE_URLS.get('SCSM'):
                     spectreData = SCSM.get()
@@ -1332,6 +1347,48 @@ def spectre_api(request, kind, submission_type, id=None):
                             content_type='application/json'
                         )
                         
+    
+    if request.method == 'POST':
+        LOGGER.debug("Got API POST request for %s", kind)
+
+        if not request.user.has_perm('reports.change_spectre'):
+            raise PermissionDenied
+        
+        if submission_type == "user" and id:
+            backendTarget = submit.get("backendTarget")
+
+            SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
+            if backendTarget:
+                URL = SPECTRE_URL + "?username=" + id
+                USERDATA = pool.apply_async(postDataAPI, (URL, submit))
+
+                # wait for answer
+                spectreData = USERDATA.get()
+
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json')
+
+        if submission_type == "computer" and id:
+            backendTarget = submit.get("backendTarget")
+
+            SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
+            if backendTarget:
+                URL = SPECTRE_URL + "?computer=" + id
+                COMPUTERDATA = pool.apply_async(postDataAPI, (URL, submit))
+
+                # wait for answer
+                spectreData = COMPUTERDATA.get()
+
+                if spectreData:
+                    return HttpResponse(
+                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
+                            status=200,
+                            content_type='application/json')
+
+
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
 
