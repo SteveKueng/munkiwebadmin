@@ -3,18 +3,25 @@ version: '3'
 services:
   db:
     image: postgres
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./docker/certs:/etc/nginx/certs
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:80
     environment:
       - DB_HOST=db
       - DB_NAME=postgres
       - DB_USER=postgres
       - DB_PASS=
+      - VIRTUAL_HOST=munkiwebadmin.example.com
     volumes:
       - .:/munkiwebadmin
       - /Users/Shared/munkirepo:/munkirepo
-    ports:
-      - "8000:8000"
     depends_on:
       - db
