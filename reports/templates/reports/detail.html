@@ -34,6 +34,7 @@
 						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#VPP" aria-controls="VPP" role="tab" data-toggle="tab">VPP</a></li>
 						<li role="presentation"><a class="tab" href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fas fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
+						<li role="presentation"><a class="tab" href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li>
 						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#MDM" aria-controls="MDM" role="tab" data-toggle="tab">MDM</a></li>
 						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if perms.vault.view_passwordAccess %}
@@ -420,6 +421,15 @@
 							</div>
 						</div>
 						{% endif %}
+					</div>
+				</div>
+				<div role="tabpanel" class="tab-pane tabDetail" id="Inventory">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12" id="InventoryItems">
+								
+							</div>
+						</div>
 					</div>
 				</div>
 				<div role="tabpanel" class="tab-pane tabDetail" id="MDM">
