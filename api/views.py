@@ -155,7 +155,7 @@ def decode_to_string(data):
 
 def getDataFromAPI(URL):
     try:
-        response = requests.get(URL, timeout=10)
+        response = requests.get(URL, timeout=15)
     except requests.exceptions.Timeout:
         pass
     else:
@@ -167,7 +167,7 @@ def getDataFromAPI(URL):
 
 def postDataAPI(URL, postData):
     try:
-        response = requests.post(URL, timeout=10, data=json.dumps(postData))
+        response = requests.post(URL, timeout=15, data=json.dumps(postData))
     except requests.exceptions.Timeout:
         pass
     else:
