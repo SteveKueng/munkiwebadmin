@@ -15,7 +15,10 @@
 						{% endif %} 
 					</div>
 					<div class="col-sm-6">
-						<h2>{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}<button type="button" class="btn btn-link" onclick="copyTextToClipboard('{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}');"><i class="fas fa-copy"></i></button></h2>
+						<h2>{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}
+							<button type="button" class="btn btn-link" onclick="copyTextToClipboard('{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}');"><i class="fas fa-copy"></i></button>
+							
+						</h2>
 						<h4>
 							<small>
 							<b id="machineModel">{{ machine.machine_model }}</b>
@@ -25,6 +28,12 @@
 							</small>
 						</h4>
 					</div>
+					{% if machine.hostname %}
+					<div class="pull-left hidden-xs" style="margin-top:15px;">
+						<a type="button" class="btn btn-link" href="vnc://{{ machine.hostname.strip }}">ScreenSharing <i class="far fa-clone"></i></a>
+						<a type="button" class="btn btn-link" href="ssh://{{ vault_username }}@{{ machine.hostname.strip }}">SSH <i class="fas fa-terminal"></i></a>
+					</div>
+					{% endif %}
 					<div id="qrcode" class="pull-right hidden-xs" style="margin-top:20px;"></div>
 				</div>
 				<div role="tabpanel">
