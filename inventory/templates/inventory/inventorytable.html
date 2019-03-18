@@ -1,7 +1,6 @@
-<!-- <h3>{{ list_title }} <span class="badge badge-info">{{ inventory_items|length }}</span></h3> -->
+<h4>{{ list_title }} <span class="badge badge-info">{{ inventory_items|length }}</span></h4>
 {% if inventory_items|length %}
-  <br>
-  <table class='clientlist table table-hover table-condensed '>
+  <table class='clientlist table table-hover table-condensed'>
       <tbody>
       {% for item in inventory_items %}
           <tr onclick="document.location = '{% url "inventory" %}items/?name={{ item.name|urlencode }}';">

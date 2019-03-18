@@ -145,19 +145,6 @@ $(document).on('click','.form-control', function (e) {
     removeDeleteButton('.manifestItem');
 });
 
-$(document).on('click','.workflows', function (e) {
-    if($(this).hasClass('active')) {
-        workflowName = " "
-        $(this).removeClass('active');
-    } else {
-        workflowName = $(this).find(':first-child').text();
-        item = $("#imagrworkflow").find('.workflows');
-        $(item).removeClass('active');
-        $(this).addClass('active');
-    } 
-    setWorkflow(workflowName);
-});
-
 $(document).on('click','#showPassButton', function (e) {
     e.preventDefault()
     reason = $('#showPass').find('textarea').val()
@@ -282,8 +269,8 @@ function getComputerItem(pathname) {
                 }
     
                 getDeviceIcon(serial, "_iconDetail");
-                //getImagrReports(serial);
                 loadPasswordAccess(serial);
+                loadInventory(serial);
                 getMDMDeviceInfo(serial);
                 get_model_description(serial);
                 if (tab) {
@@ -853,34 +840,6 @@ function deleteMachineAndManifest() {
     deleteMachine();
 }
 
-function setWorkflow(workflow) {
-    event.preventDefault();
-    var machineURL = '/api/report/'+current_pathname;
-    $.ajax({
-        method: 'POST',
-        url: machineURL,
-        data: { imagr_workflow : workflow },
-        success: function(data) {
-            //set active
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $("#errorModalTitleText").text("workflow set error");
-            try {
-                var json_data = $.parseJSON(jqXHR.responseText)
-                if (json_data['result'] == 'failed') {
-                    $("#errorModalDetailText").text(json_data['detail']);
-                    $("#errorModal").modal("show");
-                    return;
-                }
-            } catch(err) {
-                // do nothing
-            }
-            $("#errorModalDetailText").text(errorThrown);
-            $("#errorModal").modal("show");
-        }
-    });
-}
-
 function getInitialManifest(serial, handleData) {
     var defautlManifestTyp = $("#defaultManifestType").attr('value');
     if (defautlManifestTyp == "hostname") {
@@ -1286,6 +1245,20 @@ function removeDeviceFromAppGroup(groupID, deviceID) {
             $("#errorModalDetailText").text(errorThrown);
             $("#process_progress").modal("hide");
             $("#errorModal").modal("show");
+        }
+    });
+}
+
+function loadInventory(serial) {
+    url = "/inventory/detail/" + serial
+    $.ajax({
+        method: 'GET',
+        url: url,
+        success: function(data) {
+            $("#InventoryItems").append(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // do nothing
         }
     });
 }
