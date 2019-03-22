@@ -134,6 +134,7 @@ def convert_to_qwertz(string):
 
 
 def convert_html_to_json(raw_html):
+    LOGGER.debug("raw html: %s", raw_html)
     cleanr = re.compile('<.*?>')
     cleantext = re.sub(cleanr, '', raw_html)
     try:
@@ -167,7 +168,7 @@ def getDataFromAPI(URL):
 
 def postDataAPI(URL, postData):
     try:
-        response = requests.post(URL, timeout=15, data=json.dumps(postData))
+        response = requests.post(URL, timeout=15, data=postData)
     except requests.exceptions.Timeout:
         pass
     else:
@@ -1172,6 +1173,7 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
                                     'exception_type': 'BadRequest',
                                     'detail': 'Missing group'}),
                         content_type='application/json', status=400)
+                        
             if action == "devices":
                 if primary_id and secondary_id:
                     appGroups = simpleMDMpy.appGroups(simpleMDMKey)
@@ -1364,8 +1366,7 @@ def spectre_api(request, kind, submission_type, id=None):
                 spectreData = {}
                 pool = ThreadPool(processes=2)
 
-                URL = SPECTRE_URL + "?username=" + id
-                USERDATA = pool.apply_async(postDataAPI, (URL, submit))
+                USERDATA = pool.apply_async(postDataAPI, (SPECTRE_URL, submit))
 
                 # wait for answer
                 spectreData = USERDATA.get()
@@ -1383,12 +1384,11 @@ def spectre_api(request, kind, submission_type, id=None):
 
             SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
             LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
-            if backendTarget:
+            if SPECTRE_URL:
                 spectreData = {}
                 pool = ThreadPool(processes=2)
-                
-                URL = SPECTRE_URL + "?computer=" + id
-                COMPUTERDATA = pool.apply_async(postDataAPI, (URL, submit))
+
+                COMPUTERDATA = pool.apply_async(postDataAPI, (SPECTRE_URL, submit))
 
                 # wait for answer
                 spectreData = COMPUTERDATA.get()
