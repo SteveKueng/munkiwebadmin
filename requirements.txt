@@ -1,4 +1,4 @@
-django==1.11.18
+django==1.11.20
 uwsgi
 psycopg2-binary
 mysqlclient
