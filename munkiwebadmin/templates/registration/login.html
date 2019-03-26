@@ -1,65 +1,90 @@
-{% extends "base.html" %}
 {% load mwa_extras %}
-
-{% block java_script %}
 {% load static %}
-{% if not user.is_authenticated %}
-<script type='text/javascript'>
-$(document).ready(function() {
-    $('#loginModal').on('shown.bs.modal', function () {
-        $('#login_username_field').find('input').focus();
-    })
-    $('#loginModal').modal('show');
-});
-</script>
-{% endif %}
-{% endblock java_script %}
-
-{% block content %}
 {% if user.is_authenticated %}
-    <meta http-equiv="refresh" content="1; url={% url 'dashboard' %}">
+<meta http-equiv="refresh" content="1; url={% url 'dashboard' %}">
 {% else %}
-<!--
-Bootstrap modal
--->
-<div class="modal fade" data-hide="false" data-backdrop="static" id="loginModal">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <form method="post" action="{% url "login" %}">
-      <div class="modal-header">
-        <img src="{% get_static_prefix %}styles/{{ style }}/logo.png" width="100" style="display: block; margin-left: auto; margin-right: auto;">
-        <br>
-        <h4 class="modal-title text-primary" style="text-align:center">MunkiWebAdmin</h4>
-      </div>
-      <div class="modal-body">
-        {% if form.errors %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Steve Küng">
+
+    <title>{{ APPNAME }} - {{ style|upper }}</title>
+
+    {% load static %}
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/bootstrap.min.css' type="text/css" media="all" />
+
+    <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
+
+    <!-- jQuery -->
+    <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script type='text/javascript' src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <script type='text/javascript' src='{% get_static_prefix %}js/typeahead/bootstrap3-typeahead.min.js'></script>
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .col-centered{
+        float: none;
+        margin: 0 auto;
+      }
+
+      body {
+        padding-top: 130px;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+        body {
+          padding-left: 0px;
+        }
+      }
+    </style>
+    <link rel="icon" href="{% get_static_prefix %}styles/{{ style }}/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
+  </head>
+  <body class="text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-centered">
+    <form method="post" action="{% url "login" %}">
+      {% csrf_token %}
+      <img class="mb-4" src="{% get_static_prefix %}styles/{{ style }}/logo.png" alt="" height="72">
+      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      {% if form.errors %}
             <div class="alert alert-danger" role="alert">
                 Your username and password didn't match. Please try again.
             </div>
         {% endif %}
-        {% csrf_token %}
-        <div class="form-group" id='login_username_field'>
-        <!--  {{ form.username.label_tag }} -->
-            {{ form.username|addcss:'form-control' }}
-        </div>
-        <div class="form-group" style="margin-bottom: 0px !important;">
-        <!--  {{ form.password.label_tag }} -->
-            {{ form.password|addcss:'form-control' }}
-        </div>
-        <script type="text/javascript" >
+      <label for="inputEmail" class="sr-only">Username</label>
+      {{ form.username|addcss:'form-control' }}
+      <label for="inputPassword" class="sr-only">Password</label>
+      {{ form.password|addcss:'form-control' }}
+      <script type="text/javascript" >
         $(document).ready(function(){
             $("#id_username").attr('placeholder', '{{form.username.label}}');
             $("#id_password").attr('placeholder', '{{form.password.label}}');
         });
-        </script>
-        <input type="hidden" name="next" value="{{ next }}" />
-      </div>
-      <div class="modal-footer">
-          <input type="submit" class="btn btn-primary btn-block" value="Log in" />
-      </div>
-      </form>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+      </script>
+      <input type="submit" class="btn btn-primary btn-block" value="Log in" /> 
+    </form>
+  </div>
 </div>
+  </div>
+  </body>
+</html>
 {% endif %}
-{% endblock content %}
