@@ -1173,6 +1173,18 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
                                     'exception_type': 'BadRequest',
                                     'detail': 'Missing group'}),
                         content_type='application/json', status=400)
+
+            if action == "update_apps":
+                if primary_id:
+                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
+                    appGroups.proxyDict = proxies
+                    response = appGroups.updateApps(appGroupID=primary_id)
+                else:
+                    return HttpResponse(
+                        json.dumps({'result': 'failed',
+                                    'exception_type': 'BadRequest',
+                                    'detail': 'Missing group'}),
+                        content_type='application/json', status=400)
                         
             if action == "devices":
                 if primary_id and secondary_id:
