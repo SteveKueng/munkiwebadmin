@@ -1148,6 +1148,9 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
 
             if action == "refresh":
                 response = devices.refreshDevice(deviceID=machine.simpleMDMID)
+            
+            if action == "push_apps":
+                response = devices.pushAppsDevice(deviceID=machine.simpleMDMID)
 
         if submission_type == "device_groups" and action == "devices":
             if primary_id and secondary_id:
