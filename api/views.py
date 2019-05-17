@@ -1100,7 +1100,7 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
 
     if request.method == 'POST':
         LOGGER.debug("Got API POST request for %s", kind)
-        if not request.user.has_perm('reports.change_machine'):
+        if not request.user.has_perm('reports.can_push_mdm'):
             raise PermissionDenied
         
         # ------- get submit -------

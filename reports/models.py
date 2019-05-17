@@ -63,7 +63,8 @@ class MunkiReport(models.Model):
     class Meta:
         ordering = ['machine']
         permissions = (("can_view_reports", "Can view reports"),
-                       ("can_view_dashboard", "Can view dashboard"),)
+                       ("can_view_dashboard", "Can view dashboard"),
+                       ("can_push_mdm", "Can push mdm"),)
 
     def hostname(self):
         return self.machine.hostname
