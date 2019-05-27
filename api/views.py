@@ -1244,7 +1244,7 @@ def updates_api(request, kind):
     if not request.user.has_perm('updates.view_updates'):
         raise PermissionDenied
 
-    response = updates.list_products()
+    response = updates.views.list_products()
     return HttpResponse(json.dumps(response),
             content_type='application/json')
 
