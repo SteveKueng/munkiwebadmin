@@ -30,7 +30,7 @@ reposadocommon.prefsFilePath = prefsFilePath
 
 @login_required
 def status(request):
-    '''Returns status of long-running process'''
+	'''Returns status of long-running process'''
 	LOGGER.debug('got status request for update_list_process')
 	status_response = {}
 	processes = Process.objects.filter(name='update_list_process')
