@@ -22,6 +22,7 @@ from reports.models import Machine, MunkiReport, Spectre
 from inventory.models import Inventory, InventoryItem
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+import updates
 
 import datetime
 import json
@@ -207,6 +208,7 @@ def getSimpleMDMDeviceGroups(apiKey):
     if response.status_code in range(200,207):
         return response.json()
     return None
+
 
 def getSimpleMDMAppGroups(apiKey):
     """ returns device info for your device """
@@ -1232,6 +1234,19 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
+
+@csrf_exempt
+@logged_in_or_basicauth()
+def updates_api(request, kind):
+    LOGGER.debug("Got API request for %s" % (kind))
+    if kind not in ['updates']:
+        return HttpResponse(status=404)
+    if not request.user.has_perm('updates.view_updates'):
+        raise PermissionDenied
+
+    response = updates.list_products()
+    return HttpResponse(json.dumps(response),
+            content_type='application/json')
 
 @csrf_exempt
 @logged_in_or_basicauth()
