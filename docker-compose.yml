@@ -11,6 +11,12 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./docker/certs:/etc/nginx/certs
+  reposado:
+    image: stevekueng/reposado
+    ports:
+      - "8088:8088"
+    volumes:
+      - /Volumes/WORK/MAIN/reposado:/reposado
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:80
@@ -23,5 +29,11 @@ services:
     volumes:
       - .:/munkiwebadmin
       - /Users/Shared/munkirepo:/munkirepo
+      - /Volumes/WORK/MAIN/reposado:/reposado
     depends_on:
       - db
+      - reposado
+
+volumes:
+  Reposado:
+    external: false
