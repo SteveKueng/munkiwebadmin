@@ -65,6 +65,11 @@ try:
 except AttributeError:
     CONVERT_TO_QWERTZ = False
 
+try:
+    TIMEOUT = settings.TIMEOUT
+except AttributeError:
+    TIMEOUT = 20
+
 proxies = {}
 if PROXY_ADDRESS != "":
     proxies = {
@@ -169,7 +174,7 @@ def decode_to_string(data):
 
 def getDataFromAPI(URL):
     try:
-        response = requests.get(URL, timeout=15)
+        response = requests.get(URL, timeout=TIMEOUT)
     except requests.exceptions.Timeout:
         pass
     else:
@@ -181,7 +186,7 @@ def getDataFromAPI(URL):
 
 def postDataAPI(URL, postData):
     try:
-        response = requests.post(URL, timeout=15, data=postData)
+        response = requests.post(URL, timeout=TIMEOUT, data=postData)
     except requests.exceptions.Timeout:
         pass
     else:

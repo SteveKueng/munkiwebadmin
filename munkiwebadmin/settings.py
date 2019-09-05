@@ -70,6 +70,8 @@ LOGIN_EXEMPT_URLS = ()
 # django ldap auth
 USE_LDAP = False
 
+TIMEOUT = 20 # default 20
+
 try:
     execfile("/config/settings.py")
 except:
