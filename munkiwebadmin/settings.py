@@ -237,7 +237,7 @@ LOGGING = {
         },
         'file': {
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/munkiwebadmin.log',
+            'filename': 'munkiwebadmin.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter': 'verbose'
@@ -258,7 +258,7 @@ LOGGING = {
 }
 
 # needed by django-wsgiserver when using staticserve=collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
