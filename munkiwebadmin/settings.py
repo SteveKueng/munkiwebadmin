@@ -21,9 +21,6 @@ APPNAME = os.getenv('APPNAME')
 MUNKI_REPO_DIR = '/munkirepo'
 MAKECATALOGS_PATH = '/munkitools/makecatalogs'
 
-#if os.getenv('DJANGO_ENV') == 'prod':
-#    ICONS_URL = "/icons/"
-#else:
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
 
@@ -54,9 +51,8 @@ if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
 # keyczart addkey --location=fieldkeys --status=primary --size=256
 ENCRYPTED_FIELDS_KEYDIR = '/fieldkeys'
 
-if os.getenv('SECRET_KEY'):
-    SECRET_KEY = os.getenv('SECRET_KEY')
-else:
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
     SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
 
 DEBUG = False
@@ -69,6 +65,7 @@ LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
 USE_LDAP = False
+KERBEROS_REALM = os.getenv('KERBEROS_REALM')
 
 TIMEOUT = 20 # default 20
 
@@ -114,10 +111,10 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_remote_auth_ldap.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    #'munkiwebadmin.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
@@ -141,7 +138,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'munkiwebadmin.wsgi.application'
-
 
 if os.getenv('DB') == 'postgres':
     DATABASES = {
@@ -180,10 +176,6 @@ if os.getenv('DB') == 'mssql':
         }
     }
 
-
-    
-
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -199,10 +191,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
-
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE')
 
 TIME_ZONE = os.getenv('TIME_ZONE')
@@ -274,12 +264,18 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-
 if USE_LDAP:
-    AUTHENTICATION_BACKENDS = (
-        'django_auth_ldap.backend.LDAPBackend',
-        'django.contrib.auth.backends.ModelBackend',
-    )
+    if KERBEROS_REALM:
+        AUTHENTICATION_BACKENDS = (
+            'django_remote_auth_ldap.backend.RemoteUserLDAPBackend',
+            'django_auth_ldap.backend.LDAPBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        )
+    else:
+        AUTHENTICATION_BACKENDS = (
+            'django_auth_ldap.backend.LDAPBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        )
 else:
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
