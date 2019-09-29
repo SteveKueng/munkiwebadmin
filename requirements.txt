@@ -7,6 +7,7 @@ django-pyodbc-azure<2.0
 django-encrypted-fields
 python-ldap
 django-auth-ldap
+django-remote-auth-ldap
 django-cors-headers
 requests
 simpleMDMpy

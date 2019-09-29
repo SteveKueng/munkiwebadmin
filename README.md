@@ -205,3 +205,14 @@ if there is no admin user create one:
 ```bash
 docker exec -it munkiwebadmin_web_1 /bin/bash -c "python manage.py createsuperuser"
 ```
+
+# Kerberos
+setspn.exe  -A HTTP/munkiwebadmin EXAMPLE\munkiwebadmin
+setspn.exe  -A HTTP/munkiwebadmin.example.com EXAMPLE\munkiwebadmin
+
+ktpass /princ HTTP/munkiwebadmin.example.com@EXAMPLE.COM /ptype krb5_nt_principal /crypto rc4-hmac-nt /mapuser EXAMPLE\munkiwebadmin /out krb5.keytab -kvno 0 /pass 
+
+kinit -5 -V -k -t /etc/krb5.keytab HTTP/munkiwebadmin.example.com@EXAMPLE.COM
+
+/etc/hosts
+127.0.0.1	munkiwebadmin.example.com munkiwebadmmin localhost
