@@ -207,12 +207,62 @@ docker exec -it munkiwebadmin_web_1 /bin/bash -c "python manage.py createsuperus
 ```
 
 # Kerberos
+add the spn to your service account and generate the keytab file (execute this commands on your windows server)
+```
 setspn.exe  -A HTTP/munkiwebadmin EXAMPLE\munkiwebadmin
 setspn.exe  -A HTTP/munkiwebadmin.example.com EXAMPLE\munkiwebadmin
-
 ktpass /princ HTTP/munkiwebadmin.example.com@EXAMPLE.COM /ptype krb5_nt_principal /crypto rc4-hmac-nt /mapuser EXAMPLE\munkiwebadmin /out krb5.keytab -kvno 0 /pass 
+```
 
+copy the krb5.keytab to your docker host
+create the followning http conf on your docker host:
+```
+WSGIPythonPath /munkiwebadmin/munkiwebadmin
+<VirtualHost *:80>
+    <Location />
+        AuthType Kerberos
+        AuthName "Login"
+        KrbMethodNegotiate On
+        KrbMethodK5Passwd On
+        KrbAuthRealms EXAMPLE.COM
+        KrbServiceName HTTP/munkiwebadmin.example.com@EXAMPLE.COM
+        Krb5KeyTab /etc/krb5.keytab
+        require valid-user
+    </Location>
+
+    Alias /static /munkiwebadmin/static
+    <Directory /munkiwebadmin/static>
+        Require all granted
+    </Directory>
+    
+    Alias "/media" "/munkirepo/icons"
+    <Location "/media">
+    	Require all granted
+    </Location>
+
+    <Directory /munkiwebadmin/munkiwebadmin >
+        WSGIProcessGroup munkiwebadmin
+        WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+
+    WSGIDaemonProcess munkiwebadmin python-path=/munkiwebadmin
+    WSGIProcessGroup munkiwebadmin
+
+    WSGIScriptAlias / /munkiwebadmin/munkiwebadmin/wsgi.py
+
+    LimitRequestBody 0 
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+start the docker image with the following command:
+```bash
+docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /Users/Shared/krb5.keytab:/etc/krb5.keytab -v /Users/Shared/http.conf:/etc/apache2/sites-enabled/000-default.conf -e KERBEROS_REALM=EXAMPLE.COM -e VIRTUAL_HOST=munkiwebadmin.example.com -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h "$HOSTNAME" stevekueng/munkiwebadmin
+```
+
+within the docker image you can test your kerberos conf with:
+```bash
 kinit -5 -V -k -t /etc/krb5.keytab HTTP/munkiwebadmin.example.com@EXAMPLE.COM
-
-/etc/hosts
-127.0.0.1	munkiwebadmin.example.com munkiwebadmmin localhost
+```
