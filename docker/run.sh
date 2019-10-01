@@ -9,8 +9,10 @@ fi
 
 update-ca-certificates
 
+cp /etc/hosts /etc/hosts.bak
 virtual_host_short=$(echo $VIRTUAL_HOST | cut -d. -f1)
-sed "s/127.0.0.1.*/127.0.0.1 localhost $virtual_host_short $VIRTUAL_HOST/" /etc/hosts
+sed -i "s/127.0.0.1.*/127.0.0.1 localhost $virtual_host_short $VIRTUAL_HOST/" /etc/hosts.bak
+cp /etc/hosts.bak /etc/hosts
 
 #seret key
 python manage.py generate_secret_key --replace
