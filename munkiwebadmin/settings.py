@@ -268,7 +268,6 @@ if USE_LDAP:
     if KERBEROS_REALM:
         AUTHENTICATION_BACKENDS = (
             'django_remote_auth_ldap.backend.RemoteUserLDAPBackend',
-            'django_auth_ldap.backend.LDAPBackend',
             'django.contrib.auth.backends.ModelBackend',
         )
     else:
