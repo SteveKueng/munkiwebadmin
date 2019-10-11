@@ -69,6 +69,10 @@ RUN find ${APP_DIR} -name '*.pyc' -delete
 # Install all python dependency libs
 RUN pip install -r requirements.txt
 
+# install remote ldap
+RUN git clone https://github.com/apmorton/django-remote-auth-ldap.git
+RUN python django-remote-auth-ldap/setup.py install
+
 # configure git
 RUN git config --global core.preloadindex true
 RUN git config --global core.fscache true
