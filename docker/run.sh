@@ -26,7 +26,4 @@ python manage.py makemigrations manifests pkgsinfo process reports updates vault
 python manage.py migrate --noinput
 
 chown -R www-data:www-data $APP_DIR
-chown -R www-data:www-data /reposado
-chown -R www-data:www-data /munkirepo
-
 exec "$@"

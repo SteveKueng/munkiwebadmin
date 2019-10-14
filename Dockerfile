@@ -81,6 +81,10 @@ RUN git config --global gc.auto 256
 ADD ./docker/munkiwebadmin.conf /etc/apache2/sites-available/000-default.conf
 RUN chown -R www-data:www-data ${APP_DIR}
 
+# permissions for www-data
+RUN usermod -u 1000 www-data
+RUN usermod -G staff www-data
+
 VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
 
 # Exposed port
