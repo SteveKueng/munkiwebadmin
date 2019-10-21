@@ -91,3 +91,4 @@ VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
 EXPOSE 80
 ENTRYPOINT ["/bin/sh", "docker/run.sh"]
 CMD ["apache2ctl", "-D","FOREGROUND"]
+USER www-data
