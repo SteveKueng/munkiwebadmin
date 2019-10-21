@@ -25,5 +25,4 @@ cp static_root/styles/$STYLE/favicon.ico .
 python manage.py makemigrations manifests pkgsinfo process reports updates vault
 python manage.py migrate --noinput
 
-chown -R www-data:www-data $APP_DIR
 exec "$@"
