@@ -22,7 +22,7 @@
 						<h4>
 							<small>
 							<b id="machineModel">{{ machine.machine_model }}</b>
-							{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType %}
+							{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity %}
 							| <i class="fa fa-battery-{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbattery:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}" aria-hidden="true"></i> {{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbatteryprecent:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}%
 							{% endif %}
 							</small>
@@ -197,7 +197,7 @@
 								</ul>
 							</div>
 						</div>
-						{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType %}
+						{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity %}
 						<h4>Battery</h4>
 						<div class="row">
 							<div class="col-lg-6">
@@ -206,9 +206,9 @@
 									<li class="list-group-item"><b>Firmware:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_model_info.sppower_battery_firmware_version }}</span></li>
 									<li class="list-group-item"><b>Charging:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_is_charging == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
 									<li class="list-group-item"><b>Charged:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_fully_charged == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
-									<li class="list-group-item"><b>Max capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }} mAh</span></li>
+									<!--<li class="list-group-item"><b>Max capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }} mAh</span></li>
 									<li class="list-group-item"><b>Current capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity }} mAh ({{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbatteryprecent:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}%)</span></li>
-								</ul>
+									-->								</ul>
 							</div>
 							<div class="col-lg-6">
 								<ul class="list-group">
@@ -387,7 +387,7 @@
 														<li class="list-group-item"><b>Card Type:</b><span class="pull-right">{{ card.sppci_bus|slice:"11:"|replace }}</span></li>
 														</ul>
 													</div>
-												</div>
+													</div>
 											</div>
 										</div>
 
