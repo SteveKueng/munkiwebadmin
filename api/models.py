@@ -19,6 +19,7 @@ try:
 except AttributeError:
     GIT = None
 
+
 class FileError(Exception):
     '''Class for file errors'''
     pass
@@ -47,6 +48,7 @@ class FileDoesNotExistError(FileError):
 class FileAlreadyExistsError(FileError):
     '''Error when creating a new file at an existing pathname'''
     pass
+
 
 class Plist(object):
     '''Pseudo-Django object'''

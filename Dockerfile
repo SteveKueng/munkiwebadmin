@@ -13,6 +13,7 @@ ENV PROXY_ADDRESS ''
 ENV STYLE 'default'
 ENV VAULT_USERNAME 'admin'
 ENV CONVERT_TO_QWERTZ ''
+ENV DEBUG 'False'
 
 #database
 ENV DB 'postgres'
