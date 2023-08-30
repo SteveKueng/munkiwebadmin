@@ -38,9 +38,9 @@ RUN apt-get clean && apt-get update && apt-get install -y locales
 RUN sed -i '/^#.* en_US.* /s/^#//' /etc/locale.gen
 RUN locale-gen
 # install mssql
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
+#RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+#RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
+#RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
 # -------
 
 # create dirs
@@ -70,7 +70,7 @@ RUN find ${APP_DIR} -name '*.pyc' -delete
 RUN pip install -r requirements.txt
 
 # install remote ldap
-RUN git clone https://github.com/SteveKueng/django-remote-auth-ldap.git /tmp/django-remote-auth-ldap && cd /tmp/django-remote-auth-ldap && python setup.py install && cd ${APP_DIR} && rm -rf /tmp
+#RUN git clone https://github.com/SteveKueng/django-remote-auth-ldap.git /tmp/django-remote-auth-ldap && cd /tmp/django-remote-auth-ldap && python setup.py install && cd ${APP_DIR} && rm -rf /tmp
 
 # configure git
 RUN git config --global core.preloadindex true

@@ -16,6 +16,7 @@ db.sqlite3
 # ignore collectstatics
 static_root
 munkiwebadmin/static/styles
+static
 
 config.codekit3
 *.log*

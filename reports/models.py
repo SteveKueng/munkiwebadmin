@@ -31,7 +31,6 @@ class Machine(models.Model):
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
     current_status = models.CharField(max_length=200, blank=True)
-    simpleMDMID = models.CharField(max_length=16, blank=True)
 
     def errors(self):
         return MunkiReport.objects.get(machine=self).errors
@@ -152,11 +151,3 @@ class MunkiReport(models.Model):
         self.console_user = "unknown"
         if "ConsoleUser" in plist:
             self.console_user = unicode(plist["ConsoleUser"])
-
-class Spectre(models.Model):
-    '''Placeholder so we get permissions entries in the admin database'''
-    class Meta:
-        permissions = (
-            ('can_view_spectre', 'View spectre reports'),
-        )
-    pass

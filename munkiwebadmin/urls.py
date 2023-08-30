@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^catalogs/', include('catalogs.urls')),
     url(r'^pkgsinfo/', include('pkgsinfo.urls')),
     url(r'^icons/', include('icons.urls')),
-    url(r'^vpp/', include('vpp.urls')),
     url(r'^inventory/', include('inventory.urls')),
     url(r'^santa/', include('santa.urls')),
     url(r'^makecatalogs/', include('process.urls')),

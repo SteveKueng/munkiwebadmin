@@ -25,12 +25,9 @@ MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
 
 MODEL_LOOKUP_ENABLED = True
-
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
-
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 
-SIMPLEMDMKEY = os.getenv('SIMPLEMDMKEY')
 # lock info
 #LOCK_MESSAGE = 'Locked by IT Support.'
 #IT_NUMBER = '0000'
@@ -101,7 +98,6 @@ INSTALLED_APPS = [
     'updates',
     'santa',
     'vault',
-    'vpp',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -111,7 +107,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_remote_auth_ldap.middleware.RemoteUserMiddleware',
+    #'django_remote_auth_ldap.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',

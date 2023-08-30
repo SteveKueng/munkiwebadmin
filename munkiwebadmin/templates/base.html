@@ -160,12 +160,6 @@
                         Icons
                     </a>
                 </li>
-                <li {% if page == 'vpp' %} class="active" {% endif %}>
-                    <a href="{% url 'vpp' %}">
-                        <i class="fab fa-app-store"></i>
-                        VPP
-                    </a>
-                </li>
                 {% endif %}
                 {% if REPOSADO and perms.updates.view_updates %}
                 <li {% if page == 'updates' %} class="active" {% endif %}>
