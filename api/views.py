@@ -18,7 +18,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
-from reports.models import Machine, MunkiReport, Spectre
+from reports.models import Machine, MunkiReport
 from inventory.models import Inventory, InventoryItem
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
@@ -36,7 +36,6 @@ import hashlib
 import zlib
 import sys
 import requests
-import simpleMDMpy
 from multiprocessing.pool import ThreadPool
 
 if os.listdir('/reposado') != []:
@@ -46,19 +45,9 @@ if os.listdir('/reposado') != []:
 LOGGER = logging.getLogger('munkiwebadmin')
 
 try:
-    simpleMDMKey = settings.SIMPLEMDMKEY
-except AttributeError:
-    simpleMDMKey = ""
-
-try:
     PROXY_ADDRESS = settings.PROXY_ADDRESS
 except AttributeError:
     PROXY_ADDRESS = ""
-
-try:
-    SPECTRE_URLS = settings.SPECTRE_URLS
-except AttributeError:
-    SPECTRE_URLS = ""
 
 try:
     CONVERT_TO_QWERTZ = settings.CONVERT_TO_QWERTZ
@@ -76,13 +65,6 @@ if PROXY_ADDRESS != "":
         "http": 'http://'+PROXY_ADDRESS,
         "https": 'https://'+PROXY_ADDRESS
     }
-
-
-
-
-
-
-
 
 
 def normalize_value_for_filtering(value):
@@ -194,57 +176,6 @@ def postDataAPI(URL, postData):
             response.encoding = "utf-8-sig"
             return convert_html_to_json(response.text)
     return None
-
-
-def getSimpleMDMID(apiKey, serial_number):
-    """ returns device ID for your device """
-    devices = simpleMDMpy.devices(apiKey)
-    devices.proxyDict = proxies
-    response = devices.getDevice(search=serial_number)
-    if response.status_code in range(200,207):
-        for data in response.json()['data']:
-            return data.get('id')
-    return None
-
-
-def getSimpleMDMDevice(apiKey, ID):
-    """ returns device info for your device """
-    devices = simpleMDMpy.devices(apiKey)
-    devices.proxyDict = proxies
-    response = devices.getDevice(deviceID=ID)
-    if response.status_code in range(200,207):
-        return response.json()
-    return None
-
-
-def getSimpleMDMDeviceGroups(apiKey):
-    """ returns device info for your device """
-    deviceGroups = simpleMDMpy.deviceGroups(apiKey)
-    deviceGroups.proxyDict = proxies
-    response = deviceGroups.getDeviceGroup()
-    if response.status_code in range(200,207):
-        return response.json()
-    return None
-
-
-def getSimpleMDMAppGroups(apiKey):
-    """ returns device info for your device """
-    appGroups = simpleMDMpy.appGroups(apiKey)
-    appGroups.proxyDict = proxies
-    response = appGroups.getAppGroup()
-    if response.status_code in range(200,207):
-        return response.json()
-    return None
-
-
-def setSimpleMDMName(apiKey, deviceID, deviceName):
-    """ sets device name in simpleMDM """
-    devices = simpleMDMpy.devices(apiKey)
-    devices.proxyDict = proxies
-    if devices.updateDevice(deviceName, str(deviceID)).status_code == 200:
-        return True
-    return False
-
 
 @csrf_exempt
 @logged_in_or_basicauth()
@@ -891,18 +822,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         report.errors = 1
                         report.warnings = 0
 
-                    # simpleMDM
-                    if simpleMDMKey:
-                        LOGGER.debug("simpleMDM connnect")
-                        try:
-                            simpleMDMID = getSimpleMDMID(simpleMDMKey, serial_number)
-                        except Exception as e:
-                            LOGGER.error(e)
-                        else:
-                            machine.simpleMDMID = simpleMDMID
-                            LOGGER.debug("simpleMDM device id %s", machine.simpleMDMID)
-                            setSimpleMDMName(simpleMDMKey, machine.simpleMDMID, machine.hostname)
-
                     report.timestamp = timezone.now()
                     try:
                         machine.save()
@@ -1067,23 +986,13 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
         if not request.user.has_perm('reports.can_view_reports'):
             raise PermissionDenied
 
-        data = None        
-        if submission_type == "device_groups":
-            data = getSimpleMDMDeviceGroups(simpleMDMKey)
-        
-        if submission_type == "app_groups":
-            data = getSimpleMDMAppGroups(simpleMDMKey)
+        data = None
         
         if submission_type == "devices" and primary_id:
             try:
                 machine = Machine.objects.get(serial_number=primary_id)
             except Machine.DoesNotExist:
                 return HttpResponse(status=204)
-            
-            if not machine.simpleMDMID:
-                return HttpResponse(status=204)
-            
-            data = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)
             
             if CONVERT_TO_QWERTZ:
                 # layout fix
@@ -1133,43 +1042,8 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
                                     'detail': '%s does not exist' % serial_number}),
                         content_type='application/json', status=404)
             
-            if not machine.simpleMDMID:
-                return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'MachineDoesNotExist',
-                                    'detail': '%s has no simplMDM ID' % serial_number}),
-                        content_type='application/json', status=404)
-
-            devices = simpleMDMpy.devices(simpleMDMKey)
             devices.proxyDict = proxies
             response = None
-
-            if action == "restart":
-                response = devices.restcartDevice(deviceID=machine.simpleMDMID)
-            
-            if action == "shutdown":
-                response = devices.shutdownDevice(deviceID=machine.simpleMDMID)
-                
-            if action == "lock":
-                try:
-                    LOCK_MESSAGE = settings.LOCK_MESSAGE
-                except AttributeError:
-                    LOCK_MESSAGE = ""
-                try:
-                    IT_NUMBER = settings.IT_NUMBER
-                except AttributeError:
-                    IT_NUMBER = ""
-                try:
-                    PIN = settings.PIN
-                except AttributeError:
-                    PIN = ""
-                response = devices.lockDevice(deviceID=machine.simpleMDMID, message=LOCK_MESSAGE, phone_number=IT_NUMBER, pin=PIN)
-
-            if action == "refresh":
-                response = devices.refreshDevice(deviceID=machine.simpleMDMID)
-            
-            if action == "push_apps":
-                response = devices.pushAppsDevice(deviceID=machine.simpleMDMID)
 
         if submission_type == "device_groups" and action == "devices":
             if primary_id and secondary_id:
@@ -1293,193 +1167,6 @@ def updates_api(request, kind, update_id=None):
             updates.append(products[key])
     return HttpResponse(json.dumps(updates, sort_keys=True, indent=1, cls=DjangoJSONEncoder),
             content_type='application/json')
-
-@csrf_exempt
-@logged_in_or_basicauth()
-def spectre_api(request, kind, submission_type, id=None):
-    LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, id))
-    if kind not in ['spectre']:
-        return HttpResponse(status=404)
-    
-    # ------- get submit -------
-    try:
-        submit = json.loads(request.body)
-    except:
-        submit = request.POST
-
-    if request.method == 'GET':
-        LOGGER.debug("Got API GET request for %s", kind)
-
-        if not request.user.has_perm('reports.can_view_spectre'):
-            raise PermissionDenied
-
-        if SPECTRE_URLS != "":
-            if submission_type == "user" and id:
-                spectreData = {}
-                pool = ThreadPool(processes=2)
-
-                if SPECTRE_URLS.get('AD'):
-                    URL = SPECTRE_URLS['AD'] + "?username=" + id
-                    AD = pool.apply_async(getDataFromAPI, (URL, ))
-
-                if SPECTRE_URLS.get('SCSM'):
-                    URL = SPECTRE_URLS['SCSM'] + "?username=" + id
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, ))
-
-                # wait for answer
-                if SPECTRE_URLS.get('AD'):
-                    spectreData["AD"] = AD.get()
-                if SPECTRE_URLS.get('SCSM'):
-                    spectreData["SCSM"] = SCSM.get()
-
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json'
-                        )
-            
-            if submission_type == "users":
-                spectreData = {}
-                pool = ThreadPool(processes=2)
-
-                if SPECTRE_URLS.get('SCSM'):
-                    URL = SPECTRE_URLS['SCSM'] + "?username=all"
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, ))
-
-                if SPECTRE_URLS.get('SCSM'):
-                    spectreData = SCSM.get()
-
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json'
-                        )
-
-            if submission_type == "computer" and id:
-                spectreData = {}
-                pool = ThreadPool(processes=3)
-
-                if SPECTRE_URLS.get('SCSM'):
-                    URL = SPECTRE_URLS['SCSM'] + "?computername=" + id
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, ))
-                
-                try:
-                    spectreData['os'] =  "macOS"
-                    machine = Machine.objects.get(hostname=id)
-                    spectreData['Munki'] = model_to_dict(machine)
-                except Machine.DoesNotExist:
-                    machine = {}
-                    spectreData['os'] =  "Windows"
-
-                if spectreData['os'] == "macOS":
-                    try:
-                        report = MunkiReport.objects.get(machine=machine)
-                        spectreData['Munki']['report'] = report.get_report()
-                    except MunkiReport.DoesNotExist:
-                        spectreData['Munki']['report'] = ""
-                
-                    if machine.simpleMDMID:
-                        spectreData['MDM'] = getSimpleMDMDevice(simpleMDMKey, machine.simpleMDMID)['data']
-                
-                if spectreData['os'] == "Windows":
-                    if SPECTRE_URLS.get('AD'):
-                        URL = SPECTRE_URLS['AD'] + "?computername=" + id
-                        AD = pool.apply_async(getDataFromAPI, (URL, ))
-
-                    if SPECTRE_URLS.get('SCCM'):
-                        URL = SPECTRE_URLS['SCCM'] + "?computername=" + id
-                        SCCM = pool.apply_async(getDataFromAPI, (URL, ))
-
-                    if SPECTRE_URLS.get('AD'):
-                        spectreData["AD"] = AD.get()
-                    if SPECTRE_URLS.get('SCCM'):
-                        spectreData["SCCM"] = SCCM.get()
-
-                if SPECTRE_URLS.get('SCSM'):
-                    spectreData["SCSM"] = SCSM.get()
-
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json'
-                        )
-
-            if submission_type == "computers":
-                spectreData = {}
-                pool = ThreadPool(processes=2)
-
-                if SPECTRE_URLS.get('SCSM'):
-                    URL = SPECTRE_URLS['SCSM'] + "?computername=all"
-                    SCSM = pool.apply_async(getDataFromAPI, (URL, ))
-
-                if SPECTRE_URLS.get('SCSM'):
-                    spectreData = SCSM.get()
-
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json'
-                        )
-                        
-    
-    if request.method == 'POST':
-        LOGGER.debug("Got API POST request for %s", kind)
-
-        if not request.user.has_perm('reports.change_spectre'):
-            raise PermissionDenied
-        
-        if submission_type == "user" and id:
-            backendTarget = submit.get("backendTarget")
-            LOGGER.debug("backendTarget: %s", backendTarget)
-
-            SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
-            LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
-            if SPECTRE_URL:
-                spectreData = {}
-                pool = ThreadPool(processes=2)
-
-                USERDATA = pool.apply_async(postDataAPI, (SPECTRE_URL, submit))
-
-                # wait for answer
-                spectreData = USERDATA.get()
-
-                LOGGER.debug("spectreData: %s", spectreData)
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json')
-
-        if submission_type == "computer" and id:
-            backendTarget = submit.get("backendTarget")
-            LOGGER.debug("backendTarget: %s", backendTarget)
-
-            SPECTRE_URL = SPECTRE_URLS.get(backendTarget, None)
-            LOGGER.debug("SPECTRE_URL: %s", SPECTRE_URL)
-            if SPECTRE_URL:
-                spectreData = {}
-                pool = ThreadPool(processes=2)
-
-                COMPUTERDATA = pool.apply_async(postDataAPI, (SPECTRE_URL, submit))
-
-                # wait for answer
-                spectreData = COMPUTERDATA.get()
-
-                LOGGER.debug("spectreData: %s", spectreData)
-                if spectreData:
-                    return HttpResponse(
-                            content=json.dumps(spectreData, ensure_ascii=False, sort_keys=True, cls=DjangoJSONEncoder, default=str),
-                            status=200,
-                            content_type='application/json')
-
-
-    # ----------- error 404 -----------------
-    return HttpResponse(status=404)
-
 
 @csrf_exempt
 @logged_in_or_basicauth()

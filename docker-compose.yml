@@ -3,6 +3,10 @@ version: '3'
 services:
   db:
     image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
   nginx-proxy:
     image: jwilder/nginx-proxy
     ports:
@@ -11,12 +15,6 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./docker/certs:/etc/nginx/certs
-  reposado:
-    image: stevekueng/reposado
-    ports:
-      - "8088:8088"
-    volumes:
-      - /Volumes/WORK/MAIN/reposado:/reposado
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:80
@@ -24,15 +22,13 @@ services:
       - DB_HOST=db
       - DB_NAME=postgres
       - DB_USER=postgres
-      - DB_PASS=
-      - VIRTUAL_HOST=munkiwebadmin.example.com
+      - DB_PASS=password
+      - VIRTUAL_HOST=kamino.ikueng.ch
     volumes:
       - .:/munkiwebadmin
-      - /Users/Shared/munkirepo:/munkirepo
-      - /Volumes/WORK/MAIN/reposado:/reposado
+      - /tmp/munkirepo:/munkirepo
     depends_on:
       - db
-      - reposado
 
 volumes:
   Reposado:

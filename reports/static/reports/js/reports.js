@@ -1069,17 +1069,6 @@ function getAppGroups(deviceID) {
                 });
                 html += '</ul>'
                 html += '</div>'
-                $('#vppDetail').html(html);
-
-                //typeahead
-                $(".vpp_app_groups").typeahead({
-                    source: source,
-                    autoSelect: true,
-                    updater: function (item) {
-                        selectedGroupID = map[item];
-                        return item;
-                    }
-                });
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -1196,7 +1185,6 @@ function addDeviceToAppGroup(deviceID) {
                 $("#process_progress").modal("hide");
                 pushApps(selectedGroupID);
                 selectedGroupID = "";
-                $('.vpp_app_groups').val('')
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $("#errorModalTitleText").text("MDM post error");

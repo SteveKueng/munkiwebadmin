@@ -40,11 +40,9 @@
 					<!-- Nav tabs -->
 					<ul id="clientTab" class="nav nav-tabs {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}" role="tablist">
 						<li role="presentation" class="active"><a class="tab" href="#Software" aria-controls="Software" role="tab" data-toggle="tab">Software</a></li>
-						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#VPP" aria-controls="VPP" role="tab" data-toggle="tab">VPP</a></li>
 						<li role="presentation"><a class="tab" href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fas fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
 						<li role="presentation"><a class="tab" href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li>
-						<li role="presentation" class="{% if not machine.simpleMDMID %}hidden{% endif %}"><a class="tab" href="#MDM" aria-controls="MDM" role="tab" data-toggle="tab">MDM</a></li>
 						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if perms.vault.view_passwordAccess %}
 						<li role="presentation"><a class="tab" href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
@@ -108,28 +106,6 @@
 										<i class="fas fa-spinner fa-pulse fa-1x"></i>
 									</div>
 								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div role="tabpanel" class="tab-pane tabDetail" id="VPP">
-					<div class="panel-body">
-						<h4>VPP Apps</h4>
-						<!---
-						<div class="row">
-							<div class="col-lg-12">
-								<button type="submit" class="btn btn-primary" onclick="clientActions('shutdown')">Push Apps</button>
-							</div>
-						</div>
-						-->
-						<div class="row" id="vppDetail">
-							<div class="col-lg-12">
-								<i class="fas fa-spinner fa-pulse fa-2x"></i>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-lg-12">
-								<input type='text' autocomplete="off" class='list-group-item form-control vpp_app_groups' style='padding-bottom:19px; padding-top:20px;' onkeypress="addDeviceToAppGroup('{{ machine.simpleMDMID }}')">
 							</div>
 						</div>
 					</div>
