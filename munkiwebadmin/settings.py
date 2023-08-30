@@ -52,8 +52,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
 
-DEBUG = False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+
+DEBUG = False
+if os.getenv('DEBUG') == 'True':
+    DEBUG = True
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ORIGIN_WHITELIST = ()
