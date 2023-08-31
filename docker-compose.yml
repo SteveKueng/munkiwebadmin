@@ -30,7 +30,3 @@ services:
       - /tmp/munkirepo:/munkirepo
     depends_on:
       - db
-
-volumes:
-  Reposado:
-    external: false
