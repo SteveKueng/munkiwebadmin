@@ -84,7 +84,7 @@ def index(request, computer_serial=None):
                 machine = None
                 try:
                     machine = Machine.objects.get(serial_number=computer_serial)
-                except Machine.DoesNotExist, err:
+                except Machine.DoesNotExist as err:
                     return HttpResponse(
                         json.dumps({'result': 'failed',
                                     'exception_type': str(type(err)),
@@ -319,7 +319,7 @@ def getManifest(request, manifest_path):
     LOGGER.debug("Got read request for %s", manifest_path)
     try:
         plist = Plist.read('manifests', manifest_path)
-    except (FileDoesNotExistError, FileReadError), err:
+    except (FileDoesNotExistError, FileReadError) as err:
         return HttpResponse(
             json.dumps({'result': 'failed',
                         'exception_type': str(type(err)),
@@ -375,7 +375,7 @@ def getStatus(request):
         status = "led-grey"
         try:
             machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist, err:
+        except Machine.DoesNotExist as err:
             pass
 
         if machine:

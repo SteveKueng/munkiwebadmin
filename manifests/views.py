@@ -38,7 +38,7 @@ def index(request, manifest_path=None):
             LOGGER.debug("Got read request for %s", manifest_path)
             try:
                 plist = Plist.read('manifests', manifest_path)
-            except (FileDoesNotExistError, FileReadError), err:
+            except (FileDoesNotExistError, FileReadError) as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),

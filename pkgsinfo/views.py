@@ -101,7 +101,7 @@ def index(request):
                         pkginfo_list, request.user,
                         delete_pkgs=json_data.get('deletePkg', False)
                     )
-                except FileError, err:
+                except FileError as err:
                     return HttpResponse(
                         json.dumps({'result': 'failed',
                                     'exception_type': str(type(err)),
@@ -130,7 +130,7 @@ def index(request):
             Pkginfo.mass_edit_catalogs(
                 pkginfo_list, catalogs_to_add, catalogs_to_delete,
                 request.user)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
