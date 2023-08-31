@@ -161,14 +161,6 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if REPOSADO and perms.updates.view_updates %}
-                <li {% if page == 'updates' %} class="active" {% endif %}>
-                    <a href="{% url 'updates' %}">
-                        <i class="fab fa-apple"></i>
-                        Updates
-                    </a>
-                </li>
-                {% endif %}
             </ul>
         </nav>
         {% endblock %}

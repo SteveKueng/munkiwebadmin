@@ -22,7 +22,7 @@ python manage.py collectstatic --noinput
 cp static_root/styles/$STYLE/favicon.ico .
 
 #update database
-python manage.py makemigrations manifests pkgsinfo process reports updates vault
+python manage.py makemigrations manifests pkgsinfo process reports vault
 python manage.py migrate --noinput
 
 #chown -R www-data:www-data $APP_DIR

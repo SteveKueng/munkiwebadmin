@@ -30,9 +30,6 @@ urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/reports/')),
 ]
 
-if os.listdir('/reposado') != []:
-    urlpatterns += [url(r'^updates/', include('updates.urls'))]
-
 # comment out the following if you are serving
 # static files a different way
 urlpatterns += staticfiles_urlpatterns()
