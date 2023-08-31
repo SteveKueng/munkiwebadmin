@@ -38,10 +38,6 @@ import sys
 import requests
 from multiprocessing.pool import ThreadPool
 
-if os.listdir('/reposado') != []:
-	sys.path.append('/reposado/code')
-	from reposadolib import reposadocommon
-
 LOGGER = logging.getLogger('munkiwebadmin')
 
 try:
@@ -1125,48 +1121,6 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
 
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
-
-@csrf_exempt
-@logged_in_or_basicauth()
-def updates_api(request, kind, update_id=None):
-    LOGGER.debug("Got API request for %s" % (kind))
-    if os.listdir('/reposado') == []:
-        return HttpResponse(status=404)
-    if kind not in ['updates']:
-        return HttpResponse(status=404)
-    if not request.user.has_perm('updates.view_updates'):
-        raise PermissionDenied
-
-    products = reposadocommon.getProductInfo()
-    catalog_branches = reposadocommon.getCatalogBranches()
-
-    list_of_productids = None
-    if update_id:
-        list_of_productids = [update_id]
-    else:
-        list_of_productids = products.keys()
-
-    updates = []
-    list_of_productids.sort()
-    for key in list_of_productids:
-        if products.get(key):
-            if not catalog_branches:
-                branchlist = ''
-            else:
-                branchlist = [branch for branch in catalog_branches.keys()
-                            if key in catalog_branches[branch]]
-                branchlist.sort()
-            
-            deprecation_state = False
-            if not products[key].get('AppleCatalogs'):
-                # not in any Apple catalogs
-                deprecation_state =  True
-            products[key]['deprecation_state'] = deprecation_state
-            products[key]['branchlist'] = branchlist
-            products[key]['id'] = key
-            updates.append(products[key])
-    return HttpResponse(json.dumps(updates, sort_keys=True, indent=1, cls=DjangoJSONEncoder),
-            content_type='application/json')
 
 @csrf_exempt
 @logged_in_or_basicauth()

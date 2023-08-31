@@ -24,13 +24,6 @@ exit
 #### munkireport scripts
 [report scripts](https://github.com/SteveKueng/mwa2_scripts)
 
-## Munkiwebadmin with reposado
-```bash
-docker run --name reposado -d -p 8088:8088 -v Reposado:/reposado mscottblake/reposado
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v Reposado:/reposado -h $HOSTNAME --link postgres_db stevekueng/munkiwebadmin
-```
-
-
 ## Munkiwebadmin custom style
 create a local folder for your styles: 
 ```bash
@@ -70,7 +63,6 @@ docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkir
 | Variable      | Usage         | Default|
 | ------------- |-------------|:------:|
 | APPNAME      | Django app name | _MunkiWebAdmin_ |
-| SIMPLEMDMKEY  | simpleMDM API key. Needed for use with simpleMDM ||
 | ALLOWED_HOSTS | django allowed hosts. e.g. _[ munkiwebadmin.example.com ]_ |_[ * ]_|
 | DEFAULT_MANIFEST | default manifest to use. _serail_number_ or _hostname_     |_serial_number_ |
 | PROXY_ADDRESS | proxy server address     ||

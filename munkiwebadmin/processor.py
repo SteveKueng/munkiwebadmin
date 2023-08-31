@@ -30,10 +30,6 @@ try:
 except:
     HOSTNAME = "localhost"
 
-REPOSADO = False
-if os.listdir('/reposado') != []:
-    REPOSADO = True
-
 def index(request):
     try:
         image = request.user.ldap_user.attrs["thumbnailPhoto"]
@@ -42,5 +38,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'REPOSADO': REPOSADO, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
+    return {'style': STYLE, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
 
