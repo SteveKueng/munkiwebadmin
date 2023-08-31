@@ -23,3 +23,5 @@ config.codekit3
 migrations
 
 favicon.ico
+
+virtualenv*
