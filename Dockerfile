@@ -14,6 +14,9 @@ ENV STYLE 'default'
 ENV VAULT_USERNAME 'admin'
 ENV CONVERT_TO_QWERTZ ''
 ENV DEBUG 'False'
+ENV MUNKI_REPO_DIR '/munkirepo'
+ENV MAKECATALOGS_PATH '/munkitools/makecatalogs'
+ENV ENCRYPTED_FIELDS_KEYDIR '/fieldkeys'
 
 #database
 ENV DB 'postgres'
@@ -86,7 +89,7 @@ RUN chown -R www-data:www-data ${APP_DIR}
 RUN usermod -u 1000 www-data
 RUN usermod -G staff www-data
 
-VOLUME [ "/munkirepo", "/fieldkeys", "/reposado" ]
+VOLUME [ "/munkirepo", "/fieldkeys" ]
 
 # Exposed port
 EXPOSE 80

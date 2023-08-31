@@ -18,8 +18,8 @@ MEDIA_URL = "/media/"
 # APPNAME is user-visible web app name
 APPNAME = os.getenv('APPNAME')
 
-MUNKI_REPO_DIR = '/munkirepo'
-MAKECATALOGS_PATH = '/munkitools/makecatalogs'
+MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR')
+MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH')
 
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
@@ -46,7 +46,7 @@ if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
 # mkdir fieldkeys
 # keyczart create --location=fieldkeys --purpose=crypt
 # keyczart addkey --location=fieldkeys --status=primary --size=256
-ENCRYPTED_FIELDS_KEYDIR = '/fieldkeys'
+ENCRYPTED_FIELDS_KEYDIR = os.getenv('ENCRYPTED_FIELDS_KEYDIR')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
@@ -98,7 +98,6 @@ INSTALLED_APPS = [
     'process',
     'reports',
     'icons',
-    'updates',
     'santa',
     'vault',
 ]
