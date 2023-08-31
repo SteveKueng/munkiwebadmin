@@ -198,13 +198,13 @@ def plist_api(request, kind, filepath=None):
         if filepath:
             try:
                 response = Plist.read(kind, filepath)
-            except FileDoesNotExistError, err:
+            except FileDoesNotExistError as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
                                 'detail': str(err)}),
                     content_type='application/json', status=404)
-            except FileReadError, err:
+            except FileReadError as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
@@ -318,20 +318,20 @@ def plist_api(request, kind, filepath=None):
             del request_data['filename']
         try:
             Plist.new(kind, filepath, request.user, plist_data=request_data)
-        except FileAlreadyExistsError, err:
+        except FileAlreadyExistsError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json',
                 status=409)
-        except FileWriteError, err:
+        except FileWriteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -386,7 +386,7 @@ def plist_api(request, kind, filepath=None):
             LOGGER.debug("plist data %s", request_data)
             data = plistlib.writePlistToString(request_data)
             Plist.write(data, kind, filepath, request.user)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -443,7 +443,7 @@ def plist_api(request, kind, filepath=None):
         try:
             data = plistlib.writePlistToString(plist_data)
             Plist.write(data, kind, filepath, request.user)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -480,19 +480,19 @@ def plist_api(request, kind, filepath=None):
                 content_type='application/json', status=403)
         try:
             Plist.delete(kind, filepath, request.user)
-        except FileDoesNotExistError, err:
+        except FileDoesNotExistError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=404)
-        except FileDeleteError, err:
+        except FileDeleteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -535,7 +535,7 @@ def file_api(request, kind, filepath=None):
                 response['Content-Disposition'] = (
                     'attachment; filename="%s"' % os.path.basename(filepath))
                 return response
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
@@ -592,7 +592,7 @@ def file_api(request, kind, filepath=None):
                 MunkiFile.new(kind, filedata, filename, request.user)
             else:
                 MunkiFile.writedata(kind, filedata, filename, request.user)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -626,19 +626,19 @@ def file_api(request, kind, filepath=None):
                 content_type='application/json', status=403)
         try:
             MunkiFile.delete(kind, filepath, request.user)
-        except FileDoesNotExistError, err:
+        except FileDoesNotExistError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=404)
-        except FileDeleteError, err:
+        except FileDeleteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),

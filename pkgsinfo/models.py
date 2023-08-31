@@ -171,13 +171,13 @@ class Pkginfo(Plist):
                     delete_this_pkg = True
             try:
                 cls.delete('pkgsinfo', pathname, user)
-            except FileDeleteError, err:
+            except FileDeleteError as err:
                 errors.append('Error %s when removing %s' % (err, pathname))
             else:
                 if delete_this_pkg:
                     try:
                         MunkiFile.delete('pkgs', pkg_path, user)
-                    except FileDeleteError, err:
+                    except FileDeleteError as err:
                         errors.append('Error %s when removing %s'
                                       % (err, pkg_path))
         if errors:
@@ -221,7 +221,7 @@ class Pkginfo(Plist):
                 data = plistlib.writePlistToString(plist)
                 try:
                     cls.write(data, 'pkgsinfo', pathname, user)
-                except FileWriteError, err:
+                except FileWriteError as err:
                     LOGGER.error('Update failed for %s: %s', pathname, err)
                     errors.append('Error %s when updating %s' % (err, pathname))
                     continue
