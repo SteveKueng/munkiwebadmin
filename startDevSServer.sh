@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. virtualexport-python2.7/bin/activate
+. virtualexport-python3.7/bin/activate
 
 export APPNAME='MunkiWebAdmin'
 export TIME_ZONE='UTC'
@@ -15,7 +15,7 @@ export CONVERT_TO_QWERTZ=''
 export DEBUG='True'
 export MUNKI_REPO_DIR='/tmp/munkirepo'
 export MAKECATALOGS_PATH='/usr/local/munki/makecatalogs'
-export ENCRYPTED_FIELDS_KEYDIR='/tmp/fieldkeys'
+export FIELD_ENCRYPTION_KEY='VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI='
 
 #database
 export DB='postgres'
@@ -39,7 +39,7 @@ if [ ! -f $ENCRYPTED_FIELDS_KEYDIR/meta ]; then
     keyczart addkey --location=$ENCRYPTED_FIELDS_KEYDIR --status=primary --size=256
 fi
 
-python manage.py makemigrations manifests pkgsinfo process reports vault
+python manage.py makemigrations manifests pkgsinfo process reports vault inventory
 python manage.py migrate --noinput
 
 python manage.py createsuperuser --username admin

@@ -8,5 +8,5 @@ class localAdminAdmin(admin.ModelAdmin):
 class passwordAccessAdmin(admin.ModelAdmin):
     list_display = ('machine', 'user', 'reason', 'date')
 
-#admin.site.register(localAdmin, localAdminAdmin)
-#admin.site.register(passwordAccess, passwordAccessAdmin)
+admin.site.register(localAdmin, localAdminAdmin)
+admin.site.register(passwordAccess, passwordAccessAdmin)

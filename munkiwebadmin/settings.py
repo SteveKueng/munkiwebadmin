@@ -20,18 +20,14 @@ APPNAME = os.getenv('APPNAME')
 
 MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR')
 MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH')
-
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
 
 MODEL_LOOKUP_ENABLED = True
-CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
-VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 
-# lock info
-#LOCK_MESSAGE = 'Locked by IT Support.'
-#IT_NUMBER = '0000'
-#PIN = '123456'
+CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
+
+VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 
@@ -42,11 +38,7 @@ STYLE = os.getenv('STYLE')
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
 
-#fieldkey for https://github.com/defrex/django-encrypted-fields
-# mkdir fieldkeys
-# keyczart create --location=fieldkeys --purpose=crypt
-# keyczart addkey --location=fieldkeys --status=primary --size=256
-ENCRYPTED_FIELDS_KEYDIR = os.getenv('ENCRYPTED_FIELDS_KEYDIR')
+FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', '')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
@@ -88,6 +80,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'encrypted_model_fields',
 
     # our apps
     'api',
@@ -192,13 +185,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE')
-
 TIME_ZONE = os.getenv('TIME_ZONE')
 
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 #### end basic Django settings

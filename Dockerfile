@@ -16,7 +16,7 @@ ENV CONVERT_TO_QWERTZ ''
 ENV DEBUG 'False'
 ENV MUNKI_REPO_DIR '/munkirepo'
 ENV MAKECATALOGS_PATH '/munkitools/makecatalogs'
-ENV ENCRYPTED_FIELDS_KEYDIR '/fieldkeys'
+ENV FIELD_ENCRYPTION_KEY 'VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI='
 
 #database
 ENV DB 'postgres'
@@ -52,7 +52,6 @@ RUN mkdir ${APP_DIR}
 RUN mkdir /munkirepo
 RUN mkdir /munkitools
 RUN mkdir /config
-RUN mkdir /fieldkeys
 
 # download munkitools
 RUN curl -Lk -o munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip munkitools.zip -d . && rm -rf /munkitools.zip 
@@ -89,7 +88,7 @@ RUN chown -R www-data:www-data ${APP_DIR}
 RUN usermod -u 1000 www-data
 RUN usermod -G staff www-data
 
-VOLUME [ "/munkirepo", "/fieldkeys" ]
+VOLUME [ "/munkirepo" ]
 
 # Exposed port
 EXPOSE 80

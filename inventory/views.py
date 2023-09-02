@@ -12,17 +12,9 @@ from django import forms
 from django.db.models import Q
 from django.db.models import Count
 
-import plistlib
-import base64
-import bz2
-import hashlib
 import json
 
-from datetime import datetime
-import urllib2
-from xml.etree import ElementTree
-
-from models import Inventory, InventoryItem
+from .models import Inventory, InventoryItem
 from reports.models import Machine
 
 

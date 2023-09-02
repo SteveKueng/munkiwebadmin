@@ -265,7 +265,7 @@ def plist_api(request, kind, filepath=None):
             return HttpResponse(plistlib.writePlistToString(response),
                                 content_type='application/xml')
 
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'put':
@@ -367,7 +367,7 @@ def plist_api(request, kind, filepath=None):
             request_data = json.loads(request.body)
             request_data = convert_strings_to_dates(request_data)
         else:
-            request_data = plistlib.readPlistFromString(request.body)
+            request_data = request.body
         if not request_data:
             # need to deal with this issue
             return HttpResponse(
@@ -377,15 +377,10 @@ def plist_api(request, kind, filepath=None):
                                 'Request body was empty or missing valid data'}
                           ),
                 content_type='application/json', status=400)
-        if 'filename' in request_data:
-            # perhaps support rename here in the future, but for now,
-            # ignore it
-            del request_data['filename']
-            
         try:
             LOGGER.debug("plist data %s", request_data)
-            data = plistlib.writePlistToString(request_data)
-            Plist.write(data, kind, filepath, request.user)
+            plist = plistlib.loads(request_data)
+            Plist.write(plist, kind, filepath, request.user)
         except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
@@ -400,7 +395,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json')
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(request_data),
+                    request_data,
                     content_type='application/xml')
 
     elif request.method == 'PATCH':
@@ -550,7 +545,7 @@ def file_api(request, kind, filepath=None):
                 return HttpResponse(plistlib.writePlistToString(response),
                                     content_type='application/xml')
 
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'put':
@@ -742,7 +737,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 content_type='application/'+response_type, status=200)
     
     # ----------- HTTP_X_METHODOVERRIDE -----------------
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'delete':
@@ -839,7 +834,9 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         compressed_inventory = compressed_inventory.replace(" ", "+")
                         inventory_str = decode_to_string(compressed_inventory)
                         try:
-                            inventory_list = plistlib.readPlistFromString(inventory_str)
+                            with open(inventory_str, 'rb') as fp:
+                                inventory_list = plistlib.load(fp)
+                            #inventory_list = plistlib.readPlistFromString(inventory_str)
                         except Exception:
                             inventory_list = None
                         if inventory_list:
@@ -1006,7 +1003,7 @@ def mdm_api(request, kind, submission_type, primary_id=None, action=None, second
                     plistlib.writePlistToString(data),
                     content_type='application/xml')
     
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'put':

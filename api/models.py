@@ -109,17 +109,17 @@ class Plist(object):
                     'version': '1.0',
                     'catalogs': ['development']
                 }
-        data = plistlib.writePlistToString(plist)
         try:
-            with open(filepath, 'w') as fileref:
-                fileref.write(data.encode('utf-8'))
+            plistFile=open(filepath,'wb')
+            plistlib.dump(plist, plistFile)
+            plistFile.close()
             LOGGER.info('Created %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)
         except (IOError, OSError) as err:
             LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
-        return data
+        return plist
 
     @classmethod
     def read(cls, kind, pathname):
@@ -128,7 +128,8 @@ class Plist(object):
         if not os.path.exists(filepath):
             raise FileDoesNotExistError('%s/%s not found' % (kind, pathname))
         try:
-            plistdata = plistlib.readPlist(filepath)
+            with open(filepath, 'rb') as fp:
+                plistdata = plistlib.load(fp)
             return plistdata
         except (IOError, OSError) as err:
             LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
@@ -150,8 +151,9 @@ class Plist(object):
                 LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
                 raise FileWriteError(err)
         try:
-            with open(filepath, 'w') as fileref:
-                fileref.write(data)
+            fileref=open(filepath,'wb')
+            plistlib.dump(data, fileref)
+            fileref.close()
             LOGGER.info('Wrote %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)

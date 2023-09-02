@@ -13,22 +13,17 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from models import Machine, MunkiReport, BusinessUnit
+from .models import Machine, MunkiReport, BusinessUnit
 from manifests.models import ManifestFile
 from catalogs.models import Catalog
 from api.models import Plist, FileDoesNotExistError, FileReadError
 
-import base64
-import bz2
 import plistlib
-import re
-import urllib2
+import urllib
 from datetime import timedelta, date
 from xml.etree import ElementTree
-import fnmatch
 import json
 import logging
-import os
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -68,9 +63,9 @@ proxies = {
 }
 
 if PROXY_ADDRESS:
-    proxy = urllib2.ProxyHandler(proxies)
-    opener = urllib2.build_opener(proxy)
-    urllib2.install_opener(opener)
+    proxy = urllib.request.ProxyHandler(proxies)
+    opener = urllib.request.build_opener(proxy)
+    urllib.request.install_opener(opener)
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
@@ -495,7 +490,7 @@ def model_description_lookup(request, serial):
     if (len(serial) == 12):
         snippet = serial[-4:]
     try:
-        f = urllib2.urlopen("https://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
+        f = urllib.request.urlopen("https://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
         et = ElementTree.parse(f)
         return HttpResponse(et.findtext("configCode").decode("utf-8"), content_type='application/xml', status=201)
     except:

@@ -50,7 +50,7 @@ def calcbattery(current_value, max_value):
     try:
         battery = int(float(current_value)/max_value*4)
     except:
-        print "error calc battery"
+        print("error calc battery")
     return battery
 
 @register.filter
@@ -59,7 +59,7 @@ def calcbatteryprecent(current_value, max_value):
     try:
         battery = int(float(current_value)/max_value*100)
     except:
-        print "error calc battery"
+        print("error calc battery")
     return battery
 
 @register.filter
