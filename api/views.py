@@ -295,7 +295,7 @@ def plist_api(request, kind, filepath=None):
                 request_data = json.loads(request.body)
                 request_data = convert_strings_to_dates(request_data)
             else:
-                request_data = plistlib.readPlistFromString(request.body)
+                request_data = plistlib.loads(request.body)
         if (filepath and 'filename' in request_data
                 and filepath != request_data['filename']):
             return HttpResponse(
@@ -345,7 +345,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json', status=201)
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(request_data),
+                    plistlib.dumps(request_data),
                     content_type='application/xml', status=201)
 
     elif request.method == 'PUT':
@@ -367,7 +367,7 @@ def plist_api(request, kind, filepath=None):
             request_data = json.loads(request.body)
             request_data = convert_strings_to_dates(request_data)
         else:
-            request_data = request.body
+            request_data = plistlib.loads(request.body)
         if not request_data:
             # need to deal with this issue
             return HttpResponse(
@@ -379,8 +379,7 @@ def plist_api(request, kind, filepath=None):
                 content_type='application/json', status=400)
         try:
             LOGGER.debug("plist data %s", request_data)
-            plist = plistlib.loads(request_data)
-            Plist.write(plist, kind, filepath, request.user)
+            Plist.write(request_data, kind, filepath, request.user)
         except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
@@ -417,7 +416,7 @@ def plist_api(request, kind, filepath=None):
             request_data = json.loads(request.body)
             request_data = convert_strings_to_dates(request_data)
         else:
-            request_data = plistlib.readPlistFromString(request.body)
+            request_data = plistlib.loads(request.body)
         if not request_data:
             # need to deal with this issue
             return HttpResponse(
@@ -427,13 +426,9 @@ def plist_api(request, kind, filepath=None):
                                 'Request body was empty or missing valid data'}
                           ),
                 content_type='application/json', status=400)
-        if 'filename' in request_data:
-            # perhaps support rename here in the future, but for now,
-            # ignore it
-            del request_data['filename']
+        
         # read existing manifest
         plist_data = Plist.read(kind, filepath)
-        #plist_data['filename'] = filepath
         plist_data.update(request_data)
         try:
             data = plistlib.writePlistToString(plist_data)
