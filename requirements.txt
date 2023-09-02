@@ -1,8 +1,8 @@
 django>=1.11,<2.0
 uwsgi
-psycopg2-binary
+psycopg2-binary==2.8.6
 mysqlclient
-django-encrypted-fields
+django-encrypted-model-fields
 python-ldap
 django-auth-ldap
 django-cors-headers

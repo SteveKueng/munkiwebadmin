@@ -38,14 +38,14 @@ def index(request, manifest_path=None):
             LOGGER.debug("Got read request for %s", manifest_path)
             try:
                 plist = Plist.read('manifests', manifest_path)
+                plist = plistlib.dumps(plist, sort_keys=False)
             except (FileDoesNotExistError, FileReadError) as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
                                 'detail': str(err)}),
                     content_type='application/json', status=404)
-            manifest_text = plistlib.writePlistToString(plist)
-            context = {'plist_text': manifest_text,
+            context = {'plist_text': plist,
                        'pathname': manifest_path}
             return render(request, 'manifests/detail.html', context=context)
         if request.method == 'POST':

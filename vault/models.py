@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import django
 from django.db import models
 from django.contrib.auth.models import User
-from encrypted_fields import EncryptedCharField, EncryptedDateTimeField
+from encrypted_model_fields.fields import EncryptedCharField, EncryptedDateTimeField
 from datetime import timedelta
 
 from reports.models import Machine
