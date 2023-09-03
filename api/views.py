@@ -262,7 +262,7 @@ def plist_api(request, kind, filepath=None):
             return HttpResponse(json.dumps(response) + '\n',
                                 content_type='application/json')
         else:
-            return HttpResponse(plistlib.writePlistToString(response),
+            return HttpResponse(plistlib.dumps(response),
                                 content_type='application/xml')
 
     if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
@@ -431,7 +431,7 @@ def plist_api(request, kind, filepath=None):
         plist_data = Plist.read(kind, filepath)
         plist_data.update(request_data)
         try:
-            data = plistlib.writePlistToString(plist_data)
+            data = plistlib.dumps(plist_data)
             Plist.write(data, kind, filepath, request.user)
         except FileError as err:
             return HttpResponse(
@@ -447,7 +447,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json')
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(plist_data),
+                    plistlib.dumps(plist_data),
                     content_type='application/xml')
 
     elif request.method == 'DELETE':
@@ -537,7 +537,7 @@ def file_api(request, kind, filepath=None):
                 return HttpResponse(json.dumps(response) + '\n',
                                     content_type='application/json')
             else:
-                return HttpResponse(plistlib.writePlistToString(response),
+                return HttpResponse(plistlib.dumps(response),
                                     content_type='application/xml')
 
     if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
@@ -757,6 +757,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     report = MunkiReport(machine=machine)
 
                 if machine and report:
+                    LOGGER.debug("Report %s for machine %s", machine, report)
                     machine.remote_ip = request.META['REMOTE_ADDR']
                     report.activity = ""
 
@@ -764,9 +765,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         machine.hostname = submit.get('name')
                     if 'username' in submit:
                         machine.username = submit.get('username')
-                    if 'unit' in submit:
-                        unit = BusinessUnit.objects.get(hash=submit.get('unit'))
-                        machine.businessunit = unit
 
                     if 'base64bz2report' in submit:
                         report.update_report(submit.get('base64bz2report'))
@@ -823,15 +821,14 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 bundleid_ignorelist = [
                     'com.apple.print.PrinterProxy'
                 ]
+                LOGGER.debug("Request for machine %s", machine)
                 if machine:
                     compressed_inventory = submit.get('base64bz2inventory')
                     if compressed_inventory:
                         compressed_inventory = compressed_inventory.replace(" ", "+")
                         inventory_str = decode_to_string(compressed_inventory)
                         try:
-                            with open(inventory_str, 'rb') as fp:
-                                inventory_list = plistlib.load(fp)
-                            #inventory_list = plistlib.readPlistFromString(inventory_str)
+                            inventory_list = plistlib.loads(inventory_str)
                         except Exception:
                             inventory_list = None
                         if inventory_list:
@@ -953,164 +950,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
             # success
             return HttpResponse(status=204)
     
-    # ----------- error 404 -----------------
-    return HttpResponse(status=404)
-
-@csrf_exempt
-@logged_in_or_basicauth()
-def mdm_api(request, kind, submission_type, primary_id=None, action=None, secondary_id=None):
-    LOGGER.debug("Got API request for %s, %s, %s, %s" % (kind, submission_type, primary_id, secondary_id))
-    if kind not in ['mdm']:
-        return HttpResponse(status=404)
-    
-    # ----------- RESPONSE TYPE -----------------
-    response_type = 'json'
-    if request.META.get('HTTP_ACCEPT') == 'application/xml':
-        response_type = 'xml'
-    
-    if request.method == 'GET':
-        LOGGER.debug("Got API GET request for %s", kind)
-
-        if not request.user.has_perm('reports.can_view_reports'):
-            raise PermissionDenied
-
-        data = None
-        
-        if submission_type == "devices" and primary_id:
-            try:
-                machine = Machine.objects.get(serial_number=primary_id)
-            except Machine.DoesNotExist:
-                return HttpResponse(status=204)
-            
-            if CONVERT_TO_QWERTZ:
-                # layout fix
-                firmware_password = data['data']['attributes'].get('firmware_password')
-                if firmware_password:
-                    data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
-        
-        if data:
-            if response_type == 'json':
-                return HttpResponse(
-                    json.dumps(data) + '\n',
-                    content_type='application/json')
-            else:
-                return HttpResponse(
-                    plistlib.writePlistToString(data),
-                    content_type='application/xml')
-    
-    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
-        # support browsers/libs that don't directly support the other verbs
-        http_method = request.META['HTTP_X_METHODOVERRIDE']
-        if http_method.lower() == 'put':
-            request.method = 'PUT'
-            request.META['REQUEST_METHOD'] = 'PUT'
-            request.PUT = QueryDict(request.body)
-        if http_method.lower() == 'delete':
-            request.method = 'DELETE'
-            request.META['REQUEST_METHOD'] = 'DELETE'
-            request.DELETE = QueryDict(request.body)
-        if http_method.lower() == 'patch':
-            request.method = 'PATCH'
-            request.META['REQUEST_METHOD'] = 'PATCH'
-            request.PATCH = QueryDict(request.body)
-
-    if request.method == 'POST':
-        LOGGER.debug("Got API POST request for %s", kind)
-        if not request.user.has_perm('reports.can_push_mdm'):
-            raise PermissionDenied
-        
-        # ------- get submit -------
-        if submission_type == "devices" and primary_id:
-            try:
-                machine = Machine.objects.get(serial_number=primary_id)
-            except Machine.DoesNotExist:
-                return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'MachineDoesNotExist',
-                                    'detail': '%s does not exist' % serial_number}),
-                        content_type='application/json', status=404)
-            
-            devices.proxyDict = proxies
-            response = None
-
-        if submission_type == "device_groups" and action == "devices":
-            if primary_id and secondary_id:
-                deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
-                deviceGroups.proxyDict = proxies
-                response = deviceGroups.assignDevice(deviceID=secondary_id, deviceGoupID=primary_id)
-            else:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'BadRequest',
-                                'detail': 'Missing group'}),
-                    content_type='application/json', status=400)
-
-        if submission_type == "app_groups": 
-            if action == "push_apps":
-                if primary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.pushApps(appGroupID=primary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-            if action == "update_apps":
-                if primary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.updateApps(appGroupID=primary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-                        
-            if action == "devices":
-                if primary_id and secondary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.assignDevice(appGroupID=primary_id, deviceID=secondary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-    if request.method == 'DELETE':
-        LOGGER.debug("Got API DELETE request for %s", kind)
-        if not request.user.has_perm('reports.change_machine'):
-            raise PermissionDenied
-        if submission_type == "app_groups" and action == "devices":
-            if primary_id and secondary_id:
-                appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                appGroups.proxyDict = proxies
-                response = appGroups.unAssignDevice(appGroupID=primary_id, deviceID=secondary_id)
-                LOGGER.debug(response)
-            else:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'BadRequest',
-                                'detail': 'Missing group'}),
-                    content_type='application/json', status=400)
-    
-    if response:
-        try:
-            content_type = response.headers['Content-Type']
-        except:
-            content_type = None
-            
-        return HttpResponse(
-                    content=response.content,
-                    status=response.status_code,
-                    content_type=content_type
-                )
-
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
 
