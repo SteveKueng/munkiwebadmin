@@ -13,7 +13,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Machine, MunkiReport, BusinessUnit
+from .models import Machine, MunkiReport
 from manifests.models import ManifestFile
 from catalogs.models import Catalog
 from api.models import Plist, FileDoesNotExistError, FileReadError
@@ -95,26 +95,31 @@ def index(request, computer_serial=None):
                         pass
 
                 if report_plist:
-                    time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
-                    time = time[3:].split(':')
+                    try:
+                        time = report_plist['MachineInfo']['SystemProfile'][0]['SPSoftwareDataType'][0]['uptime']
+                        time = time[3:].split(':')
+                    except Exception as err:
+                        time = ""
+                        pass
 
                     disksPreList = []
                     disksList = []
                     counter = 0
                     # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
-                    for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                        if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
-                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
-                        else:
-                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
-                        partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                        # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
-                        for p in disksPreList:
-                            if p == deviceName:
-                                counter = counter + 1
-                        if counter == 0:
-                            disksPreList.append(deviceName)
-                        counter = 0
+                    if "SPStorageDataType" in report_plist["MachineInfo"]["SystemProfile"][0]:
+                        for index, i in enumerate(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"]):
+                            if "physical_drive" in report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]:
+                                deviceName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["physical_drive"].get("device_name", None)
+                            else:
+                                deviceName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                            partitionName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["_name"]
+                            # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
+                            for p in disksPreList:
+                                if p == deviceName:
+                                    counter = counter + 1
+                            if counter == 0:
+                                disksPreList.append(deviceName)
+                            counter = 0
 
                     diskInfoDict = {}
                     partitionsList = []
@@ -124,26 +129,26 @@ def index(request, computer_serial=None):
 
                     #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
                     for i in disksPreList:
-                        for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                        for index, b in enumerate(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"]):
                             # Reading Name of disk inside the partition-information
-                            if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
-                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
+                            if "physical_drive" in report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]:
+                                diskName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["physical_drive"].get("device_name", None)
                             else:
-                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
-                            partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                                diskName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                            partitionName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["_name"]
                             # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
                             if diskName == i:
                                 # Reading partition information from system_profiler
-                                partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
+                                partitionsAttributesDict = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]
                                 # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
-                                partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                                partitionsAttributesDict['percentFull'] = 100 * (float(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"] - report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["free_space_in_bytes"]) / report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"])
                                 partitionDict['partitionName'] = partitionName
                                 partitionDict['partitionAtributes'] = partitionsAttributesDict
                                 partitionsList.append(partitionDict)
                                 partitionDict = {}
                                 # Calculate the diskSize by adding every parttion-size to diskSize
-                                diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
-                                diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].get("physical_drive", None)
+                                diskSize = diskSize + report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"]
+                                diskInfoDict['physicalDisk'] = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index].get("physical_drive", None)
                         diskInfoDict['partitions'] = partitionsList
                         partitionsList = []
                         diskInfoDict['diskName'] = i
@@ -183,17 +188,9 @@ def index(request, computer_serial=None):
         hardware = request.GET.get('hardware', None)
         os_version = request.GET.get('os_version', None)
         model = request.GET.get('model', None)
-        businessunit = request.GET.get('businessunit', None)
         unknown = request.GET.get('unknown', None)
 
-        if BUSINESS_UNITS_ENABLED:
-            business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-            if unknown:
-                reports = Machine.objects.filter(businessunit__isnull=True)
-            else:
-                reports = Machine.objects.filter(businessunit__exact=business_units)
-        else:
-            reports = Machine.objects.all()
+        reports = Machine.objects.all()
 
         if show is not None:
             now = timezone.now()
@@ -241,9 +238,6 @@ def index(request, computer_serial=None):
 
         if model:
             reports = reports.filter(machine_model__exact=model)
-
-        if businessunit:
-            reports = reports.filter(businessunit__exact=businessunit)
         
         context = {'reports': reports,}
         return render(request, 'reports/clienttable.html', context=context)
@@ -257,13 +251,8 @@ def index(request, computer_serial=None):
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
-    if BUSINESS_UNITS_ENABLED:
-        business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-        reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
-        machines = Machine.objects.filter(businessunit__exact=business_units)
-    else:
-        reports = MunkiReport.objects.all()
-        machines = Machine.objects.all()
+    reports = MunkiReport.objects.all()
+    machines = Machine.objects.all()
 
     munki = {}
     munki['errors'] = reports.filter(errors__gt=0).count()
