@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-import django.contrib.auth.views
+from  django.contrib.auth.views import LoginView, LogoutView, logout_then_login
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
@@ -16,8 +16,8 @@ except:
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^login/', django.contrib.auth.views.LoginView, name='login'),
-    url(r'^logout/', django.contrib.auth.views.LogoutView, name='logout'),
+    url(r'^login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
+    url(r'^logout/', logout_then_login, name='logout'),
     url(r'^api/', include('api.urls')),
     url(r'^manifests/', include('manifests.urls')),
     url(r'^reports/', include('reports.urls')),
