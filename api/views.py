@@ -892,6 +892,13 @@ def db_api(request, kind, subclass=None, serial_number=None):
                                         'exception_type': 'MachineDoesNotExist',
                                         'detail': '%s does not exist' % serial_number}),
                             content_type='application/json', status=404)
+                    except localAdmin.DoesNotExist:
+                        return HttpResponse(
+                            json.dumps({'result': 'failed',
+                                        'exception_type': 'No Password found',
+                                        'detail': 'No password found for %s' % serial_number}),
+                            content_type='application/json', status=404)
+
                     
                     if response_type == 'json':
                         return HttpResponse(
