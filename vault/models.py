@@ -10,7 +10,7 @@ from reports.models import Machine
 
 class passwordAccess(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE, editable=False)
-    user = models.ForeignKey(User, editable=False)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, editable=False)
     reason = models.CharField(max_length=140, editable=False)
     date = models.DateTimeField(default=django.utils.timezone.now, editable=False)
 

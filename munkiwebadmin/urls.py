@@ -15,9 +15,9 @@ except:
 	BASE_DIR = ""
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/', django.contrib.auth.views.login, name='login'),
-    url(r'^logout/', django.contrib.auth.views.logout_then_login, name='logout'),
+    url(r'^admin/', admin.site.urls),
+    url(r'^login/', django.contrib.auth.views.LoginView, name='login'),
+    url(r'^logout/', django.contrib.auth.views.LogoutView, name='logout'),
     url(r'^api/', include('api.urls')),
     url(r'^manifests/', include('manifests.urls')),
     url(r'^reports/', include('reports.urls')),
