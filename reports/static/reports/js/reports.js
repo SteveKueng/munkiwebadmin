@@ -890,6 +890,9 @@ function showPassword(reason) {
             passwordAccessTable.ajax.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR["responseJSON"]["detail"])
+            $("#errorModalDetailText").text(jqXHR["responseJSON"]["detail"]);
+            $("#errorModal").modal("show");
         }
     });
 }
