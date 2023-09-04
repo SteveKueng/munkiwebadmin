@@ -432,8 +432,8 @@ def plist_api(request, kind, filepath=None):
         plist_data = Plist.read(kind, filepath)
         plist_data.update(request_data)
         try:
-            data = plistlib.dumps(plist_data)
-            Plist.write(data, kind, filepath, request.user)
+            #data = plistlib.dumps(plist_data)
+            Plist.write(plist_data, kind, filepath, request.user)
         except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
