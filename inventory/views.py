@@ -1,9 +1,6 @@
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import RequestContext
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
 from django.http import Http404
-#from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User

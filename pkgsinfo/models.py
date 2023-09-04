@@ -89,10 +89,6 @@ def record(message=None, percent_done=None):
 
 class PkginfoFile(models.Model):
     '''Placeholder so we get permissions entries in the admin database'''
-    class Meta:
-        permissions = (
-            ('view_pkginfofile', 'View pkginfo'),
-        )
     pass
 
 
