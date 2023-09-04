@@ -19,7 +19,8 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine, MunkiReport
-from inventory.models import Inventory, InventoryItem
+from reports.views import model_lookup
+from inventory.models import Inventory
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
@@ -781,12 +782,13 @@ def db_api(request, kind, subclass=None, serial_number=None):
                             hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
                     if hwinfo:
-                        machine.machine_model = hwinfo.get('machine_model', machine.machine_model)
+                        machine.machine_model = model_lookup(serial_number).get('name', None)
+                        if not machine.machine_model:
+                            machine.machine_model = hwinfo.get('machine_model', machine.machine_model)
                         machine.cpu_type = hwinfo.get('cpu_type', machine.cpu_type)
                         machine.cpu_speed = hwinfo.get('current_processor_speed', machine.cpu_speed)
                         machine.ram = hwinfo.get('physical_memory', machine.ram)
                     
-                    # 
                     if not machine.os_version:
                         machine.os_version = "unknown"
                     if not machine.machine_model:
