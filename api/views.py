@@ -395,7 +395,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json')
             else:
                 return HttpResponse(
-                    request_data,
+                    plistlib.dumps(request_data),
                     content_type='application/xml')
 
     elif request.method == 'PATCH':

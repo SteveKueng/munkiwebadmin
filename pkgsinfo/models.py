@@ -6,6 +6,7 @@ from django.db import models
 import os
 import logging
 import plistlib
+import functools
 from collections import defaultdict
 from distutils.version import LooseVersion
 from multiprocessing.pool import ThreadPool
@@ -139,7 +140,7 @@ class Pkginfo(Plist):
                 pathname = files[index]
                 pkginfo_dict[name].append((version, catalogs, pathname))
         for key in pkginfo_dict.keys():
-            pkginfo_dict[key].sort(compare_versions)
+            pkginfo_dict[key].sort(key=functools.cmp_to_key(compare_versions))
         LOGGER.debug('Sorted pkgsinfo dict')
 
         # now convert to a list of lists
