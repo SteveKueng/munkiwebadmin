@@ -22,37 +22,6 @@ function do_resize() {
 }
 $(window).resize(do_resize);
 
-// using jQuery
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie !== '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = jQuery.trim(cookies[i]);
-//             // Does this cookie string begin with the name we want?
-//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }
-// var csrftoken = getCookie('csrftoken');
-
-// function csrfSafeMethod(method) {
-//     // these HTTP methods do not require CSRF protection
-//     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-// }
-// $.ajaxSetup({
-//     timeout:10000,
-//     beforeSend: function(xhr, settings) {
-//         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-//             xhr.setRequestHeader("X-CSRFToken", csrftoken);
-//         }
-//     }
-// });
-
 // grid/list view
 $(document).on('click','.grid_list', function (e) {
     $(".grid_list").removeClass('active')
