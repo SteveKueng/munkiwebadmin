@@ -449,6 +449,10 @@ var key_list = {'name': 'Name',
                 'catalogs': 'Catalogs',
                 'category': 'Category',
                 'developer': 'Developer',
+                'preinstall_script': 'Preinstall script',
+                'postinstall_script': 'Postinstall script',
+                'preuninstall_script': 'Preuninstall script',
+                'postuninstall_script': 'Postuninstall script',
                 'unattended_install': 'Unattended install',
                 'unattended_uninstall': 'Unattended uninstall'};
 
