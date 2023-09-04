@@ -26,7 +26,8 @@
     font-size: 12px;
 }
 
-.dropdown-menu {
+.dropdown-menu:not(.dropdown-user) {
     position: fixed;
     margin-top: 110px;
 }
+
