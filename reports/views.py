@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import RequestContext
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Count
-from collections import OrderedDict
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Machine, MunkiReport
-from manifests.models import ManifestFile
 from catalogs.models import Catalog
 from api.models import Plist, FileDoesNotExistError, FileReadError
 
@@ -36,11 +31,6 @@ try:
     DEFAULT_MANIFEST = settings.DEFAULT_MANIFEST
 except AttributeError:
     DEFAULT_MANIFEST = "serial_number"
-
-try:
-    BUSINESS_UNITS_ENABLED = settings.BUSINESS_UNITS_ENABLED
-except AttributeError:
-    BUSINESS_UNITS_ENABLED = False
 
 try:
     MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
@@ -470,21 +460,26 @@ def formatted_manafactured_date(year, week):
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
     return formatted_date
 
-def model_description_lookup(request, serial):
+def model_lookup(serial):
     """Determines the models human readable description based off the serial
     number"""
-    # Based off https://github.com/MagerValp/MacModelShelf/
 
-    snippet = serial[-3:]
-    if (len(serial) == 12):
-        snippet = serial[-4:]
+    options = "page=categorydata&serialnumber=%s" % serial
+    url = "https://km.support.apple.com/kb/index?%s" % options
+    
     try:
-        f = urllib.request.urlopen("https://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
-        et = ElementTree.parse(f)
-        return HttpResponse(et.findtext("configCode").decode("utf-8"), content_type='application/xml', status=201)
+        response = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as e:
+        print("HTTP Error: %s" % e.code)
+        return None
+    
+    try:
+        data = response.read()
+        model = json.loads(data.decode("utf-8"))
     except:
-        return HttpResponse(status=204)
-
+        print("Error: Could not decode JSON")
+        return None
+    return model
 
 def getSoftwareList(catalogs):
     """return a dict with all catalogs consolidated"""
