@@ -243,7 +243,7 @@ class MunkiFile(object):
         '''Retreives a file upload and saves it to pathname'''
         filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
         try:
-            with open(filepath, 'w') as fileref:
+            with open(filepath, 'wb') as fileref:
                 fileref.write(filedata)
             if user and GIT and kind == "icons":
                 MunkiGit().add_file_at_path(filepath, user)

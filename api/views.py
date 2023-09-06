@@ -9,9 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.forms.models import model_to_dict
-from django.core.serializers.json import DjangoJSONEncoder
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -35,9 +32,7 @@ import base64
 import bz2
 import hashlib
 import zlib
-import sys
 import requests
-from multiprocessing.pool import ThreadPool
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -567,10 +562,10 @@ def file_api(request, kind, filepath=None):
             filedata = request.FILES.get('filedata')
         else:
             filename = filepath
-            filedata = request.body
+            filedata = request.body.decode('utf-8')
             if "data:image/png;base64" in filedata:
                 img = filedata.split(',')[1]
-                filedata = img.decode('base64')
+                filedata = base64.b64decode(img)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
