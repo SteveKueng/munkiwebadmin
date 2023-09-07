@@ -1,64 +1,58 @@
+# MunkiWebAdmin
 ## Introduction
 This is version 2 of MunkiWebAdmin, a web-based administration tool for Munki.
 
-## Getting started
-install docker
+![MunkiWebAdmin ScreenShot](doc/ScreenShot1.png "")
 
-run postgres container:
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/stevekueng)
+
+# Getting started
+
+## Linux (dev server)
+### 1. Preparation
+install the following tools:
+- Python 3
+- Git
+- Docker (optional for database)
+
+### 2. Clone repo
 ```bash
-docker run -d --name postgres_db -e POSTGRES_DB=munkiwebadmin_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:9.6
+git clone -b django4 https://github.com/SteveKueng/munkiwebadmin.git
+cd munkiwebadmin
 ```
 
-run munkiwebadmin container
+### 3. Database
+Create a database (MySQL/MariaDB or Postgres) or use the following script (docker)
 ```bash
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -h $HOSTNAME stevekueng/munkiwebadmin
+./createDatabase.sh
 ```
 
-#### create superuser
+### 4. Create virtualenv (optional)
 ```bash
-docker exec -it munkiwebadmin bash
+pip install virtualenv
+virtualenv mwa2_virtualenv
+. mwa2_virtualenv/bin/active
+```
+
+### 5. Init DB
+```bash
+python manage.py migrate
 python manage.py createsuperuser
-exit
 ```
 
-#### munkireport scripts
-[report scripts](https://github.com/SteveKueng/mwa2_scripts)
+### 6. Edit variables
+open startDevServer.sh and change the environment variables
 
-## Munkiwebadmin custom style
-create a local folder for your styles: 
+### 7. Run munkiwebadmin
 ```bash
-mkdir /path/to/styles
+./startDevServer.sh
 ```
-clone munkiwebadmin styles repo:
-```bash
-cd /path/to/styles
-git clone https://github.com/SteveKueng/mwa2-style.git default
-```
-rename the folder in styles
-```bash
-mv /path/to/styles/default /path/to/styles/myCorp
-```
+[Install MunkiScripts](#install-munkiscripts)
 
-start munkiwebadmin with custom style:
-```bash
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -v /path/to/styles:/munkiwebadmin/munkiwebadmin/static/styles -e STYLE="myCorp" -h $HOSTNAME --link postgres_db stevekueng/munkiwebadmin
-```
+## Docker
+comming soon
 
-if you change somting in your styles folder restart the munkiwebadmin contrainer
-```bash
-docker restart munkiwebadmin
-```
-
-
-## use ngnix proxy
-more infos about ngnix proxy: https://github.com/jwilder/nginx-proxy
-
-```bash
-docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
-docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkirepo -e DB_HOST=postgres_db -e DB_NAME=munkiwebadmin_db -e DB_USER=postgres -e DB_PASS=postgres --link postgres_db -e VIRTUAL_HOST=munkiwebadmin.example.com -h $HOSTNAME stevekueng/munkiwebadmin
-```
-
-## docker variables
+### Docker variables
 
 | Variable      | Usage         | Default|
 | ------------- |-------------|:------:|
@@ -74,12 +68,24 @@ docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkir
 | DB_HOST | Database host     | _db_       |
 | DB_PORT | Database port     | _5432_     |
 
-## create docker image
+
+## Install MunkiScripts
+### 1. Download
+Check out the dropdown and download the .pkg
+
+![Download scripts screenshot](doc/ScreenShot2.png "")
+
+### 2. Install munkiscripts
+Double klick on the .pkg
+
+### 3. Configure munkiscripts
 ```bash
-docker build -t munkiwebadmin:latest .
+defaults write /var/root/Library/Preferences/com.github.stevekueng.munkiwebadmin.plist ServerURL -string "http://munkiwebadmin.example.com"
+#basic auth key created with: python python -c 'import base64; print "Basic %s" % base64.b64encode("USERNAME:PASSWORD")'
+defaults write /var/root/Library/Preferences/com.github.stevekueng.munkiwebadmin.plist authKey -string "QmFzaWMgdGVzdDpwYXNz" 
 ```
 
-## API
+# API
 MWA2 supports a basic API for reading from and writing to the Munki repo.
 
 manifests and pkgsinfo endpoints are supported. For these endpoints, the GET, POST, PUT, PATCH and DELETE methods are supported.
@@ -98,7 +104,7 @@ Note: this encoding is easily reversible, thus the recommendation to use https a
 
 Some examples of interacting with the API (where the server is running at http://localhost:8080):
 
-#### GET:
+## GET:
 ```bash
 ##Get all manifests##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" http://localhost:8080/api/manifests
@@ -128,7 +134,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      "http://localhost:8080/api/pkgsinfo/?installer_item_location=.mobileconfig&api_fields=filename,installer_item_location"
 ```
 
-#### POST:
+## POST:
 ```bash
 ##Create a new pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
@@ -146,7 +152,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgsinfo/fakepkg-1.0.plist
 ```
 
-#### PUT:
+## PUT:
 ```bash
 ##Replace an existing pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
@@ -156,7 +162,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgsinfo/fakepkg-1.0.plist
 ```
 
-#### PATCH:
+## PATCH:
 ```bash
 ##Change the value of specific keys in an existing pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
@@ -166,7 +172,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgsinfo/fakepkg-1.0.plist
 ```
 
-#### DELETE:
+## DELETE:
 ```bash
 ##Delete a pkginfo item##
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
@@ -174,7 +180,7 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/pkgsinfo/fakepkg-1.0.plist
 ```
 
-#### UPLOADING A NEW PKG OR ICON:
+## UPLOADING A NEW PKG OR ICON:
 ```bash
 curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      -X POST \
@@ -190,15 +196,9 @@ curl -H "Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=" \
      http://localhost:8080/api/icons/Firefox.png
 ```
 
-# Dev Server
-run startDevSServer.sh
 
-if there is no admin user create one:
-```bash
-docker exec -it munkiwebadmin_web_1 /bin/bash -c "python manage.py createsuperuser"
-```
-
-# Kerberos
+# Special configurations
+## Kerberos
 add the spn to your service account and generate the keytab file (execute this commands on your windows server)
 ```
 setspn.exe  -A HTTP/munkiwebadmin EXAMPLE\munkiwebadmin
@@ -257,4 +257,11 @@ docker run -d -p 8000:80 --name munkiwebadmin -v /Users/Shared/munkirepo:/munkir
 within the docker image you can test your kerberos conf with:
 ```bash
 kinit -5 -V -k -t /etc/krb5.keytab HTTP/munkiwebadmin.example.com@EXAMPLE.COM
+```
+
+# Development
+
+## create docker image
+```bash
+docker build -t munkiwebadmin:latest .
 ```
