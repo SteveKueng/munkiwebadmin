@@ -1,0 +1,19 @@
+.	40755	0/0
+./usr	40755	0/0
+./usr/local	40755	0/0
+./usr/local/munki	40755	0/0
+./usr/local/munki/._preflight	100755	0/0	0	0
+./usr/local/munki/mwa2	40755	0/0
+./usr/local/munki/mwa2/._utils.py	100755	0/0	0	0
+./usr/local/munki/mwa2/__init__.py	100755	0/0	0	4294967295
+./usr/local/munki/mwa2/__init__.pyc	100755	0/0	172	741873683
+./usr/local/munki/mwa2/__pycache__	40755	0/0
+./usr/local/munki/mwa2/__pycache__/__init__.cpython-39.pyc	100644	0/0	177	2645451159
+./usr/local/munki/mwa2/__pycache__/utils.cpython-39.pyc	100644	0/0	3012	2346243218
+./usr/local/munki/mwa2/utils.py	100755	0/0	3094	552746201
+./usr/local/munki/mwa2/utils.pyc	100755	0/0	3857	536279800
+./usr/local/munki/preflight	100755	0/0	1216	1377306177
+./usr/local/munkireport	40755	0/0
+./usr/local/munkireport/scripts	40755	0/0
+./usr/local/munkireport/scripts/._munkiwebadmin_postflight	100755	0/0	0	0
+./usr/local/munkireport/scripts/munkiwebadmin_postflight	100755	0/0	2728	223262322

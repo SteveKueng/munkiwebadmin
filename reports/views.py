@@ -12,6 +12,7 @@ from .models import Machine, MunkiReport
 from catalogs.models import Catalog
 from api.models import Plist, FileDoesNotExistError, FileReadError
 
+import os
 import plistlib
 import urllib
 from datetime import timedelta, date
@@ -493,3 +494,18 @@ def getSoftwareList(catalogs):
                 else:
                     swDict[item.name] = item
     return swDict
+
+def downloadMunkiScripts(request):
+    munkiscirpt_file = None
+    munkiscript_path = settings.MUNKISCRIPTS_PATH
+    for file in os.listdir(munkiscript_path):
+        if file.endswith(".pkg"):
+            munkiscirpt_file = os.path.join(munkiscript_path, file)
+            break
+
+    if munkiscirpt_file and os.path.exists(munkiscirpt_file):
+        with open(munkiscirpt_file, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(munkiscirpt_file)
+            return response
+    raise Http404
