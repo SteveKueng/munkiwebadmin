@@ -34,7 +34,6 @@
 						<a type="button" class="btn btn-link" href="ssh://{{ vault_username }}@{{ machine.hostname.strip }}">SSH <i class="fas fa-terminal"></i></a>
 					</div>
 					{% endif %}
-					<div id="qrcode" class="pull-right hidden-xs" style="margin-top:20px;"></div>
 				</div>
 				<div role="tabpanel">
 					<!-- Nav tabs -->
@@ -43,9 +42,8 @@
 						<li role="presentation"><a class="tab" href="#AppleUpdates" aria-controls="AppleUpdates" role="tab" data-toggle="tab">Apple Updates</a></li>
 						<li role="presentation"><a class="tab" href="#System" aria-controls="System" role="tab" data-toggle="tab">System {% if report_plist.Errors %}<i class="fas fa-exclamation-circle" aria-hidden="true"></i>{% elif report_plist.Warnings %}<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>{% endif %}</a></li>
 						<li role="presentation"><a class="tab" href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li>
-						<!--<li role="presentation"><a href="#Inventory" aria-controls="Inventory" role="tab" data-toggle="tab">Inventory</a></li> -->
 						{% if perms.vault.view_passwordAccess %}
-						<li role="presentation"><a class="tab" href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Admin</a></li>
+						<li role="presentation"><a class="tab" href="#Admin" aria-controls="Admin" role="tab" data-toggle="tab">Password</a></li>
 						{% endif %}
 					</ul>
 				</div>
@@ -417,27 +415,6 @@
 						</div>
 					</div>
 				</div>
-				<div role="tabpanel" class="tab-pane tabDetail" id="MDM">
-					<div class="panel-body">
-						<h4>Actions</h4>
-						<div class="row" id="actions">
-							<div class="col-md-7">
-								<button type="submit" class="btn btn-primary" onclick="clientActions('shutdown')">Shutdown</button>
-								<button type="submit" class="btn btn-primary" onclick="clientActions('restart')">Reboot</button>
-								<button type="submit" class="btn btn-primary" onclick="clientActions('lock')">Lock</button>
-								<button type="submit" class="btn btn-primary" onclick="clientActions('refresh')">Refresh</button>
-							</div>
-							<div class="col-md-5" id="mdmSubmit">
-							</div>
-						</div>
-						<h4>Detail</h4>
-						<div class="row" id="mdmDetail">
-							<div class="col-lg-12">
-								<i class="fas fa-spinner fa-pulse fa-3x"></i>
-							</div>
-						</div>
-					</div>
-				</div>
 				{% if perms.vault.view_passwordAccess %}
 				<div role="tabpanel" class="tab-pane tabDetail" id="Admin">
 					<div class="panel-body">
@@ -550,14 +527,3 @@ Bootstrap modal for showing process progress
 	  </div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
-
-  <script type="text/javascript">
-	var qrcode = new QRCode(document.getElementById("qrcode"), {
-		text: "{{ machine.serial_number.strip }}",
-		width: 80,
-		height: 80,
-		colorDark : "#000000",
-		colorLight : "#ffffff",
-		correctLevel : QRCode.CorrectLevel.H
-	});
-	</script>
