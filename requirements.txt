@@ -1,6 +1,6 @@
-django==2.2
+django==4.2
 uwsgi
-psycopg2-binary==2.8.6
+psycopg2-binary
 mysqlclient
 django-encrypted-model-fields
 python-ldap

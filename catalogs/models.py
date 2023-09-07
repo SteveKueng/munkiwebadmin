@@ -45,8 +45,8 @@ class Catalog(object):
                 continue
             try:
                 # attempt to read the plist so we know it's valid
-                _ = plistlib.readPlist(
-                    os.path.join(catalogs_path, name))
+                with open(os.path.join(catalogs_path, name), 'rb') as f:
+                    _ = plistlib.load(f)
             except (ExpatError, IOError):
                 # skip items that aren't valid plists
                 pass
@@ -65,8 +65,8 @@ class Catalog(object):
                 # don't process these
                 continue
             try:
-                catalog = plistlib.readPlist(
-                    os.path.join(catalogs_path, name))
+                with open(os.path.join(catalogs_path, name), 'rb') as f:
+                    catalog = plistlib.load(f)
             except (ExpatError, IOError):
                 # skip items that aren't valid plists
                 pass
@@ -81,7 +81,8 @@ class Catalog(object):
             REPO_DIR, 'catalogs', catalog_name)
         if os.path.exists(catalog_path):
             try:
-                catalog_items = plistlib.readPlist(catalog_path)
+                with open(catalog_path, 'rb') as f:
+                    catalog_items = plistlib.load(f)
                 return catalog_items
             except (ExpatError, IOError):
                 return None

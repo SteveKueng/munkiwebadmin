@@ -1,12 +1,5 @@
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import RequestContext
-from django.shortcuts import render_to_response
 from django.conf import settings
-
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.contrib.auth.models import User, Group
-
-import os
+from django.templatetags.static import static
 import base64
 
 # get settings

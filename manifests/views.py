@@ -14,6 +14,9 @@ import plistlib
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 def status(request):
     '''Returns status of long-running process'''
     LOGGER.debug('got status request for manifests_list_process')
@@ -32,7 +35,7 @@ def status(request):
 @login_required
 def index(request, manifest_path=None):
     '''Returns manifest list or detail'''
-    if manifest_path and request.is_ajax():
+    if manifest_path and is_ajax(request):
         # return manifest detail
         if request.method == 'GET':
             LOGGER.debug("Got read request for %s", manifest_path)
