@@ -22,14 +22,12 @@ MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR')
 MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH')
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
-
-MODEL_LOOKUP_ENABLED = True
-
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
 STYLE = os.getenv('STYLE')
+MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
@@ -47,7 +45,6 @@ if os.getenv('DEBUG') == 'True':
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ORIGIN_WHITELIST = ()
-
 LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
