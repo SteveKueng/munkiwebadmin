@@ -1,7 +1,6 @@
 //global var
 var passwordAccessTable = ""
 var interval = ""
-var selectedGroupID = ""
 
 window.confirm = function(message, cb) {
     $("#confirmationModal .modal-body").html(message);
@@ -236,15 +235,15 @@ function getComputerItem(pathname) {
                         }
                     });
                 }
+
+                if (tab) {
+                    activaTab(tab);
+                }
     
                 getDeviceIcon(serial, "_iconDetail");
                 loadPasswordAccess(serial);
                 loadInventory(serial);
-                getMDMDeviceInfo(serial);
-                get_model_description(serial);
-                if (tab) {
-                    activaTab(tab);
-                }
+                
                 hideProgressBar();
             },
             error: function(jqXHR, textStatus, errorThrown) {
