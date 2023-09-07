@@ -69,7 +69,7 @@
                         {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fas fa-caret-down"></i>
                         <img alt="{{ username }}" src="{{ userImage }}" class="profile-image img-circle"/>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
+                        <ul class="dropdown-menu dropdown-user dropdown-info">
                             <li id="admin" class="loginlogout"><a href="/admin/" target="_blank"><i class="fas fa-chalkboard-teacher"></i> Admin</a></li>
                             <li class="divider"></li>
                             <li id="login" class="loginlogout">
