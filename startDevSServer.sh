@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. virtualexport-python3.7/bin/activate
-
 export APPNAME='MunkiWebAdmin'
 export TIME_ZONE='UTC'
 export LANGUAGE_CODE='en-us'
@@ -30,19 +28,8 @@ if [ ! -d $MUNKI_REPO_DIR ]; then
     mkdir -p $MUNKI_REPO_DIR
 fi
 
-# Create the key directory
-if [ ! -d $ENCRYPTED_FIELDS_KEYDIR ]; then
-    mkdir -p $ENCRYPTED_FIELDS_KEYDIR
-fi
-if [ ! -f $ENCRYPTED_FIELDS_KEYDIR/meta ]; then
-    keyczart create --location=$ENCRYPTED_FIELDS_KEYDIR --purpose=crypt
-    keyczart addkey --location=$ENCRYPTED_FIELDS_KEYDIR --status=primary --size=256
-fi
-
 python manage.py makemigrations manifests pkgsinfo process reports vault inventory
 python manage.py migrate --noinput
-
-python manage.py createsuperuser --username admin
 
 # Start the development server
 python manage.py runserver 0.0.0.0:8000
