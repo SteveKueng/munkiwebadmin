@@ -6,3 +6,4 @@ podman run --name db -d \
   -p 5432:5432 \
   docker.io/library/postgres
 
+python manage.py createsuperuser
