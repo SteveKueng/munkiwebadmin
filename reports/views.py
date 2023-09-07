@@ -15,7 +15,6 @@ from api.models import Plist, FileDoesNotExistError, FileReadError
 import plistlib
 import urllib
 from datetime import timedelta, date
-from xml.etree import ElementTree
 import json
 import logging
 
@@ -406,8 +405,6 @@ def raw(request, serial):
 
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
-
-
 
 def estimate_manufactured_date(serial):
     """Estimates the week the machine was manfactured based off it's serial
