@@ -38,7 +38,8 @@ def pkg_ref_count(pkginfo_path, catalog_items):
     the installer_item_location'''
     filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        plistdata = plistlib.readPlist(filepath)
+        with open(filepath, 'rb') as f:
+            plistdata = plistlib.load(f)
     except (ExpatError, IOError):
         return 0, ''
     pkg_path = plistdata.get('installer_item_location')
@@ -57,7 +58,8 @@ def process_file(pkginfo_path):
     file and returns a tuple of name, version, catalogs, and relative path'''
     filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        pkginfo = plistlib.readPlist(filepath)
+        with open(filepath, 'rb') as f:
+            pkginfo = plistlib.load(f)
     except (ExpatError, IOError):
         return ()
     return (pkginfo.get('name', 'NO_NAME'),
@@ -105,7 +107,8 @@ class Pkginfo(Plist):
         record(message='Processing %s files' % len(files))
         all_catalog = os.path.join(CATALOGS_PATH, 'all')
         try:
-            all_items = plistlib.readPlist(all_catalog)
+            with open(all_catalog, 'rb') as f:
+                all_items = plistlib.load(f)
         except (ExpatError, OSError, IOError):
             all_items = []
         use_slower_approach = False

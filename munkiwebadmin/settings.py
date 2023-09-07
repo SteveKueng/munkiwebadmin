@@ -26,25 +26,20 @@ ICONS_URL = MEDIA_URL
 MODEL_LOOKUP_ENABLED = True
 
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
-
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
-
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
-
-DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST') # serial_number or hostname
-
+DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
 STYLE = os.getenv('STYLE')
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
 
 FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', '')
-
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS'))
 
 DEBUG = False
 if os.getenv('DEBUG') == 'True':
@@ -107,7 +102,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -165,8 +159,7 @@ if os.getenv('DB') == 'mssql':
         }
     }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
+AUTH_PASSWORD_VALIDATORS = [ {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
@@ -184,7 +177,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE')
 TIME_ZONE = os.getenv('TIME_ZONE')
-
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -269,11 +261,7 @@ else:
 LOGIN_URL='/login/'
 LOGIN_REDIRECT_URL = '/'
 
-# who gets code error notifcations when DEBUG is False
-# https://docs.djangoproject.com/en/1.9/ref/settings/#admins
 ADMINS = (
      ('Local Admin', 'root@example.com'),
 )
-# who gets broken link notifcations when DEBUG is False
-# https://docs.djangoproject.com/en/1.9/ref/settings/#managers
 MANAGERS = ADMINS

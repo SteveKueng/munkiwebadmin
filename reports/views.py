@@ -56,11 +56,14 @@ if PROXY_ADDRESS:
     opener = urllib.request.build_opener(proxy)
     urllib.request.install_opener(opener)
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
 def index(request, computer_serial=None):
     '''Returns computer list or detail'''
-    if request.is_ajax():
+    if is_ajax(request):
         if computer_serial:
             # return manifest detail
             if request.method == 'GET':
@@ -342,7 +345,7 @@ def createRequired(request):
 def getStatus(request):
     serial = request.POST.getlist('serial')[0]
     item = request.POST.getlist('item')[0]
-    if request.is_ajax() and serial and item:
+    if is_ajax(request) and serial and item:
         machine = None
         report_plist = None
         status = "led-grey"
