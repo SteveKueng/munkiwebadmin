@@ -7,11 +7,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>{{ APPNAME }} - {{ style|upper }}</title>
+    <title>{{ APPNAME }}</title>
 
     {% load static %}
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/bootstrap.min.css' type="text/css" media="all" />
+    <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
 
     <!-- Custom Fonts -->
     <link href="{% get_static_prefix %}fonts/fontawesome/css/all.css" rel="stylesheet" type="text/css">
@@ -36,7 +36,7 @@
 
     {% block java_script %}{% endblock %}
 
-    <link rel="icon" href="{% get_static_prefix %}styles/{{ style }}/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
+    <link rel="icon" href="{% get_static_prefix %}img/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
   </head>
 
   {% block body_tag %}
@@ -47,7 +47,7 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <div style="min-width:95px;">
-                    <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span></a>
+                    <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}img/logo.png"></span></a>
                 </div>
                 <button type="button" id="sidebarCollapse" class="btn btn-primary navbar-btn hidden"><i class="fas fa-bars"></i></button>
             </div>
@@ -93,7 +93,7 @@
                 <strong>MWA</strong>
             </div>
             <ul class="list-unstyled components">
-                {% if perms.reports.can_view_dashboard %}
+                {% if perms.reports.can_view_dashboard and REPO_MANAGEMENT_ONLY == False %}
                 <li {% if page == 'dashboard' %} class="active" {% endif %}>
                     <a href="{% url 'dashboard' %}">
                         <i class="fas fa-tachometer-alt"></i>
@@ -101,7 +101,7 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if perms.reports.can_view_reports %}
+                {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
                 <li {% if page == 'reports' %} class="active" {% endif %}>
                     <a href="{% url 'reports' %}" >
                         <i class="fas fa-laptop"></i>
@@ -109,7 +109,7 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if perms.reports.can_view_reports %}
+                {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
                 <li {% if page == 'inventory' %} class="active" {% endif %}>
                     <a href="{% url 'inventory' %}items">
                         <i class="fas fa-database"></i>
