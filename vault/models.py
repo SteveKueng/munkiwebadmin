@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 import django
 from django.db import models
 from django.contrib.auth.models import User
-from encrypted_fields import EncryptedCharField, EncryptedDateTimeField
-from datetime import datetime, timedelta
+from encrypted_model_fields.fields import EncryptedCharField, EncryptedDateTimeField
+from datetime import timedelta
 
 from reports.models import Machine
 
 class passwordAccess(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE, editable=False)
-    user = models.ForeignKey(User, editable=False)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, editable=False)
     reason = models.CharField(max_length=140, editable=False)
     date = models.DateTimeField(default=django.utils.timezone.now, editable=False)
 

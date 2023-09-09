@@ -1,12 +1,9 @@
-django>=1.11,<2.0
+django==4.2
 uwsgi
 psycopg2-binary
 mysqlclient
-pyodbc
-django-pyodbc-azure<2.0
-django-encrypted-fields
+django-encrypted-model-fields
 python-ldap
 django-auth-ldap
 django-cors-headers
 requests
-simpleMDMpy
