@@ -1,4 +1,4 @@
-django==4.2
+django==4.2.3
 uwsgi
 psycopg2-binary
 mysqlclient
