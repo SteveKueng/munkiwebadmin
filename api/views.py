@@ -16,7 +16,6 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine, MunkiReport
-from reports.views import model_lookup
 from inventory.models import Inventory
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
@@ -33,6 +32,7 @@ import bz2
 import hashlib
 import zlib
 import requests
+import urllib
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -134,6 +134,38 @@ def convert_html_to_json(raw_html):
     except (ValueError, KeyError, TypeError):
         data = ""
     return data
+
+
+def model_lookup(serial):
+    """Determines the models human readable description based off the serial
+    number"""
+
+    options = "page=categorydata&serialnumber=%s" % serial
+    url = "https://km.support.apple.com/kb/index?%s" % options
+    
+    try:
+        response = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as e:
+        print("HTTP Error: %s" % e.code)
+        return None
+    
+    try:
+        data = response.read()
+        model = json.loads(data.decode("utf-8"))
+    except:
+        print("Error: Could not decode JSON")
+        return None
+    return model
+
+
+def get_device_img_url(serial):
+    """ Returns the url to the device image for a given serial number"""
+    model = model_lookup(serial)
+    if model and model.get('id', None):
+        url = "https://km.support.apple.com/kb/securedImage.jsp?productid=%s&size=240x240" % model['id']
+    else:
+        url = "https://support.apple.com/kb/securedImage.jsp?configcode=%s&size=240x240" % serial[-4:]
+    return url
 
 
 def decode_to_string(data):
@@ -779,16 +811,25 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     if hwinfo:
                         machine.machine_model = model_lookup(serial_number).get('name', None)
                         if not machine.machine_model:
-                            machine.machine_model = hwinfo.get('machine_model', machine.machine_model)
-                        machine.cpu_type = hwinfo.get('cpu_type', machine.cpu_type)
-                        machine.cpu_speed = hwinfo.get('current_processor_speed', machine.cpu_speed)
-                        machine.ram = hwinfo.get('physical_memory', machine.ram)
+                            machine.machine_model = hwinfo.get('machine_model', "unknown")
+                        
+                        machine.img_url = get_device_img_url(serial_number)
+
+                        # get cpu type
+                        if not hwinfo.get('cpu_type', None):
+                            machine.cpu_type = hwinfo['cpu_type']
+                        if not hwinfo.get('chip_type', None):
+                            machine.cpu_type = hwinfo['chip_type']
+                        
+                        if hwinfo.get('current_processor_speed', None):
+                            machine.cpu_speed = hwinfo['current_processor_speed']
+                        
+                        if hwinfo.get('physical_memory', None):
+                            machine.ram = hwinfo['physical_memory']
                     
                     if not machine.os_version:
                         machine.os_version = "unknown"
-                    if not machine.machine_model:
-                        machine.machine_model = "unknown"
-
+                    
                     report.runtype = submit.get('runtype', 'UNKNOWN')
 
                     if submission_type == 'postflight':

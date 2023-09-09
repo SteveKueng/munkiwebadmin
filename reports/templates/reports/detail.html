@@ -8,7 +8,7 @@
 				<div class="modal-header {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<div class="col-sm-3 text-center machineIcon">
-						<img id="{{ machine.serial_number }}_iconDetail" src='{% get_static_prefix %}img/apple.png' alt="" width="100" />
+						<img id="iconDetail" src='{{ machine.img_url }}' alt="" width="100" />
 						{% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
 						<div class="overlay"></div>
 						<div class="button" data-toggle="modal" data-target="#deleteConfirmationModal"><i class="fas fa-trash"></i></div>
