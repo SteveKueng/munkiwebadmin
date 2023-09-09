@@ -20,6 +20,7 @@ class Machine(models.Model):
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
     current_status = models.CharField(max_length=200, blank=True)
+    img_url = models.CharField(max_length=200, blank=True)
 
     def errors(self):
         return MunkiReport.objects.get(machine=self).errors

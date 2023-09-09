@@ -180,7 +180,6 @@ def index(request, computer_serial=None):
         hardware = request.GET.get('hardware', None)
         os_version = request.GET.get('os_version', None)
         model = request.GET.get('model', None)
-        unknown = request.GET.get('unknown', None)
 
         reports = Machine.objects.all()
 
@@ -459,27 +458,6 @@ def formatted_manafactured_date(year, week):
     formatted_date = 'Week of %s %s %s' % \
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
     return formatted_date
-
-def model_lookup(serial):
-    """Determines the models human readable description based off the serial
-    number"""
-
-    options = "page=categorydata&serialnumber=%s" % serial
-    url = "https://km.support.apple.com/kb/index?%s" % options
-    
-    try:
-        response = urllib.request.urlopen(url)
-    except urllib.error.HTTPError as e:
-        print("HTTP Error: %s" % e.code)
-        return None
-    
-    try:
-        data = response.read()
-        model = json.loads(data.decode("utf-8"))
-    except:
-        print("Error: Could not decode JSON")
-        return None
-    return model
 
 def getSoftwareList(catalogs):
     """return a dict with all catalogs consolidated"""
