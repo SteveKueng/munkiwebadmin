@@ -60,7 +60,6 @@ comming soon
 | ALLOWED_HOSTS | django allowed hosts. e.g. _[ munkiwebadmin.example.com ]_ |_[ * ]_|
 | DEFAULT_MANIFEST | default manifest to use. _serail_number_ or _hostname_     |_serial_number_ |
 | PROXY_ADDRESS | proxy server address     ||
-| STYLE | style munkiwebadmin should use. Style varable is the name of your style folder: _Munkiwebadmin custom style_ |_default_ |
 | DB | Database type. currently only postgres possible | postgres |
 | DB_NAME | Database name | _munkiwebadmin_db_ |
 | DB_USER | Database user     | _postgres_ |
