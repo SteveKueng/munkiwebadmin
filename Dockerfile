@@ -1,4 +1,4 @@
-FROM python:2.7-slim
+FROM python:3.11-slim
 
 ENV APP_DIR /munkiwebadmin
 
@@ -10,7 +10,6 @@ ENV SIMPLEMDMKEY ''
 ENV ALLOWED_HOSTS '[*]'
 ENV DEFAULT_MANIFEST 'serail_number'
 ENV PROXY_ADDRESS ''
-ENV STYLE 'default'
 ENV VAULT_USERNAME 'admin'
 ENV CONVERT_TO_QWERTZ ''
 ENV DEBUG 'False'
@@ -41,10 +40,6 @@ RUN apt-get install -y unixodbc-dev tdsodbc mariadb-client libmariadbclient-dev 
 RUN apt-get clean && apt-get update && apt-get install -y locales
 RUN sed -i '/^#.* en_US.* /s/^#//' /etc/locale.gen
 RUN locale-gen
-# install mssql
-#RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-#RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
-#RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
 # -------
 
 # create dirs
@@ -61,19 +56,11 @@ RUN cp -r /munki-munki*/code/client/* /munkitools && rm -rf /munki-munki*
 COPY . ${APP_DIR}
 WORKDIR ${APP_DIR}
 
-#load default style
-RUN curl -Lk -o /tmp/mwa2-style.zip https://github.com/SteveKueng/mwa2-style/archive/master.zip && unzip /tmp/mwa2-style.zip -d /tmp && rm -rf /tmp/mwa2-style.zip
-RUN mkdir -p /munkiwebadmin/munkiwebadmin/static/styles/default
-RUN cp -r /tmp/mwa2-style-master/* /munkiwebadmin/munkiwebadmin/static/styles/default && rm -rf /tmp/mwa2-style-master
-
 # clean pyc
 RUN find ${APP_DIR} -name '*.pyc' -delete
 
 # Install all python dependency libs
 RUN pip install -r requirements.txt
-
-# install remote ldap
-#RUN git clone https://github.com/SteveKueng/django-remote-auth-ldap.git /tmp/django-remote-auth-ldap && cd /tmp/django-remote-auth-ldap && python setup.py install && cd ${APP_DIR} && rm -rf /tmp
 
 # configure git
 RUN git config --global core.preloadindex true
