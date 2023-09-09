@@ -14,6 +14,11 @@ try:
 	BASE_DIR = settings.BASE_DIR
 except:
 	BASE_DIR = ""
+      
+try:
+	REPO_MANAGEMENT_ONLY = settings.REPO_MANAGEMENT_ONLY
+except:
+	REPO_MANAGEMENT_ONLY = False
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -28,8 +33,12 @@ urlpatterns = [
     url(r'^inventory/', include('inventory.urls')),
     url(r'^santa/', include('santa.urls')),
     url(r'^makecatalogs/', include('process.urls')),
-    url(r'^$', RedirectView.as_view(url='/reports/')),
 ]
+
+if REPO_MANAGEMENT_ONLY:
+    urlpatterns.append(url(r'^$', RedirectView.as_view(url='/manifests/')))
+else:
+    urlpatterns.append(url(r'^$', RedirectView.as_view(url='/reports/')))
 
 # comment out the following if you are serving
 # static files a different way

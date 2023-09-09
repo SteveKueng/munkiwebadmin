@@ -4,11 +4,6 @@ import base64
 
 # get settings
 try:
-    STYLE = settings.STYLE
-except:
-    STYLE = 'default'
-
-try:
     APPNAME = settings.APPNAME
 except:
     APPNAME = "MunkiWebAdmin"
@@ -23,6 +18,11 @@ try:
 except:
     HOSTNAME = "localhost"
 
+try:
+    REPO_MANAGEMENT_ONLY = settings.REPO_MANAGEMENT_ONLY
+except:
+    REPO_MANAGEMENT_ONLY = False
+
 def index(request):
     try:
         image = request.user.ldap_user.attrs["thumbnailPhoto"]
@@ -31,5 +31,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
+    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
 
