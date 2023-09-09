@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>identifier</key>
+	<string>com.github.stevekueng.munkiscripts</string>
+	<key>install_location</key>
+	<string>/</string>
+	<key>name</key>
+	<string>munkiscripts-4.1.pkg</string>
+	<key>postinstall_action</key>
+	<string>none</string>
+	<key>preserve_xattr</key>
+	<false/>
+	<key>version</key>
+	<string>4.1</string>
+</dict>
+</plist>

@@ -1,0 +1,74 @@
+#!/usr/local/munki/munki-python
+
+import os
+import sys
+import subprocess
+import base64
+import bz2
+from mwa2 import utils
+
+sys.path.insert(0, "/usr/local/munki" )
+from munkilib import FoundationPlist
+
+def get_hardware_info():
+    '''Uses system profiler to get hardware info for this machine'''
+    cmd = ['/usr/sbin/system_profiler', '-xml', 'SPHardwareDataType', 'SPSoftwareDataType',
+           'SPNetworkDataType', 'SPInstallHistoryDataType', 'SPDisplaysDataType',
+           'SPStorageDataType', 'SPPrintersDataType', 'SPNetworkVolumeDataType',
+           'SPThunderboltDataType', 'SPSerialATADataType', 'SPUSBDataType', 'SPPowerDataType']
+    proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (output, dummy_error) = proc.communicate()
+    try:
+        plist = FoundationPlist.readPlistFromString(output)
+        # system_profiler xml is an array
+        newPlist = dict()
+        for plistDict in plist:
+            newPlist[plistDict['_dataType']] = plistDict['_items']
+        return newPlist
+    except BaseException:
+        return {}
+
+def main():
+    """ main """
+    RUNTYPE = "unknown"
+    if len(sys.argv) == 2:
+        RUNTYPE = sys.argv[1]
+
+    # report
+    REPORTPATH = "/Library/Managed Installs/ManagedInstallReport.plist"
+    reportPlist = FoundationPlist.readPlist(REPORTPATH)
+
+    hardwareinfo = get_hardware_info()
+    reportPlist["MachineInfo"]["SystemProfile"] = list()
+    reportPlist["MachineInfo"]["SystemProfile"] = [hardwareinfo]
+
+    bz2report = bz2.compress(FoundationPlist.writePlistToString(reportPlist))
+    base64bz2report = base64.b64encode(bz2report)
+    #report = base64bz2report.replace(" ", "+")
+    report = base64bz2report
+
+    serialNumber = hardwareinfo["SPHardwareDataType"][0]["serial_number"]
+    clientName = utils.get_computer_name()
+    username = os.getlogin()
+    
+    url = "/api/report/"+serialNumber
+    data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "username": username, "base64bz2report": report}
+    resc = utils.send_data(url, data)
+
+    #inventory
+    INVENTORYPATH = "/Library/Managed Installs/ApplicationInventory.plist"
+
+    if os.path.exists(INVENTORYPATH):
+        inventoryPlist = FoundationPlist.readPlist(INVENTORYPATH)
+        bz2inventory = bz2.compress(FoundationPlist.writePlistToString(inventoryPlist))
+        base64bz2inventory = base64.b64encode(bz2inventory)
+#        inventory = base64bz2inventory.replace(" ", "+")
+        inventory = base64bz2inventory
+        url = "/api/inventory/"+serialNumber
+        data = {"base64bz2inventory": inventory}
+        resc = utils.send_data(url, data)
+
+if __name__ == "__main__":
+    main()

@@ -87,7 +87,7 @@ class Plist(object):
             try:
                 # attempt to create missing intermediate dirs
                 os.makedirs(plist_parent_dir)
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
                 raise FileWriteError(err)
         if plist_data:
@@ -109,17 +109,17 @@ class Plist(object):
                     'version': '1.0',
                     'catalogs': ['development']
                 }
-        data = plistlib.writePlistToString(plist)
         try:
-            with open(filepath, 'w') as fileref:
-                fileref.write(data.encode('utf-8'))
+            plistFile=open(filepath,'wb')
+            plistlib.dump(plist, plistFile)
+            plistFile.close()
             LOGGER.info('Created %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
-        return data
+        return plist
 
     @classmethod
     def read(cls, kind, pathname):
@@ -128,9 +128,10 @@ class Plist(object):
         if not os.path.exists(filepath):
             raise FileDoesNotExistError('%s/%s not found' % (kind, pathname))
         try:
-            plistdata = plistlib.readPlist(filepath)
+            with open(filepath, 'rb') as fp:
+                plistdata = plistlib.load(fp)
             return plistdata
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
             raise FileReadError(err)
         except (ExpatError, IOError):
@@ -146,16 +147,17 @@ class Plist(object):
             try:
                 # attempt to create missing intermediate dirs
                 os.makedirs(plist_parent_dir)
-            except OSError, err:
+            except OSError as err:
                 LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
                 raise FileWriteError(err)
         try:
-            with open(filepath, 'w') as fileref:
-                fileref.write(data)
+            fileref=open(filepath,'wb')
+            plistlib.dump(data, fileref)
+            fileref.close()
             LOGGER.info('Wrote %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().add_file_at_path(filepath, user)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
 
@@ -171,7 +173,7 @@ class Plist(object):
             LOGGER.info('Deleted %s/%s', kind, pathname)
             if user and GIT:
                 MunkiGit().delete_file_at_path(filepath, user)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)
 
@@ -215,7 +217,7 @@ class MunkiFile(object):
             try:
                 # attempt to create missing intermediate dirs
                 os.makedirs(file_parent_dir)
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 LOGGER.error(
                     'Create failed for %s/%s: %s', kind, pathname, err)
                 raise FileWriteError(err)
@@ -232,7 +234,7 @@ class MunkiFile(object):
             if user and GIT and kind == "icons":
                 MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
 
@@ -241,12 +243,12 @@ class MunkiFile(object):
         '''Retreives a file upload and saves it to pathname'''
         filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
         try:
-            with open(filepath, 'w') as fileref:
+            with open(filepath, 'wb') as fileref:
                 fileref.write(filedata)
             if user and GIT and kind == "icons":
                 MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
 
@@ -262,6 +264,6 @@ class MunkiFile(object):
             if user and GIT and kind == "icons":
                 MunkiGit().delete_file_at_path(filepath, user)
             LOGGER.info('Deleted %s/%s', kind, pathname)
-        except (IOError, OSError), err:
+        except (IOError, OSError) as err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)

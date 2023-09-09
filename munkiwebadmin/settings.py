@@ -20,39 +20,27 @@ APPNAME = os.getenv('APPNAME')
 
 MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR')
 MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH')
-
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
-
-MODEL_LOOKUP_ENABLED = True
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
-
-# lock info
-#LOCK_MESSAGE = 'Locked by IT Support.'
-#IT_NUMBER = '0000'
-#PIN = '123456'
-
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
+DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
+MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
 
-DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST') # serial_number or hostname
-
-STYLE = os.getenv('STYLE')
+REPO_MANAGEMENT_ONLY = False
+if os.getenv('REPO_MANAGEMENT_ONLY') == 'True':
+    REPO_MANAGEMENT_ONLY = True
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
 
-#fieldkey for https://github.com/defrex/django-encrypted-fields
-# mkdir fieldkeys
-# keyczart create --location=fieldkeys --purpose=crypt
-# keyczart addkey --location=fieldkeys --status=primary --size=256
-ENCRYPTED_FIELDS_KEYDIR = os.getenv('ENCRYPTED_FIELDS_KEYDIR')
-
+FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', '')
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS'))
 
 DEBUG = False
 if os.getenv('DEBUG') == 'True':
@@ -60,7 +48,6 @@ if os.getenv('DEBUG') == 'True':
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ORIGIN_WHITELIST = ()
-
 LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
@@ -79,7 +66,6 @@ except:
 ###########################################################################
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -88,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'encrypted_model_fields',
 
     # our apps
     'api',
@@ -102,7 +89,7 @@ INSTALLED_APPS = [
     'vault',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -112,11 +99,9 @@ MIDDLEWARE_CLASSES = [
     #'django_remote_auth_ldap.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -174,8 +159,7 @@ if os.getenv('DB') == 'mssql':
         }
     }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
+AUTH_PASSWORD_VALIDATORS = [ {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
@@ -192,13 +176,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 LANGUAGE_CODE = os.getenv('LANGUAGE_CODE')
-
 TIME_ZONE = os.getenv('TIME_ZONE')
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 #### end basic Django settings
@@ -281,11 +261,7 @@ else:
 LOGIN_URL='/login/'
 LOGIN_REDIRECT_URL = '/'
 
-# who gets code error notifcations when DEBUG is False
-# https://docs.djangoproject.com/en/1.9/ref/settings/#admins
 ADMINS = (
      ('Local Admin', 'root@example.com'),
 )
-# who gets broken link notifcations when DEBUG is False
-# https://docs.djangoproject.com/en/1.9/ref/settings/#managers
 MANAGERS = ADMINS
