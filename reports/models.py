@@ -19,7 +19,6 @@ class Machine(models.Model):
     cpu_arch = models.CharField(max_length=32, blank=True)
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
-    current_status = models.CharField(max_length=200, blank=True)
     img_url = models.CharField(max_length=200, blank=True)
 
     def errors(self):

@@ -51,9 +51,10 @@ def main():
 
     serialNumber = hardwareinfo["SPHardwareDataType"][0]["serial_number"]
     clientName = utils.get_computer_name()
+    username = os.getlogin()
     
     url = "/api/report/"+serialNumber
-    data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "base64bz2report": report}
+    data = {"runtype": RUNTYPE, "submission_type": "postflight", "name": clientName, "username": username, "base64bz2report": report}
     resc = utils.send_data(url, data)
 
     #inventory

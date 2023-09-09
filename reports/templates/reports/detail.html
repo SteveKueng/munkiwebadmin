@@ -17,7 +17,6 @@
 					<div class="col-sm-6">
 						<h2>{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}
 							<button type="button" class="btn btn-link" onclick="copyTextToClipboard('{% if machine.hostname %}{{ machine.hostname.strip }}{% else %}{{ machine.serial_number.strip }}{% endif %}');"><i class="fas fa-copy"></i></button>
-							
 						</h2>
 						<h4>
 							<small>
@@ -164,25 +163,22 @@
 								<ul class="list-group">
 									<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
 									<li class="list-group-item"><b>Serial:</b><span class="pull-right"><button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard('{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}');"><i class="fas fa-copy"></i></button> {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
-									<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.cpu_type }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.current_processor_speed }} {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.number_processors }} Cores</span></li>
+									<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ machine.cpu_type }}</span></li>
 									<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
 									<li class="list-group-item"><b>Last Munki run:</b><span class="pull-right">{{ report_plist.EndTime }}</span></li>
 									<li class="list-group-item"><b>Runtype:</b><span class="pull-right">{{ report_plist.RunType }}</span></li>
 								</ul>
 							</div>
 						</div>
-						{% if report_plist.Conditions.machine_type == 'laptop' and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType and report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity %}
+		
+						{% if 'MacBook' in report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_name %}
 						<h4>Battery</h4>
 						<div class="row">
 							<div class="col-lg-6">
 								<ul class="list-group">
 									<li class="list-group-item"><b>Serial:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_model_info.sppower_battery_serial_number }}</span></li>
 									<li class="list-group-item"><b>Firmware:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_model_info.sppower_battery_firmware_version }}</span></li>
-									<li class="list-group-item"><b>Charging:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_is_charging == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
-									<li class="list-group-item"><b>Charged:</b><span class="pull-right">{% if report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_fully_charged == "TRUE" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</span></li>
-									<!--<li class="list-group-item"><b>Max capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }} mAh</span></li>
-									<li class="list-group-item"><b>Current capacity:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity }} mAh ({{ report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_current_capacity|calcbatteryprecent:report_plist.MachineInfo.SystemProfile.0.SPPowerDataType.0.sppower_battery_charge_info.sppower_battery_max_capacity }}%)</span></li>
-									-->								</ul>
+								</ul>
 							</div>
 							<div class="col-lg-6">
 								<ul class="list-group">
@@ -193,81 +189,7 @@
 						</div>
 						{% endif %}
 
-						<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Network</h4>
-						<ul class="list-group">
-							{% for interface in report_plist.MachineInfo.SystemProfile.0.SPNetworkDataType %}
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-2" >
-										<div class="row">
-											<div class="col-lg-12 text-center" >
-												{% if "AirPort" in interface.type %}
-												<i class="fas fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
-												{% else %}
-												<i class="fas fa-globe-americas" aria-hidden="true" style="font-size: 70px"></i>
-												{% endif %}
-											</div>
-										</div>
-										<div class="row" style="margin-top: 5px">
-											<div class="col-lg-12 text-center">{{ interface|get:"_name" }}</div>
-										</div>
-									</div>
-									<div class="col-lg-10" >
-										<div class="row" style="border-left: 1px solid #ddd">
-											<div class="col-lg-12">
-												<ul class="list-group">
-													{% for key,value in interface.items %}
-														{% if not key in "_name,spnetwork_service_order,type" %}
-															{% if value|get_type == 'str' %}
-															<li class="list-group-item"><b>{{key|replace}}:</b><span class="pull-right">{{value}}</span></li>
-															{% elif value|get_type == '_InternalDict' %}
-															<li class="list-group-item"><b>{{key}}:</b><span class="pull-right"></span>
-																<ul class="list-group">
-																	{% for subkey,subvalue in value.items %}
-																	<li class="list-group-item"><b>{{subkey|replace}}:</b><span class="pull-right">{{ subvalue }}</span></li>
-																	{% endfor %}
-																</ul>
-															</span></li>
-															{% endif %}
-														{% endif %}
-													{% endfor %}
-												</ul>
-											</div>
-										</div>
-
-										{% for screen in interface.spdisplays_ndrvs %}
-										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
-											<div class="col-lg-2">
-												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
-													<i class="fas fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
-												{% else %}
-													<i class="fas fa-tv" aria-hidden="true" style="font-size: 70px"></i>
-												{% endif %}
-											</div>
-											<div class="col-lg-5">
-												<ul class="list-group">
-												<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
-												<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
-													<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
-												<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
-												</ul>
-											</div>
-											<div class="col-lg-5">
-												<ul class="list-group">
-													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
-													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
-													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
-													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
-												</ul>
-											</div>
-										</div>
-										{% endfor %}
-									</div>
-								</div>
-							</li>
-							{% endfor %}
-						</ul>
-						<a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><h4></a>Drives</h4>
+						<a role="button" data-toggle="collapse" href="#Drives" aria-expanded="false" aria-controls="Drives"><h4></a>Drives</h4>
 						<ul class="list-group">
 								{% for device in disksList %}
 							<li class="list-group-item">
@@ -324,7 +246,7 @@
 							</li>
 							{% endfor %}
 						</ul>
-						<a role="button" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"><h4></a>Graphics</h4>
+						<a role="button" data-toggle="collapse" href="#Graphics" aria-expanded="false" aria-controls="Graphics"><h4></a>Graphics</h4>
 						<ul class="list-group">
 							{% for card in report_plist.MachineInfo.SystemProfile.0.SPDisplaysDataType %}
 							<li class="list-group-item">
@@ -366,6 +288,81 @@
 										</div>
 
 										{% for screen in card.spdisplays_ndrvs %}
+										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
+											<div class="col-lg-2">
+												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
+													<i class="fas fa-laptop" aria-hidden="true" style="font-size: 70px"></i>
+												{% else %}
+													<i class="fas fa-tv" aria-hidden="true" style="font-size: 70px"></i>
+												{% endif %}
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+												<li class="list-group-item"><b>Name:</b><span class="pull-right">{{ screen|get:"_name" }}</span></li>
+												<li class="list-group-item"><b>Resolution (Max):</b><span class="pull-right">{{ screen|get:"_spdisplays_pixels" }}</span></li>
+													<li class="list-group-item"><b>Resolution (Set):</b><span class="pull-right">{{ screen|get:"_spdisplays_resolution" }}</span></li>
+												<li class="list-group-item"><b>Type:</b><span class="pull-right">{{ screen.spdisplays_display_type|slice:"11:"}}</li>
+												</ul>
+											</div>
+											<div class="col-lg-5">
+												<ul class="list-group">
+													<li class="list-group-item"><b>Serial-No:</b><span class="pull-right">{% if screen|get:"spdisplays_display-serial-number" %}{{ screen|get:"spdisplays_display-serial-number" }}{% else %}No Data{% endif %}</span></li>
+													<li class="list-group-item"><b>Year of purchase:</b><span class="pull-right">{{ screen|get:"_spdisplays_display-year" }}</span></li>
+													<li class="list-group-item"><b>Internal:</b><span class="pull-right">{% if screen.spdisplays_builtin == "spdisplays_yes" %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
+													<li class="list-group-item"><b>Supports rotation:</b><span class="pull-right">{% if screen.spdisplays_rotation == "spdisplays_supported"  %}<i class="fas fa-check" aria-hidden="true"></i>{% else %}<i class="fas fa-times" aria-hidden="true"></i>{% endif %}</li>
+												</ul>
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								</div>
+							</li>
+							{% endfor %}
+						</ul>
+
+						<a role="button" data-toggle="collapse" href="#Network" aria-expanded="false" aria-controls="Network"><h4></a>Network</h4>
+						<ul class="list-group">
+							{% for interface in report_plist.MachineInfo.SystemProfile.0.SPNetworkDataType %}
+							<li class="list-group-item">
+								<div class="row">
+									<div class="col-lg-2" >
+										<div class="row">
+											<div class="col-lg-12 text-center" >
+												{% if "AirPort" in interface.type %}
+												<i class="fas fa-wifi" aria-hidden="true" style="font-size: 70px"></i>
+												{% else %}
+												<i class="fas fa-globe-americas" aria-hidden="true" style="font-size: 70px"></i>
+												{% endif %}
+											</div>
+										</div>
+										<div class="row" style="margin-top: 5px">
+											<div class="col-lg-12 text-center">{{ interface|get:"_name" }}</div>
+										</div>
+									</div>
+									<div class="col-lg-10" >
+										<div class="row" style="border-left: 1px solid #ddd">
+											<div class="col-lg-12">
+												<ul class="list-group">
+													{% for key,value in interface.items %}
+														{% if not key in "_name,spnetwork_service_order,type" %}
+															{% if value|get_type == 'str' %}
+															<li class="list-group-item"><b>{{key|replace}}:</b><span class="pull-right">{{value}}</span></li>
+															{% elif value|get_type == '_InternalDict' %}
+															<li class="list-group-item"><b>{{key}}:</b><span class="pull-right"></span>
+																<ul class="list-group">
+																	{% for subkey,subvalue in value.items %}
+																	<li class="list-group-item"><b>{{subkey|replace}}:</b><span class="pull-right">{{ subvalue }}</span></li>
+																	{% endfor %}
+																</ul>
+															</span></li>
+															{% endif %}
+														{% endif %}
+													{% endfor %}
+												</ul>
+											</div>
+										</div>
+
+										{% for screen in interface.spdisplays_ndrvs %}
 										<div class="row" style="border-left: 1px solid #ddd; margin-top: 20px">
 											<div class="col-lg-2">
 												{% if screen.spdisplays_builtin == "spdisplays_yes" %}
