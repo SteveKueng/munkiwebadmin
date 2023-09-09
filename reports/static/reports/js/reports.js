@@ -169,6 +169,7 @@ function activaTab(tab){
   $('.nav-tabs a[href="#' + tab + '"]').tab('show');
 };
 
+
 function getDeviceIcon(serial, iconid) {
     var image_url = "https://support.apple.com/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
     var $image = $("#"+serial+iconid);
