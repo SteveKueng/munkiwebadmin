@@ -159,35 +159,6 @@ $('#SearchField').prop('disabled', true);
             <div id="hardwarebreakdown" style="height: 300px; cursor: pointer;"></div>
         </div>
     </div>
-		{% if low_disk_machines %}
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Low disk space</h3>
-            </div>
-            <table class="table table-striped table-condensed table-bordered">
-            {% for item in low_disk_machines|dictsort:'available_disk_space' %}
-                <tr>
-                    <td>
-                        {% if perms.reports.can_view_reports %}
-                        <a href='{% url 'reports.views.detail' item.serial_number %}'>
-                        {% endif %}
-                        {{ item.hostname }}
-                        <span class="pull-right">
-                            {{ item.available_disk_space|humanreadablesize }}
-                        </span>
-                        {% if perms.reports.can_view_reports %}
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </table>
-        </div>
-    </div>
-</div>
-{% endif %}
-
 </div><!-- /row -->
 
 {% endblock %}
