@@ -26,8 +26,11 @@ CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
 VAULT_USERNAME = os.getenv('VAULT_USERNAME')
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
-STYLE = os.getenv('STYLE')
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
+
+REPO_MANAGEMENT_ONLY = False
+if os.getenv('REPO_MANAGEMENT_ONLY') == 'True':
+    REPO_MANAGEMENT_ONLY = True
 
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
