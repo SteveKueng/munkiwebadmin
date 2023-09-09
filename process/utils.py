@@ -1,5 +1,5 @@
 ''' process/utils.py '''
-from models import Process
+from .models import Process
 
 def record_status(processname, message=None, percent_done=None):
     '''Record process feedback so we can display it during long-running

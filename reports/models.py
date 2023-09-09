@@ -8,29 +8,18 @@ from uuid import uuid4
 from django.contrib.auth.models import User, Group
 import django
 
-class BusinessUnit(models.Model):
-    hash = models.CharField(max_length=36, default=uuid4, primary_key=True, unique=True)
-    name = models.CharField(max_length=30, unique=True)
-
-    class Meta:
-        permissions = (("can_view_businessunit", "Can view business unit"),)
-
-    def machines(self):
-        return Machine.objects.filter(businessunit=self).count()
-
 class Machine(models.Model):
     serial_number = models.CharField(max_length=16, unique=True, primary_key=True)
     hostname = models.CharField(max_length=64, blank=True)
     username = models.CharField(max_length=256, blank=True)
     remote_ip = models.CharField(max_length=15, blank=True)
-    businessunit = models.ForeignKey(BusinessUnit, null=True, blank=True, default=None, on_delete=models.CASCADE)
     machine_model = models.CharField(max_length=64, blank=True)
     cpu_type = models.CharField(max_length=64, blank=True)
     cpu_speed = models.CharField(max_length=32, blank=True)
     cpu_arch = models.CharField(max_length=32, blank=True)
     ram = models.CharField(max_length=16, blank=True)
     os_version = models.CharField(max_length=16, blank=True)
-    current_status = models.CharField(max_length=200, blank=True)
+    img_url = models.CharField(max_length=200, blank=True)
 
     def errors(self):
         return MunkiReport.objects.get(machine=self).errors
@@ -69,7 +58,7 @@ class MunkiReport(models.Model):
         return self.machine.hostname
 
     def encode(self, plist):
-        string = plistlib.writePlistToString(plist)
+        string = plistlib.dumps(plist)
         bz2data = bz2.compress(string)
         b64data = base64.b64encode(bz2data)
         return b64data
@@ -94,7 +83,7 @@ class MunkiReport(models.Model):
         try:
             bz2data = base64.b64decode(data)
             string = bz2.decompress(bz2data)
-            plist = plistlib.readPlistFromString(string)
+            plist = plistlib.loads(string)
             return plist
         except Exception:
             return {}
@@ -108,9 +97,8 @@ class MunkiReport(models.Model):
     def update_report(self, base64bz2report):
         # Save report.
         try:
-            base64bz2report = base64bz2report.replace(" ", "+")
+            #base64bz2report = base64bz2report.replace(" ", "+")
             plist = self.b64bz_decode(base64bz2report)
-            #self.report = base64bz2report
             self.report = base64bz2report
         except:
             plist = None
@@ -132,7 +120,7 @@ class MunkiReport(models.Model):
             if (section in plist) and len(plist[section]):
                 activity[section] = plist[section]
         if activity:
-            self.activity = plistlib.writePlistToString(activity)
+            self.activity = plistlib.dumps(activity)
         else:
             self.activity = None
 
@@ -150,4 +138,4 @@ class MunkiReport(models.Model):
         # Check console user.
         self.console_user = "unknown"
         if "ConsoleUser" in plist:
-            self.console_user = unicode(plist["ConsoleUser"])
+            self.console_user = plist["ConsoleUser"]

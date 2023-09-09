@@ -1,7 +1,6 @@
 //global var
 var passwordAccessTable = ""
 var interval = ""
-var selectedGroupID = ""
 
 window.confirm = function(message, cb) {
     $("#confirmationModal .modal-body").html(message);
@@ -21,37 +20,6 @@ function do_resize() {
     }
 }
 $(window).resize(do_resize);
-
-// using jQuery
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie !== '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = jQuery.trim(cookies[i]);
-//             // Does this cookie string begin with the name we want?
-//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }
-// var csrftoken = getCookie('csrftoken');
-
-// function csrfSafeMethod(method) {
-//     // these HTTP methods do not require CSRF protection
-//     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-// }
-// $.ajaxSetup({
-//     timeout:10000,
-//     beforeSend: function(xhr, settings) {
-//         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-//             xhr.setRequestHeader("X-CSRFToken", csrftoken);
-//         }
-//     }
-// });
 
 // grid/list view
 $(document).on('click','.grid_list', function (e) {
@@ -201,6 +169,7 @@ function activaTab(tab){
   $('.nav-tabs a[href="#' + tab + '"]').tab('show');
 };
 
+
 function getDeviceIcon(serial, iconid) {
     var image_url = "https://support.apple.com/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
     var $image = $("#"+serial+iconid);
@@ -267,15 +236,15 @@ function getComputerItem(pathname) {
                         }
                     });
                 }
+
+                if (tab) {
+                    activaTab(tab);
+                }
     
                 getDeviceIcon(serial, "_iconDetail");
                 loadPasswordAccess(serial);
                 loadInventory(serial);
-                getMDMDeviceInfo(serial);
-                get_model_description(serial);
-                if (tab) {
-                    activaTab(tab);
-                }
+                
                 hideProgressBar();
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -921,6 +890,9 @@ function showPassword(reason) {
             passwordAccessTable.ajax.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR["responseJSON"]["detail"])
+            $("#errorModalDetailText").text(jqXHR["responseJSON"]["detail"]);
+            $("#errorModal").modal("show");
         }
     });
 }
@@ -940,299 +912,6 @@ function getTypeahead(url, listid) {
             });
         },
         error: function(jqXHR, textStatus, errorThrown) {
-        }
-    });
-}
-
-
-function get_model_description(serial) {
-    $.ajax({
-        url: '/reports/model/' + serial,
-        type: 'GET',
-        dataType: 'html',
-        success: function(data, textStatus, xhr) {
-            $('#machineModel').html(data)
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            //alert(errorThrown)
-        },
-    });
-}
-
-function getMDMDeviceInfo(serail) {
-    var machineURL = '/api/mdm/devices/'+serail;
-    $.ajax({
-        method: 'GET',
-        url: machineURL,
-        success: function(data) {
-            var html = '<div class="col-lg-6">';
-            html += '<ul class="list-group">';
-            if (data) {
-                var attributes = data['data']['attributes']
-                var element = 0;
-                $.each(attributes, function(key, value) {
-                    if(element == 12){
-                        html += '<div class="col-lg-6">';
-                        html += '<ul class="list-group">';
-                    }
-                    if(value) {
-                        codeStyle = ""
-                        if(key == "firmware_password" || key == "filevault_recovery_key") {
-                            codeStyle = 'font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;';
-                        }
-                        html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+key.replace(/_/g, " ")+':</b><span class="pull-right" style="text-transform: none; '+codeStyle+'">'+value+'</span></li>';
-                        element = element + 1;
-                    }
-                    if(element == 12) {
-                        html += '</ul>'
-                        html += '</div>'
-                    }
-                });
-                
-                //get device groups
-                getMDMDeviceGroupInfo(data['data']['id'], data['data']['relationships']['device_group']['data']['id']);
-
-                //get app groups
-                getAppGroups(data['data']['id']);    
-            } else {
-                html += '<li class="list-group-item">no data</li>'
-            }
-            html += '</ul>'
-            html += '</div>'
-            
-            //add html
-            $('#mdmDetail').html(html);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var html = '';
-            html += '<div class="col-lg-6">'
-            html += '<ul class="list-group">'
-            html += '<li class="list-group-item">no data</li>'
-            html += '</ul>'
-            html += '</div>'
-            $('#mdmDetail').html(html);
-        }
-    });
-}
-
-function getMDMDeviceGroupInfo(clientID, currentGroupID) {
-    var machineURL = '/api/mdm/device_groups';
-    $.ajax({
-        method: 'GET',
-        url: machineURL,
-        success: function(data) {
-            if (data) {
-                var html = '';
-                var list = '';
-                var buttonName = '';
-                $.each(data['data'], function(key, value) {
-                    list += '<li' 
-                    if (currentGroupID == value['id']) {
-                        buttonName = value['attributes']['name']
-                        list += ' class="disabled"'
-                    } 
-                    list += '><a onclick="changeGroup( \''+clientID+'\', \''+value['id']+'\' )">'+value['attributes']['name']+'</a></li>';
-                });
-
-                html += '<div class="dropdown pull-right"> \
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="groupDrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+buttonName+'<span class="caret"></span></button> \
-                    <ul class="dropdown-menu" aria-labelledby="groupDrop">'+list+'</ul></div>'
-                $('#mdmSubmit').html(html);
-            }
-            
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-        }
-    });
-}
-
-function getAppGroups(deviceID) {
-    var machineURL = '/api/mdm/app_groups';
-    $.ajax({
-        method: 'GET',
-        url: machineURL,
-        success: function(data) {
-            if (data) {
-                var source = [];
-                var map = {};
-                var html = '<div class="col-lg-12">';
-                html += '<ul class="list-group">';
-                $.each(data['data'], function(key, value) {
-                    source.push(value['attributes']['name']);
-                    map[value['attributes']['name']] = value['id'];
-                    
-                    value['relationships']['devices']['data'].some(function(el) {
-                        if (el['id'] == deviceID){
-                            html += '<li class="list-group-item" style="text-transform: capitalize;"><b>'+value['attributes']['name']+'</b><span class="pull-right"><button class="btn btn-danger btn-xs" onclick="removeDeviceFromAppGroup('+value['id']+', '+deviceID+')" ><i class="fas fa-trash" aria-hidden="true"></i></button></span></li>';
-                        }
-                    });
-                });
-                html += '</ul>'
-                html += '</div>'
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-        }
-    });
-}
-
-function changeGroup(device, group) {
-    var url = '/api/mdm/device_groups/'+group + "/devices/" + device;
-    confirm("<h4>Change group for device: "+current_pathname+"?</h4>", function(result) { 
-        if (result) {
-            $("#process_progress").modal("show");
-            $.ajax({
-                method: 'POST',
-                url: url,
-                success: function(data) {
-                    getMDMDeviceInfo(current_pathname);
-                    $("#process_progress").modal("hide");
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    $("#errorModalTitleText").text("MDM post error");
-                    try {
-                        var json_data = $.parseJSON(jqXHR.responseText)
-                        if (json_data['result'] == 'failed') {
-                            $("#errorModalDetailText").text(json_data['detail']);
-                            $("#process_progress").modal("hide");
-                            $("#errorModal").modal("show");
-                            return;
-                        }
-                    } catch(err) {
-                        // do nothing
-                    }
-                    $("#errorModalDetailText").text(errorThrown);
-                    $("#process_progress").modal("hide");
-                    $("#errorModal").modal("show");
-                }
-            });
-        }
-    }); 
-}
-
-function clientActions(action) {
-    var url = '/api/mdm/devices/'+current_pathname + "/" + action ;
-    confirm("<h4>"+ action +" device: "+current_pathname+"?</h4>", function(result) { 
-        if (result) {
-            $("#process_progress").modal("show");
-            $.ajax({
-                method: 'POST',
-                url: url,
-                success: function(data) {
-                    getMDMDeviceInfo(current_pathname);
-                    $("#process_progress").modal("hide");
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    $("#errorModalTitleText").text("MDM post error");
-                    try {
-                        var json_data = $.parseJSON(jqXHR.responseText)
-                        if (json_data['result'] == 'failed') {
-                            $("#errorModalDetailText").text(json_data['detail']);
-                            $("#process_progress").modal("hide");
-                            $("#errorModal").modal("show");
-                            return;
-                        }
-                    } catch(err) {
-                        // do nothing
-                    }
-                    $("#errorModalDetailText").text(errorThrown);
-                    $("#process_progress").modal("hide");
-                    $("#errorModal").modal("show");
-                }
-            });
-        }
-    }); 
-}
-
-function pushApps(groupID) {
-    var url = '/api/mdm/app_groups/'+groupID + "/push_apps" ;
-    $("#process_progress").modal("show");
-    $.ajax({
-        method: 'POST',
-        url: url,
-        success: function(data) {
-            $("#process_progress").modal("hide");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $("#errorModalTitleText").text("MDM post error");
-            try {
-                var json_data = $.parseJSON(jqXHR.responseText)
-                if (json_data['result'] == 'failed') {
-                    $("#errorModalDetailText").text(json_data['detail']);
-                    $("#process_progress").modal("hide");
-                    $("#errorModal").modal("show");
-                    return;
-                }
-            } catch(err) {
-                // do nothing
-            }
-            $("#errorModalDetailText").text(errorThrown);
-            $("#process_progress").modal("hide");
-            $("#errorModal").modal("show");
-        }
-    });
-}
-
-function addDeviceToAppGroup(deviceID) {
-    if (event.which == '13' && selectedGroupID != "" && deviceID != "") {
-        var url = '/api/mdm/app_groups/'+selectedGroupID + "/devices/" + deviceID;
-        $("#process_progress").modal("show");
-        $.ajax({
-            method: 'POST',
-            url: url,
-            success: function(data) {
-                getAppGroups(deviceID);
-                $("#process_progress").modal("hide");
-                pushApps(selectedGroupID);
-                selectedGroupID = "";
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $("#errorModalTitleText").text("MDM post error");
-                try {
-                    var json_data = $.parseJSON(jqXHR.responseText)
-                    if (json_data['result'] == 'failed') {
-                        $("#errorModalDetailText").text(json_data['detail']);
-                        $("#process_progress").modal("hide");
-                        $("#errorModal").modal("show");
-                        return;
-                    }
-                } catch(err) {
-                    // do nothing
-                }
-                $("#errorModalDetailText").text(errorThrown);
-                $("#process_progress").modal("hide");
-                $("#errorModal").modal("show");
-            }
-        });
-    }
-}
-
-function removeDeviceFromAppGroup(groupID, deviceID) {
-    var url = '/api/mdm/app_groups/'+groupID + "/devices/" + deviceID;
-    $("#process_progress").modal("show");
-    $.ajax({
-        method: 'DELETE',
-        url: url,
-        success: function(data) {
-            getAppGroups(deviceID);
-            $("#process_progress").modal("hide");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $("#errorModalTitleText").text("MDM post error");
-            try {
-                var json_data = $.parseJSON(jqXHR.responseText)
-                if (json_data['result'] == 'failed') {
-                    $("#errorModalDetailText").text(json_data['detail']);
-                    $("#process_progress").modal("hide");
-                    $("#errorModal").modal("show");
-                    return;
-                }
-            } catch(err) {
-                // do nothing
-            }
-            $("#errorModalDetailText").text(errorThrown);
-            $("#process_progress").modal("hide");
-            $("#errorModal").modal("show");
         }
     });
 }

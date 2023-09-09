@@ -9,9 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.forms.models import model_to_dict
-from django.core.serializers.json import DjangoJSONEncoder
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -19,7 +16,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine, MunkiReport
-from inventory.models import Inventory, InventoryItem
+from inventory.models import Inventory
 from vault.models import localAdmin, passwordAccess
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
@@ -34,9 +31,8 @@ import base64
 import bz2
 import hashlib
 import zlib
-import sys
 import requests
-from multiprocessing.pool import ThreadPool
+import urllib
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -140,6 +136,38 @@ def convert_html_to_json(raw_html):
     return data
 
 
+def model_lookup(serial):
+    """Determines the models human readable description based off the serial
+    number"""
+
+    options = "page=categorydata&serialnumber=%s" % serial
+    url = "https://km.support.apple.com/kb/index?%s" % options
+    
+    try:
+        response = urllib.request.urlopen(url)
+    except urllib.error.HTTPError as e:
+        print("HTTP Error: %s" % e.code)
+        return None
+    
+    try:
+        data = response.read()
+        model = json.loads(data.decode("utf-8"))
+    except:
+        print("Error: Could not decode JSON")
+        return None
+    return model
+
+
+def get_device_img_url(serial):
+    """ Returns the url to the device image for a given serial number"""
+    model = model_lookup(serial)
+    if model and model.get('id', None):
+        url = "https://km.support.apple.com/kb/securedImage.jsp?productid=%s&size=240x240" % model['id']
+    else:
+        url = "https://support.apple.com/kb/securedImage.jsp?configcode=%s&size=240x240" % serial[-4:]
+    return url
+
+
 def decode_to_string(data):
     '''Decodes an inventory submission, which is a plist-encoded
     list, compressed via bz2 and base64 encoded.'''
@@ -198,13 +226,13 @@ def plist_api(request, kind, filepath=None):
         if filepath:
             try:
                 response = Plist.read(kind, filepath)
-            except FileDoesNotExistError, err:
+            except FileDoesNotExistError as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
                                 'detail': str(err)}),
                     content_type='application/json', status=404)
-            except FileReadError, err:
+            except FileReadError as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
@@ -262,10 +290,10 @@ def plist_api(request, kind, filepath=None):
             return HttpResponse(json.dumps(response) + '\n',
                                 content_type='application/json')
         else:
-            return HttpResponse(plistlib.writePlistToString(response),
+            return HttpResponse(plistlib.dumps(response),
                                 content_type='application/xml')
 
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'put':
@@ -295,7 +323,7 @@ def plist_api(request, kind, filepath=None):
                 request_data = json.loads(request.body)
                 request_data = convert_strings_to_dates(request_data)
             else:
-                request_data = plistlib.readPlistFromString(request.body)
+                request_data = plistlib.loads(request.body)
         if (filepath and 'filename' in request_data
                 and filepath != request_data['filename']):
             return HttpResponse(
@@ -318,20 +346,20 @@ def plist_api(request, kind, filepath=None):
             del request_data['filename']
         try:
             Plist.new(kind, filepath, request.user, plist_data=request_data)
-        except FileAlreadyExistsError, err:
+        except FileAlreadyExistsError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json',
                 status=409)
-        except FileWriteError, err:
+        except FileWriteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -345,7 +373,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json', status=201)
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(request_data),
+                    plistlib.dumps(request_data),
                     content_type='application/xml', status=201)
 
     elif request.method == 'PUT':
@@ -367,7 +395,7 @@ def plist_api(request, kind, filepath=None):
             request_data = json.loads(request.body)
             request_data = convert_strings_to_dates(request_data)
         else:
-            request_data = plistlib.readPlistFromString(request.body)
+            request_data = plistlib.loads(request.body)
         if not request_data:
             # need to deal with this issue
             return HttpResponse(
@@ -377,16 +405,10 @@ def plist_api(request, kind, filepath=None):
                                 'Request body was empty or missing valid data'}
                           ),
                 content_type='application/json', status=400)
-        if 'filename' in request_data:
-            # perhaps support rename here in the future, but for now,
-            # ignore it
-            del request_data['filename']
-            
         try:
             LOGGER.debug("plist data %s", request_data)
-            data = plistlib.writePlistToString(request_data)
-            Plist.write(data, kind, filepath, request.user)
-        except FileError, err:
+            Plist.write(request_data, kind, filepath, request.user)
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -400,7 +422,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json')
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(request_data),
+                    plistlib.dumps(request_data),
                     content_type='application/xml')
 
     elif request.method == 'PATCH':
@@ -422,7 +444,7 @@ def plist_api(request, kind, filepath=None):
             request_data = json.loads(request.body)
             request_data = convert_strings_to_dates(request_data)
         else:
-            request_data = plistlib.readPlistFromString(request.body)
+            request_data = plistlib.loads(request.body)
         if not request_data:
             # need to deal with this issue
             return HttpResponse(
@@ -432,18 +454,14 @@ def plist_api(request, kind, filepath=None):
                                 'Request body was empty or missing valid data'}
                           ),
                 content_type='application/json', status=400)
-        if 'filename' in request_data:
-            # perhaps support rename here in the future, but for now,
-            # ignore it
-            del request_data['filename']
+        
         # read existing manifest
         plist_data = Plist.read(kind, filepath)
-        #plist_data['filename'] = filepath
         plist_data.update(request_data)
         try:
-            data = plistlib.writePlistToString(plist_data)
-            Plist.write(data, kind, filepath, request.user)
-        except FileError, err:
+            #data = plistlib.dumps(plist_data)
+            Plist.write(plist_data, kind, filepath, request.user)
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -457,7 +475,7 @@ def plist_api(request, kind, filepath=None):
                     content_type='application/json')
             else:
                 return HttpResponse(
-                    plistlib.writePlistToString(plist_data),
+                    plistlib.dumps(plist_data),
                     content_type='application/xml')
 
     elif request.method == 'DELETE':
@@ -480,19 +498,19 @@ def plist_api(request, kind, filepath=None):
                 content_type='application/json', status=403)
         try:
             Plist.delete(kind, filepath, request.user)
-        except FileDoesNotExistError, err:
+        except FileDoesNotExistError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=404)
-        except FileDeleteError, err:
+        except FileDeleteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -535,7 +553,7 @@ def file_api(request, kind, filepath=None):
                 response['Content-Disposition'] = (
                     'attachment; filename="%s"' % os.path.basename(filepath))
                 return response
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': str(type(err)),
@@ -547,10 +565,10 @@ def file_api(request, kind, filepath=None):
                 return HttpResponse(json.dumps(response) + '\n',
                                     content_type='application/json')
             else:
-                return HttpResponse(plistlib.writePlistToString(response),
+                return HttpResponse(plistlib.dumps(response),
                                     content_type='application/xml')
 
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'put':
@@ -576,10 +594,10 @@ def file_api(request, kind, filepath=None):
             filedata = request.FILES.get('filedata')
         else:
             filename = filepath
-            filedata = request.body
+            filedata = request.body.decode('utf-8')
             if "data:image/png;base64" in filedata:
                 img = filedata.split(',')[1]
-                filedata = img.decode('base64')
+                filedata = base64.b64decode(img)
         if not (filename and filedata):
             # malformed request
             return HttpResponse(
@@ -592,7 +610,7 @@ def file_api(request, kind, filepath=None):
                 MunkiFile.new(kind, filedata, filename, request.user)
             else:
                 MunkiFile.writedata(kind, filedata, filename, request.user)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -626,19 +644,19 @@ def file_api(request, kind, filepath=None):
                 content_type='application/json', status=403)
         try:
             MunkiFile.delete(kind, filepath, request.user)
-        except FileDoesNotExistError, err:
+        except FileDoesNotExistError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=404)
-        except FileDeleteError, err:
+        except FileDeleteError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
-        except FileError, err:
+        except FileError as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
@@ -742,7 +760,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 content_type='application/'+response_type, status=200)
     
     # ----------- HTTP_X_METHODOVERRIDE -----------------
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
+    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
         # support browsers/libs that don't directly support the other verbs
         http_method = request.META['HTTP_X_METHODOVERRIDE']
         if http_method.lower() == 'delete':
@@ -767,6 +785,7 @@ def db_api(request, kind, subclass=None, serial_number=None):
                     report = MunkiReport(machine=machine)
 
                 if machine and report:
+                    LOGGER.debug("Report %s for machine %s", machine, report)
                     machine.remote_ip = request.META['REMOTE_ADDR']
                     report.activity = ""
 
@@ -774,9 +793,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         machine.hostname = submit.get('name')
                     if 'username' in submit:
                         machine.username = submit.get('username')
-                    if 'unit' in submit:
-                        unit = BusinessUnit.objects.get(hash=submit.get('unit'))
-                        machine.businessunit = unit
 
                     if 'base64bz2report' in submit:
                         report.update_report(submit.get('base64bz2report'))
@@ -792,18 +808,37 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
                             hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
+                    LOGGER.debug("hwinfo %s", hwinfo)
                     if hwinfo:
-                        machine.machine_model = hwinfo.get('machine_model', machine.machine_model)
-                        machine.cpu_type = hwinfo.get('cpu_type', machine.cpu_type)
-                        machine.cpu_speed = hwinfo.get('current_processor_speed', machine.cpu_speed)
-                        machine.ram = hwinfo.get('physical_memory', machine.ram)
+                        # model lookup
+                        if hwinfo.get('machine_model', None):
+                            machine.machine_model = hwinfo['machine_model']
+                        model_name = model_lookup(serial_number).get('name', None)
+                        if model_name:
+                            machine.machine_model = model_name
+
+                        # get image url
+                        machine.img_url = get_device_img_url(serial_number)
+
+                        # get cpu type
+                        if hwinfo.get('cpu_type', None):
+                            machine.cpu_type = hwinfo['cpu_type']
+                        if hwinfo.get('chip_type', None):
+                            machine.cpu_type = hwinfo['chip_type']
+                        
+                        # get cpu speed
+                        if hwinfo.get('current_processor_speed', None):
+                            machine.cpu_speed = hwinfo['current_processor_speed']
+                        
+                        # get pyhsical memory
+                        if hwinfo.get('physical_memory', None):
+                            machine.ram = hwinfo['physical_memory']
                     
-                    # 
                     if not machine.os_version:
                         machine.os_version = "unknown"
-                    if not machine.machine_model:
-                        machine.machine_model = "unknown"
 
+                    LOGGER.debug("machine %s", machine)
+                    
                     report.runtype = submit.get('runtype', 'UNKNOWN')
 
                     if submission_type == 'postflight':
@@ -833,13 +868,14 @@ def db_api(request, kind, subclass=None, serial_number=None):
                 bundleid_ignorelist = [
                     'com.apple.print.PrinterProxy'
                 ]
+                LOGGER.debug("Request for machine %s", machine)
                 if machine:
                     compressed_inventory = submit.get('base64bz2inventory')
                     if compressed_inventory:
                         compressed_inventory = compressed_inventory.replace(" ", "+")
                         inventory_str = decode_to_string(compressed_inventory)
                         try:
-                            inventory_list = plistlib.readPlistFromString(inventory_str)
+                            inventory_list = plistlib.loads(inventory_str)
                         except Exception:
                             inventory_list = None
                         if inventory_list:
@@ -901,6 +937,13 @@ def db_api(request, kind, subclass=None, serial_number=None):
                                         'exception_type': 'MachineDoesNotExist',
                                         'detail': '%s does not exist' % serial_number}),
                             content_type='application/json', status=404)
+                    except localAdmin.DoesNotExist:
+                        return HttpResponse(
+                            json.dumps({'result': 'failed',
+                                        'exception_type': 'No Password found',
+                                        'detail': 'No password found for %s' % serial_number}),
+                            content_type='application/json', status=404)
+
                     
                     if response_type == 'json':
                         return HttpResponse(
@@ -961,164 +1004,6 @@ def db_api(request, kind, subclass=None, serial_number=None):
             # success
             return HttpResponse(status=204)
     
-    # ----------- error 404 -----------------
-    return HttpResponse(status=404)
-
-@csrf_exempt
-@logged_in_or_basicauth()
-def mdm_api(request, kind, submission_type, primary_id=None, action=None, secondary_id=None):
-    LOGGER.debug("Got API request for %s, %s, %s, %s" % (kind, submission_type, primary_id, secondary_id))
-    if kind not in ['mdm']:
-        return HttpResponse(status=404)
-    
-    # ----------- RESPONSE TYPE -----------------
-    response_type = 'json'
-    if request.META.get('HTTP_ACCEPT') == 'application/xml':
-        response_type = 'xml'
-    
-    if request.method == 'GET':
-        LOGGER.debug("Got API GET request for %s", kind)
-
-        if not request.user.has_perm('reports.can_view_reports'):
-            raise PermissionDenied
-
-        data = None
-        
-        if submission_type == "devices" and primary_id:
-            try:
-                machine = Machine.objects.get(serial_number=primary_id)
-            except Machine.DoesNotExist:
-                return HttpResponse(status=204)
-            
-            if CONVERT_TO_QWERTZ:
-                # layout fix
-                firmware_password = data['data']['attributes'].get('firmware_password')
-                if firmware_password:
-                    data['data']['attributes']['firmware_password'] = convert_to_qwertz(firmware_password)
-        
-        if data:
-            if response_type == 'json':
-                return HttpResponse(
-                    json.dumps(data) + '\n',
-                    content_type='application/json')
-            else:
-                return HttpResponse(
-                    plistlib.writePlistToString(data),
-                    content_type='application/xml')
-    
-    if request.META.has_key('HTTP_X_METHODOVERRIDE'):
-        # support browsers/libs that don't directly support the other verbs
-        http_method = request.META['HTTP_X_METHODOVERRIDE']
-        if http_method.lower() == 'put':
-            request.method = 'PUT'
-            request.META['REQUEST_METHOD'] = 'PUT'
-            request.PUT = QueryDict(request.body)
-        if http_method.lower() == 'delete':
-            request.method = 'DELETE'
-            request.META['REQUEST_METHOD'] = 'DELETE'
-            request.DELETE = QueryDict(request.body)
-        if http_method.lower() == 'patch':
-            request.method = 'PATCH'
-            request.META['REQUEST_METHOD'] = 'PATCH'
-            request.PATCH = QueryDict(request.body)
-
-    if request.method == 'POST':
-        LOGGER.debug("Got API POST request for %s", kind)
-        if not request.user.has_perm('reports.can_push_mdm'):
-            raise PermissionDenied
-        
-        # ------- get submit -------
-        if submission_type == "devices" and primary_id:
-            try:
-                machine = Machine.objects.get(serial_number=primary_id)
-            except Machine.DoesNotExist:
-                return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'MachineDoesNotExist',
-                                    'detail': '%s does not exist' % serial_number}),
-                        content_type='application/json', status=404)
-            
-            devices.proxyDict = proxies
-            response = None
-
-        if submission_type == "device_groups" and action == "devices":
-            if primary_id and secondary_id:
-                deviceGroups = simpleMDMpy.deviceGroups(simpleMDMKey)
-                deviceGroups.proxyDict = proxies
-                response = deviceGroups.assignDevice(deviceID=secondary_id, deviceGoupID=primary_id)
-            else:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'BadRequest',
-                                'detail': 'Missing group'}),
-                    content_type='application/json', status=400)
-
-        if submission_type == "app_groups": 
-            if action == "push_apps":
-                if primary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.pushApps(appGroupID=primary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-            if action == "update_apps":
-                if primary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.updateApps(appGroupID=primary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-                        
-            if action == "devices":
-                if primary_id and secondary_id:
-                    appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                    appGroups.proxyDict = proxies
-                    response = appGroups.assignDevice(appGroupID=primary_id, deviceID=secondary_id)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing group'}),
-                        content_type='application/json', status=400)
-
-    if request.method == 'DELETE':
-        LOGGER.debug("Got API DELETE request for %s", kind)
-        if not request.user.has_perm('reports.change_machine'):
-            raise PermissionDenied
-        if submission_type == "app_groups" and action == "devices":
-            if primary_id and secondary_id:
-                appGroups = simpleMDMpy.appGroups(simpleMDMKey)
-                appGroups.proxyDict = proxies
-                response = appGroups.unAssignDevice(appGroupID=primary_id, deviceID=secondary_id)
-                LOGGER.debug(response)
-            else:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'BadRequest',
-                                'detail': 'Missing group'}),
-                    content_type='application/json', status=400)
-    
-    if response:
-        try:
-            content_type = response.headers['Content-Type']
-        except:
-            content_type = None
-            
-        return HttpResponse(
-                    content=response.content,
-                    status=response.status_code,
-                    content_type=content_type
-                )
-
     # ----------- error 404 -----------------
     return HttpResponse(status=404)
 

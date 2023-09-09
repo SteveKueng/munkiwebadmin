@@ -1,20 +1,8 @@
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import RequestContext
-from django.shortcuts import render_to_response
 from django.conf import settings
-
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.contrib.auth.models import User, Group
-
-import os
+from django.templatetags.static import static
 import base64
 
 # get settings
-try:
-    STYLE = settings.STYLE
-except:
-    STYLE = 'default'
-
 try:
     APPNAME = settings.APPNAME
 except:
@@ -30,6 +18,11 @@ try:
 except:
     HOSTNAME = "localhost"
 
+try:
+    REPO_MANAGEMENT_ONLY = settings.REPO_MANAGEMENT_ONLY
+except:
+    REPO_MANAGEMENT_ONLY = False
+
 def index(request):
     try:
         image = request.user.ldap_user.attrs["thumbnailPhoto"]
@@ -38,5 +31,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'style': STYLE, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
+    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
 

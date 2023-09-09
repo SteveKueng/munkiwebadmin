@@ -1,34 +1,23 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.template import RequestContext
-from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.http import Http404
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Count
-from collections import OrderedDict
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from models import Machine, MunkiReport, BusinessUnit
-from manifests.models import ManifestFile
+from .models import Machine, MunkiReport
 from catalogs.models import Catalog
 from api.models import Plist, FileDoesNotExistError, FileReadError
 
-import base64
-import bz2
+import os
 import plistlib
-import re
-import urllib2
+import urllib
 from datetime import timedelta, date
-from xml.etree import ElementTree
-import fnmatch
 import json
 import logging
-import os
 
 LOGGER = logging.getLogger('munkiwebadmin')
 
@@ -41,11 +30,6 @@ try:
     DEFAULT_MANIFEST = settings.DEFAULT_MANIFEST
 except AttributeError:
     DEFAULT_MANIFEST = "serial_number"
-
-try:
-    BUSINESS_UNITS_ENABLED = settings.BUSINESS_UNITS_ENABLED
-except AttributeError:
-    BUSINESS_UNITS_ENABLED = False
 
 try:
     MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
@@ -68,15 +52,18 @@ proxies = {
 }
 
 if PROXY_ADDRESS:
-    proxy = urllib2.ProxyHandler(proxies)
-    opener = urllib2.build_opener(proxy)
-    urllib2.install_opener(opener)
+    proxy = urllib.request.ProxyHandler(proxies)
+    opener = urllib.request.build_opener(proxy)
+    urllib.request.install_opener(opener)
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 @login_required
 @permission_required('reports.can_view_reports', login_url='/login/')
 def index(request, computer_serial=None):
     '''Returns computer list or detail'''
-    if request.is_ajax():
+    if is_ajax(request):
         if computer_serial:
             # return manifest detail
             if request.method == 'GET':
@@ -84,7 +71,7 @@ def index(request, computer_serial=None):
                 machine = None
                 try:
                     machine = Machine.objects.get(serial_number=computer_serial)
-                except Machine.DoesNotExist, err:
+                except Machine.DoesNotExist as err:
                     return HttpResponse(
                         json.dumps({'result': 'failed',
                                     'exception_type': str(type(err)),
@@ -100,26 +87,31 @@ def index(request, computer_serial=None):
                         pass
 
                 if report_plist:
-                    time = report_plist.MachineInfo.SystemProfile[0].SPSoftwareDataType[0].uptime
-                    time = time[3:].split(':')
+                    try:
+                        time = report_plist['MachineInfo']['SystemProfile'][0]['SPSoftwareDataType'][0]['uptime']
+                        time = time[3:].split(':')
+                    except Exception as err:
+                        time = ""
+                        pass
 
                     disksPreList = []
                     disksList = []
                     counter = 0
                     # Loops every partition in SPStorageDataType and generates a list with all the names of the disks
-                    for index, i in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
-                        if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
-                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
-                        else:
-                            deviceName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
-                        partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
-                        # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
-                        for p in disksPreList:
-                            if p == deviceName:
-                                counter = counter + 1
-                        if counter == 0:
-                            disksPreList.append(deviceName)
-                        counter = 0
+                    if "SPStorageDataType" in report_plist["MachineInfo"]["SystemProfile"][0]:
+                        for index, i in enumerate(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"]):
+                            if "physical_drive" in report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]:
+                                deviceName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["physical_drive"].get("device_name", None)
+                            else:
+                                deviceName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                            partitionName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["_name"]
+                            # lops the already generated entrys in disksPreList and check it against the new value, to prevent doubbled entrys
+                            for p in disksPreList:
+                                if p == deviceName:
+                                    counter = counter + 1
+                            if counter == 0:
+                                disksPreList.append(deviceName)
+                            counter = 0
 
                     diskInfoDict = {}
                     partitionsList = []
@@ -129,26 +121,26 @@ def index(request, computer_serial=None):
 
                     #Loops the before generated list of disks and extends the dicitionary with a partition-list and it's attributes
                     for i in disksPreList:
-                        for index, b in enumerate(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType):
+                        for index, b in enumerate(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"]):
                             # Reading Name of disk inside the partition-information
-                            if "physical_drive" in report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]:
-                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].physical_drive.get("device_name", None)
+                            if "physical_drive" in report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]:
+                                diskName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["physical_drive"].get("device_name", None)
                             else:
-                                diskName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]["com.apple.corestorage.pv"][0].get("device_name", None)
-                            partitionName = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]._name
+                                diskName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["com.apple.corestorage.pv"][0].get("device_name", None)
+                            partitionName = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["_name"]
                             # If diskName is equal to the actual iteration of disksPreList then the ifromation will be written into the values of the various dicts
                             if diskName == i:
                                 # Reading partition information from system_profiler
-                                partitionsAttributesDict = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index]
+                                partitionsAttributesDict = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]
                                 # Calculate how many percent are in use of the parttion and populates the key percentFull of the partition information
-                                partitionsAttributesDict['percentFull'] = 100 * (float(report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes - report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].free_space_in_bytes) / report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes)
+                                partitionsAttributesDict['percentFull'] = 100 * (float(report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"] - report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["free_space_in_bytes"]) / report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"])
                                 partitionDict['partitionName'] = partitionName
                                 partitionDict['partitionAtributes'] = partitionsAttributesDict
                                 partitionsList.append(partitionDict)
                                 partitionDict = {}
                                 # Calculate the diskSize by adding every parttion-size to diskSize
-                                diskSize = diskSize + report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].size_in_bytes
-                                diskInfoDict['physicalDisk'] = report_plist.MachineInfo.SystemProfile[0].SPStorageDataType[index].get("physical_drive", None)
+                                diskSize = diskSize + report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index]["size_in_bytes"]
+                                diskInfoDict['physicalDisk'] = report_plist["MachineInfo"]["SystemProfile"][0]["SPStorageDataType"][index].get("physical_drive", None)
                         diskInfoDict['partitions'] = partitionsList
                         partitionsList = []
                         diskInfoDict['diskName'] = i
@@ -188,17 +180,8 @@ def index(request, computer_serial=None):
         hardware = request.GET.get('hardware', None)
         os_version = request.GET.get('os_version', None)
         model = request.GET.get('model', None)
-        businessunit = request.GET.get('businessunit', None)
-        unknown = request.GET.get('unknown', None)
 
-        if BUSINESS_UNITS_ENABLED:
-            business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-            if unknown:
-                reports = Machine.objects.filter(businessunit__isnull=True)
-            else:
-                reports = Machine.objects.filter(businessunit__exact=business_units)
-        else:
-            reports = Machine.objects.all()
+        reports = Machine.objects.all()
 
         if show is not None:
             now = timezone.now()
@@ -246,9 +229,6 @@ def index(request, computer_serial=None):
 
         if model:
             reports = reports.filter(machine_model__exact=model)
-
-        if businessunit:
-            reports = reports.filter(businessunit__exact=businessunit)
         
         context = {'reports': reports,}
         return render(request, 'reports/clienttable.html', context=context)
@@ -262,13 +242,8 @@ def index(request, computer_serial=None):
 @login_required
 @permission_required('reports.can_view_dashboard', login_url='/login/')
 def dashboard(request):
-    if BUSINESS_UNITS_ENABLED:
-        business_units = get_objects_for_user(request.user, 'reports.can_view_businessunit')
-        reports = MunkiReport.objects.filter(machine__businessunit__exact=business_units)
-        machines = Machine.objects.filter(businessunit__exact=business_units)
-    else:
-        reports = MunkiReport.objects.all()
-        machines = Machine.objects.all()
+    reports = MunkiReport.objects.all()
+    machines = Machine.objects.all()
 
     munki = {}
     munki['errors'] = reports.filter(errors__gt=0).count()
@@ -319,7 +294,7 @@ def getManifest(request, manifest_path):
     LOGGER.debug("Got read request for %s", manifest_path)
     try:
         plist = Plist.read('manifests', manifest_path)
-    except (FileDoesNotExistError, FileReadError), err:
+    except (FileDoesNotExistError, FileReadError) as err:
         return HttpResponse(
             json.dumps({'result': 'failed',
                         'exception_type': str(type(err)),
@@ -369,13 +344,13 @@ def createRequired(request):
 def getStatus(request):
     serial = request.POST.getlist('serial')[0]
     item = request.POST.getlist('item')[0]
-    if request.is_ajax() and serial and item:
+    if is_ajax(request) and serial and item:
         machine = None
         report_plist = None
         status = "led-grey"
         try:
             machine = Machine.objects.get(serial_number=serial)
-        except Machine.DoesNotExist, err:
+        except Machine.DoesNotExist as err:
             pass
 
         if machine:
@@ -431,8 +406,6 @@ def raw(request, serial):
     return HttpResponse(plistlib.writePlistToString(report_plist),
         content_type='text/plain')
 
-
-
 def estimate_manufactured_date(serial):
     """Estimates the week the machine was manfactured based off it's serial
     number"""
@@ -486,22 +459,6 @@ def formatted_manafactured_date(year, week):
         (ret.strftime('%A'), day.lstrip('0') + suffix, ret.strftime('%B %Y'))
     return formatted_date
 
-def model_description_lookup(request, serial):
-    """Determines the models human readable description based off the serial
-    number"""
-    # Based off https://github.com/MagerValp/MacModelShelf/
-
-    snippet = serial[-3:]
-    if (len(serial) == 12):
-        snippet = serial[-4:]
-    try:
-        f = urllib2.urlopen("https://support-sp.apple.com/sp/product?cc=%s&lang=en_US" % snippet, timeout=2)
-        et = ElementTree.parse(f)
-        return HttpResponse(et.findtext("configCode").decode("utf-8"), content_type='application/xml', status=201)
-    except:
-        return HttpResponse(status=204)
-
-
 def getSoftwareList(catalogs):
     """return a dict with all catalogs consolidated"""
     swDict = dict()
@@ -515,3 +472,18 @@ def getSoftwareList(catalogs):
                 else:
                     swDict[item.name] = item
     return swDict
+
+def downloadMunkiScripts(request):
+    munkiscirpt_file = None
+    munkiscript_path = settings.MUNKISCRIPTS_PATH
+    for file in os.listdir(munkiscript_path):
+        if file.endswith(".pkg"):
+            munkiscirpt_file = os.path.join(munkiscript_path, file)
+            break
+
+    if munkiscirpt_file and os.path.exists(munkiscirpt_file):
+        with open(munkiscirpt_file, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(munkiscirpt_file)
+            return response
+    raise Http404

@@ -5,10 +5,7 @@
 			{% for report in reports %}
 			<li onClick="window.location.hash = '#{{ report.serial_number }}'" class="col-xs-4 col-md-4 col-lg-2 col-xl-1" data-state="all">
 			  <div class="border-div {% if report.errors %}client-error{% elif report.warnings %}client-warning{% endif %}">
-						<img id="{{ report.serial_number }}_icon" src='{% get_static_prefix %}img/apple.png' alt="" width="72" />
-						<script type='text/javascript'>
-						getDeviceIcon("{{report.serial_number}}", "_icon");
-						</script>
+						<img id="icon" src='{{ report.img_url }}' alt="" width="72" />
 						{% if report.hostname %}
 						<span class="important">{{ report.hostname }}</span>
 						{% endif %}

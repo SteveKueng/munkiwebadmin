@@ -7,19 +7,16 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>{{ APPNAME }} - {{ style|upper }}</title>
+    <title>{{ APPNAME }}</title>
 
     {% load static %}
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/bootstrap.min.css' type="text/css" media="all" />
+    <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
 
     <!-- Custom Fonts -->
     <link href="{% get_static_prefix %}fonts/fontawesome/css/all.css" rel="stylesheet" type="text/css">
     <link href="{% get_static_prefix %}fonts/fontawesome/css/v4-shims.css" rel="stylesheet" type="text/css">
-
-
     <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
-
 
     {% block extra_style %}{% endblock %}
 
@@ -39,14 +36,7 @@
 
     {% block java_script %}{% endblock %}
 
-
-    <link rel="icon" href="{% get_static_prefix %}styles/{{ style }}/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <link rel="icon" href="{% get_static_prefix %}img/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
   </head>
 
   {% block body_tag %}
@@ -57,7 +47,7 @@
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <div style="min-width:95px;">
-                    <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}styles/{{ style }}/logo.png"></span></a>
+                    <a class="navbar-brand" href="/"><span><img style="max-width:100px; max-height:35px; margin-top: -7px; padding-right:5px;" src="{% get_static_prefix %}img/logo.png"></span></a>
                 </div>
                 <button type="button" id="sidebarCollapse" class="btn btn-primary navbar-btn hidden"><i class="fas fa-bars"></i></button>
             </div>
@@ -69,7 +59,7 @@
                         {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <i class="fas fa-caret-down"></i>
                         <img alt="{{ username }}" src="{{ userImage }}" class="profile-image img-circle"/>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
+                        <ul class="dropdown-menu dropdown-user dropdown-info">
                             <li id="admin" class="loginlogout"><a href="/admin/" target="_blank"><i class="fas fa-chalkboard-teacher"></i> Admin</a></li>
                             <li class="divider"></li>
                             <li id="login" class="loginlogout">
@@ -78,7 +68,9 @@
                             {% else %}
                                 <a href="/login/">Login</a>
                             {% endif %}
-                            </li><li class="divider"></li>
+                            <li class="divider"></li>
+                            <li id="MunkiScrips" class="loginlogout"><a href="/reports/downloadMunkiScripts" target="_blank"><i class="fa fa-download"></i> MunkiScrips</a></li>
+                            <li class="divider"></li>
                             <li class="disabled"><a><i class="fas fa-server"></i> {{ HOSTNAME }}</a></li>
                         </ul> 
                     </li>
@@ -101,7 +93,7 @@
                 <strong>MWA</strong>
             </div>
             <ul class="list-unstyled components">
-                {% if perms.reports.can_view_dashboard %}
+                {% if perms.reports.can_view_dashboard and REPO_MANAGEMENT_ONLY == False %}
                 <li {% if page == 'dashboard' %} class="active" {% endif %}>
                     <a href="{% url 'dashboard' %}">
                         <i class="fas fa-tachometer-alt"></i>
@@ -109,29 +101,15 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if perms.reports.can_view_reports %}
-                    {% if business_units_enabled %}
-                    <li {% if page == 'reports' %} class="active" {% endif %}>
-                            <a href="#unitsSubmenu" data-toggle="collapse" aria-expanded="false">
-                                <i class="fas fa-laptop"></i>
-                                Business Units
-                            </a>
-                            <ul class="collapse list-unstyled" id="unitsSubmenu">
-                                {% for business_unit in business_units %}
-                                <li {% if subpage == business_unit.hash %} class="active" {% endif %}><a href="{% url 'reports' %}?businessunit={{ business_unit.hash }}">{{ business_unit.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                    </li>
-                    {% else %}
-                    <li {% if page == 'reports' %} class="active" {% endif %}>
-                        <a href="{% url 'reports' %}" >
-                            <i class="fas fa-laptop"></i>
-                            Computer
-                        </a>
-                    </li>
-                    {% endif %}
+                {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
+                <li {% if page == 'reports' %} class="active" {% endif %}>
+                    <a href="{% url 'reports' %}" >
+                        <i class="fas fa-laptop"></i>
+                        Computer
+                    </a>
+                </li>
                 {% endif %}
-                {% if perms.reports.can_view_reports %}
+                {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
                 <li {% if page == 'inventory' %} class="active" {% endif %}>
                     <a href="{% url 'inventory' %}items">
                         <i class="fas fa-database"></i>
