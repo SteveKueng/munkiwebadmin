@@ -808,27 +808,36 @@ def db_api(request, kind, subclass=None, serial_number=None):
                         if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
                             hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
 
+                    LOGGER.debug("hwinfo %s", hwinfo)
                     if hwinfo:
-                        machine.machine_model = model_lookup(serial_number).get('name', None)
-                        if not machine.machine_model:
-                            machine.machine_model = hwinfo.get('machine_model', "unknown")
-                        
+                        # model lookup
+                        if hwinfo.get('machine_model', None):
+                            machine.machine_model = hwinfo['machine_model']
+                        model_name = model_lookup(serial_number).get('name', None)
+                        if model_name:
+                            machine.machine_model = model_name
+
+                        # get image url
                         machine.img_url = get_device_img_url(serial_number)
 
                         # get cpu type
-                        if not hwinfo.get('cpu_type', None):
+                        if hwinfo.get('cpu_type', None):
                             machine.cpu_type = hwinfo['cpu_type']
-                        if not hwinfo.get('chip_type', None):
+                        if hwinfo.get('chip_type', None):
                             machine.cpu_type = hwinfo['chip_type']
                         
+                        # get cpu speed
                         if hwinfo.get('current_processor_speed', None):
                             machine.cpu_speed = hwinfo['current_processor_speed']
                         
+                        # get pyhsical memory
                         if hwinfo.get('physical_memory', None):
                             machine.ram = hwinfo['physical_memory']
                     
                     if not machine.os_version:
                         machine.os_version = "unknown"
+
+                    LOGGER.debug("machine %s", machine)
                     
                     report.runtype = submit.get('runtype', 'UNKNOWN')
 
