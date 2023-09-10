@@ -36,6 +36,7 @@ virtualenv mwa2_virtualenv
 
 ### 5. Init DB
 ```bash
+cd app
 python manage.py migrate
 python manage.py createsuperuser
 ```
