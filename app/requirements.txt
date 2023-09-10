@@ -1,0 +1,9 @@
+django==4.2.3
+uwsgi
+psycopg2-binary==2.9.6
+mysqlclient
+django-encrypted-model-fields
+python-ldap
+django-auth-ldap
+django-cors-headers
+requests
