@@ -2,8 +2,8 @@ django==4.2.3
 psycopg2-binary==2.9.6
 gunicorn==21.2.0
 mysqlclient==2.2.0
-django-encrypted-model-fields=0.6.5
-python-ldap=3.4.3
-django-auth-ldap=4.5.0
-django-cors-headers=4.2.0
-requests=2.31.0
+django-encrypted-model-fields==0.6.5
+python-ldap==3.4.3
+django-auth-ldap==4.5.0
+django-cors-headers==4.2.0
+requests==2.31.0
