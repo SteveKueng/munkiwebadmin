@@ -12,11 +12,11 @@
     <meta name="description" content="">
     <meta name="author" content="Steve Küng">
 
-    <title>{{ APPNAME }} - {{ style|upper }}</title>
+    <title>{{ APPNAME }}</title>
 
     {% load static %}
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}styles/{{ style }}/bootstrap.min.css' type="text/css" media="all" />
+    <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
 
     <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
 
@@ -55,7 +55,7 @@
         }
       }
     </style>
-    <link rel="icon" href="{% get_static_prefix %}styles/{{ style }}/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
+    <link rel="icon" href="{% get_static_prefix %}img/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
   </head>
   <body class="text-center">
     <div class="container">
@@ -63,7 +63,7 @@
             <div class="col-md-3 col-centered">
     <form method="post" action="{% url "login" %}">
       {% csrf_token %}
-      <img class="mb-4" src="{% get_static_prefix %}styles/{{ style }}/logo.png" alt="" height="72">
+      <img class="mb-4" src="{% get_static_prefix %}img/logo.png" alt="" height="72">
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       {% if form.errors %}
             <div class="alert alert-danger" role="alert">
