@@ -3,8 +3,8 @@
 NAME="MunkiWebAdmin"                          # Name of the application
 DJANGODIR=/home/app/web                       # Django project directory
 SOCKFILE=/home/app/gunicorn.sock              # we will communicte using this unix socket
-USER=root                                      # the user to run as
-GROUP=root                                     # the group to run as
+USER=root                                     # the user to run as
+GROUP=root                                    # the group to run as
 NUM_WORKERS=3                                 # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=munkiwebadmin.settings # which settings file should Django use
 
