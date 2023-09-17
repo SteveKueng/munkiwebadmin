@@ -53,6 +53,8 @@ open startDevServer.sh and change the environment variables
 ## Docker
 comming soon
 
+docker exec -it munkiwebadmin sh -c "python manage.py createsuperuser"
+
 ### Docker variables
 
 | Variable      | Usage         | Default|
