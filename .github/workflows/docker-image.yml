@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "mwa2" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "mwa2" ]
+    branches: [ "main" ]
 
 jobs:
 
@@ -14,5 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile
+      run: docker build app --file app/Dockerfile.prod --tag stevekueng/munkiwebadmin:$(date +%s)
+      
+    - name: Docker Push
+      run: docker push stevekueng/munkiwebadmin

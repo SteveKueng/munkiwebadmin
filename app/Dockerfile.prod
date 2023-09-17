@@ -61,6 +61,8 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 COPY --from=builder /tmp/munkitools /munkitools
 
+RUN chmod +x /home/app/web/entrypoint.prod.sh
+
 # nginx config
 COPY munkiwebadmin/munkiwebadmin.conf /etc/nginx/sites-available/default
 
