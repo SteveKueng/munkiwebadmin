@@ -6,4 +6,5 @@ docker run --name db -d \
   -p 5432:5432 \
   docker.io/library/postgres
 
+cd app
 python manage.py createsuperuser
