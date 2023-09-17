@@ -1,6 +1,5 @@
 # Django settings for munkiwebadmin project.
 import os
-from django.conf import global_settings
 import socket
 
 try:
@@ -16,35 +15,26 @@ MEDIA_URL = "/media/"
 # munkiwebadmin-specific
 ###########################################################################
 # APPNAME is user-visible web app name
-APPNAME = os.getenv('APPNAME')
-
-MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR')
+APPNAME = os.getenv('APPNAME', 'MunkiWebAdmin')
+MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR', '/munkirepo')
 MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH')
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
-VAULT_USERNAME = os.getenv('VAULT_USERNAME')
-PROXY_ADDRESS = os.getenv('PROXY_ADDRESS')
+VAULT_USERNAME = os.getenv('VAULT_USERNAME', 'admin')
+PROXY_ADDRESS = os.getenv('PROXY_ADDRESS', '')
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
+FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', 'VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI=')
+REPO_MANAGEMENT_ONLY = os.getenv("REPO_MANAGEMENT_ONLY", 'False').lower() in ('true', '1', 't')
 
-REPO_MANAGEMENT_ONLY = False
-if os.getenv('REPO_MANAGEMENT_ONLY') == 'True':
-    REPO_MANAGEMENT_ONLY = True
-
+# enable git integration
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
 
-FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', '')
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    SECRET_KEY = 'y2k94mib_ve%c9hth=9grurdontuse1(t&his;jy-xkcd'
-
-ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS'))
-
-DEBUG = False
-if os.getenv('DEBUG') == 'True':
-    DEBUG = True
+SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
+DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ORIGIN_WHITELIST = ()
@@ -96,7 +86,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django_remote_auth_ldap.middleware.RemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -122,42 +111,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'munkiwebadmin.wsgi.application'
 
-if os.getenv('DB') == 'postgres':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASS'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
-if os.getenv('DB') == 'mysql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASS'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-        }
-    }
-if os.getenv('DB') == 'mssql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'sql_server.pyodbc',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASS'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-            'OPTIONS': {
-                'driver': 'ODBC Driver 17 for SQL Server',
-            },
-        }
-    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [ {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -175,8 +138,8 @@ AUTH_PASSWORD_VALIDATORS = [ {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
-LANGUAGE_CODE = os.getenv('LANGUAGE_CODE')
-TIME_ZONE = os.getenv('TIME_ZONE')
+LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'en-us')
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -226,7 +189,7 @@ LOGGING = {
 }
 
 # needed by django-wsgiserver when using staticserve=collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
