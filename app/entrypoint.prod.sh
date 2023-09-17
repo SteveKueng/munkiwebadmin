@@ -21,6 +21,7 @@ then
 fi
 
 # migrate database
+python manage.py makemigrations inventory manifests pkgsinfo process reports santa vault
 python manage.py migrate
 
 echo "Starting $NAME as `whoami`"

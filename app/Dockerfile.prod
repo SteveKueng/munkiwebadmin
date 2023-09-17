@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends nginx
 COPY --from=builder /usr/src/app/wheels /wheels
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
-COPY --from=builder /tmp/munkitools /munkitools
+COPY --from=builder /tmp/munkitools/munki-munki-*/code/client /munkitools
 
 RUN chmod +x /home/app/web/entrypoint.prod.sh
 
