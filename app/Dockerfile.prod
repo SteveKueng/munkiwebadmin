@@ -1,0 +1,76 @@
+###########
+# BUILDER #
+###########
+
+# pull official base image
+FROM python:3.11-slim as builder
+
+# set work directory
+WORKDIR /usr/src/app
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install system dependencies
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y gcc default-libmysqlclient-dev python3-dev \
+    libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev \
+    build-essential libssl-dev libffi-dev libjpeg-dev \
+    libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# lint
+RUN pip install --upgrade pip
+COPY . /usr/src/app/
+
+# install python dependencies
+COPY ./requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+
+# download munkitools
+RUN curl -Lk -o /tmp/munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip /tmp/munkitools.zip -d /tmp/munkitools && rm -rf /tmp/munkitools.zip 
+
+
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.11-slim
+
+# create directory for the app user
+RUN mkdir -p /home/app
+RUN mkdir /munkirepo
+RUN mkdir /munkitools
+
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+# copy project
+COPY . $APP_HOME
+
+# install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends nginx
+COPY --from=builder /usr/src/app/wheels /wheels
+RUN pip install --upgrade pip
+RUN pip install --no-cache /wheels/*
+COPY --from=builder /tmp/munkitools /munkitools
+
+# nginx config
+COPY munkiwebadmin/munkiwebadmin.conf /etc/nginx/sites-available/default
+
+# static files
+RUN mkdir $APP_HOME/staticfiles
+RUN python manage.py collectstatic --noinput
+
+# volumes
+VOLUME [ "/munkirepo" ]
+
+# run entrypoint.prod.sh
+ENTRYPOINT ["/home/app/web/entrypoint.prod.sh"]
+EXPOSE 80
