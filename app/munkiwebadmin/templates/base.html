@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="auto">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,6 +20,8 @@
         <link rel="stylesheet" href='{% get_static_prefix %}css/munkiwebadmin.css' type="text/css" media="all" />
 
         {% block extra_style %}{% endblock %}
+
+        <script type="module" src="{% get_static_prefix %}js/color-modes.js"></script>
 
         <!-- static/media url for js -->
         <script>
@@ -55,7 +57,7 @@
                         {% if perms.reports.can_view_dashboard and REPO_MANAGEMENT_ONLY == False %}
                         <li class="sidebar-item{% if page == 'dashboard' %} active{% endif %}">
                             <a href="{% url 'dashboard' %}" class="sidebar-link">
-                                <i class="fa-solid fa-gauge pe-2"></i>
+                                <i class="fa-solid fa-gauge fa-fw"></i>
                                 Dashboard
                             </a>
                         </li>
@@ -63,7 +65,7 @@
                         {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
                         <li class="sidebar-item{% if page == 'reports' %} active{% endif %}">
                             <a href="{% url 'reports' %}" class="sidebar-link">
-                                <i class="fa-solid fa-desktop pe-2"></i>
+                                <i class="fa-solid fa-desktop fa-fw"></i>
                                 Computer
                             </a>
                         </li>
@@ -71,7 +73,7 @@
                         {% if perms.reports.can_view_reports and REPO_MANAGEMENT_ONLY == False %}
                         <li class="sidebar-item{% if page == 'inventory' %} active{% endif %}">
                             <a href="{% url 'inventory' %}items" class="sidebar-link">
-                                <i class="fa-solid fa-warehouse pe-2"></i>
+                                <i class="fa-solid fa-warehouse fa-fw"></i>
                                 Inventory
                             </a>
                         </li>
@@ -80,7 +82,7 @@
                         {% if perms.manifests.view_manifestfile %}
                         <li class="sidebar-item{% if page == 'manifests' %} active{% endif %}">
                             <a href="{% url 'manifests' %}" class="sidebar-link">
-                                <i class="fa-solid fa-file-invoice pe-2"></i>
+                                <i class="fa-solid fa-file-invoice fa-fw"></i>
                                 Manifests
                             </a>
                         </li>
@@ -88,13 +90,13 @@
                         {% if perms.pkgsinfo.view_pkginfofile %}
                         <li class="sidebar-item{% if page == 'pkginfo' %} active{% endif %}">
                             <a href="{% url 'pkginfo' %}" class="sidebar-link">
-                                <i class="fa-solid fa-box-open pe-2"></i>
+                                <i class="fa-solid fa-box-open fa-fw"></i>
                                 Package Info
                             </a>
                         </li>
                         <li class="sidebar-item{% if page == 'icons' %} active{% endif %}">
                             <a href="{% url 'icons' %}" class="sidebar-link">
-                                <i class="fas fa-image pe-2"></i>
+                                <i class="fas fa-image fa-fw"></i>
                                 Icons
                             </a>
                         </li>
@@ -113,17 +115,42 @@
                     </button>
                     <div class="navbar-collapse navbar">
                         <ul class="navbar-nav">
+
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-circle-half-stroke"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+                                    <a href="#" target="_blank" class="dropdown-item" data-bs-theme-value="light"><i class="fa-solid fa-sun fa-fw"></i>
+                                        Light
+                                    </a>
+                                    <a href="#" target="_blank" class="dropdown-item" data-bs-theme-value="dark"><i class="fa-solid fa-moon fa-fw"></i>
+                                        Dark
+                                    </a>
+                                    <a href="#" target="_blank" class="dropdown-item" data-bs-theme-value="auto"><i class="fa-solid fa-circle-half-stroke fa-fw"></i>
+                                        Auto
+                                    </a>
+                                </div>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a href="#" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
                                     <img alt="{{ username }}" src="{{ userImage }}" class="avatar img-fluid rounded" />
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="/admin/" target="_blank" class="dropdown-item"><i class="fas fa-chalkboard-teacher"></i> Admin</a>
-                                    <a href="#" class="dropdown-item"><i class="fas fa-download"></i> MunkiScrips</a>
+                                    <a href="/admin/" target="_blank" class="dropdown-item"><i class="fas fa-chalkboard-teacher fa-fw"></i>
+                                        Admin
+                                    </a>
+                                    <a href="#" class="dropdown-item"><i class="fas fa-download fa-fw"></i>
+                                        MunkiScrips
+                                    </a>
                                     {% if user.is_authenticated %}
-                                    <a href="/logout/" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                                        <a href="/logout/" class="dropdown-item"><i class="fas fa-sign-out-alt fa-fw"></i>
+                                            Logout
+                                        </a>
                                     {% else %}
-                                        <a href="/login/" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Login</a>
+                                        <a href="/login/" class="dropdown-item"><i class="fas fa-sign-out-alt fa-fw"></i>
+                                            Login
+                                        </a>
                                     {% endif %}
                                 </div>
                             </li>
