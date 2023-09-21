@@ -85,13 +85,7 @@ function getRunningMachine() {
 }
 
 // Sidebar toggle
-$(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-    });
-
-    if ($(window).width() < 768) {
-        $('#sidebarCollapse').removeClass('hidden');
-        $('#sidebar').toggleClass('active');
-     }
+const sidebarToggle = document.body.querySelector('#sidebar-toggle');
+sidebarToggle.addEventListener('click', function() {
+    document.querySelector("#sidebar").classList.toggle('collapsed');
 });

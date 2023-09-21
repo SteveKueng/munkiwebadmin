@@ -30,16 +30,10 @@
     setTheme(getPreferredTheme())
   
     const showActiveTheme = (theme, focus = false) => {
-      const themeSwitcher = document.querySelector('#bd-theme')
-  
-      if (!themeSwitcher) {
-        return
-      }
-  
-      const themeSwitcherText = document.querySelector('#bd-theme-text')
-      const activeThemeIcon = document.querySelector('.theme-icon-active use')
+      const activeThemeIcon = document.querySelector('#bd-theme-selector')
       const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-      const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+      const iconOfActiveBtn = btnToActive.querySelector('i').getAttribute('class')
+      console.log(iconOfActiveBtn)
   
       document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
         element.classList.remove('active')
@@ -48,13 +42,7 @@
   
       btnToActive.classList.add('active')
       btnToActive.setAttribute('aria-pressed', 'true')
-      activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-      const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
-      themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
-  
-      if (focus) {
-        themeSwitcher.focus()
-      }
+      activeThemeIcon.setAttribute('class', iconOfActiveBtn)
     }
   
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

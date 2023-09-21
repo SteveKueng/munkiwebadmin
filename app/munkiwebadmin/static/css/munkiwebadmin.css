@@ -94,6 +94,24 @@ a.sidebar-link {
     margin-left: auto;
 }
 
+/* Sidebar toggle */
+#sidebar.collapsed {
+    margin-left: -264px;
+}
+
+
+/* content style */
+.content {
+    flex: 1;
+    max-width: 100vw;
+    width: 100vw;
+}
+
 /* Footer and Nav */
 
-@media (max-width:767.98px) {}
+@media (max-width:767.98px) {
+    .content {
+        max-width: auto;
+        width: auto;
+    }
+}
