@@ -89,3 +89,9 @@ const sidebarToggle = document.body.querySelector('#sidebar-toggle');
 sidebarToggle.addEventListener('click', function() {
     document.querySelector("#sidebar").classList.toggle('collapsed');
 });
+
+$(window).on('resize', function() {
+    if($(window).width() < 768) {
+        $('#sidebar').addClass('collapsed');
+    }
+})
