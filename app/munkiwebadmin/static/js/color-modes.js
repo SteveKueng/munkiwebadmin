@@ -33,7 +33,6 @@
       const activeThemeIcon = document.querySelector('#bd-theme-selector')
       const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
       const iconOfActiveBtn = btnToActive.querySelector('i').getAttribute('class')
-      console.log(iconOfActiveBtn)
   
       document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
         element.classList.remove('active')

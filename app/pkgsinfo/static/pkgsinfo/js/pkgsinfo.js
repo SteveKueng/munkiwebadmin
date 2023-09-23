@@ -12,13 +12,13 @@ $(window).resize(do_resize);
 // reset url on modal close
 $(document).on('hide.bs.modal','#pkginfoItem', function () {
   // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#pkginfoItem').data('bs.modal').isShown = false;
+  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
+      ($('#pkginfoItem').data('bs.modal') || {})._isShown = false;
       $("#saveOrCancelConfirmationModal").modal("show");
       event.preventDefault();
       return;
   } else {
-    $('#pkginfoItem').data('bs.modal').isShown = true;
+    ($('#pkginfoItem').data('bs.modal') || {})._isShown = true;
     window.location.hash = '';
     current_pathname = "";
   }
@@ -356,7 +356,7 @@ var editor = null;
 
 function getPkginfoItem(pathname) {
     //event.preventDefault();
-    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
         /*if (! confirm('Discard current changes?')) {
             event.preventDefault();
             return;
@@ -601,7 +601,7 @@ function rebuildCatalogs() {
         data: '',
         dataType: 'json',
         global: false,
-        complete: function(jqXHR, textStatus){
+        complete: function(jqXHR, textStatus) {
             window.clearInterval(poll_loop);
             $('#process_progress').modal('hide');
             $('#list_items').DataTable().ajax.reload();
@@ -671,7 +671,7 @@ function showDeleteConfirmationModal() {
         //  doesn't have an associated installer_item, like
         //  apple_update_metadata or nopkg items)
         // TO-DO: offer to remove associated uninstaller items
-        $('#deleteConfirmationModalInstallerItem').removeClass('hidden');
+        $('#deleteConfirmationModalInstallerItem').removeClass('d-none');
         $('#delete_pkg').attr('disabled', true);
         // ask the server for the count of references for the installer item
         $.ajax({
@@ -685,7 +685,7 @@ function showDeleteConfirmationModal() {
                     $('#delete_pkg').removeAttr("disabled");
                 } else {
                     // multiple references! hide the checkbox
-                    $('#deleteConfirmationModalInstallerItem').addClass('hidden');
+                    $('#deleteConfirmationModalInstallerItem').addClass('d-none');
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {

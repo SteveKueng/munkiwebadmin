@@ -14,7 +14,6 @@
 
         <!-- Custom Fonts -->
         <link href="{% get_static_prefix %}fonts/fontawesome/css/all.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
 
         <!-- custom CSS -->
         <link rel="stylesheet" href='{% get_static_prefix %}css/munkiwebadmin.css' type="text/css" media="all" />
@@ -30,8 +29,8 @@
 
         <!-- jQuery -->
         <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
-        <script type='text/javascript' src='{% get_static_prefix %}js/jquery-ui/jquery-ui.min.js'></script>
         <script type='text/javascript' src='{% get_static_prefix %}js/jquery.dataTables.min.js'></script>
+        <script type='text/javascript' src='{% get_static_prefix %}js/dataTables.bootstrap5.min.js'></script>
 
         {% block java_script %}{% endblock %}
 
@@ -89,7 +88,7 @@
                         {% endif %}
                         {% if perms.pkgsinfo.view_pkginfofile %}
                         <li class="">
-                            <a href="{% url 'pkginfo' %}" class="sidebar-link nav-link{% if page == 'pkginfo' %} active{% endif %}">
+                            <a href="{% url 'pkginfo' %}" class="sidebar-link nav-link{% if page == 'pkgsinfo' %} active{% endif %}">
                                 <i class="fa-solid fa-box-open fa-fw"></i>
                                 Package Info
                             </a>
@@ -162,10 +161,10 @@
                     </div>
                 </nav>
 
-                <!-- ========= loadingbar (may change) ======= -->
+                <!-- ========= loadingbar (may change) ======= ≈
                 <div id="site-loading-bar" class="progress" style="display: none;">
                     <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
+                </div> -->
                 
                 <!-- ========= Main content section ======= -->
                 <main class="content px-3 py-2">
@@ -199,9 +198,7 @@
 
         <!-- Bootstrap Core JavaScript -->
         <script type='text/javascript' src="{% get_static_prefix %}js/bootstrap.bundle.js"></script>
-
-        <!-- Metis Menu Plugin JavaScript -->
-        <script src="{% get_static_prefix %}js/metisMenu/metisMenu.min.js"></script>
-        <script src="{% get_static_prefix %}js/munkiwebadmin.js"></script>
+        <script type='text/javascript' src="{% get_static_prefix %}js/munkiwebadmin.js"></script>
+        <script type='text/javascript' src="{% get_static_prefix %}js/jquery-ui.min.js"></script>
     </body>
 </html>

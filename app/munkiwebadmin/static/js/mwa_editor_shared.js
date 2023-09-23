@@ -118,14 +118,12 @@ function update_status(from_url) {
 
 
 function showSaveOrCancelBtns() {
-    //$('#delete_btn').addClass('hidden');
-    $('#cancel').addClass('hidden');
-    $('#save_and_cancel').removeClass('hidden');
+    $('#cancel').addClass('d-none');
+    $('#save_and_cancel').removeClass('d-none');
 }
 
 
 function hideSaveOrCancelBtns() {
-    $('#save_and_cancel').addClass('hidden');
-    $('#cancel').removeClass('hidden');
-    //$('#delete_btn').removeClass('hidden');
+    $('#save_and_cancel').addClass('d-none');
+    $('#cancel').removeClass('d-none');
 }

@@ -3,13 +3,12 @@
 
 {% block extra_style %}
 {% load static %}
-<link rel="stylesheet" href="{% get_static_prefix %}css/plisteditor.css" type="text/css" media="all" />
 <link rel="stylesheet" href="{% get_static_prefix %}pkgsinfo/css/pkgsinfo.css" type="text/css" media="all" />
-<link rel="stylesheet" href="{% get_static_prefix %}css/bootstrap-chosen.css" type="text/css" media="all" />
 {% endblock extra_style %}
 
 {% block java_script %}
 {% load static %}
+<script type='text/javascript' src='{% get_static_prefix %}js/typeahead.bundle.js'></script>
 <script type='text/javascript' src='{% get_static_prefix %}js/jquery.plisteditor.js'></script>
 <script type='text/javascript' src='{% get_static_prefix %}js/plistparser.js'></script>
 <script type="text/javascript" charset="utf-8" src="{% get_static_prefix %}js/ace/src-min-noconflict/ace.js"></script>
@@ -70,7 +69,7 @@
 <!--
 Bootstrap modal for mass editing pkginfo items
 -->
-<div class="modal fade" id="massEditModal">
+<div class="modal" id="massEditModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -98,8 +97,8 @@ Bootstrap modal for mass editing pkginfo items
           </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onClick="massEditCatalogs()">Change</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onClick="massEditCatalogs()">Change</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -107,7 +106,7 @@ Bootstrap modal for mass editing pkginfo items
 <!--
 Bootstrap modal for confirming mass pkginfo deletion
 -->
-<div class="modal fade" id="massDeleteConfirmationModal">
+<div class="modal" id="massDeleteConfirmationModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -125,8 +124,8 @@ Bootstrap modal for confirming mass pkginfo deletion
         <br>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="deletePkginfoList()">Delete</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onClick="deletePkginfoList()">Delete</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -134,7 +133,7 @@ Bootstrap modal for confirming mass pkginfo deletion
 <!--
 Bootstrap modal for showing process progress
 -->
-<div class="modal fade" data-backdrop="static" id="process_progress">
+<div class="modal" data-backdrop="static" id="process_progress">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -154,7 +153,7 @@ Bootstrap modal for showing process progress
 <!--
 Bootstrap modal for errors
 -->
-<div class="modal fade" data-backdrop="static" id="errorModal">
+<div class="modal" data-backdrop="static" id="errorModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -169,7 +168,7 @@ Bootstrap modal for errors
         </form>
       </div>
       <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -1,4 +1,4 @@
-<div class="modal fade" id="pkginfoItem">
+<div class="modal" id="pkginfoItem">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -8,42 +8,40 @@
           <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()" style="margin-top:-40px;">Delete</button>
           {% endif %}
       </div>
-      <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist" id="editortabs">
-          <li role="presentation" class="active">
-            <a href="#basicstab" aria-controls="basicstab" role="tab" data-toggle="tab">Basics</a>
+      <div role="tabpanel" class="modal-body" >
+        <ul class="nav nav-tabs" id="editortabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="basicstab" data-bs-toggle="tab" data-bs-target="#basicstab-pane" type="button" role="tab" aria-controls="basicstab-pane" aria-selected="false">Basics</button>
           </li>
-          <li role="presentation">
-            <a href="#detailtab" aria-controls="editortab" role="tab" data-toggle="tab">Details</a>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="detailtab" data-bs-toggle="tab" data-bs-target="#detailtab-pane" type="button" role="tab" aria-controls="detailtab-pane" aria-selected="false">Details</button>
           </li>
-          <li role="presentation">
-            <a href="#plisttab" aria-controls="plisttab" role="tab" data-toggle="tab">plist</a>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="plisttab" data-bs-toggle="tab" data-bs-target="#plisttab-pane" type="button" role="tab" aria-controls="plisttab-pane" aria-selected="false">plist</button>
           </li>
         </ul>
-      <div role="tabpanel" class="modal-body" >
-        <!-- Tab panes -->
         <div class="tab-content" id="item_editor">
-          <div role="tabpanel" class="tab-pane active" id="basicstab">
+          <div class="tab-pane fade show active" id="basicstab-pane" role="tabpanel" aria-labelledby="basicstab" tabindex="0">
               <div id="basics" class="plist-editor"></div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="detailtab">
+          <div class="tab-pane fade show" id="detailtab-pane" role="tabpanel" aria-labelledby="detailtab" tabindex="0">
               <div id="detail" class="plist-editor"></div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="plisttab">
+          <div class="tab-pane fade show" id="plisttab-pane" role="tabpanel" aria-labelledby="plisttab" tabindex="0">
               <div id='plist'>{{ plist_text }}</div>
           </div>
-         </div>
+        </div>
       </div>
       <div class="modal-footer">
         {% if perms.pkgsinfo.change_pkginfofile %}
-        <div class='pull-right hidden' id='save_and_cancel'>
+        <div class='pull-right d-none' id='save_and_cancel'>
           <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
           <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
         </div>
         {% endif %}
         <div class='pull-right' id='cancel'>
         {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
-          <button type="button" class="btn btn-default" data-dismiss="modal" onClick="cancelEdit()">Cancel</button>
+          <button type="button" class="btn btn-default" data-bs-dismiss="modal" onClick="cancelEdit()">Cancel</button>
         </div>
 
       </div>
@@ -54,7 +52,7 @@
 <!--
 Bootstrap modal for confirming pkginfo deletion
 -->
-<div class="modal fade" id="deleteConfirmationModal" data-backdrop="false">
+<div class="modal" id="deleteConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -63,7 +61,7 @@ Bootstrap modal for confirming pkginfo deletion
       <div class="modal-body">
         <p>Really delete <strong>{{ pathname }}</strong>?</p>
         <p>This action cannot be undone.</p>
-        <div id="deleteConfirmationModalInstallerItem" class='hidden'>
+        <div id="deleteConfirmationModalInstallerItem" class='d-none'>
             <div class="checkbox pull-right">
                 <label>
                     <input type="checkbox" id="delete_pkg">
@@ -74,8 +72,8 @@ Bootstrap modal for confirming pkginfo deletion
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="deletePkginfoItem()">Delete</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onClick="deletePkginfoItem()">Delete</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -83,7 +81,7 @@ Bootstrap modal for confirming pkginfo deletion
 <!--
 Bootstrap modal for confirming canceling editing
 -->
-<div class="modal fade" id="cancelEditConfirmationModal" data-backdrop="false">
+<div class="modal" id="cancelEditConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -93,8 +91,8 @@ Bootstrap modal for confirming canceling editing
         <p>Really discard your changes to <strong>{{ pathname }}</strong>?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="cancelEdit()">Discard Changes</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Continue Editing</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"  onClick="cancelEdit()">Discard Changes</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Continue Editing</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -102,7 +100,7 @@ Bootstrap modal for confirming canceling editing
 <!--
 Bootstrap modal for saving or canceling when loading a different pkginfo
 -->
-<div class="modal fade" id="saveOrCancelConfirmationModal" data-backdrop="false">
+<div class="modal" id="saveOrCancelConfirmationModal" data-backdrop="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -112,9 +110,9 @@ Bootstrap modal for saving or canceling when loading a different pkginfo
         <p>Save your changes to <strong>{{ pathname }}</strong> before proceeding?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onClick="cancelEdit()">Discard Changes</button>
-        <button type="button" class="btn btn-success" data-dismiss="modal" onClick="savePkginfoItem()">Save Changes</button>
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onClick="cancelEdit()">Discard Changes</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" onClick="savePkginfoItem()">Save Changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
