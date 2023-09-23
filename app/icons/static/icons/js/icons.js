@@ -14,12 +14,12 @@ var file;
 $(document).on('hide.bs.modal','#iconItem', function () {
   // check for unsaved changes
   if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#iconItem').data('bs.modal').isShown = false;
+      ($('#iconItem').data('bs.modal') || {})._isShown = false;
       $("#saveOrCancelConfirmationModal").modal("show");
       event.preventDefault();
       return;
   } else {
-    $('#iconItem').data('bs.modal').isShown = true;
+    ($('#iconItem').data('bs.modal') || {})._isShown = true;
     window.location.hash = '';
     current_pathname = "";
   }
