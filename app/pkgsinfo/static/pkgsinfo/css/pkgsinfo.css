@@ -25,9 +25,3 @@
     font-family: Courier, monospace;
     font-size: 12px;
 }
-
-.dropdown-menu:not(.dropdown-info) {
-    position: fixed;
-    margin-top: 110px;
-}
-
