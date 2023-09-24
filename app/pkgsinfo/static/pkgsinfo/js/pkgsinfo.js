@@ -1,10 +1,8 @@
 function do_resize() {
     $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 300);
-    $('#item_list').height($(window).height() - 90);
-    $('.dataTables_scrollBody').height($(window).height() - 170);
-    //$('.modal-body').height($(window).height() - 270);
+    $('#plist').height($(window).height() - 310);
+    $('#item_list').height($(window).height() - 150);
 }
 
 $(window).resize(do_resize);
@@ -380,10 +378,10 @@ function getPkginfoItem(pathname) {
                 //alert('Error in parsing plist. ' + e);
                 js_obj = null;
             }
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('button[data-bs-toggle="tab"]').on('click', function (e) {
                 //e.target // newly activated tab
                 //e.relatedTarget // previous active tab
-                setupView(e.target.hash);
+                setupView('#'+e.target.id);
             })
             editor = initializeAceEditor('plist', plistChanged);
             hideSaveOrCancelBtns();

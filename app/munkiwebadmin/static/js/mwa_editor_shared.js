@@ -73,20 +73,28 @@ function getCatalogData() {
 
 function initializeAceEditor(element_id, change_fn) {
     editor = ace.edit(element_id);
-    editor.setTheme("ace/theme/sqlserver");
     editor.getSession().setMode("ace/mode/xml");
     editor.setShowPrintMargin(false);
     editor.getSession().setUseWrapMode(true);
     editor.getSession().getDocument().setNewLineMode('unix');
     editor.resize(true);
     editor.getSession().on('change', change_fn);
+    
+    // set theme based on user preference
+    const theme = document.documentElement.getAttribute('data-bs-theme')
+    if(theme == 'dark') {
+        editor.setTheme("ace/theme/tomorrow_night");
+    } else {
+        editor.setTheme("ace/theme/xcode");
+    }
+    
     return editor
 }
 
 
 function detectUnsavedChanges() {
     $(window).on('beforeunload', function (event) {
-        if ($('#save_and_cancel') && !$('#save_and_cancel').hasClass('hidden')) {
+        if ($('#save_and_cancel') && !$('#save_and_cancel').hasClass('d-none')) {
             var message = 'You haven\'t saved your changes.';
             event.returnValue = message;
             return message;

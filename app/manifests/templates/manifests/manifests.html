@@ -25,13 +25,13 @@
         <div class="form-inline">
             <div class="form-group">
                   <div class="btn-group">
-                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#searchManifestModal">
+                      <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#searchManifestModal">
                           Search manifests
                       </button>
                   </div>
                   {% if perms.manifests.add_manifestfile %}
                   <div class="btn-group">
-                      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newManifestModal">
+                      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newManifestModal">
                           New manifest
                       </button>
                   </div>
@@ -56,7 +56,7 @@
 <!--
 Bootstrap modal for showing progress
 -->
-<div class="modal" data-backdrop="static" id="process_progress">
+<div class="modal" data-bs-backdrop="static" id="process_progress">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -76,7 +76,7 @@ Bootstrap modal for showing progress
 <!--
 Bootstrap modal for creating manifests
 -->
-<div class="modal" data-backdrop="static" id="newManifestModal">
+<div class="modal" data-bs-backdrop="static" id="newManifestModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -100,7 +100,7 @@ Bootstrap modal for creating manifests
 <!--
 Bootstrap modal for searching inside manifests
 -->
-<div class="modal" data-backdrop="static" id="searchManifestModal">
+<div class="modal" data-bs-backdrop="static" id="searchManifestModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -136,7 +136,7 @@ Bootstrap modal for searching inside manifests
 <!--
 Bootstrap modal for errors
 -->
-<div class="modal" data-backdrop="static" id="errorModal">
+<div class="modal" data-bs-backdrop="static" id="errorModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">

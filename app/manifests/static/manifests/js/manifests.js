@@ -2,9 +2,7 @@ function do_resize() {
     $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
     $('#plist').height($(window).height() - 270);
-    //$('#item_list').height($(window).height() - 100);
-    //$('.dataTables_scrollBody').height($(window).height() - 180);
-    //$('#list_items').DataTable().draw();
+    $('#item_list').height($(window).height() - 150);
 }
 
 $(window).resize(do_resize);
@@ -12,13 +10,13 @@ $(window).resize(do_resize);
 // reset url on modal close
 $(document).on('hide.bs.modal','#manifestItems', function () {
   // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#manifestItems').data('bs.modal').isShown = false;
+  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
+      ($('#manifestItems').data('bs.modal') || {})._isShown = false;
       $("#saveOrCancelConfirmationModal").modal("show");
       event.preventDefault();
       return;
   } else {
-    $('#manifestItems').data('bs.modal').isShown = true;
+   ($('#manifestItems').data('bs.modal') || {})._isShown = true;
     window.location.hash = '';
     current_pathname = "";
   }
@@ -85,11 +83,6 @@ $(document).ready(function() {
     $(document).on('shown.bs.modal', '.modal', function(event){
         $(event.currentTarget).find('input').select();
     });
-
-    // make included manifests link buttons clickable
-    //$(document).on('click', 'span.row_link_btn', function(event){
-    //    linkToIncludedManifest($(event.currentTarget));
-    //});
 
     $(window).on('hashchange', function() {
         hash = window.location.hash;
@@ -198,11 +191,8 @@ function monitor_manifest_list() {
 
 
 function cancelEdit() {
-    //$('#cancelEditConfirmationModal').modal('hide');
     hideSaveOrCancelBtns();
     $("#manifestItems").modal("hide");
-    //$('.modal-backdrop').remove();
-    //getManifestItem(current_pathname);
 }
 
 var js_obj = {};
@@ -416,13 +406,13 @@ function constructDetail() {
         $('#detail').html('')
         $('#detail').plistEditor(js_obj,
             { change: updatePlistAndBasics,
-              keytypes: keys_and_types,
-              validator: validator});
+                keytypes: keys_and_types,
+                validator: validator});
     } else {
         $('#detail').html('<br/>Invalid plist.')
     }
-   setupHelpers();
-   addIncludedManifestLinks('#detail');
+    setupHelpers();
+    addIncludedManifestLinks('#detail');
 }
 
 function addIncludedManifestLinks(editor) {
@@ -488,7 +478,7 @@ var selected_tab_viewname = "#basicstab";
 var editor = null;
 
 function getManifestItem(pathname) {
-    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
         requested_pathname = pathname;
         $("#saveOrCancelConfirmationModal").modal("show");
         event.preventDefault();
@@ -508,10 +498,10 @@ function getManifestItem(pathname) {
                 //alert('Error in parsing plist. ' + e);
                 js_obj = null;
             }
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('button[data-bs-toggle="tab"]').on('click', function (e) {
                 //e.target // newly activated tab
                 //e.relatedTarget // previous active tab
-                setupView(e.target.hash);
+                setupView('#'+e.target.id);
             });
             editor = initializeAceEditor('plist', plistChanged);
             hideSaveOrCancelBtns();
@@ -552,12 +542,6 @@ function getManifestItem(pathname) {
 
 
 function duplicateManifestItem() {
-    /*if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-        requested_pathname = pathname;
-        $("#saveOrCancelConfirmationModal").modal("show");
-        event.preventDefault();
-        return;
-    }*/
     var manifest_names = $('#data_storage').data('manifest_names');
     var pathname = $('#manifest-copy-name').val();
     if (manifest_names.indexOf(pathname) != -1) {
@@ -618,9 +602,6 @@ function saveManifestItem() {
         success: function(data) {
             hideSaveOrCancelBtns();
             $("#manifestItems").modal("hide");
-            //window.location.hash = '';
-            //$('#list_items').DataTable().ajax.reload();
-            //$('.modal-backdrop').remove();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $("#errorModalTitleText").text("Manifest save error");
@@ -650,12 +631,6 @@ function searchManifests() {
 
 
 function newManifestItem() {
-    /*if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-        requested_pathname = pathname;
-        $("#saveOrCancelConfirmationModal").modal("show");
-        event.preventDefault();
-        return;
-    }*/
     var manifest_names = $('#data_storage').data('manifest_names');
     var pathname = $('#new-manifest-name').val();
     if (manifest_names.indexOf(pathname) != -1) {
@@ -696,9 +671,9 @@ function newManifestItem() {
 }
 
 
-function deleteManifestItem() {
+function deleteManifestItem(manifest_name) {
     $('.modal-backdrop').remove();
-    var manifestItemURL = '/api/manifests/' + current_pathname;
+    var manifestItemURL = '/api/manifests/' + manifest_name;
     $.ajax({
         method: 'POST',
         url: manifestItemURL,
