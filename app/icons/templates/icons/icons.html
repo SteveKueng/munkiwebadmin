@@ -3,14 +3,12 @@
 
 {% block extra_style %}
 {% load static %}
-<link rel="stylesheet" href="{% get_static_prefix %}css/bootstrap-chosen.css" type="text/css" media="all" />
 {% endblock extra_style %}
 
 {% block java_script %}
 {% load static %}
 <script type='text/javascript' src='{% get_static_prefix %}icons/js/icons.js'></script>
 <script type='text/javascript' src='{% get_static_prefix %}js/mwa_editor_shared.js'></script>
-<script type='text/javascript' src='{% get_static_prefix %}js/chosen.jquery.min.js'></script>
 {% endblock java_script %}
 
 {% block content %}
@@ -20,7 +18,7 @@
         <div class="form-group">
               {% if perms.pkgsinfo.add_pkginfofile %}
               <div class="btn-group">
-                  <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newIconModal">
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newIconModal">
                       New icon
                   </button>
               </div>
@@ -46,8 +44,8 @@
 <!--
 Bootstrap modal for upload new icon
 -->
-<div class="modal" data-backdrop="static" id="newIconModal">
-    <div class="modal-dialog">
+<div class="modal" id="newIconModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="newIconModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Upload new icon</h4>
@@ -80,14 +78,14 @@ Bootstrap modal for upload new icon
 <!--
 Bootstrap modal for showing icon edit
 -->
-<div class="modal" id="iconItem">
-    <div class="modal-dialog">
+<div class="modal" id="iconItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="iconItemLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h4 id="pathname"></h4>
-          <div class='pull-right' id='delete_btn' style="margin-top:-40px;">
+          <div class='pull-right' id='delete_btn'>
           {% if perms.pkgsinfo.delete_pkginfofile %}
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Delete</button>
+              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
           {% endif %}
           </div>
         </div>
@@ -106,7 +104,7 @@ Bootstrap modal for showing icon edit
         <div class="modal-footer">
           {% if perms.pkgsinfo.change_pkginfofile %}
           <div class='pull-right hidden' id='save_and_cancel'>
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelEditConfirmationModal">Cancel</button>
             <button type="button" class="btn btn-success" onClick="saveIconItem()">Save</button>
           </div>
           {% endif %}
@@ -143,7 +141,7 @@ Bootstrap modal for showing icon edit
   <!--
   Bootstrap modal for confirming canceling editing
   -->
-  <div class="modal" id="cancelEditConfirmationModal" data-backdrop="false">
+  <div class="modal" id="cancelEditConfirmationModal" data-bs-backdrop="false">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -162,7 +160,7 @@ Bootstrap modal for showing icon edit
   <!--
   Bootstrap modal for saving or canceling when loading a different icon
   -->
-  <div class="modal" id="saveOrCancelConfirmationModal" data-backdrop="false">
+  <div class="modal" id="saveOrCancelConfirmationModal" data-bs-backdrop="false">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
