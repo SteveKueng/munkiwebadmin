@@ -528,10 +528,10 @@
             if (isNaN(timestamp)) {
                 // invalid date string
                 alert("Invalid date!")
-                $(valueElement).closest('td').addClass('danger');
+                $(valueElement).closest('td').addClass('table-danger');
                 timestamp = 0;
             } else {
-                $(valueElement).parent().closest('td').removeClass('danger');
+                $(valueElement).parent().closest('td').removeClass('table-danger');
             }
             val = new Date(timestamp);
         } else if (type == 'boolean') {
@@ -579,7 +579,7 @@
             }
             if (opt.validator) {
                 // this is a cheat and ties us to Bootstrap 3 contextual classes
-                $(this).parent().removeClass('success info warning danger');
+                $(this).parent().removeClass('table-success table-info table-warning table-danger');
                 console.log(path, val)
                 var extraClass = opt.validator(path, val);
                 if (extraClass) $(this).parent().addClass(extraClass);

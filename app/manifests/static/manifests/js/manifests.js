@@ -4,23 +4,7 @@ function do_resize() {
     $('#plist').height($(window).height() - 270);
     $('#item_list').height($(window).height() - 150);
 }
-
 $(window).resize(do_resize);
-
-// reset url on modal close
-$(document).on('hide.bs.modal','#manifestItems', function () {
-  // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
-      ($('#manifestItems').data('bs.modal') || {})._isShown = false;
-      $("#saveOrCancelConfirmationModal").modal("show");
-      event.preventDefault();
-      return;
-  } else {
-   ($('#manifestItems').data('bs.modal') || {})._isShown = true;
-    window.location.hash = '';
-    current_pathname = "";
-  }
-});
 
 $(document).ready(function() {
     initManifestsTable();
@@ -92,24 +76,18 @@ $(document).ready(function() {
             }
         }
     });
-
 } );
-
 
 function linkToIncludedManifest(target) {
     //parent is <td>; its parent is <tr>
     var tableRow = $(target).closest('tr'),
         manifest_path = $(tableRow).find('.value').val();
     getManifestItem(manifest_path);
-    //window.location.hash = manifest_path;
 }
-
 
 var render_name = function(data, type, full, meta) {
-    //return '<a href="#' + data + '" onClick="getManifestItem(\'' + data + '\')">' + data + '</a>';
     return '<a href="#' + data + '">' + data + '</a>';
 }
-
 
 function initManifestsTable() {
     $('#list_items').dataTable({
@@ -156,8 +134,6 @@ function initManifestsTable() {
           }],
          "sDom": "<t>",
          "bPaginate": false,
-         //"scrollY": '100vh',
-         //"bScrollCollapse": true,
          "bInfo": false,
          "autoWidth": false,
          "bFilter": true,
@@ -180,7 +156,6 @@ function initManifestsTable() {
      });
 }
 
-
 function monitor_manifest_list() {
     $('#process_progress_title_text').text('Getting manifest data...')
     $('#process_progress_status_text').text('Processing...')
@@ -189,14 +164,14 @@ function monitor_manifest_list() {
         }, 1000);
 }
 
-
 function cancelEdit() {
     hideSaveOrCancelBtns();
+    window.location.hash = '';
+    current_pathname = "";
     $("#manifestItems").modal("hide");
 }
 
 var js_obj = {};
-
 // these should be moved into their own file maybe so they can be edited
 // seperately
 var key_list = {'catalogs': 'Catalogs',
@@ -221,7 +196,6 @@ var keys_and_types = {'catalogs': ['catalogname'],
                       'optional_installs': ['itemname'],
                      };
 
-
 function getCurrentCatalogList() {
     if ( js_obj.hasOwnProperty('catalogs') ) {
         return js_obj['catalogs'];
@@ -229,7 +203,6 @@ function getCurrentCatalogList() {
         return [];
     }
 }
-
 
 function getSuggestedItems() {
     // return a list of item names based on current manifest catalog list
@@ -255,7 +228,6 @@ function getSuggestedItems() {
     }
 }
 
-
 function getValidCatalogNames() {
     // return a list of valid catalog names, which are the keys to the
     // catalog_data object minus those keys that start with "._"
@@ -268,7 +240,6 @@ function getValidCatalogNames() {
     }
     return [];
 }
-
 
 function getValidInstallItems() {
     // return a list of item names based on current manifest catalog list
@@ -294,19 +265,19 @@ function getValidInstallItems() {
     }
 }
 
-
 var validator = function(path, val) {
     // returns a bootstrap class name to highlight items that aren't 'valid'
     var path_items = path.split('.');
     if (path_items.indexOf('catalogs') != -1) {
         //check val against valid catalog names
-        var catalog_names = $('#data_storage').data('catalog_names');
-        if (catalog_names && catalog_names.indexOf(val) == -1) return 'danger';
+        var data = $('#data_storage').data('catalog_data');
+        var catalog_names = Object.keys(data);
+        if (catalog_names && catalog_names.indexOf(val) == -1) return 'table-warning';
     }
     if (path_items.indexOf('included_manifests') != -1) {
         //check val against valid manifest names
         var manifest_names = $('#data_storage').data('manifest_names');
-        if (manifest_names && manifest_names.indexOf(val) == -1) return 'danger';
+        if (manifest_names && manifest_names.indexOf(val) == -1) return 'table-warning';
     }
     if (path_items.indexOf('featured_items') != -1 ||
         path_items.indexOf('managed_installs') != -1 ||
@@ -316,61 +287,14 @@ var validator = function(path, val) {
             //check val against valid install items
             var valid_names = getValidInstallItems();
             if (valid_names.length && valid_names.indexOf(val) == -1) {
-                return 'danger';
+                return 'table-warning';
             }
     }
     return null;
 };
 
-
-function setupTypeaheadForPropertyNames() {
-    // typeahead/autocomplete for manifest keys
-    // suggest keys that are not already in use
-    if (js_obj == null) return;
-    var keys_in_use = Object.keys(js_obj),
-        suggested_keys = Object.keys(keys_and_types),
-        keys_to_suggest = suggested_keys.filter(function(value, index, arr){
-            return (keys_in_use.indexOf(value) == -1)
-        });
-    $('input.property').typeahead({source: keys_to_suggest});
-}
-
-
-function setupTypeahead() {
-    // setup typeahead/autocomplete for various fields
-    $('tr[data-path="catalogs"] textarea.value').typeahead({source: function(query, process) {
-            //return process($('#data_storage').data('catalog_names'));
-            return process(getValidCatalogNames());
-        }
-    });
-    $('tr[data-path="included_manifests"] textarea.value').typeahead({source: function(query, process) {
-            return process($('#data_storage').data('manifest_names'));
-        }
-    });
-    $('tbody.connectable textarea.value').typeahead({source: function(query, process) {
-            // should match managed_installs, managed_uninstalls,
-            // managed_updates and optional_installs
-            return process(getSuggestedItems());
-        }
-    });
-    setupTypeaheadForPropertyNames();
-}
-
-
-function connectSortables() {
-    // Connect our sortable lists of installer items so we can drag items
-    // between them
-    $('tr[data-path="featured_items"] tbody').addClass('connectable');
-    $('tr[data-path="managed_installs"] tbody').addClass('connectable');
-    $('tr[data-path="managed_uninstalls"] tbody').addClass('connectable');
-    $('tr[data-path="managed_updates"] tbody').addClass('connectable');
-    $('tr[data-path="optional_installs"] tbody').addClass('connectable');
-    $('tbody.connectable').sortable("option", "connectWith", '.connectable');
-}
-
 function setupHelpers() {
-    connectSortables();
-    setupTypeahead();
+
 }
 
 function setupView(viewName) {
@@ -400,7 +324,6 @@ function constructBasics() {
     addIncludedManifestLinks('#basics');
 }
 
-
 function constructDetail() {
     if (js_obj != null) {
         $('#detail').html('')
@@ -416,7 +339,7 @@ function constructDetail() {
 }
 
 function addIncludedManifestLinks(editor) {
-    rows = $(editor).find("tr[data-path='included_manifests']");
+    rows = $(editor).find("tr[data-bs-path='included_manifests']");
     $(rows).each(function() {
         var row_controls = $(this).find('.row-controls');
         $(row_controls).each(function() {
@@ -431,7 +354,6 @@ function addIncludedManifestLinks(editor) {
     });
 }
 
-
 function updatePlist() {
     if (js_obj != null) {
         editor.setValue(PlistParser.toPlist(js_obj, true));
@@ -441,7 +363,6 @@ function updatePlist() {
     }
 }
 
-
 function updatePlistAndBasics(data) {
     js_obj = data;
     showSaveOrCancelBtns();
@@ -449,14 +370,12 @@ function updatePlistAndBasics(data) {
     setupHelpers();
 }
 
-
 function updatePlistAndDetail(data) {
     js_obj = data;
     showSaveOrCancelBtns();
     updatePlist();
     setupHelpers();
 }
-
 
 function plistChanged() {
     showSaveOrCancelBtns();
@@ -621,14 +540,12 @@ function saveManifestItem() {
     });
 }
 
-
 function searchManifests() {
     $('#searchManifestModal').modal('hide');
     $('.modal-backdrop').remove();
     $('#list_items').DataTable().destroy()
     initManifestsTable();
 }
-
 
 function newManifestItem() {
     var manifest_names = $('#data_storage').data('manifest_names');
@@ -669,7 +586,6 @@ function newManifestItem() {
         },
     });
 }
-
 
 function deleteManifestItem(manifest_name) {
     $('.modal-backdrop').remove();

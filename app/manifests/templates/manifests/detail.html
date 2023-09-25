@@ -1,5 +1,5 @@
 <div class="modal" id="manifestItems" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="manifestItemsLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl modal-fullscreen-xl-down">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="manifestItemsLabel">{{ pathname }}</h1>
@@ -68,7 +68,7 @@ Bootstrap modal for confirming manifest deletion
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal"  onClick="deleteManifestItem('{{ pathname }}')">Delete</button>
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default" data-bs-target="#manifestItems" data-bs-toggle="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -87,7 +87,7 @@ Bootstrap modal for confirming canceling editing
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal"  onClick="cancelEdit()">Discard Changes</button>
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Continue Editing</button>
+        <button type="button" class="btn btn-default" data-bs-target="#manifestItems" data-bs-toggle="modal">Continue Editing</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
