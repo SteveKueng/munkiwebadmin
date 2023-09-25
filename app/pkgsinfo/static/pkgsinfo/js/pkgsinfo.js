@@ -4,7 +4,6 @@ function do_resize() {
     $('#plist').height($(window).height() - 310);
     $('#item_list').height($(window).height() - 150);
 }
-
 $(window).resize(do_resize);
 
 // reset url on modal close
@@ -51,7 +50,6 @@ $(document).ready(function() {
     });
 } );
 
-
 function select_catalog(name) {
     $('#catalog_dropdown').html(name + ' <span class="caret"></span>');
     $('#catalog_dropdown').data('value', name);
@@ -59,7 +57,6 @@ function select_catalog(name) {
     dt.rows().invalidate();
     dt.draw();
 }
-
 
 function update_catalog_dropdown_list() {
     var catalog_list = getValidCatalogNames();
@@ -118,7 +115,6 @@ function getValidInstallItems() {
     }
 }
 
-
 $.fn.dataTable.ext.search.push(
     function( settings, searchData, index, rowData, counter ) {
         // custom search filter to filter out rows that have no versions
@@ -136,7 +132,6 @@ $.fn.dataTable.ext.search.push(
     }
 );
 
-
 function get_checked_items() {
     var selected_items = [];
     $('.pkginfo_items').each(function(){
@@ -147,7 +142,6 @@ function get_checked_items() {
     return selected_items;
 }
 
-
 var enableMassActionMenuItems = function() {
     if (get_checked_items().length == 0) {
         $('#massaction_dropdown_list').children('li').addClass('disabled');
@@ -155,7 +149,6 @@ var enableMassActionMenuItems = function() {
         $('#massaction_dropdown_list').children('li').removeClass('disabled');
     }
 }
-
 
 var confirmMassDelete = function() {
     var selected_items = get_checked_items()
@@ -171,7 +164,6 @@ var confirmMassDelete = function() {
     }
 }
 
-
 var openMassEditModal = function() {
     var selected_items = get_checked_items()
     var selected_item_count = selected_items.length
@@ -186,7 +178,6 @@ var openMassEditModal = function() {
         $("#massEditModal").modal("show");
     }
 }
-
 
 var render_versions = function(data, type, row, meta) {
     var html = '<div class="list-group" style="margin-bottom: 0px;">\n';
@@ -204,13 +195,11 @@ var render_versions = function(data, type, row, meta) {
     return html
 }
 
-
 var render_name = function(data, type, row, meta) {
     data = data.replace(".", "<wbr/>.");
     data = data.replace("_", "<wbr/>_");
     return data;
 }
-
 
 function initPkginfoTable() {
     $('#list_items').dataTable({
@@ -256,13 +245,9 @@ function initPkginfoTable() {
      //searchField.trigger('keyup');
 }
 
-
 function cancelEdit() {
-    //$('#cancelEditConfirmationModal').modal('hide');
     hideSaveOrCancelBtns();
     $("#pkginfoItem").modal("hide");
-    //$('.modal-backdrop').remove();
-    //getPkginfoItem(current_pathname);
 }
 
 
@@ -289,9 +274,7 @@ function constructBasics() {
     } else {
         $('#basics').html('<br/>Invalid plist.')
     }
-    setupTypeahead();
 }
-
 
 function constructDetail() {
     if (js_obj != null) {
@@ -303,9 +286,7 @@ function constructDetail() {
     } else {
         $('#detail').html('<br/>Invalid plist.')
     }
-   setupTypeahead();
 }
-
 
 function updatePlist() {
     if (js_obj != null) {
@@ -316,22 +297,17 @@ function updatePlist() {
     }
 }
 
-
 function updatePlistAndBasics(data) {
     js_obj = data;
     showSaveOrCancelBtns();
     updatePlist();
-    setupTypeahead();
 }
-
 
 function updatePlistAndDetail(data) {
     js_obj = data;
     showSaveOrCancelBtns();
     updatePlist();
-    setupTypeahead();
 }
-
 
 function plistChanged() {
     showSaveOrCancelBtns();
@@ -346,7 +322,6 @@ function plistChanged() {
         js_obj = {};
     }
 }
-
 
 var current_pathname = "";
 var requested_pathname = "";
@@ -426,16 +401,13 @@ function discardChangesAndLoadNext() {
     getPkginfoItem(requested_pathname);
 }
 
-
 function saveChangesAndLoadNext() {
     savePkginfoItem();
     //$('#saveOrCancelConfirmationModal').modal('hide');
     $('.modal-backdrop').remove();
 }
 
-
 var js_obj = {};
-
 var selected_tab_viewname = "#basicstab";
 
 // these should be moved into their own file maybe so they can be edited
@@ -520,7 +492,6 @@ var keys_and_types = {'allow_untrusted': true,
                       'update_for': ['itemname'],
                       'version': '1.0'};
 
-
 var validator = function(path, val) {
     var path_items = path.split('.');
     if (path_items.indexOf('requires') != -1 ||
@@ -534,40 +505,6 @@ var validator = function(path, val) {
     return null;
 };
 
-
-function setupTypeahead() {
-    // typeahead/autocomplete for pkginfo keys
-    // suggest keys that are not already in use
-    if (js_obj == null) return;
-    var keys_in_use = Object.keys(js_obj),
-        suggested_keys = Object.keys(keys_and_types),
-        keys_to_suggest = suggested_keys.filter(function(value, index, arr){
-            return (keys_in_use.indexOf(value) == -1)
-        });
-    $('div.plist-editor input.property').typeahead({source: keys_to_suggest});
-    $('tr[data-path="catalogs"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidCatalogNames());
-        }
-    });
-    $('tr[data-path="requires"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidInstallItems());
-        }
-    });
-    $('tr[data-path="update_for"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidInstallItems());
-        }
-    });
-    $('tr[data-path="category"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getCategories());
-        }
-    });
-    $('tr[data-path="developer"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getDevelopers());
-        }
-    });
-}
-
-
 function getCategories() {
     var data = $('#data_storage').data('catalog_data');
     if (data) {
@@ -576,7 +513,6 @@ function getCategories() {
     return [];
 }
 
-
 function getDevelopers() {
     var data = $('#data_storage').data('catalog_data');
     if (data) {
@@ -584,7 +520,6 @@ function getDevelopers() {
     }
     return [];
 }
-
 
 function rebuildCatalogs() {
     $('#process_progress_title_text').text('Rebuilding catalogs...')
@@ -615,7 +550,6 @@ function monitor_pkgsinfo_list() {
             update_status('/pkgsinfo/__get_process_status');
         }, 1000);
 }
-
 
 function savePkginfoItem() {
     // save pkginfo item back to the repo
@@ -655,7 +589,6 @@ function savePkginfoItem() {
           },
     });
 }
-
 
 function showDeleteConfirmationModal() {
     var installer_item_path = $('#pathname').data('installer-item-path');
@@ -697,7 +630,6 @@ function showDeleteConfirmationModal() {
     $("#deleteConfirmationModal").modal("show");
 }
 
-
 function massEditCatalogs() {
     var pkginfo_list = get_checked_items();
     var catalogs_to_add = ($("#catalogs_to_add").val() || []);
@@ -733,7 +665,6 @@ function massEditCatalogs() {
     });
 }
 
-
 function deletePkginfoList() {
     var pkginfo_list = get_checked_items();
     var deletePkg = $('#mass_delete_pkg').is(':checked');
@@ -766,7 +697,6 @@ function deletePkginfoList() {
     });
 }
 
-
 function deleteInstallerItem(installer_item_path) {
     if (installer_item_path) {
         the_url = "/api/pkgs/" + installer_item_path
@@ -795,7 +725,6 @@ function deleteInstallerItem(installer_item_path) {
         });
     }
 }
-
 
 function deletePkginfoItem() {
     // do the actual pkginfo item deletion
