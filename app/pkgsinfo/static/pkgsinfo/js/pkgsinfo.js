@@ -2,7 +2,7 @@ function do_resize() {
     $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
     $('#plist').height($(window).height() - 310);
-    $('#item_list').height($(window).height() - 150);
+    //$('#list_items').height($(window).height() - 150);
 }
 $(window).resize(do_resize);
 
@@ -45,9 +45,9 @@ function select_catalog(name) {
 
 function update_catalog_dropdown_list() {
     var catalog_list = getValidCatalogNames();
-    var list_html = '<li><a href="#" onClick="select_catalog(\'all\')">all</a></li>\n';
+    var list_html = '<li><a class="dropdown-item" href="#" onClick="select_catalog(\'all\')">all</a></li>\n';
     for (var i=0; i < catalog_list.length; i++) {
-        list_html += '<li><a href="#" onClick="select_catalog(\''+ catalog_list[i] + '\')">' + catalog_list[i] + '</a></li>\n';
+        list_html += '<li><a class="dropdown-item" href="#" onClick="select_catalog(\''+ catalog_list[i] + '\')">' + catalog_list[i] + '</a></li>\n';
     }
     $('#catalog_dropdown_list').html(list_html);
 }
@@ -127,9 +127,9 @@ function get_checked_items() {
 
 var enableMassActionMenuItems = function() {
     if (get_checked_items().length == 0) {
-        $('#massaction_dropdown_list').children('li').addClass('disabled');
+        $('#massaction_dropdown_list').children('li').children('a').addClass('disabled');
     } else {
-        $('#massaction_dropdown_list').children('li').removeClass('disabled');
+        $('#massaction_dropdown_list').children('li').children('a').removeClass('disabled');
     }
 }
 

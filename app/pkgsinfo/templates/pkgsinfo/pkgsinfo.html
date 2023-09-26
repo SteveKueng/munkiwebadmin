@@ -20,44 +20,78 @@
 {% block content %}
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div id='item_list'>
-        <div class="form-inline">
-            <div class="form-group">
-              <div class="btn-group">
-                <button type="button" id="catalog_dropdown"
-                        class="btn btn-default dropdown-toggle" data-value="{{catalog}}" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                    {{catalog}} <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-info" id="catalog_dropdown_list">
-                    <li><a href="#">all</a></li>
-                </ul>
-              </div>
-              <div class="btn-group" role="group">
-                <button type="button" id="makecatalogs" class="btn btn-primary" onClick="rebuildCatalogs()">Makecatalogs</button>
-              </div>
-            </div>
-            <div class="form-group pull-right">
-              <div class="btn-group">
-                  <button type="button" id="massaction_dropdown"
-                          class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-cog" aria-hidden="true"></i> <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-right dropdown-info" id="massaction_dropdown_list">
-                      <li class="disabled"><a href="#" id="mass_delete">Delete items…</a></li>
-                      <li class="disabled"><a href="#" id="mass_edit_catalogs">Edit catalogs…</a></li>
-                  </ul>
-              </div>
-            </div>
+    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+      
+      <!--
+      <div class="form-group">
+        <div class="btn-group">
+          <button type="button" id="catalog_dropdown"
+                  class="btn btn-default dropdown-toggle" data-value="{{catalog}}" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+              {{catalog}} <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-info" id="catalog_dropdown_list">
+              <li><a href="#">all</a></li>
+          </ul>
         </div>
-        <table class="table table-striped table-bordered wraptext" id='list_items'>
-          <thead>
-            <tr><th>Name</th><th>Version</th></tr>
-          </thead>
-          <tbody>
-              <!-- table is filled via AJAX/JSON calls by DataTables -->
-          </tbody>
-        </table>
+        <div class="btn-group" role="group">
+          <button type="button" id="makecatalogs" class="btn btn-primary" onClick="rebuildCatalogs()">Makecatalogs</button>
+        </div>
+      </div>
+      <div class="form-group pull-right">
+        <div class="btn-group">
+            <button type="button" id="massaction_dropdown"
+                    class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-cog" aria-hidden="true"></i> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right dropdown-info" id="massaction_dropdown_list">
+                <li class="disabled"><a href="#" id="mass_delete">Delete items…</a></li>
+                <li class="disabled"><a href="#" id="mass_edit_catalogs">Edit catalogs…</a></li>
+            </ul>
+        </div>
+      </div> -->
+
+      <div class="btn-group" role="group" aria-label="First group">
+        <div class="btn-group" role="group">
+          <button type="button" id="catalog_dropdown" class="btn btn-secondary dropdown-toggle" data-value="{{catalog}}" data-bs-toggle="dropdown" aria-expanded="false">
+            {{catalog}}
+          </button>
+          <ul class="dropdown-menu" id="catalog_dropdown_list">
+            <li><a class="dropdown-item" href="#">all</a></li>
+          </ul>
+        </div>
+        <button type="button" id="makecatalogs" class="btn btn-primary" onClick="rebuildCatalogs()">Makecatalogs</button>
+      </div>
+      <div class="input-group">
+        <div class="btn-group" role="group">
+          <button type="button" id="massaction_dropdown" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+          </button>
+          <ul class="dropdown-menu" id="massaction_dropdown_list">
+            <li><a href="#" class="dropdown-item disabled" id="mass_delete">Delete items…</a></li>
+            <li><a href="#" class="dropdown-item disabled" id="mass_edit_catalogs">Edit catalogs…</a></li>
+          </ul>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div> <!-- /row -->
+
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div id='item_list'>
+      <table class="table table-striped table-bordered wraptext" id='list_items'>
+      <thead>
+        <tr><th>Name</th><th>Version</th></tr>
+      </thead>
+      <tbody>
+          <!-- table is filled via AJAX/JSON calls by DataTables -->
+      </tbody>
+    </table>
     </div>
   </div>
 </div>
