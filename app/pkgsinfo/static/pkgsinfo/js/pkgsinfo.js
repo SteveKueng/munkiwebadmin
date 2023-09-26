@@ -6,21 +6,6 @@ function do_resize() {
 }
 $(window).resize(do_resize);
 
-// reset url on modal close
-$(document).on('hide.bs.modal','#pkginfoItem', function () {
-  // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
-      ($('#pkginfoItem').data('bs.modal') || {})._isShown = false;
-      $("#saveOrCancelConfirmationModal").modal("show");
-      event.preventDefault();
-      return;
-  } else {
-    ($('#pkginfoItem').data('bs.modal') || {})._isShown = true;
-    window.location.hash = '';
-    current_pathname = "";
-  }
-});
-
 $(document).ready(function() {
     initPkginfoTable();
     hash = window.location.hash;
@@ -67,7 +52,6 @@ function update_catalog_dropdown_list() {
     $('#catalog_dropdown_list').html(list_html);
 }
 
-
 function update_catalog_edit_list() {
     var catalog_list = getValidCatalogNames();
     $('#catalogs_to_add').empty();
@@ -80,7 +64,6 @@ function update_catalog_edit_list() {
     $('#catalogs_to_add').trigger("chosen:updated");
     $('#catalogs_to_delete').trigger("chosen:updated");
 }
-
 
 function getValidCatalogNames() {
     // return a list of valid catalog names, which are the keys to the
@@ -247,9 +230,10 @@ function initPkginfoTable() {
 
 function cancelEdit() {
     hideSaveOrCancelBtns();
+    window.location.hash = '';
+    current_pathname = "";
     $("#pkginfoItem").modal("hide");
 }
-
 
 function setupView(viewName) {
     selected_tab_viewname = viewName;
@@ -401,12 +385,6 @@ function discardChangesAndLoadNext() {
     getPkginfoItem(requested_pathname);
 }
 
-function saveChangesAndLoadNext() {
-    savePkginfoItem();
-    //$('#saveOrCancelConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
-}
-
 var js_obj = {};
 var selected_tab_viewname = "#basicstab";
 
@@ -551,9 +529,8 @@ function monitor_pkgsinfo_list() {
         }, 1000);
 }
 
-function savePkginfoItem() {
+function savePkginfoItem(closeAfterSave=false) {
     // save pkginfo item back to the repo
-    //$('.modal-backdrop').remove();
     var plist_data = editor.getValue();
     var pkginfoItemURL = '/api/pkgsinfo/' + current_pathname;
     $.ajax({
@@ -567,9 +544,13 @@ function savePkginfoItem() {
         success: function(data) {
             hideSaveOrCancelBtns();
             rebuildCatalogs();
-            $("#pkginfoItem").modal("hide");
-            if (requested_pathname.length) {
-                getPkginfoItem(requested_pathname);
+            if (closeAfterSave == false) {
+                getPkginfoItem(current_pathname);
+                $('.modal-backdrop').remove();
+            } else {
+                $("#pkginfoItem").modal("hide");
+                current_pathname = "";
+                window.location.hash = '';
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -590,8 +571,8 @@ function savePkginfoItem() {
     });
 }
 
-function showDeleteConfirmationModal() {
-    var installer_item_path = $('#pathname').data('installer-item-path');
+function getPkgRefCount() {
+    var installer_item_path = $('#pkginfoItemLabel').data('installer-item-path');
     if (installer_item_path) {
         // we need to check to see how many pkginfo items reference this
         // installer item path; if more than one we should not offer to
@@ -627,7 +608,6 @@ function showDeleteConfirmationModal() {
         });
     }
     // show the deletion confirmation dialog
-    $("#deleteConfirmationModal").modal("show");
 }
 
 function massEditCatalogs() {

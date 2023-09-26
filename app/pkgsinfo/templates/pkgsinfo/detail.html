@@ -3,9 +3,9 @@
     <div class="modal-content">
       <div class="modal-header">
           <img src="{{ icon_url }}" class='pkginfo-icon pull-left' height='32' style="margin-top:3px; margin-right:10px;"/>
-          <h4 id='pathname' data-installer-item-path='{{ installer_item_path }}'>{{ pathname }}</h4>
+          <h1 class="modal-title fs-5" data-installer-item-path='{{ installer_item_path }}' id="pkginfoItemLabel">{{ pathname }}</h1>
           {% if perms.pkgsinfo.delete_pkginfofile %}
-          <button type="button" class="btn btn-danger pull-right" onClick="showDeleteConfirmationModal()">Delete</button>
+          <button type="button" class="btn btn-danger pull-right" onClick="getPkgRefCount()" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
           {% endif %}
       </div>
       <div role="tabpanel" class="modal-body" >
@@ -35,15 +35,15 @@
       <div class="modal-footer">
         {% if perms.pkgsinfo.change_pkginfofile %}
         <div class='pull-right d-none' id='save_and_cancel'>
-          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelEditConfirmationModal">Cancel</button>
-          <button type="button" class="btn btn-success" onClick="savePkginfoItem()">Save</button>
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelEditConfirmationModal">Cancel</button>
+          <button type="button" class="btn btn-primary" onClick="savePkginfoItem()">Save</button>
+          <button type="button" class="btn btn-primary" onClick="savePkginfoItem('true')">Save and close</button>
         </div>
         {% endif %}
         <div class='pull-right' id='cancel'>
-        {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
+          {% if not perms.pkgsinfo.change_pkginfofile %}<span class="bg-danger">You don't have permissions to make changes here.</span>{% endif %}
           <button type="button" class="btn btn-default" data-bs-dismiss="modal" onClick="cancelEdit()">Cancel</button>
         </div>
-
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -52,7 +52,7 @@
 <!--
 Bootstrap modal for confirming pkginfo deletion
 -->
-<div class="modal" id="deleteConfirmationModal" data-backdrop="false">
+<div class="modal" id="deleteConfirmationModal" data-bs-backdrop="static">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -64,7 +64,7 @@ Bootstrap modal for confirming pkginfo deletion
         <div id="deleteConfirmationModalInstallerItem" class='d-none'>
             <div class="checkbox pull-right">
                 <label>
-                    <input type="checkbox" id="delete_pkg">
+                    <input type="checkbox" id="delete_pkg" disabled>
                     Also delete installer item
                 </label>
             </div>
@@ -73,7 +73,7 @@ Bootstrap modal for confirming pkginfo deletion
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onClick="deletePkginfoItem()">Delete</button>
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default" data-bs-target="#pkginfoItem" data-bs-toggle="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -81,7 +81,7 @@ Bootstrap modal for confirming pkginfo deletion
 <!--
 Bootstrap modal for confirming canceling editing
 -->
-<div class="modal" id="cancelEditConfirmationModal" data-backdrop="false">
+<div class="modal" id="cancelEditConfirmationModal" data-bs-backdrop="static">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -92,7 +92,7 @@ Bootstrap modal for confirming canceling editing
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal"  onClick="cancelEdit()">Discard Changes</button>
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Continue Editing</button>
+        <button type="button" class="btn btn-default" data-bs-target="#pkginfoItem" data-bs-toggle="modal">Continue Editing</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -100,7 +100,7 @@ Bootstrap modal for confirming canceling editing
 <!--
 Bootstrap modal for saving or canceling when loading a different pkginfo
 -->
-<div class="modal" id="saveOrCancelConfirmationModal" data-backdrop="false">
+<div class="modal" id="saveOrCancelConfirmationModal" data-bs-backdrop="static">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
