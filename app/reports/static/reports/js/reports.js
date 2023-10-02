@@ -142,6 +142,7 @@ $(document).on('hide.bs.modal','#computerDetails', function () {
 });
 
 $(document).ready(function() {
+    getClientTable();
     hash = window.location.hash;
     if (hash.length > 1) {
         getComputerItem(hash.slice(1));
@@ -662,44 +663,63 @@ function getItemsToSave(listid) {
     return itemList
 }
 
-function getClientTable(filter) {
-    showProgressBar();
-    var reportItemURL = '/reports/?'+filter;
-    $.ajax({
-        xhr: function() {
-                var xhr = new window.XMLHttpRequest();
-                xhr.addEventListener("progress", function(e) {
-                    var pro = (e.loaded / e.total) * 100;
-                    $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
-                }, false);
-                return xhr;
-            },
-        method: 'GET',
-        url: reportItemURL,
-        cache: false,
-        success: function(data) {
-            $('#clienttable').html(data);
-            hideProgressBar();
+function getClientTable() {
+    $('#list_items').dataTable({
+        ajax: {
+            url: '/reports/_json',
+            dataSrc: '',
+            complete: function(jqXHR, textStatus){
+                $('#process_progress').modal('hide');
+              },
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#clienttable').html("");
-            $("#errorModalTitleText").text("computer list read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
-            hideProgressBar();
-        },
-        dataType: 'html'
+        columns: [
+            { data: 'img_url' },
+            { data: 'hostname' },
+            { data: 'serial_number' },
+            { data: 'username' },
+            { data: 'machine_model' },
+            { data: 'cpu_type' },
+            { data: 'os_version' }
+        ],
+        "sDom": "<t>",
+        "bPaginate": false,
+        //"scrollY": "100vh",
+        "bInfo": false,
+        "autoWidth": false,
+        "bFilter": true,
+        "bStateSave": false,
+        "aaSorting": [[0,'asc']],
+        "columnDefs": [
+            { "targets": 0,
+              "render": render_img,
+            }
+        ],
+        responsive: {
+            details: {
+                renderer: DataTable.Responsive.renderer.tableAll({
+                    tableClass: 'table'
+                })
+            }
+        }
     })
+    // tie our search field to the table
+    var thisTable = $('#list_items').DataTable(),
+        searchField = $('#listSearchField');
+    searchField.keyup(function(){
+        thisTable.search($(this).val()).draw();
+    });
+     
+    let table = new DataTable('#list_items');
+    table.on('click', 'tbody tr', function () {
+        let data = table.row(this).data();
+        var url = window.location.href;
+        window.location.href = url + '#' + data['serial_number'];
+    });
+
+}
+
+var render_img = function(data, type, full, meta) {
+    return '<img src="' + data + '" width="40"></img>';
 }
 
 function addDeleteButton(id) {

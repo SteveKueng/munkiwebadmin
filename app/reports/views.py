@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
-from django.http import Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.db.models import Count
@@ -172,66 +171,6 @@ def index(request, computer_serial=None):
                                 'exception_type': 'MethodNotSupported',
                                 'detail': 'POST/PUT/DELETE should use the API'}),
                     content_type='application/json', status=404)
-
-        # return list of available computers
-        LOGGER.debug("Got index request for computers")
-
-        show = request.GET.get('show', None)
-        hardware = request.GET.get('hardware', None)
-        os_version = request.GET.get('os_version', None)
-        model = request.GET.get('model', None)
-
-        reports = Machine.objects.all()
-
-        if show is not None:
-            now = timezone.now()
-            hour_ago = now - timedelta(hours=1)
-            today = now.date()
-            tomorrow = today + timedelta(days=1)
-            week_ago = today - timedelta(days=7)
-            month_ago = today - timedelta(days=30)
-            three_months_ago = today - timedelta(days=90)
-
-            if show == 'errors':
-                reports = reports.filter(munkireport__errors__gt=0)
-            elif show == 'warnings':
-                reports = reports.filter(munkireport__warnings__gt=0)
-            elif show == 'activity':
-                reports = reports.filter(munkireport__activity__isnull=False)
-            elif show == 'hour':
-                reports = reports.filter(munkireport__timestamp__gte=hour_ago)
-            elif show == 'today':
-                reports = reports.filter(munkireport__timestamp__gte=today)
-            elif show == 'week':
-                reports = reports.filter(munkireport__timestamp__gte=week_ago)
-            elif show == 'month':
-                reports = reports.filter(munkireport__timestamp__gte=month_ago)
-            elif show == 'notweek':
-                reports = reports.filter(munkireport__timestamp__range=(month_ago, week_ago))
-            elif show == 'notmonth':
-                reports = reports.filter(munkireport__timestamp__range=(three_months_ago, month_ago))
-            elif show == 'notquarter':
-                reports = reports.exclude(munkireport__timestamp__gte=three_months_ago)
-            elif show == 'inprogress':
-                reports = reports.filter(current_status="in_progress")
-
-        if hardware:
-            if hardware == 'macbook':
-                reports = reports.filter(machine_model__startswith="MacBook")
-            elif hardware == 'mac':
-                reports = reports.exclude(machine_model__startswith="MacBook")
-                reports = reports.exclude(machine_model__startswith="VMware")
-            elif hardware == 'vm':
-                reports = reports.filter(machine_model__startswith="VMware")
-
-        if os_version:
-            reports = reports.filter(os_version__exact=os_version)
-
-        if model:
-            reports = reports.filter(machine_model__exact=model)
-        
-        context = {'reports': reports,}
-        return render(request, 'reports/clienttable.html', context=context)
     
     # no ajax
     context = {'filterDevices': request.GET.urlencode(),
@@ -287,6 +226,14 @@ def dashboard(request):
                 'page': 'dashboard'}
 
     return render(request, 'reports/dashboard.html', context=context)
+
+@login_required
+def getjson(request):
+    """ returns json list of machines """
+    LOGGER.debug("Got json request for machines")
+    machines = Machine.objects.all()
+    return HttpResponse(json.dumps(list(machines.values())),
+                            content_type='application/json')
 
 @login_required
 def getManifest(request, manifest_path):
