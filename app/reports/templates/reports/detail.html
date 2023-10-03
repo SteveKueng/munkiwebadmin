@@ -5,7 +5,6 @@
 	<div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-xl-down">
 		<div class="modal-content">
 			<div class="modal-header {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<div class="col-sm-3 text-center machineIcon">
 					<img id="iconDetail" src='{{ machine.img_url }}' alt="" width="100" />
 					{% if perms.reports.delete_machine and perms.manifests.delete_manifests %}
@@ -30,7 +29,7 @@
 				</div>
 				{% endif %}
 			</div>
-			<div role="tabpanel" class="modal-body">
+			<div class="modal-body">
 				<!-- Nav tabs -->
 				<ul id="clientTab" class="nav nav-pills mb-3 {% if report_plist.Errors %}client-error{% elif report_plist.Warnings %}client-warning{% endif %}" role="tablist">
 					<li class="nav-item" role="presentation">
@@ -52,8 +51,8 @@
 					{% endif %}
 				</ul>
 				<div class="tab-content" id="detail_content" >
-					<div class="tab-pane fade show tabDetail active" id="softwaretab-pane" role="tabpanel" aria-labelledby="softwaretab" tabindex="0">
-						<input class="hidden" id="manifestName" value="{% if defaultManifest == 'hostname' %}{{machine.hostname}}{% else %}{{ machine.serial_number }}{% endif %}"/>
+					<div class="tab-pane  show tabDetail active" id="softwaretab-pane" role="tabpanel" aria-labelledby="softwaretab" tabindex="0">
+						<input class="d-none" id="manifestName" value="{% if defaultManifest == 'hostname' %}{{machine.hostname}}{% else %}{{ machine.serial_number }}{% endif %}"/>
 						<div class="panel-body" id="SoftwareView">
 							<!-- Manifests / Catalog -->
 							<div class="row" id="manifestTop">
@@ -110,7 +109,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane fade show tabDetail" id="appleupdatestab-pane" role="tabpanel" aria-labelledby="appleupdatestab" tabindex="0">
+					<div class="tab-pane  show tabDetail" id="appleupdatestab-pane" role="tabpanel" aria-labelledby="appleupdatestab" tabindex="0">
 						<div class="panel-body">
 							{% if report_plist.MachineInfo.SystemProfile.0.SPInstallHistoryDataType %}
 							<table class="table table-striped">
@@ -132,7 +131,7 @@
 							{% endif %}
 						</div>
 					</div>
-					<div class="tab-pane fade show tabDetail" id="systemtab-pane" role="tabpanel" aria-labelledby="systemtab" tabindex="0">
+					<div class="tab-pane  show tabDetail" id="systemtab-pane" role="tabpanel" aria-labelledby="systemtab" tabindex="0">
 						<div class="panel-body">
 							{% if report_plist.Errors %}
 							<h4>Errors</h4>
@@ -166,7 +165,7 @@
 										<li class="list-group-item d-flex justify-content-between align-items-center">
 										  	OS Version
 											<span class="badge bg-primary rounded-pill">
-												{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }} <i id="osversion" class="fas fa-info-circle" type="button" data-toggle="popover" data-container="body" data-placement="top" data-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i>
+												{{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.os_version }} <i id="osversion" class="fas fa-info-circle" type="button" data-bs-toggle="popover" data-bs-container="body" data-bs-placement="top" data-bs-content="Kernel-Version: {{ report_plist.MachineInfo.SystemProfile.0.SPSoftwareDataType.0.kernel_version }}" aria-hidden="true"></i>
 											</span>
 										</li>
 										<li class="list-group-item d-flex justify-content-between align-items-center">
@@ -190,18 +189,50 @@
 										</li>
 										{% endif %}
 									  </ul>
-										<script>
-											$('#osversion').popover();
-										</script>
+									<script>
+										$('#osversion').popover();
+									</script>
 								</div>
 								<div class="col-lg-6">
 									<ul class="list-group">
-										<li class="list-group-item"><b>Hardware Type:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}</span></li>
-										<li class="list-group-item"><b>Serial:</b><span class="pull-right"><button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard('{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}');"><i class="fas fa-copy"></i></button> {{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}</span></li>
-										<li class="list-group-item"><b>Processor:</b><span class="pull-right">{{ machine.cpu_type }}</span></li>
-										<li class="list-group-item"><b>Physical Memory:</b><span class="pull-right">{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}</span></li>
-										<li class="list-group-item"><b>Last Munki run:</b><span class="pull-right">{{ report_plist.EndTime }}</span></li>
-										<li class="list-group-item"><b>Runtype:</b><span class="pull-right">{{ report_plist.RunType }}</span></li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Hardware Type
+											<span class="badge bg-primary rounded-pill">
+												{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.machine_model }}
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Serial
+											<button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard('{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }}');"><i class="fas fa-copy"></i></button>
+											<span class="badge bg-primary rounded-pill">
+												{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.serial_number }} 
+											</span>
+
+										</li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Processor
+											<span class="badge bg-primary rounded-pill">
+												{{ machine.cpu_type }}
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Physical Memory
+											<span class="badge bg-primary rounded-pill">
+												{{ report_plist.MachineInfo.SystemProfile.0.SPHardwareDataType.0.physical_memory }}
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Last Munki run
+											<span class="badge bg-primary rounded-pill">
+												{{ report_plist.EndTime }}
+											</span>
+										</li>
+										<li class="list-group-item d-flex justify-content-between align-items-center">
+											Runtype
+											<span class="badge bg-primary rounded-pill">
+												{{ report_plist.RunType }}
+											</span>
+										</li>
 									</ul>
 								</div>
 							</div>
@@ -443,17 +474,16 @@
 							{% endif %}
 						</div>
 					</div>
-					<div class="tab-pane fade show tabDetail" id="inverntorytab-pane" role="tabpanel" aria-labelledby="inverntorytab" tabindex="0">
+					<div class="tab-pane  show tabDetail" id="inverntorytab-pane" role="tabpanel" aria-labelledby="inverntorytab" tabindex="0">
 						<div class="panel-body">
 							<div class="row">
 								<div class="col-md-12" id="InventoryItems">
-									
 								</div>
 							</div>
 						</div>
 					</div>
 					{% if perms.vault.view_passwordAccess %}
-					<div class="tab-pane fade show tabDetail" id="admintab-pane" role="tabpanel" aria-labelledby="admintab" tabindex="0">
+					<div class="tab-pane  show tabDetail" id="admintab-pane" role="tabpanel" aria-labelledby="admintab" tabindex="0">
 						<div class="panel-body">
 							<div class="row">
 								<div class='col-md-12' id="showPass">
@@ -497,7 +527,7 @@
 				</div>
 			</div>	
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-default" data-bs-dismiss="modal" onclick="cancelEdit()">Cancel</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
@@ -508,7 +538,7 @@
 <!--
 Bootstrap modal for confirming manifest deletion
 -->
-<div class="modal fade" id="deleteConfirmationModal" data-backdrop="false">
+<div class="modal" id="deleteConfirmationModal" data-bs-backdrop="static">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -520,8 +550,8 @@ Bootstrap modal for confirming manifest deletion
 				<br>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal"  onClick="deleteMachineAndManifest()">Delete</button>
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal"  onClick="deleteMachineAndManifest()">Delete</button>
+				<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
@@ -530,7 +560,7 @@ Bootstrap modal for confirming manifest deletion
 <!--
 Bootstrap modal for confirming actions
 -->
-<div class="modal fade" id="confirmationModal" data-backdrop="false">
+<div class="modal" id="confirmationModal" data-bs-backdrop="static">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -541,8 +571,8 @@ Bootstrap modal for confirming actions
 				</div>
 				<div class="modal-body"></div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-dismiss="modal" id="confirmYes">OK</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmYes">OK</button>
+					<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
@@ -551,7 +581,7 @@ Bootstrap modal for confirming actions
 <!--
 Bootstrap modal for showing process progress
 -->
-<div class="modal fade" data-backdrop="false" id="process_progress">
+<div class="modal" data-bs-backdrop="static" id="process_progress">
 	<div class="modal-dialog">
 	  <div class="modal-content">
 		<div class="modal-header">
