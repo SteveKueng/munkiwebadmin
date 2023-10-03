@@ -25,3 +25,9 @@
     font-family: Courier, monospace;
     font-size: 12px;
 }
+
+.form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 2px;
+}

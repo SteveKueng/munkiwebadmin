@@ -163,18 +163,16 @@ var openMassEditModal = function() {
 }
 
 var render_versions = function(data, type, row, meta) {
-    var html = '<div class="list-group" style="margin-bottom: 0px;">\n';
+    var html = '<li class="list-group" style="margin-bottom: 0px;">\n';
     var catalog_filter = $('#catalog_dropdown').data('value');
     for(var i = 0; i < data.length; i++) {
         if (catalog_filter == 'all' || data[i][1].indexOf(catalog_filter) != -1) {
             html += '<a href="#' + data[i][2] + '" class="pkginfo_items list-group-item" data-path=\'' + data[i][2] + '\'>';
-            //html += '" onClick="getPkginfoItem(\'' + data[i][2] + '\')">';
-            html += '<input type="checkbox" class="pull-right"/>\n';
+            html += '<input type="checkbox" class="form-check-input me-2"/>\n';
             html += data[i][0] + '</a>';
-
         }
     }
-    html += '</div>\n';
+    html += '</li>\n';
     return html
 }
 
