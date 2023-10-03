@@ -90,8 +90,11 @@ sidebarToggle.addEventListener('click', function() {
     document.querySelector("#sidebar").classList.toggle('collapsed');
 });
 
-$(window).on('resize', function() {
+$(window).on('load', function() {
     if($(window).width() < 768) {
         $('#sidebar').addClass('collapsed');
+    }
+    if($(window).width() >= 768) {
+        $('#sidebar').removeClass('collapsed');
     }
 })
