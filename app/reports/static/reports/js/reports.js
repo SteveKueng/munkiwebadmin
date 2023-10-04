@@ -229,7 +229,7 @@ function createListElements(elements, listid) {
     $.each(elements, function( index, value ) {
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control "+listid+"' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item "+listid+"' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
     $( "."+listid+"" ).focus()
 }
 
@@ -419,13 +419,14 @@ function saveManifest(manifest, listid) {
 // edit software
 function loopSoftwareElements(elements, listid, require_update) {
     var match = listid.match("remote");
-    if(!match) {
-        $( "#"+listid ).append("<input type='text' class='list-group-item form-control software' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
-        $( "#"+listid+" .software" ).focus()
-    }
     $.each(elements, function( index, value ) {
         createSoftwareElement(value, listid, require_update);
     });
+    if(!match) {
+        $( "#"+listid ).append("<input type='text' class='list-group-item software' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+        $( "#"+listid+" .software" ).focus()
+    }
+    
 }
 
 var softwareElementCount = 0

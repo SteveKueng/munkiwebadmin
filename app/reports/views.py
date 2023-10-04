@@ -260,29 +260,31 @@ def createRequired(request):
     requiredDict = dict()
     for software in softwareList:
         software = softwareList[software]
-        if software.name in requiredDict:
-            requiredDict[software.name]['version'] = software.version
+        if software["name"] in requiredDict:
+            requiredDict[software["name"]]['version'] = software.get('version')
         else:
-            requiredDict[software.name] = {'version': software.version}
+            requiredDict[software["name"]] = {'version': software.get('version')}
         if "icon" in software:
-            requiredDict[software.name]['icon'] = ICONS_URL + "/" + software.icon
+            requiredDict[software["name"]]['icon'] = ICONS_URL + "/" + software.icon
         else:
-            requiredDict[software.name]['icon'] = ICONS_URL + "/" + software.name + ".png"
+            requiredDict[software["name"]]['icon'] = ICONS_URL + "/" + software["name"] + ".png"
         if "display_name" in software:
-            requiredDict[software.name]['display_name'] = software.display_name
+            requiredDict[software["name"]]['display_name'] = software.get('display_name')
+        else:
+            requiredDict[software["name"]]['display_name'] = software.get('name')
         # if software has requres add them to requiredDict
         if "requires" in software:
-            requiredDict[software.name]['requires'] = software.requires
+            requiredDict[software["name"]]['requires'] = software.get('requires')
         # if software has update for, add it to the right software in requiredDict
         if "update_for" in software:
-            for update in software.update_for:
+            for update in software.get('update_for'):
                 if update in requiredDict:
                     if "updates" in requiredDict[update]:
-                        requiredDict[update]["updates"].append(software.name)
+                        requiredDict[update]["updates"].append(software["name"])
                     else:
-                        requiredDict[update]["updates"] = [software.name]
+                        requiredDict[update]["updates"] = [software["name"]]
                 else:
-                    requiredDict[update] = {'updates':[software.name]}
+                    requiredDict[update] = {'updates':[software["name"]]}
     return HttpResponse(json.dumps(requiredDict),
                         content_type='application/json')
 
@@ -413,11 +415,11 @@ def getSoftwareList(catalogs):
         catalog_items = Catalog.detail(catalog)
         if catalog_items:
             for item in catalog_items:
-                if item.name in swDict:
-                    if item.version > swDict[item.name].version and catalog in swDict[item.name].catalogs:
-                        swDict[item.name] = item
+                if item.get('name', None) and item['name'] in swDict:
+                    if item.version > swDict[item['name'] ].version and catalog in swDict[item['name']].catalogs:
+                        swDict[item['name']] = item
                 else:
-                    swDict[item.name] = item
+                    swDict[item['name'] ] = item
     return swDict
 
 def downloadMunkiScripts(request):
