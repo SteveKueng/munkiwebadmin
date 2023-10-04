@@ -1,91 +1,106 @@
-{% load mwa_extras %}
-{% load static %}
 {% if user.is_authenticated %}
-<meta http-equiv="refresh" content="1; url={% url 'dashboard' %}">
+  <meta http-equiv="refresh" content="1; url={% url 'dashboard' %}">
 {% else %}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Steve Küng">
+<html lang="en" data-bs-theme="auto">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Steve Küng">
 
-    <title>{{ APPNAME }}</title>
+        <title>{{ APPNAME }}</title>
 
-    {% load static %}
-    <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.min.css' type="text/css" media="all" />
+        {% load static %}
+        <!-- Bootstrap Core CSS -->
+        <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.css' type="text/css" media="all" />
 
-    <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
+        <!-- Custom Fonts -->
+        <link href="{% get_static_prefix %}fonts/fontawesome/css/all.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href='{% get_static_prefix %}css/jqueryui/jquery-ui.min.css' type="text/css" media="all" />
 
-    <!-- jQuery -->
-    <script type='text/javascript' src="{% get_static_prefix %}js/jquery.min.js"></script>
+        <!-- custom CSS -->
+        <link rel="stylesheet" href='{% get_static_prefix %}css/munkiwebadmin.css' type="text/css" media="all" />
+        <style>
+          html,
+          body {
+            height: 100%;
+          }
+          
+          body {
+            display: -ms-flexbox;
+            display: -webkit-box;
+            display: flex;
+            -ms-flex-align: center;
+            -ms-flex-pack: center;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            padding-top: 0px;
+            padding-bottom: 40px;
+          }
+          
+          .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+          }
+          
+          .form-signin .checkbox {
+            font-weight: 400;
+          }
+          
+          .form-signin .form-control {
+            position: relative;
+            box-sizing: border-box;
+            height: auto;
+            padding: 10px;
+            font-size: 16px;
+          }
+          
+          .form-signin .form-control:focus {
+            z-index: 2;
+          }
+          
+          .form-signin input[type="username"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+          }
+          
+          .form-signin input[type="password"] {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+          }
 
-    <!-- Bootstrap Core JavaScript -->
-    <script type='text/javascript' src="{% get_static_prefix %}js/bootstrap.min.js"></script>
-    <script type='text/javascript' src='{% get_static_prefix %}js/typeahead/bootstrap3-typeahead.min.js'></script>
-
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-
-      .col-centered{
-        float: none;
-        margin: 0 auto;
-      }
-
-      body {
-        padding-top: 130px;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-        body {
-          padding-left: 0px;
-        }
-      }
-    </style>
+          .errorlist {
+            list-style-type: none;
+            padding-inline-start: 0;
+            margin-bottom: 0;
+          }
+          </style>
     <link rel="icon" href="{% get_static_prefix %}img/favicon.ico" sizes="16x16 32x32 64x64" type="image/vnd.microsoft.icon">
   </head>
   <body class="text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 col-centered">
-    <form method="post" action="{% url "login" %}">
+    <form class="form-signin" method="POST" action="{% url 'login' %}">
+      <img class="mb-4" src="{% get_static_prefix %}img/logo.png" alt="" height="64">
+      <h1 class="h3 mb-3 font-weight-normal">{{ APPNAME }}</h1>
       {% csrf_token %}
-      <img class="mb-4" src="{% get_static_prefix %}img/logo.png" alt="" height="72">
-      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      
       {% if form.errors %}
-            <div class="alert alert-danger" role="alert">
-                Your username and password didn't match. Please try again.
-            </div>
-        {% endif %}
-      <input type="hidden" name="next" value="{{ next }}">
-      <label for="inputEmail" class="sr-only">Username</label>
-      {{ form.username|addcss:'form-control' }}
-      <label for="inputPassword" class="sr-only">Password</label>
-      {{ form.password|addcss:'form-control' }}
-      <script type="text/javascript" >
-        $(document).ready(function(){
-            $("#id_username").attr('placeholder', '{{form.username.label}}');
-            $("#id_password").attr('placeholder', '{{form.password.label}}');
-        });
-      </script>
-      <input type="submit" class="btn btn-primary btn-block" value="Log in" /> 
+        <div class="alert alert-warning" role="alert">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <input id="username" name="username" class="form-control" placeholder="Username" required="" autofocus="" type="username">
+      <input id="password" name="password" class="form-control" placeholder="Password" required="" type="password">
+      <button class="btn btn-primary w-100" type="submit">Sign in</button>
     </form>
-  </div>
-</div>
-  </div>
   </body>
+  <script type="module" src="{% get_static_prefix %}js/color-modes.js"></script>
 </html>
 {% endif %}

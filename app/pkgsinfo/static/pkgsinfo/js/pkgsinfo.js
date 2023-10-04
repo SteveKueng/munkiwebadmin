@@ -1,28 +1,10 @@
 function do_resize() {
     $('#item_editor').height($(window).height() - 270);
     //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 300);
-    $('#item_list').height($(window).height() - 90);
-    $('.dataTables_scrollBody').height($(window).height() - 170);
-    //$('.modal-body').height($(window).height() - 270);
+    $('#plist').height($(window).height() - 310);
+    //$('#list_items').height($(window).height() - 150);
 }
-
 $(window).resize(do_resize);
-
-// reset url on modal close
-$(document).on('hide.bs.modal','#pkginfoItem', function () {
-  // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#pkginfoItem').data('bs.modal').isShown = false;
-      $("#saveOrCancelConfirmationModal").modal("show");
-      event.preventDefault();
-      return;
-  } else {
-    $('#pkginfoItem').data('bs.modal').isShown = true;
-    window.location.hash = '';
-    current_pathname = "";
-  }
-});
 
 $(document).ready(function() {
     initPkginfoTable();
@@ -53,7 +35,6 @@ $(document).ready(function() {
     });
 } );
 
-
 function select_catalog(name) {
     $('#catalog_dropdown').html(name + ' <span class="caret"></span>');
     $('#catalog_dropdown').data('value', name);
@@ -62,16 +43,14 @@ function select_catalog(name) {
     dt.draw();
 }
 
-
 function update_catalog_dropdown_list() {
     var catalog_list = getValidCatalogNames();
-    var list_html = '<li><a href="#" onClick="select_catalog(\'all\')">all</a></li>\n';
+    var list_html = '<li><a class="dropdown-item" href="#" onClick="select_catalog(\'all\')">all</a></li>\n';
     for (var i=0; i < catalog_list.length; i++) {
-        list_html += '<li><a href="#" onClick="select_catalog(\''+ catalog_list[i] + '\')">' + catalog_list[i] + '</a></li>\n';
+        list_html += '<li><a class="dropdown-item" href="#" onClick="select_catalog(\''+ catalog_list[i] + '\')">' + catalog_list[i] + '</a></li>\n';
     }
     $('#catalog_dropdown_list').html(list_html);
 }
-
 
 function update_catalog_edit_list() {
     var catalog_list = getValidCatalogNames();
@@ -85,7 +64,6 @@ function update_catalog_edit_list() {
     $('#catalogs_to_add').trigger("chosen:updated");
     $('#catalogs_to_delete').trigger("chosen:updated");
 }
-
 
 function getValidCatalogNames() {
     // return a list of valid catalog names, which are the keys to the
@@ -120,7 +98,6 @@ function getValidInstallItems() {
     }
 }
 
-
 $.fn.dataTable.ext.search.push(
     function( settings, searchData, index, rowData, counter ) {
         // custom search filter to filter out rows that have no versions
@@ -138,7 +115,6 @@ $.fn.dataTable.ext.search.push(
     }
 );
 
-
 function get_checked_items() {
     var selected_items = [];
     $('.pkginfo_items').each(function(){
@@ -149,15 +125,13 @@ function get_checked_items() {
     return selected_items;
 }
 
-
 var enableMassActionMenuItems = function() {
     if (get_checked_items().length == 0) {
-        $('#massaction_dropdown_list').children('li').addClass('disabled');
+        $('#massaction_dropdown_list').children('li').children('a').addClass('disabled');
     } else {
-        $('#massaction_dropdown_list').children('li').removeClass('disabled');
+        $('#massaction_dropdown_list').children('li').children('a').removeClass('disabled');
     }
 }
-
 
 var confirmMassDelete = function() {
     var selected_items = get_checked_items()
@@ -172,7 +146,6 @@ var confirmMassDelete = function() {
         $("#massDeleteConfirmationModal").modal("show");
     }
 }
-
 
 var openMassEditModal = function() {
     var selected_items = get_checked_items()
@@ -189,30 +162,25 @@ var openMassEditModal = function() {
     }
 }
 
-
 var render_versions = function(data, type, row, meta) {
-    var html = '<div class="list-group" style="margin-bottom: 0px;">\n';
+    var html = '<li class="list-group" style="margin-bottom: 0px;">\n';
     var catalog_filter = $('#catalog_dropdown').data('value');
     for(var i = 0; i < data.length; i++) {
         if (catalog_filter == 'all' || data[i][1].indexOf(catalog_filter) != -1) {
             html += '<a href="#' + data[i][2] + '" class="pkginfo_items list-group-item" data-path=\'' + data[i][2] + '\'>';
-            //html += '" onClick="getPkginfoItem(\'' + data[i][2] + '\')">';
-            html += '<input type="checkbox" class="pull-right"/>\n';
+            html += '<input type="checkbox" class="form-check-input me-2"/>\n';
             html += data[i][0] + '</a>';
-
         }
     }
-    html += '</div>\n';
+    html += '</li>\n';
     return html
 }
-
 
 var render_name = function(data, type, row, meta) {
     data = data.replace(".", "<wbr/>.");
     data = data.replace("_", "<wbr/>_");
     return data;
 }
-
 
 function initPkginfoTable() {
     $('#list_items').dataTable({
@@ -258,15 +226,12 @@ function initPkginfoTable() {
      //searchField.trigger('keyup');
 }
 
-
 function cancelEdit() {
-    //$('#cancelEditConfirmationModal').modal('hide');
     hideSaveOrCancelBtns();
+    window.location.hash = '';
+    current_pathname = "";
     $("#pkginfoItem").modal("hide");
-    //$('.modal-backdrop').remove();
-    //getPkginfoItem(current_pathname);
 }
-
 
 function setupView(viewName) {
     selected_tab_viewname = viewName;
@@ -291,9 +256,7 @@ function constructBasics() {
     } else {
         $('#basics').html('<br/>Invalid plist.')
     }
-    setupTypeahead();
 }
-
 
 function constructDetail() {
     if (js_obj != null) {
@@ -305,9 +268,7 @@ function constructDetail() {
     } else {
         $('#detail').html('<br/>Invalid plist.')
     }
-   setupTypeahead();
 }
-
 
 function updatePlist() {
     if (js_obj != null) {
@@ -318,22 +279,17 @@ function updatePlist() {
     }
 }
 
-
 function updatePlistAndBasics(data) {
     js_obj = data;
     showSaveOrCancelBtns();
     updatePlist();
-    setupTypeahead();
 }
-
 
 function updatePlistAndDetail(data) {
     js_obj = data;
     showSaveOrCancelBtns();
     updatePlist();
-    setupTypeahead();
 }
-
 
 function plistChanged() {
     showSaveOrCancelBtns();
@@ -349,14 +305,13 @@ function plistChanged() {
     }
 }
 
-
 var current_pathname = "";
 var requested_pathname = "";
 var editor = null;
 
 function getPkginfoItem(pathname) {
     //event.preventDefault();
-    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
+    if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('d-none')) {
         /*if (! confirm('Discard current changes?')) {
             event.preventDefault();
             return;
@@ -380,10 +335,10 @@ function getPkginfoItem(pathname) {
                 //alert('Error in parsing plist. ' + e);
                 js_obj = null;
             }
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('button[data-bs-toggle="tab"]').on('click', function (e) {
                 //e.target // newly activated tab
                 //e.relatedTarget // previous active tab
-                setupView(e.target.hash);
+                setupView('#'+e.target.id);
             })
             editor = initializeAceEditor('plist', plistChanged);
             hideSaveOrCancelBtns();
@@ -428,16 +383,7 @@ function discardChangesAndLoadNext() {
     getPkginfoItem(requested_pathname);
 }
 
-
-function saveChangesAndLoadNext() {
-    savePkginfoItem();
-    //$('#saveOrCancelConfirmationModal').modal('hide');
-    $('.modal-backdrop').remove();
-}
-
-
 var js_obj = {};
-
 var selected_tab_viewname = "#basicstab";
 
 // these should be moved into their own file maybe so they can be edited
@@ -522,7 +468,6 @@ var keys_and_types = {'allow_untrusted': true,
                       'update_for': ['itemname'],
                       'version': '1.0'};
 
-
 var validator = function(path, val) {
     var path_items = path.split('.');
     if (path_items.indexOf('requires') != -1 ||
@@ -536,40 +481,6 @@ var validator = function(path, val) {
     return null;
 };
 
-
-function setupTypeahead() {
-    // typeahead/autocomplete for pkginfo keys
-    // suggest keys that are not already in use
-    if (js_obj == null) return;
-    var keys_in_use = Object.keys(js_obj),
-        suggested_keys = Object.keys(keys_and_types),
-        keys_to_suggest = suggested_keys.filter(function(value, index, arr){
-            return (keys_in_use.indexOf(value) == -1)
-        });
-    $('div.plist-editor input.property').typeahead({source: keys_to_suggest});
-    $('tr[data-path="catalogs"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidCatalogNames());
-        }
-    });
-    $('tr[data-path="requires"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidInstallItems());
-        }
-    });
-    $('tr[data-path="update_for"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getValidInstallItems());
-        }
-    });
-    $('tr[data-path="category"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getCategories());
-        }
-    });
-    $('tr[data-path="developer"] textarea.value.form-control').typeahead({source: function(query, process) {
-            return process(getDevelopers());
-        }
-    });
-}
-
-
 function getCategories() {
     var data = $('#data_storage').data('catalog_data');
     if (data) {
@@ -578,7 +489,6 @@ function getCategories() {
     return [];
 }
 
-
 function getDevelopers() {
     var data = $('#data_storage').data('catalog_data');
     if (data) {
@@ -586,7 +496,6 @@ function getDevelopers() {
     }
     return [];
 }
-
 
 function rebuildCatalogs() {
     $('#process_progress_title_text').text('Rebuilding catalogs...')
@@ -601,7 +510,7 @@ function rebuildCatalogs() {
         data: '',
         dataType: 'json',
         global: false,
-        complete: function(jqXHR, textStatus){
+        complete: function(jqXHR, textStatus) {
             window.clearInterval(poll_loop);
             $('#process_progress').modal('hide');
             $('#list_items').DataTable().ajax.reload();
@@ -618,10 +527,8 @@ function monitor_pkgsinfo_list() {
         }, 1000);
 }
 
-
-function savePkginfoItem() {
+function savePkginfoItem(closeAfterSave=false) {
     // save pkginfo item back to the repo
-    //$('.modal-backdrop').remove();
     var plist_data = editor.getValue();
     var pkginfoItemURL = '/api/pkgsinfo/' + current_pathname;
     $.ajax({
@@ -635,9 +542,13 @@ function savePkginfoItem() {
         success: function(data) {
             hideSaveOrCancelBtns();
             rebuildCatalogs();
-            $("#pkginfoItem").modal("hide");
-            if (requested_pathname.length) {
-                getPkginfoItem(requested_pathname);
+            if (closeAfterSave == false) {
+                getPkginfoItem(current_pathname);
+                $('.modal-backdrop').remove();
+            } else {
+                $("#pkginfoItem").modal("hide");
+                current_pathname = "";
+                window.location.hash = '';
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -658,9 +569,8 @@ function savePkginfoItem() {
     });
 }
 
-
-function showDeleteConfirmationModal() {
-    var installer_item_path = $('#pathname').data('installer-item-path');
+function getPkgRefCount() {
+    var installer_item_path = $('#pkginfoItemLabel').data('installer-item-path');
     if (installer_item_path) {
         // we need to check to see how many pkginfo items reference this
         // installer item path; if more than one we should not offer to
@@ -671,7 +581,7 @@ function showDeleteConfirmationModal() {
         //  doesn't have an associated installer_item, like
         //  apple_update_metadata or nopkg items)
         // TO-DO: offer to remove associated uninstaller items
-        $('#deleteConfirmationModalInstallerItem').removeClass('hidden');
+        $('#deleteConfirmationModalInstallerItem').removeClass('d-none');
         $('#delete_pkg').attr('disabled', true);
         // ask the server for the count of references for the installer item
         $.ajax({
@@ -685,7 +595,7 @@ function showDeleteConfirmationModal() {
                     $('#delete_pkg').removeAttr("disabled");
                 } else {
                     // multiple references! hide the checkbox
-                    $('#deleteConfirmationModalInstallerItem').addClass('hidden');
+                    $('#deleteConfirmationModalInstallerItem').addClass('d-none');
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -696,9 +606,7 @@ function showDeleteConfirmationModal() {
         });
     }
     // show the deletion confirmation dialog
-    $("#deleteConfirmationModal").modal("show");
 }
-
 
 function massEditCatalogs() {
     var pkginfo_list = get_checked_items();
@@ -735,7 +643,6 @@ function massEditCatalogs() {
     });
 }
 
-
 function deletePkginfoList() {
     var pkginfo_list = get_checked_items();
     var deletePkg = $('#mass_delete_pkg').is(':checked');
@@ -768,7 +675,6 @@ function deletePkginfoList() {
     });
 }
 
-
 function deleteInstallerItem(installer_item_path) {
     if (installer_item_path) {
         the_url = "/api/pkgs/" + installer_item_path
@@ -797,7 +703,6 @@ function deleteInstallerItem(installer_item_path) {
         });
     }
 }
-
 
 function deletePkginfoItem() {
     // do the actual pkginfo item deletion

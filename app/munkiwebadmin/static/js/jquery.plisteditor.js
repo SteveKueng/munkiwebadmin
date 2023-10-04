@@ -6,7 +6,7 @@
 
 // Dependencies:
 
-// * Bootstrap 3 (most recently tested with 3.3.1)
+// * Bootstrap 5
 //  (not strictly dependent on Bootstrap, but you may find it painful without)
 // * jQuery (most recently tested with v1.11.2)
 // * JSON (use json2 library for browsers that do not support JSON natively)
@@ -238,7 +238,7 @@
     function set_focus_on_text(root) {
         var tablerows = $(root).find('tr');
         if (tablerows) {
-            var td = $(tablerows[tablerows.length - 1]).children('td[data-type="string"]');
+            var td = $(tablerows[tablerows.length - 1]).children('td[data-bs-type="string"]');
             if (td) {
                 textarea = td.children('textarea');
                 if (textarea) {
@@ -267,7 +267,7 @@
                 var key = keys[i];
                 if (obj.hasOwnProperty(key)) {
                     var dataPath = (path ? path + '.' : '') + key;
-                    var tableRow = $('<tr>', {'data-path': dataPath});
+                    var tableRow = $('<tr>', {'data-bs-path': dataPath});
                     var rowHeader = $('<th>',
                                       {'scope': 'row',
                                        'class': 'col-xs-3 col-sm-3 col-md-3 col-lg-3'});
@@ -283,7 +283,7 @@
                     }
                     rowHeader.append(keyElement);
                     var rowValue = $('<td>',
-                                     {'data-type': getType(obj[key])});
+                                     {'data-bs-type': getType(obj[key])});
                     construct(opt, obj[key], rowValue, dataPath);
                     tableRow.append(rowHeader).append(rowValue);
                     if (!opt.key_list) {
@@ -313,14 +313,14 @@
                 tableBody = $('<tbody>', {'class': 'array'});
             for (var i=0; i<obj.length; ++i) {
                 var dataPath = (path ? path + '.' : '') + i;
-                var tableRow = $('<tr>', {'data-path': dataPath});
+                var tableRow = $('<tr>', {'data-bs-path': dataPath});
                 var rowHeader = $('<th>',
                                   {'scope': 'row'});
                 var grabber = $('<i>',
                                 {'class': 'grabber fa fa-bars',
                                  'aria-hidden': 'true'});
                 var rowValue = $('<td>', 
-                                 {'data-type': getType(obj[i]), 
+                                 {'data-bs-type': getType(obj[i]), 
                                   'width': '100%'});
                 construct(opt, obj[i], rowValue, dataPath);
                 rowHeader.append(grabber);
@@ -336,7 +336,7 @@
                     // store the value for the object that is moving
                     // so we still have it if the object is dragged
                     // to a different array
-                    var val = def(opt.original, ui.item.data('path'));
+                    var val = def(opt.original, ui.item.data('bs-path'));
                     ui.item.data('value', val);
                     // Some tweaks for the drop placeholder
                     ui.placeholder.height(ui.helper.outerHeight()-10);
@@ -349,14 +349,14 @@
                         if ($(this).data('value') != undefined) {
                             var val = $(this).data('value');
                         } else {
-                            var path = $(this).data('path')
+                            var path = $(this).data('bs-path')
                             var val = def(opt.original, path);
                         }
                         newArray.push(val);
                     });
                     var valueElement = $(event.target).closest('td'),
                         parentTableRow = valueElement.closest('tr'),
-                        path = parentTableRow.data('path');
+                        path = parentTableRow.data('bs-path');
                     feed(opt.original, path, newArray);
                     construct(opt, newArray, valueElement, path);
                     opt.onchange(opt.original);
@@ -437,7 +437,7 @@
     function propertyClicked(opt) {
         return function() {
             var tableRow = $(this).closest('tr'),
-            path = $(tableRow).data('path');
+            path = $(tableRow).data('bs-path');
             var safePath = path.split('.').join('\'][\'');
             opt.onpropertyclick('[\'' + safePath + '\']');
         };
@@ -448,7 +448,7 @@
             //parent is <th>; its parent is <tr>
             //alert('propertyChanged');
             var tableRow = $(this).closest('tr'),
-                prevPath = $(tableRow).data('path'),
+                prevPath = $(tableRow).data('bs-path'),
                 newKey = $(this).val(),
                 oldKey = $(this).attr('title'),
                 val = def(opt.original, prevPath, null);
@@ -471,15 +471,15 @@
                 }
                 feed(opt.original, newPath, val);
                 //update the tableRow's data path
-                $(tableRow).data('path', newPath);
+                $(tableRow).data('bs-path', newPath);
                 // jQuery doesn't actually update the DOM; in order that we
                 // can see what's going on, we'll also update the DOM item
-                $(tableRow).attr('data-path', newPath);
+                $(tableRow).attr('data-bs-path', newPath);
                 //paths for all sub-elements need to be updated, so just
                 //re-construct the value
                 //th is $(this).parent(); next item is td (value)
                 var valueElement = $(this).parent().next();
-                valueElement.attr('data-type', getType(val));
+                valueElement.attr('data-bs-type', getType(val));
                 construct(opt, val, valueElement, newPath);
             } else {
                 $(tableRow).remove();
@@ -492,7 +492,7 @@
         return function() {
             //parent is <td>; its parent is <tr>
             var tableRow = $(this).closest('tr'),
-                path = $(tableRow).data('path');
+                path = $(tableRow).data('bs-path');
             // remove oldKey and value
             stringify(feed(opt.original, path));
             if ($(tableRow).closest('tbody').hasClass('array')) {
@@ -500,14 +500,14 @@
                 // since the <tr> paths are now wrong
                 // unless we deleted the last row
                 var nextRow = $(tableRow).next('tr');
-                while ($(nextRow).data('path')) {
-                    path = $(nextRow).data('path');
+                while ($(nextRow).data('bs-path')) {
+                    path = $(nextRow).data('bs-path');
                     var pathElements = path.split('.'),
                         lastElement = pathElements.pop();
                     pathElements.push(lastElement-1);
                     path = pathElements.join('.');
-                    $(nextRow).data('path', path);
-                    $(nextRow).attr('data-path', path);
+                    $(nextRow).data('bs-path', path);
+                    $(nextRow).attr('data-bs-path', path);
                     nextRow = $(nextRow).next('tr');
                 }
             }
@@ -517,7 +517,8 @@
     }
 
     function getValue(valueElement, path) {
-        var type = $(valueElement).parent().data('type');
+        console.log(valueElement);
+        var type = $(valueElement).parent().data('bs-type');
         if (type == 'string') {
             // do not parse value; just return it as-is
             val = $(valueElement).val();
@@ -527,10 +528,10 @@
             if (isNaN(timestamp)) {
                 // invalid date string
                 alert("Invalid date!")
-                $(valueElement).closest('td').addClass('danger');
+                $(valueElement).closest('td').addClass('table-danger');
                 timestamp = 0;
             } else {
-                $(valueElement).parent().closest('td').removeClass('danger');
+                $(valueElement).parent().closest('td').removeClass('table-danger');
             }
             val = new Date(timestamp);
         } else if (type == 'boolean') {
@@ -548,7 +549,7 @@
         return function() {
             var val = null,
                 tableRow = $(this).closest('tr'),
-                path = $(tableRow).data('path');
+                path = $(tableRow).data('bs-path');
 
             if ($(this).is('select')) {
                 // null type; select new type
@@ -564,9 +565,9 @@
                     }
                 }
                 var parent = $(this).parent();
-                parent.data('type', type);
+                parent.data('bs-type', type);
                 // jQuery doesn't actually update the DOM, so we're going to
-                parent.attr('data-type', type);
+                parent.attr('data-bs-type', type);
                 construct(opt, val, parent, path);
                 // set focus
                 if ( type == 'string' || type == 'number') {
@@ -578,7 +579,8 @@
             }
             if (opt.validator) {
                 // this is a cheat and ties us to Bootstrap 3 contextual classes
-                $(this).parent().removeClass('success info warning danger');
+                $(this).parent().removeClass('table-success table-info table-warning table-danger');
+                console.log(path, val)
                 var extraClass = opt.validator(path, val);
                 if (extraClass) $(this).parent().addClass(extraClass);
             }

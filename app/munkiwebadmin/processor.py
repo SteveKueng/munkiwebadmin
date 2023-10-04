@@ -14,11 +14,6 @@ except:
     BASE_DIR = ""
 
 try:
-    HOSTNAME = settings.HOSTNAME
-except:
-    HOSTNAME = "localhost"
-
-try:
     REPO_MANAGEMENT_ONLY = settings.REPO_MANAGEMENT_ONLY
 except:
     REPO_MANAGEMENT_ONLY = False
@@ -31,5 +26,5 @@ def index(request):
         imgString = static('img/placeholder.jpg')
         pass
 
-    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'APPNAME': APPNAME, 'HOSTNAME': HOSTNAME, 'userImage': imgString }
+    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'APPNAME': APPNAME, 'userImage': imgString }
 
