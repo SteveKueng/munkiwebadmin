@@ -1,10 +1,5 @@
 function do_resize() {
-    $('#item_editor').height($(window).height() - 270);
-    //ace editor is dumb and needs the height specifically as well
-    $('#plist').height($(window).height() - 300);
-    $('#item_list').height($(window).height() - 90);
-    $('.dataTables_scrollBody').height($(window).height() - 170);
-    //$('.modal-body').height($(window).height() - 270);
+    $('#item_list').height($(window).height() - 150);
 }
 
 $(window).resize(do_resize);
@@ -14,12 +9,12 @@ var file;
 $(document).on('hide.bs.modal','#iconItem', function () {
   // check for unsaved changes
   if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#iconItem').data('bs.modal').isShown = false;
+      ($('#iconItem').data('bs.modal') || {})._isShown = false;
       $("#saveOrCancelConfirmationModal").modal("show");
       event.preventDefault();
       return;
   } else {
-    $('#iconItem').data('bs.modal').isShown = true;
+    ($('#iconItem').data('bs.modal') || {})._isShown = true;
     window.location.hash = '';
     current_pathname = "";
   }
@@ -63,7 +58,6 @@ function initIconsTable() {
                         column_rows.push(json[i]);
                     }
 				}
-				//console.log(column_rows);
                 return column_rows;
             },
             complete: function(jqXHR, textStatus){

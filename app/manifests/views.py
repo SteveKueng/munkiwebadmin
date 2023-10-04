@@ -50,7 +50,6 @@ def index(request, manifest_path=None):
                     content_type='application/json', status=404)
             context = {'plist_text': plist,
                        'pathname': manifest_path}
-            print(context)
             return render(request, 'manifests/detail.html', context=context)
         if request.method == 'POST':
             return HttpResponse(

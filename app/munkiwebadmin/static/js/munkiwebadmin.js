@@ -84,13 +84,17 @@ function getRunningMachine() {
     })
 }
 
-$(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-    });
-
-    if ($(window).width() < 768) {
-        $('#sidebarCollapse').removeClass('hidden');
-        $('#sidebar').toggleClass('active');
-     }
+// Sidebar toggle
+const sidebarToggle = document.body.querySelector('#sidebar-toggle');
+sidebarToggle.addEventListener('click', function() {
+    document.querySelector("#sidebar").classList.toggle('collapsed');
 });
+
+$(window).on('load', function() {
+    if($(window).width() < 768) {
+        $('#sidebar').addClass('collapsed');
+    }
+    if($(window).width() >= 768) {
+        $('#sidebar').removeClass('collapsed');
+    }
+})

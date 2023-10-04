@@ -21,60 +21,6 @@ function do_resize() {
 }
 $(window).resize(do_resize);
 
-// grid/list view
-$(document).on('click','.grid_list', function (e) {
-    $(".grid_list").removeClass('active')
-	    if($(this).hasClass('list')) {
-	        $('#deviceList').removeClass('grid').addClass('list');
-          $(this).addClass('active');
-	    }
-	    else if ($(this).hasClass('grid')) {
-	        $('#deviceList').removeClass('list').addClass('grid');
-          $(this).addClass('active');
-	    }
-});
-
-// filter devices
-$(document).on('click','.filterDevices', function (e) {
-    if ($(this).hasClass('active')) {
-        history.pushState('', '', '/reports/');
-        getClientTable("");
-        $(this).removeClass('active');
-    } else {
-        $(".filterDevices").removeClass('active')
-        if($(this).hasClass('vm')) {
-            history.pushState('', '', '?hardware=vm');
-            getClientTable("hardware=vm");
-            $(this).addClass('active');
-        }
-        else if ($(this).hasClass('mac')) {
-            history.pushState('', '', '?hardware=mac');
-            getClientTable("hardware=mac");
-            $(this).addClass('active');
-        }
-        else if ($(this).hasClass('macbook')) {
-            history.pushState('', '', '?hardware=macbook');
-            getClientTable("hardware=macbook");
-            $(this).addClass('active');
-        }
-        else if ($(this).hasClass('warnings')) {
-            history.pushState('', '', '?show=warnings');
-            getClientTable("show=warnings");
-            $(this).addClass('active');
-        }
-        else if ($(this).hasClass('errors')) {
-            history.pushState('', '', '?show=errors');
-            getClientTable("show=errors");
-            $(this).addClass('active');
-        }
-        else if ($(this).hasClass('activity')) {
-            history.pushState('', '', '?show=activity');
-            getClientTable("show=activity");
-            $(this).addClass('active');
-        }
-    }
-});
-
 // search field
 $(document).on('keyup','#listSearchField', function () {
 	filter = $(this).val();
@@ -88,8 +34,7 @@ $(document).on('keyup','#listSearchField', function () {
 });
 
 $(document).on('click','.tab', function (e) {
-    hash = window.location.hash;
-    window.location.hash = hash.slice(1).split('#')[0] + $(event.target).context.hash
+    window.location.href = $(event.target).context.hash
 });
 
 $(document).on('click','.manifestItem', function (e) {
@@ -108,11 +53,6 @@ $(document).on('click','.manifestItem', function (e) {
     }
 });
 
-$(document).on('click','.form-control', function (e) {
-    $('.manifestItem').removeClass('active');
-    removeDeleteButton('.manifestItem');
-});
-
 $(document).on('click','#showPassButton', function (e) {
     e.preventDefault()
     reason = $('#showPass').find('textarea').val()
@@ -124,32 +64,13 @@ $(document).on('click','#showPassButton', function (e) {
     }
 });
 
-// reset url on modal close
-$(document).on('hide.bs.modal','#computerDetails', function () {
-  // check for unsaved changes
-  if ($('#save_and_cancel').length && !$('#save_and_cancel').hasClass('hidden')) {
-      $('#computerDetails').data('bs.modal').isShown = false;
-      $("#saveOrCancelConfirmationModal").modal("show");
-      event.preventDefault();
-      return;
-  } else {
-    $('#computerDetails').data('bs.modal').isShown = true;
-    $('.modal-backdrop').hide();
-    window.location.hash = '';
-    current_pathname = "";
-    window.stop()
-  }
-});
-
 $(document).ready(function() {
+    getClientTable();
     hash = window.location.hash;
     if (hash.length > 1) {
         getComputerItem(hash.slice(1));
     }
 
-    //$('#listSearchField').focus();
-    // When a modal is shown, and it contains an <input>, make sure it's
-    // selected when the modal is shown.
     $(document).on('shown.bs.modal', '.modal', function(event){
         $(event.currentTarget).find('input').select();
     });
@@ -165,28 +86,21 @@ $(document).ready(function() {
     });
 });
 
+function cancelEdit() {
+    history.replaceState({}, document.title, ".");
+    current_pathname = "";
+    $("#computerDetails").modal("hide");
+}
+
 function activaTab(tab){
   $('.nav-tabs a[href="#' + tab + '"]').tab('show');
 };
-
-
-function getDeviceIcon(serial, iconid) {
-    var image_url = "https://support.apple.com/kb/securedImage.jsp?configcode="+serial.slice( 8 )+"&size=120x120"
-    var $image = $("#"+serial+iconid);
-    var $downloadingImage = $("<img>");
-    $downloadingImage.load(function(){
-        $image.attr("src", $(this).attr("src"));	
-    });
-    $downloadingImage.attr("src", image_url);   
-}
 
 var current_pathname = "";
 function getComputerItem(pathname) {
     var serial = pathname.split('#')[0];
     var tab = pathname.split('#')[1];
 
-    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
-    showProgressBar();
     getInitialManifest(serial, function(manifest) {
         var reportItemURL = '/reports/' + serial;
         $.ajax({
@@ -241,11 +155,8 @@ function getComputerItem(pathname) {
                     activaTab(tab);
                 }
     
-                getDeviceIcon(serial, "_iconDetail");
                 loadPasswordAccess(serial);
                 loadInventory(serial);
-                
-                hideProgressBar();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#computer_detail').html("")
@@ -263,7 +174,6 @@ function getComputerItem(pathname) {
                 }
                 $("#errorModalDetailText").text(errorThrown);
                 $("#errorModal").modal("show");
-                hideProgressBar();
             },
             dataType: 'html'
         })
@@ -319,13 +229,7 @@ function createListElements(elements, listid) {
     $.each(elements, function( index, value ) {
         $( "#"+listid ).append( "<a class='list-group-item manifestItem' id='"+listid+"_"+value+"'>"+value+"</a>" );
     });
-    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item form-control "+listid+"' style='padding-bottom:19px; padding-top:20px;' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
-
-    if(listid == "catalogs") {
-        getTypeahead("/api/catalogs?api_fields=filename", listid);
-    } else {
-        getTypeahead("/api/manifests?api_fields=filename", listid);
-    }
+    $( "#"+listid ).append( "<input type='text' id='"+listid+"' autocomplete=\"off\" class='list-group-item "+listid+"' onkeypress='addElementToList(this, \""+listid+"\", event)'>" );
     $( "."+listid+"" ).focus()
 }
 
@@ -512,21 +416,17 @@ function saveManifest(manifest, listid) {
     });
 }
 
-
 // edit software
 function loopSoftwareElements(elements, listid, require_update) {
     var match = listid.match("remote");
-    if(!match) {
-        $( "#"+listid ).append("<input type='text' class='list-group-item form-control software' style='padding-bottom:19px; padding-top:20px;' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
-        $(".software").typeahead({
-            source: Object.keys(catalogData),
-            autoSelect: true
-        });
-        $( "#"+listid+" .software" ).focus()
-    }
     $.each(elements, function( index, value ) {
         createSoftwareElement(value, listid, require_update);
     });
+    if(!match) {
+        $( "#"+listid ).append("<input type='text' class='list-group-item software' onkeypress='addSoftwareToList(this, \""+listid+"\", event)'>" );
+        $( "#"+listid+" .software" ).focus()
+    }
+    
 }
 
 var softwareElementCount = 0
@@ -662,44 +562,55 @@ function getItemsToSave(listid) {
     return itemList
 }
 
-function getClientTable(filter) {
-    showProgressBar();
-    var reportItemURL = '/reports/?'+filter;
-    $.ajax({
-        xhr: function() {
-                var xhr = new window.XMLHttpRequest();
-                xhr.addEventListener("progress", function(e) {
-                    var pro = (e.loaded / e.total) * 100;
-                    $('.progress-bar').css('width', pro + '%').attr('aria-valuenow', pro);
-                }, false);
-                return xhr;
-            },
-        method: 'GET',
-        url: reportItemURL,
-        cache: false,
-        success: function(data) {
-            $('#clienttable').html(data);
-            hideProgressBar();
+function getClientTable() {
+    $('#list_items').dataTable({
+        ajax: {
+            url: '/reports/_json',
+            dataSrc: '',
+            complete: function(jqXHR, textStatus){
+                $('#process_progress').modal('hide');
+              },
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#clienttable').html("");
-            $("#errorModalTitleText").text("computer list read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
-            hideProgressBar();
-        },
-        dataType: 'html'
+        columns: [
+            { data: 'img_url' },
+            { data: 'hostname' },
+            { data: 'serial_number' },
+            { data: 'username' },
+            { data: 'machine_model' },
+            { data: 'cpu_type' },
+            { data: 'os_version' }
+        ],
+        "sDom": "<t>",
+        "bPaginate": false,
+        //"scrollY": "100vh",
+        "bInfo": false,
+        "autoWidth": false,
+        "bFilter": true,
+        "bStateSave": false,
+        "aaSorting": [[0,'asc']],
+        "columnDefs": [
+            { "targets": 0,
+              "render": render_img,
+            }
+        ],
+        responsive: {
+            details: false
+        }
     })
+    // tie our search field to the table
+    var thisTable = $('#list_items').DataTable(),
+        searchField = $('#listSearchField');
+    searchField.keyup(function(){
+        thisTable.search($(this).val()).draw();
+    });
+     
+    let table = new DataTable('#list_items');
+    table.on('click', 'tbody tr', function () {
+        let data = table.row(this).data();
+        var url = window.location.href;
+        window.location.href = url + '#' + data['serial_number'];
+    });
+
 }
 
 function addDeleteButton(id) {
@@ -708,15 +619,6 @@ function addDeleteButton(id) {
 
 function removeDeleteButton(id) {
     $(id).find(".delete").remove();
-}
-
-function showProgressBar() {
-    $('.progress-bar').css('width', '0%').attr('aria-valuenow', "0");
-    $("#site-loading-bar").fadeIn(1);
-}
-
-function hideProgressBar() {
-     $("#site-loading-bar").fadeOut(1000);
 }
 
 function newManifestItem() {
@@ -820,6 +722,10 @@ function getInitialManifest(serial, handleData) {
     }
 }
 
+var render_img = function(data, type, full, meta) {
+    return '<img src="' + data + '" width="40"></img>';
+}
+
 function getHostname(serial, handleData) {
     $.ajax({
         method: 'GET',
@@ -893,25 +799,6 @@ function showPassword(reason) {
             console.log(jqXHR["responseJSON"]["detail"])
             $("#errorModalDetailText").text(jqXHR["responseJSON"]["detail"]);
             $("#errorModal").modal("show");
-        }
-    });
-}
-
-function getTypeahead(url, listid) {
-    $.ajax({
-        method: 'GET',
-        url: url,
-        success: function(data) {
-            var sourceArr = [];
-            for (var i = 0; i < data.length; i++) {
-                sourceArr.push(data[i].filename);
-            }
-            $("."+listid).typeahead({
-                source: sourceArr,
-                autoSelect: true
-            });
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
         }
     });
 }

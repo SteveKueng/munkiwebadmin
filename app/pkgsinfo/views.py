@@ -59,7 +59,6 @@ def status(request):
     return HttpResponse(json.dumps(status_response),
                         content_type='application/json')
 
-
 @login_required
 def getjson(request):
     '''Return pkgsinfo as json data -- used by the DataTable that
@@ -70,7 +69,6 @@ def getjson(request):
     # send it back in JSON format
     return HttpResponse(json.dumps(pkginfo_list),
                         content_type='application/json')
-
 
 @login_required
 def index(request):
