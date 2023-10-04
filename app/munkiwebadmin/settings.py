@@ -188,6 +188,12 @@ LOGGING = {
     },
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
 # needed by django-wsgiserver when using staticserve=collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Additional locations of static files
