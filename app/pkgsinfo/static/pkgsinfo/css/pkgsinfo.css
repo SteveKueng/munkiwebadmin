@@ -26,8 +26,8 @@
     font-size: 12px;
 }
 
-.dropdown-menu:not(.dropdown-info) {
-    position: fixed;
-    margin-top: 110px;
+.form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 2px;
 }
-
