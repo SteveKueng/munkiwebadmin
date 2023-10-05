@@ -194,6 +194,8 @@ CACHES = {
     }
 }
 
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
+
 # needed by django-wsgiserver when using staticserve=collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Additional locations of static files
