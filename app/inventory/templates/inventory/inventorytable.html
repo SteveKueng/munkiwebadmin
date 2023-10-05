@@ -1,6 +1,6 @@
 <h4>{{ list_title }} <span class="badge badge-info">{{ inventory_items|length }}</span></h4>
 {% if inventory_items|length %}
-  <table class='clientlist table table-hover table-condensed'>
+  <table class='clientlist table table-hover table-striped table-condensed'>
       <tbody>
       {% for item in inventory_items %}
           <tr onclick="document.location = '{% url "inventory" %}items/?name={{ item.name|urlencode }}';">
@@ -12,8 +12,8 @@
                   {{ item.version }}
                 </a>
               </td>
-              <td class="hidden">{{ item.bundleid }}</td>
-              <td class="visible-md visible-lg text-right" title='{{ item.path }}'>{{ item.path|truncatechars:50 }}</td>
+              <td class="d-none">{{ item.bundleid }}</td>
+              <td class="d-none d-lg-block text-right" title='{{ item.path }}'>{{ item.path|truncatechars:50 }}</td>
           </tr>
       {% endfor %}
       </tbody>
