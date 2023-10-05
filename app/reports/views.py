@@ -76,7 +76,6 @@ def index(request, computer_serial=None):
                                     'exception_type': str(type(err)),
                                     'detail': str(err)}),
                         content_type='application/json', status=404)
-
                 if machine:
                     try:
                         report = MunkiReport.objects.get(machine=machine)
@@ -84,7 +83,6 @@ def index(request, computer_serial=None):
                     except MunkiReport.DoesNotExist:
                         report_plist = None
                         pass
-
                 if report_plist:
                     try:
                         time = report_plist['MachineInfo']['SystemProfile'][0]['SPSoftwareDataType'][0]['uptime']
@@ -92,7 +90,6 @@ def index(request, computer_serial=None):
                     except Exception as err:
                         time = ""
                         pass
-
                     disksPreList = []
                     disksList = []
                     counter = 0
@@ -164,14 +161,12 @@ def index(request, computer_serial=None):
                         }
 
                 return render(request, 'reports/detail.html', context=context)
-
             if request.method == 'POST':
                 return HttpResponse(
                     json.dumps({'result': 'failed',
                                 'exception_type': 'MethodNotSupported',
                                 'detail': 'POST/PUT/DELETE should use the API'}),
                     content_type='application/json', status=404)
-    
     # no ajax
     context = {'filterDevices': request.GET.urlencode(),
     'page': 'reports',

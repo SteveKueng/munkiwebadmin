@@ -572,13 +572,13 @@ function getClientTable() {
               },
         },
         columns: [
-            { data: 'img_url' },
-            { data: 'hostname' },
-            { data: 'serial_number' },
-            { data: 'username' },
-            { data: 'machine_model' },
-            { data: 'cpu_type' },
-            { data: 'os_version' }
+            { data: 'img_url', className: 'align-middle' },
+            { data: 'hostname', className: 'align-middle' },
+            { data: 'serial_number', className: 'align-middle' },
+            { data: 'os_version', className: 'align-middle' },
+            { data: 'username', className: 'align-middle' },
+            { data: 'machine_model', className: 'align-middle' },
+            { data: 'cpu_type', className: 'align-middle' }
         ],
         "sDom": "<t>",
         "bPaginate": false,
