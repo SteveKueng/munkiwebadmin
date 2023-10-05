@@ -34,6 +34,7 @@ if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
 DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
@@ -193,8 +194,6 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-
-CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 
 # needed by django-wsgiserver when using staticserve=collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
