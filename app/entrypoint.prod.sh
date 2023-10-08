@@ -33,7 +33,7 @@ gunicorn munkiwebadmin.wsgi:application \
   --name $NAME \
   --workers $NUM_WORKERS \
   --user=$USER --group=$GROUP \
-  --bind=$SOCKFILE \
+  --bind=unix:$SOCKFILE \
   --log-level=warn \
   --log-file=/home/app/gunicorn.log \
   --daemon
