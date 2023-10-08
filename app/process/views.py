@@ -11,7 +11,7 @@ import logging
 import os
 import subprocess
 import time
-import threading
+import sys
 
 from django.conf import settings
 from munkiwebadmin.utils import MunkiGit
@@ -102,9 +102,12 @@ def run(request):
                                                exited=False)
             if not processes:
                 break
+            # if we get here, there are still running processes
+            LOGGER.debug('waiting for running makecatalogs processes to finish')
             time.sleep(1)
 
-        proc = subprocess.Popen([MAKECATALOGS, REPO_DIR],
+        LOGGER.debug('starting makecatalogs')
+        proc = subprocess.Popen([sys.executable, MAKECATALOGS, REPO_DIR],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         record = Process(name='makecatalogs')
         record.pid = proc.pid
