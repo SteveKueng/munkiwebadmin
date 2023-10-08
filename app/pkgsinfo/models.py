@@ -99,6 +99,8 @@ class Pkginfo(Plist):
     @classmethod
     def data(cls):
         '''Returns a structure with itemnames, versions, and filepaths'''
+        def cmp(a, b):
+            return (a > b) - (a < b) 
         def compare_versions(a, b):
             """Internal comparison function for use in sorting"""
             return cmp(LooseVersion(b[0]), LooseVersion(a[0]))
