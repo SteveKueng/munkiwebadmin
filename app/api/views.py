@@ -607,15 +607,22 @@ def file_api(request, kind, filepath=None):
                 content_type='application/json', status=400)
         try:
             if request.method == 'POST':
+                LOGGER.debug("test")
                 MunkiFile.new(kind, filedata, filename, request.user)
             else:
                 MunkiFile.writedata(kind, filedata, filename, request.user)
-        except FileError as err:
+        except (FileError, FileWriteError) as err:
             return HttpResponse(
                 json.dumps({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)}),
                 content_type='application/json', status=403)
+        except Exception as err:
+            return HttpResponse(
+                json.dumps({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)}),
+                content_type='application/json', status=500)
         else:
             return HttpResponse(
                 json.dumps({'filename': filename}),
