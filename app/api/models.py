@@ -227,14 +227,19 @@ class MunkiFile(object):
     def write(cls, kind, fileupload, pathname, user):
         '''Retreives a file upload and saves it to pathname'''
         filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
+        LOGGER.debug('Writing %s to %s', fileupload, filepath)
         try:
-            with open(filepath, 'w') as fileref:
+            with open(filepath, 'wb') as fileref:
                 for chunk in fileupload.chunks():
+                    LOGGER.debug('Writing chunk...')
                     fileref.write(chunk)
             if user and GIT and kind == "icons":
                 MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError) as err:
+            LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
+            raise FileWriteError(err)
+        except Exception as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
 
