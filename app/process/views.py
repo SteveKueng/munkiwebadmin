@@ -108,7 +108,7 @@ def run(request):
 
         LOGGER.debug('starting makecatalogs')
         proc = subprocess.Popen([sys.executable, MAKECATALOGS, REPO_DIR],
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         record = Process(name='makecatalogs')
         record.pid = proc.pid
         record.save()
