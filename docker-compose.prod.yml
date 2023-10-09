@@ -2,19 +2,18 @@ version: '3.8'
 
 services:
   munkiwebadmin:
+    container_name: munkiwebadmin
     image: stevekueng/munkiwebadmin
-    ports:
-      - 8000:8000
+    restart: unless-stopped
     environment:
       - DB_HOST=db
       - DB_NAME=munkiwebadmin_db
       - DB_USER=munkiwebadmin_user
       - DB_PASSWORD=munkiwebadmin_pass
       - DB_PORT=5432
-      - DJANGO_SECRET_KEY=secret
-      - DJANGO_DEBUG=0
       - APPNAME=MunkiWebAdmin
-      - TIME_ZONE='Europe/Zurich'
+      - ALLOWED_HOSTS=munkiwebadmin.example.com
+      - CSRF_TRUSTED_ORIGINS=https://munkiwebadmin.example.com
     depends_on:
       - db
       - munki_repo
@@ -23,19 +22,21 @@ services:
     volumes:
       - munki_repo:/munkirepo
   db:
+    container_name: munkidb
     image: postgres:15
+    restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=munkiwebadmin_user
       - POSTGRES_PASSWORD=munkiwebadmin_pass
       - POSTGRES_DB=munkiwebadmin_db
   munki_repo:
+    container_name: munkirepo
     image: stevekueng/munki-docker
+    restart: unless-stopped
     volumes:
       - munki_repo:/munki_repo
-    ports:
-      - 8080:80
 
 volumes:
   postgres_data:
