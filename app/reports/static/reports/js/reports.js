@@ -791,8 +791,8 @@ function showPassword(reason) {
         success: function(data) {
             var html = data + ' <button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard(\'' + data + '\');"><i class="fa fa-clipboard" aria-hidden="true"></i></button>'
             $("#password").html( html );
-            $("#reasonForm").addClass("hidden")
-            $("#showPassTable").removeClass("hidden")
+            $("#reasonForm").addClass("d-none")
+            $("#showPassTable").removeClass("d-none")
             passwordAccessTable.ajax.reload();
         },
         error: function(jqXHR, textStatus, errorThrown) {
