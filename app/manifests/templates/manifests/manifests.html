@@ -19,25 +19,32 @@
 <body {% if manifest_name %}onLoad="getManifestItem('{{manifest_name}}')"{% endif %}>
 {% endblock %}
 
+{% block page_title %}Manifests <span class="badge bg-secondary" id="item-count-badge">0</span>{% endblock %}
+
 {% block content %}
 <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="form-inline">
-            <div class="form-group">
-                  <div class="btn-group">
-                      <button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#searchManifestModal">
-                          Search manifests
-                      </button>
-                  </div>
-                  {% if perms.manifests.add_manifestfile %}
-                  <div class="btn-group">
-                      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newManifestModal">
-                          New manifest
-                      </button>
-                  </div>
-                  {% endif %}
-            </div>
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group" role="group" aria-label="First group">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#searchManifestModal">
+              Search manifests
+            </button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newManifestModal">
+              New manifest
+            </button>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- /row -->
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-body">
         <table class="table table-striped wraptext" id='list_items'>
           <thead>
             <tr><th>Name</th></tr>
@@ -46,7 +53,8 @@
               <!-- table is filled via AJAX/JSON calls by DataTables -->
           </tbody>
         </table>
-    
+      </div>
+    </div>
   </div>
 </div>
 <!-- data storage -->

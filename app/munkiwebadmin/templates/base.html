@@ -175,7 +175,16 @@
             <!-- ========= Main content section ======= -->
             <main class="content py-2">
                 <div class="container-fluid">
-                    {% block content %}{% endblock %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-2 text-body">{% block page_title %}{% endblock %}</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            {% block content %}{% endblock %}
+                        </div>
+                    </div>
                 </div>
             </main>
 
@@ -184,14 +193,14 @@
                 <div class="container-fluid">
                     <div class="row text-muted">
                         <div class="col-6 text-start">
-                            <p class="mb-0">
+                            <p class="mt-2">
                                 <a href="#" class="text-muted">
                                     <strong>{{ APPNAME }}</strong>
                                 </a>
                             </p>
                         </div>
                         <div class="col-6 text-end">
-                            <ul class="list-inline">
+                            <ul class="list-inline mt-2">
                                 <li class="list-inline-item">
                                     <a href="#" class="text-muted">github.com/SteveKueng</a>
                                 </li>

@@ -4,14 +4,11 @@
     original version by Joe Wollard; this version by Greg Neagle
 */
 
-$(document).ready(function()
-{
+$(document).ready(function() {
     // Perform the json call and format the results so that DataTables will
     // understand it.
-    var process_json = function( sSource, aoData, fnCallback )
-    {
-        $.getJSON( sSource, function(json, status, jqXHR)
-        {
+    var process_json = function( sSource, aoData, fnCallback ) {
+        $.getJSON( sSource, function(json, status, jqXHR) {
             // update the count info badge
             $("#item-count-badge").text(json.length);
 
@@ -21,17 +18,14 @@ $(document).ready(function()
     }
 
 
-    var version_count_template = function(name, version, count)
-    {
+    var version_count_template = function(name, version, count) {
         return "<a href='?name=" + encodeURIComponent(name) 
             + "&version=" + encodeURIComponent(version) + "'>" + version 
-            + "<span class='badge badge-info pull-right'>" + count + "</span>"
+            + " <span class='badge rounded-pill text-bg-secondary'>" + count + "</span>"
             + "</a><br />";
     }
 
-
-    var format_versions_column = function(data, type, rowObject)
-    {
+    var format_versions_column = function(data, type, rowObject) {
         out = ''
         for(var i = 0; i < data.length; i++)
         {
@@ -46,21 +40,20 @@ $(document).ready(function()
         return out;
     }
 
-
-    var format_name_column = function(data, type, rowObject)
-    {
+    var format_name_column = function(data, type, rowObject) {
         return '<a href="?name=' + encodeURIComponent(data)
             + '">' + data + "</a>";
     }
-
 
     oTable = $("#inventory-items-table").dataTable({
         "sAjaxSource": window.location.href + ".json",
         "fnServerData": process_json,
         "paging":false,
         'sDom': '"top"i',
+        "scrollY": 'calc(100vh - 270px)',
+        "scrollCollapse": true,
         "bStateSave": true,
-        "aaSorting": [[1,'desc']],
+        "aaSorting": [[0,'asc']],
         "aoColumns": [
             {'mData': 'name',
              'mRender': format_name_column
@@ -68,21 +61,24 @@ $(document).ready(function()
             {'mData': 'versions',
              'mRender': format_versions_column
             }
-        ]
+        ],
+        responsive: {
+            details: false
+        }
     });
 
-    $('#listSearchField').keyup(function(){
+    $('#listSearchField').keyup(function() {
         oTable.fnFilter( $(this).val() );       
     });
-    $('#SearchFieldMobile').keyup(function(){
+    $('#SearchFieldMobile').keyup(function() {
         oTable.fnFilter( $(this).val() );    
     });
 
-    $('#listSearchField').change(function(){
+    $('#listSearchField').change(function() {
         $('#listSearchField').keyup();
     });
 
-    $('#SearchFieldMobile').change(function(){
+    $('#SearchFieldMobile').change(function() {
         $('#SearchFieldMobile').keyup();
     });
 });

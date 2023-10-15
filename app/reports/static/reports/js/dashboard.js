@@ -49,6 +49,8 @@ function createHardwareBreakdown() {
         hardwareChart = Morris.Bar({
             element: 'hardwarebreakdown',
             data: response,
+            barColors: ['#0d6efd', '#6610f2', '#6f42c1'],
+            gridTextColor: '#dee2e6',
             xkey: 'label',
             ykeys: ['value'],
             labels: ['Count'],
@@ -67,6 +69,7 @@ function createOSBreakdown() {
         //console.log(response)
         osChart = Morris.Donut({
             element: 'osbreakdown',
+            colors: ['#0d6efd', '#6610f2', '#6f42c1'],
             data: response,
             resize: true
         }).on('click', function(i, row){

@@ -11,21 +11,29 @@
 <script type='text/javascript' src='{% get_static_prefix %}js/mwa_editor_shared.js'></script>
 {% endblock java_script %}
 
+{% block page_title %}Icons <span class="badge bg-secondary" id="item-count-badge">0</span>{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-12">
-    <div class="form-inline">
-        <div class="form-group">
-              {% if perms.pkgsinfo.add_pkginfofile %}
-              <div class="btn-group">
-                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newIconModal">
-                      New icon
-                  </button>
-              </div>
-              {% endif %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group" role="group" aria-label="First group">
+            <button type="button" class="btn btn-success {% if not perms.pkgsinfo.add_pkginfofile %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#newIconModal">
+                New icon
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-    <div id='item_list'>
+  </div>
+</div> <!-- /row -->
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-3">
+      <div class="card-body">
         <table class="table table-striped wraptext" id='list_items'>
           <thead>
             <tr><th>Icon</th><th>Name</th></tr>
