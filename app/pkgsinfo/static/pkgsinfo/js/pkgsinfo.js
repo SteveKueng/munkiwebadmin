@@ -190,7 +190,7 @@ function initPkginfoTable() {
             dataSrc: "",
             complete: function(jqXHR, textStatus){
                   window.clearInterval(poll_loop);
-                  $('#process_progress').modal('hide');
+                  $("#item-count-badge").text(jqXHR.responseJSON.length);
                 },
             global: false,
         },
