@@ -62,29 +62,26 @@ function initIconsTable() {
             },
             complete: function(jqXHR, textStatus){
                   window.clearInterval(poll_loop);
-                  $('#process_progress').modal('hide');
+                  $("#item-count-badge").text(jqXHR.responseJSON.length);
                 },
             global: false,
         },
-        columnDefs: [
-         { "targets": 0,
-            "width": "60px",
+        columnDefs: [{
+            "targets": 0,
             "render": render_icon,
             "searchable": false,
-         },
-         {
+        },
+        {
             "targets": 1,
-            //"width": "40%",
             "render": render_name,
-          },],
-         "sDom": "<t>",
-         "bPaginate": false,
-         //"scrollY": "100vh",
-         "bInfo": false,
-         "autoWidth": false,
-         "bFilter": true,
-         "bStateSave": false,
-         "aaSorting": [[1,'asc']]
+        },],
+        'sDom': '"top"i',
+        "paging":false,
+        "scrollY": 'calc(100vh - 350px)',
+        "scrollCollapse": true,
+        "bFilter": true,
+        "bStateSave": true,
+        "aaSorting": [[0,'asc']]
         });
         // start our monitoring timer loop
         monitor_icon_list();
@@ -94,16 +91,12 @@ function initIconsTable() {
         searchField.keyup(function(){
             thisTable.search($(this).val()).draw();
         });
-        //searchField.trigger('keyup');
 }
 
 
 function cancelEdit() {
-    //$('#cancelEditConfirmationModal').modal('hide');
     hideSaveOrCancelBtns();
     $("#iconItem").modal("hide");
-    //$('.modal-backdrop').remove();
-    //getIconItem(current_pathname);
 }
 
 

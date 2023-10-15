@@ -206,14 +206,13 @@ function initPkginfoTable() {
             "searchable": false,
             "orderable": false,
           },],
-         "sDom": "<t>",
-         "bPaginate": false,
-         //"scrollY": "100vh",
-         "bInfo": false,
-         "autoWidth": false,
-         "bFilter": true,
-         "bStateSave": false,
-         "aaSorting": [[0,'asc']]
+        'sDom': '"top"i',
+        "paging":false,
+        "scrollY": 'calc(100vh - 350px)',
+        "scrollCollapse": true,
+        "bFilter": true,
+        "bStateSave": true,
+        "aaSorting": [[0,'asc']]
      });
      // start our monitoring timer loop
      monitor_pkgsinfo_list();

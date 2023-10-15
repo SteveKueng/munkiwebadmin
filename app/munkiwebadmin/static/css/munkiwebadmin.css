@@ -41,7 +41,7 @@ h4 {
     max-width: var(--sidebar-size);
     min-width: var(--sidebar-size);
     transition: all 0.35s ease-in-out;
-    border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)   
+    border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
 }
 
 .main {
@@ -52,6 +52,7 @@ h4 {
     overflow: hidden;
     transition: all 0.35s ease-in-out;
     width: 100%;
+    background-color: var(--bs-secondary-bg);
 }
 
 /* Sidebar Elements Style */
@@ -74,7 +75,6 @@ h4 {
 }
 
 .sidebar-header {
-    color: var(--bs-body-color);
     font-size: .75rem;
     padding: 1.5rem 1.5rem .375rem;
 }
@@ -87,6 +87,10 @@ a.sidebar-link {
 .avatar {
     height: 38px;
     width: 38px;
+}
+
+.navbar {
+    background-color: var(--bs-body-bg);
 }
 
 .navbar-expand .navbar-nav {
@@ -102,16 +106,25 @@ a.sidebar-link {
 .content {
     flex: 1;
     max-width: 100vw;
+    height: calc(100vh - 98px);
+    overflow: auto;
 }
 
+
 /* Footer and Nav */
+.footer {
+    border-top: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+    height: 20px;
+}
+
 @media (max-width:767.98px) {
     .content {
         max-width: auto;
-        width: auto;
+        width: 100vw;
     }
 
     .navbar, footer {
         width: 100vw;
     }
 }
+

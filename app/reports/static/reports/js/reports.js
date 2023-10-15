@@ -568,31 +568,29 @@ function getClientTable() {
             url: '/reports/_json',
             dataSrc: '',
             complete: function(jqXHR, textStatus){
-                $('#process_progress').modal('hide');
+                $("#item-count-badge").text(jqXHR.responseJSON.length);
               },
         },
         columns: [
-            { data: 'img_url', className: 'align-middle' },
-            { data: 'hostname', className: 'align-middle' },
+            { data: 'img_url', className: 'align-middle', orderable: false, searchable: false },
+            { data: 'hostname', className: 'align-middle text-nowrap' },
             { data: 'serial_number', className: 'align-middle' },
             { data: 'os_version', className: 'align-middle' },
             { data: 'username', className: 'align-middle' },
-            { data: 'machine_model', className: 'align-middle' },
+            { data: 'machine_model', className: 'align-middle  text-nowrap' },
             { data: 'cpu_type', className: 'align-middle' }
         ],
-        "sDom": "<t>",
-        "bPaginate": false,
-        //"scrollY": "100vh",
-        "bInfo": false,
-        "autoWidth": false,
+        'sDom': '"top"i',
+        "paging":false,
+        "scrollY": 'calc(100vh - 270px)',
+        "scrollCollapse": true,
         "bFilter": true,
-        "bStateSave": false,
-        "aaSorting": [[0,'asc']],
-        "columnDefs": [
-            { "targets": 0,
-              "render": render_img,
-            }
-        ],
+        "bStateSave": true,
+        "aaSorting": [[1,'asc']],
+        "columnDefs": [{ 
+                "targets": 0,
+                "render": render_img,
+        }],
         responsive: {
             details: false
         }
