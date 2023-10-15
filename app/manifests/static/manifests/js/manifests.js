@@ -121,24 +121,21 @@ function initManifestsTable() {
             },
             complete: function(jqXHR, textStatus) {
                 window.clearInterval(poll_loop);
-                $('#process_progress').modal('hide');
+                $("#item-count-badge").text(jqXHR.responseJSON.length);
             },
             global: false,
         },
-        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            $('td', nRow).addClass('table-list-item');
-		},
-         "columnDefs": [
-          { "targets": 0,
-            "render": render_name,
-          }],
-         "sDom": "<t>",
-         "bPaginate": false,
-         "bInfo": false,
-         "autoWidth": false,
-         "bFilter": true,
-         "bStateSave": false,
-         "aaSorting": [[0,'asc']]
+        "columnDefs": [{
+        "targets": 0,
+        "render": render_name,
+        }],
+        'sDom': '"top"i',
+        "paging":false,
+        "scrollY": 'calc(100vh - 350px)',
+        "scrollCollapse": true,
+        "bFilter": true,
+        "bStateSave": true,
+        "aaSorting": [[0,'asc']]
      });
      // start our monitoring timer loop
      monitor_manifest_list();

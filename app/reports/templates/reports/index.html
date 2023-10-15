@@ -10,45 +10,30 @@
 <script type='text/javascript' src='{% get_static_prefix %}reports/js/reports.js'></script>
 {% endblock java_script %}
 
+{% block page_title %}Computer <span class="badge bg-secondary" id="item-count-badge">0</span>{% endblock %}
+
 {% block content %}
-
-<!--
-<div class="btn-group" role="group">
-  <button class="btn btn-default mac filterDevices {% if 'mac' in filterDevices %}active{% endif %}">Mac</button>
-  <button class="btn btn-default macbook filterDevices {% if 'macbook' in filterDevices %}active{% endif %}">MacBook</button>
-  <button class="btn btn-default vm filterDevices {% if 'vm' in filterDevices %}active{% endif %}">VM</button>
-</div>
-
-<div class="btn-group" role="group">
-  <button class="btn btn-default filterDevices errors {% if 'errors' in filterDevices %}active{% endif %}">Errors</button>
-  <button class="btn btn-default filterDevices warnings {% if 'warnings' in filterDevices %}active{% endif %}">Warnings</button>
-  <button class="btn btn-default filterDevices activity {% if 'active' in filterDevices %}active{% endif %}">Active</button>
-</div>
-
-<div class="btn-group pull-right" role="group">
-  <button class="grid grid_list btn btn-default active"><i class="fa fa-th" aria-hidden="true"></i></button>
-  <button class="list fix-margin-list-btn grid_list btn btn-default"><i class="fa fa-list" aria-hidden="true"></i></button>
-</div> -->
-
 <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div id='item_list'>
-      <table class="table table-striped table-hover nowrap" id='list_items'>
-      <thead>
-        <tr>
-          <th data-priority="2">Icon</th>
-          <th data-priority="1">Hostname</th>
-          <th data-priority="4">Serial Number</th>
-          <th>OS</th>
-          <th>Username</th>
-          <th data-priority="3">Model</th>
-          <th data-priority="5">CPU</th>
-        </tr>
-      </thead>
-      <tbody>
-          <!-- table is filled via AJAX/JSON calls by DataTables -->
-      </tbody>
-    </table>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-striped table-hover" id='list_items'>
+          <thead>
+            <tr>
+              <th data-priority="2">Icon</th>
+              <th data-priority="1">Hostname</th>
+              <th data-priority="4">Serial Number</th>
+              <th>OS</th>
+              <th>Username</th>
+              <th data-priority="3">Model</th>
+              <th data-priority="5">CPU</th>
+            </tr>
+          </thead>
+          <tbody>
+              <!-- table is filled via AJAX/JSON calls by DataTables -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
