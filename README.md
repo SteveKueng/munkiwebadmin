@@ -32,7 +32,7 @@ If you don't create an specify a DB, django will use a sqlite3 DB.
 ```bash
 pip install virtualenv
 virtualenv mwa2_virtualenv
-. mwa2_virtualenv/bin/active
+. mwa2_virtualenv/bin/activate
 ```
 
 ### 4. Install requirements
