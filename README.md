@@ -17,7 +17,7 @@ install the following tools:
 
 ### 2. Clone repo
 ```bash
-git clone -b django4 https://github.com/SteveKueng/munkiwebadmin.git
+git clone https://github.com/SteveKueng/munkiwebadmin.git
 cd munkiwebadmin
 ```
 
