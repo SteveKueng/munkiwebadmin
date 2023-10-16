@@ -21,8 +21,9 @@ git clone https://github.com/SteveKueng/munkiwebadmin.git
 cd munkiwebadmin
 ```
 
-### 3. Database
+### 3. Database (optional)
 Create a database (MySQL/MariaDB or Postgres) or use the following script (docker)
+If you don't create an specify a DB, django will use a sqlite3 DB.
 ```bash
 ./createDatabase.sh
 ```
@@ -34,18 +35,24 @@ virtualenv mwa2_virtualenv
 . mwa2_virtualenv/bin/active
 ```
 
-### 5. Init DB
+### 4. Install requirements
 ```bash
 cd app
+pip install -r requirements.txt
+```
+
+### 6. Init DB
+```bash
 python manage.py migrate
 python manage.py createsuperuser
 ```
 
-### 6. Edit variables
+### 7. Edit variables
 open startDevServer.sh and change the environment variables
 
-### 7. Run munkiwebadmin
+### 8. Run munkiwebadmin
 ```bash
+cd ..
 ./startDevServer.sh
 ```
 [Install MunkiScripts](#install-munkiscripts)
