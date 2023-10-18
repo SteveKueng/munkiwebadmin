@@ -191,6 +191,7 @@ function initPkginfoTable() {
             complete: function(jqXHR, textStatus){
                   window.clearInterval(poll_loop);
                   $("#item-count-badge").text(jqXHR.responseJSON.length);
+                  $('#process_progress').modal('hide');
                 },
             global: false,
         },
@@ -201,7 +202,6 @@ function initPkginfoTable() {
          },
          {
             "targets": 1,
-            //"width": "40%",
             "render": render_versions,
             "searchable": false,
             "orderable": false,
@@ -222,7 +222,6 @@ function initPkginfoTable() {
      searchField.keyup(function(){
          thisTable.search($(this).val()).draw();
      });
-     //searchField.trigger('keyup');
 }
 
 function cancelEdit() {

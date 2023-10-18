@@ -122,6 +122,7 @@ function initManifestsTable() {
             complete: function(jqXHR, textStatus) {
                 window.clearInterval(poll_loop);
                 $("#item-count-badge").text(jqXHR.responseJSON.length);
+                $('#process_progress').modal('hide');
             },
             global: false,
         },
