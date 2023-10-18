@@ -39,8 +39,12 @@ def index(request, manifest_path=None):
         # return manifest detail
         if request.method == 'GET':
             LOGGER.debug("Got read request for %s", manifest_path)
+            key_list = {'catalogs', 'included_manifests', 'featured_items', 'managed_installs', 'managed_uninstalls', 'managed_updates', 'optional_installs'}
             try:
                 plist = Plist.read('manifests', manifest_path)
+                for key in key_list:
+                    if key not in plist:
+                        plist[key] = []
                 plist = plistlib.dumps(plist).decode()
             except (FileDoesNotExistError, FileReadError) as err:
                 return HttpResponse(
