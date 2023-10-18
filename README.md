@@ -58,9 +58,31 @@ cd ..
 [Install MunkiScripts](#install-munkiscripts)
 
 ## Docker
-comming soon
+### Simple docker setup
+docker run -d -p 8000:80 \
+     -e ALLOWED_HOSTS=munkiwebadmin.example.com \
+     -e CSRF_TRUSTED_ORIGINS=https://munkiwebadmin.example.com \
+     --name munkiwebadmin stevekueng/munkiwebadmin
 
 docker exec -it munkiwebadmin sh -c "python manage.py createsuperuser"
+
+### docker-compose
+depending on your needs there is a compose file for a complete setup (munkiwebadmin, DB, munkirepo) or one for just munkiwebadmin with a DB.
+
+#### complete setup
+check out the docker-compose.prod.repo.yml and change the URL to something usefull for you.
+Run docker compose:
+```bash
+docker-compose up -f docker-compose.prod.repo.yml 
+```
+
+#### only munkiwebadmin with DB
+check out the docker-compose.prod.yml, change the URL to something usefull for you and also change the munkirepo.
+Run docker compose:
+```bash
+docker-compose up -f docker-compose.prod.yml 
+```
+
 
 ### Docker variables
 
@@ -69,7 +91,6 @@ docker exec -it munkiwebadmin sh -c "python manage.py createsuperuser"
 | APPNAME      | Django app name | _MunkiWebAdmin_ |
 | ALLOWED_HOSTS | django allowed hosts. e.g. _[ munkiwebadmin.example.com ]_ |_[ * ]_|
 | DEFAULT_MANIFEST | default manifest to use. _serail_number_ or _hostname_     |_serial_number_ |
-| PROXY_ADDRESS | proxy server address     ||
 | DB | Database type. currently only postgres possible | postgres |
 | DB_NAME | Database name | _munkiwebadmin_db_ |
 | DB_USER | Database user     | _postgres_ |
