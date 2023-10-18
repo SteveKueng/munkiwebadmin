@@ -517,6 +517,8 @@ function saveManifestItem() {
         timeout: 10000,
         success: function(data) {
             hideSaveOrCancelBtns();
+            window.location.hash = '';
+            current_pathname = "";
             $("#manifestItems").modal("hide");
         },
         error: function(jqXHR, textStatus, errorThrown) {
