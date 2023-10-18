@@ -17,10 +17,11 @@ services:
       - CSRF_TRUSTED_ORIGINS=https://munkiwebadmin.example.com
     depends_on:
       - db
+      - munki_repo
     links:
       - db
     volumes:
-      - <munki_repo/path>:/munkirepo
+      - munki_repo:/munkirepo
   db:
     container_name: munkidb
     image: postgres:15
@@ -31,6 +32,12 @@ services:
       - POSTGRES_USER=munkiwebadmin_user
       - POSTGRES_PASSWORD=munkiwebadmin_pass
       - POSTGRES_DB=munkiwebadmin_db
+  munki_repo:
+    container_name: munkirepo
+    image: stevekueng/munki-docker
+    restart: unless-stopped
+    volumes:
+      - munki_repo:/munki_repo
 
 volumes:
   postgres_data:
