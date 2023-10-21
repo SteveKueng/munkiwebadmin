@@ -8,8 +8,19 @@
 
         <title>{{ APPNAME }}</title>
 
+        <script charset="utf-8">
+            (function () {
+                // immediately set the theme mode to avoid flashes
+                var systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+                var theme = localStorage.getItem('theme') || (systemTheme.matches ? 'dark' : 'light');
+                document.getElementsByTagName('html')[0].setAttribute('data-bs-theme', theme);
+            })()
+        </script>
+
         {% load static %}
         <!-- Bootstrap Core CSS -->
+        <script type="module" src="{% get_static_prefix %}js/color-modes.js"></script>
+        <link rel="stylesheet" href='{% get_static_prefix %}css/munkiwebadmin.css' type="text/css" media="all" />
         <link rel="stylesheet" href='{% get_static_prefix %}css/bootstrap.css' type="text/css" media="all" />
         <link rel="stylesheet" href='{% get_static_prefix %}css/dataTables.bootstrap5.min.css' type="text/css" media="all" />
         <link rel="stylesheet" href='{% get_static_prefix %}css/responsive.bootstrap5.min.css' type="text/css" media="all" />
@@ -17,12 +28,10 @@
         <!-- Custom Fonts -->
         <link href="{% get_static_prefix %}fonts/fontawesome/css/all.min.css" rel="stylesheet" type="text/css">
 
-        <!-- custom CSS -->
-        <link rel="stylesheet" href='{% get_static_prefix %}css/munkiwebadmin.css' type="text/css" media="all" />
 
         {% block extra_style %}{% endblock %}
 
-        <script type="module" src="{% get_static_prefix %}js/color-modes.js"></script>
+        
 
         <!-- static/media url for js -->
         <script>
