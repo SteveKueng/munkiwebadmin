@@ -10,6 +10,7 @@ $(document).ready(function() {
     initManifestsTable();
     hash = window.location.hash;
     if (hash.length > 1) {
+        event.preventDefault();
         getManifestItem(hash.slice(1));
     }
     getCatalogData();
@@ -72,6 +73,7 @@ $(document).ready(function() {
         hash = window.location.hash;
         if (hash.length > 1) {
             if (hash.slice(1) != current_pathname) {
+                $('.modal-backdrop').remove();
                 getManifestItem(hash.slice(1));
             }
         }
@@ -137,21 +139,21 @@ function initManifestsTable() {
         "bFilter": true,
         "bStateSave": true,
         "aaSorting": [[0,'asc']]
-     });
-     // start our monitoring timer loop
-     monitor_manifest_list();
-     // tie our search field to the table
-     var thisTable = $('#list_items').DataTable();
-     $('#listSearchField').keyup(function(){
-          thisTable.search($(this).val()).draw();
-     });
+    });
+    // start our monitoring timer loop
+    monitor_manifest_list();
+    // tie our search field to the table
+    var thisTable = $('#list_items').DataTable();
+    $('#listSearchField').keyup(function(){
+        thisTable.search($(this).val()).draw();
+    });
 
-     $('#list_items').on('click', 'tbody td', function () {
-         var id = $(this).find('a').attr('href');
-         id = id.substring(1);
-         var url = window.location.href;
-         window.location.href = url + id;
-     });
+    let table = new DataTable('#list_items');
+    table.on('click', 'tbody tr', function () {
+        let data = table.row(this).data();
+        var url = window.location.href;
+        window.location.href = url + '#' + data[0];
+    });
 }
 
 function monitor_manifest_list() {
@@ -164,9 +166,9 @@ function monitor_manifest_list() {
 
 function cancelEdit() {
     hideSaveOrCancelBtns();
-    window.location.hash = '';
+    history.replaceState({}, document.title, ".");
     current_pathname = "";
-    $("#manifestItems").modal("hide");
+    $('.modal-backdrop').remove();
 }
 
 var js_obj = {};
@@ -432,7 +434,6 @@ function getManifestItem(pathname) {
             window.location.hash = pathname;
 
             if (!$('#manifestItems').hasClass('in')){
-              //alert("test")
               $("#manifestItems").modal("show");
             }
         },

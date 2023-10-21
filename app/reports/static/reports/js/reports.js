@@ -79,7 +79,7 @@ $(document).ready(function() {
         hash = window.location.hash;
         if (hash.length > 1) {
             if (hash.slice(1).split('#')[0] != current_pathname) {
-                $('.modal-backdrop').hide();
+                $('.modal-backdrop').remove();
                 getComputerItem(hash.slice(1));
             }
         }
@@ -89,7 +89,6 @@ $(document).ready(function() {
 function cancelEdit() {
     history.replaceState({}, document.title, ".");
     current_pathname = "";
-    $("#computerDetails").modal("hide");
 }
 
 function activaTab(tab){
@@ -598,9 +597,9 @@ function getClientTable() {
     // tie our search field to the table
     var thisTable = $('#list_items').DataTable(),
         searchField = $('#listSearchField');
-    searchField.keyup(function(){
-        thisTable.search($(this).val()).draw();
-    });
+        searchField.keyup(function() {
+            thisTable.search($(this).val()).draw();
+        });
      
     let table = new DataTable('#list_items');
     table.on('click', 'tbody tr', function () {
@@ -608,7 +607,6 @@ function getClientTable() {
         var url = window.location.href;
         window.location.href = url + '#' + data['serial_number'];
     });
-
 }
 
 function addDeleteButton(id) {
