@@ -10,7 +10,6 @@ $(document).ready(function() {
     initManifestsTable();
     hash = window.location.hash;
     if (hash.length > 1) {
-        event.preventDefault();
         getManifestItem(hash.slice(1));
     }
     getCatalogData();
@@ -80,15 +79,20 @@ $(document).ready(function() {
     });
 } );
 
+var render_name = function(data, type, full, meta) {
+    return '<a href="#' + data + '">' + data + '</a>';
+}
+
+function resetUrl() {
+    history.replaceState({}, document.title, ".");
+    current_pathname = "";
+}
+
 function linkToIncludedManifest(target) {
     //parent is <td>; its parent is <tr>
     var tableRow = $(target).closest('tr'),
         manifest_path = $(tableRow).find('.value').val();
     getManifestItem(manifest_path);
-}
-
-var render_name = function(data, type, full, meta) {
-    return '<a href="#' + data + '">' + data + '</a>';
 }
 
 function initManifestsTable() {
@@ -166,8 +170,7 @@ function monitor_manifest_list() {
 
 function cancelEdit() {
     hideSaveOrCancelBtns();
-    history.replaceState({}, document.title, ".");
-    current_pathname = "";
+    resetUrl();
     $('.modal-backdrop').remove();
 }
 
@@ -439,20 +442,20 @@ function getManifestItem(pathname) {
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#manifest_detail').html("")
-            current_pathname = "";
             $("#errorModalTitleText").text("Manifest read error");
-             try {
-                 var json_data = $.parseJSON(jqXHR.responseText)
-                 if (json_data['result'] == 'failed') {
-                     $("#errorModalDetailText").text(json_data['detail']);
-                     $("#errorModal").modal("show");
-                     return;
-                 }
-             } catch(err) {
-                 // do nothing
-             }
-             $("#errorModalDetailText").text(errorThrown);
-             $("#errorModal").modal("show");
+            resetUrl();
+            try {
+                var json_data = $.parseJSON(jqXHR.responseText)
+                if (json_data['result'] == 'failed') {
+                    $("#errorModalDetailText").text(json_data['detail']);
+                    $("#errorModal").modal("show");
+                    return;
+                }
+            } catch(err) {
+                // do nothing
+            }
+            $("#errorModalDetailText").text(errorThrown);
+            $("#errorModal").modal("show");
         },
         dataType: 'html'
     });
@@ -507,7 +510,6 @@ function duplicateManifestItem() {
 
 function saveManifestItem() {
     var plist_data = editor.getValue();
-    //var postdata = JSON.stringify({'plist_data': plist_data})
     var manifestItemURL = '/api/manifests/' + current_pathname;
     $.ajax({
         method: 'POST',
@@ -519,9 +521,9 @@ function saveManifestItem() {
         timeout: 10000,
         success: function(data) {
             hideSaveOrCancelBtns();
-            window.location.hash = '';
-            current_pathname = "";
+            resetUrl();
             $("#manifestItems").modal("hide");
+            $('.modal-backdrop').remove();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $("#errorModalTitleText").text("Manifest save error");
@@ -529,13 +531,11 @@ function saveManifestItem() {
                 var json_data = $.parseJSON(jqXHR.responseText)
                 if (json_data['result'] == 'failed') {
                     $("#errorModalDetailText").text(json_data['detail']);
-                    $("#errorModal").modal("show");
-                    return;
+
                 }
             } catch(err) {
-              // do nothing
+                $("#errorModalDetailText").text(errorThrown);
             }
-            $("#errorModalDetailText").text(errorThrown);
             $("#errorModal").modal("show");
         },
     });
