@@ -86,9 +86,14 @@ $(document).ready(function() {
     });
 });
 
-function cancelEdit() {
+function resetUrl() {
     history.replaceState({}, document.title, ".");
     current_pathname = "";
+}
+
+function cancelEdit() {
+    resetUrl();
+    $('.modal-backdrop').remove();
 }
 
 function activaTab(tab){
@@ -159,8 +164,8 @@ function getComputerItem(pathname) {
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#computer_detail').html("")
-                current_pathname = "";
                 $("#errorModalTitleText").text("computer read error");
+                resetUrl();
                 try {
                     var json_data = $.parseJSON(jqXHR.responseText)
                     if (json_data['result'] == 'failed') {
@@ -651,6 +656,7 @@ function deleteMachine() {
         headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             getClientTable();
+            resetUrl();
             $('#computerDetails').modal('hide');
         },
         error: function(jqXHR, textStatus, errorThrown) {
