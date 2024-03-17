@@ -20,6 +20,12 @@ RUN apt-get update \
     libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
     fuse3 blobfuse2 \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
+RUN dpkg -i packages-microsoft-prod.deb
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y fuse3 blobfuse2 \
 # -------
 
 # install dependencies
