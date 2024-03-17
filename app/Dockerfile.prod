@@ -19,7 +19,6 @@ RUN apt-get update \
     libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev \
     build-essential libssl-dev libffi-dev libjpeg-dev \
     libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
-    fuse3 blobfuse2 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
