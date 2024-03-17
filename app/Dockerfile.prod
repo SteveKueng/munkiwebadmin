@@ -13,12 +13,15 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
+RUN curl -sSL -O https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+RUN dpkg -i packages-microsoft-prod.deb
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y gcc default-libmysqlclient-dev python3-dev \
     libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev \
     build-essential libssl-dev libffi-dev libjpeg-dev \
     libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
+    fuse3 blobfuse2 \
     && rm -rf /var/lib/apt/lists/*
 
 # lint
