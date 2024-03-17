@@ -22,7 +22,7 @@ RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-micros
 RUN dpkg -i packages-microsoft-prod.deb
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y fuse3 blobfuse2 \
+    && apt-get install -y fuse3 blobfuse2
 # -------
 
 # install dependencies
