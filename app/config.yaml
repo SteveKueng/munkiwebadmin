@@ -24,8 +24,3 @@ attr_cache:
 
 azstorage:
   type: block
-  account-name: ikueng
-  sas: sp=racwdl&st=2024-03-17T16:11:52Z&se=2025-12-01T00:11:52Z&spr=https&sv=2022-11-02&sr=c&sig=DxU4pTADsrethehw6953j7zjL9DnA8Y4op244rcMfPA%3D
-  endpoint: https://ikueng.blob.core.windows.net
-  mode: sas
-  container: munki
