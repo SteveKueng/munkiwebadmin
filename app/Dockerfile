@@ -16,14 +16,22 @@ RUN apt-get update \
     libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev \
     build-essential libssl-dev libffi-dev libjpeg-dev \
     libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
+    git fuse3 libfuse3-dev golang \
     && rm -rf /var/lib/apt/lists/*
-
-RUN curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
-RUN dpkg -i packages-microsoft-prod.deb
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y fuse3 blobfuse2
 # -------
+
+# set work directory
+WORKDIR /tmp
+
+# build blobfuse
+RUN git clone https://github.com/Azure/azure-storage-fuse/
+WORKDIR /tmp/azure-storage-fuse
+RUN ./build.sh
+RUN cp blobfuse2 /usr/local/bin
+RUN rm -rf /tmp/azure-storage-fuse
+
+# set work directory
+WORKDIR /usr/src/app
 
 # install dependencies
 RUN pip install --upgrade pip
