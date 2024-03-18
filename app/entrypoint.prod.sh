@@ -8,9 +8,12 @@ GROUP=root                                    # the group to run as
 NUM_WORKERS=3                                 # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=munkiwebadmin.settings # which settings file should Django use
 
+# mount azure blob storage 
+if [ "$AZURE_STORAGE_BLOB_ENDPOINT" != "" ]; then
+  blobfuse2 mount /munkirepo/
+fi
 
-if [ "$DATABASE" = "postgres" ]
-then
+if [ "$DATABASE" == "postgres" ]; then
     echo "Waiting for postgres..."
 
     while ! nc -z $SQL_HOST $SQL_PORT; do
