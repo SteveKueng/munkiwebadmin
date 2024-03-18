@@ -33,8 +33,13 @@ if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
     GIT_PATH = '/usr/bin/git'
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ") + os.environ.get('WEBSITE_HOSTNAME', "")
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ") + os.environ.get('WEBSITE_HOSTNAME', "")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
+
+if os.environ.get('WEBSITE_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ.get('WEBSITE_HOSTNAME'))
+    CSRF_TRUSTED_ORIGINS.append(os.environ.get('WEBSITE_HOSTNAME'))
+
 DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
