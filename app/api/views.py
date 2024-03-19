@@ -14,7 +14,6 @@ from django.http import HttpResponse, QueryDict, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
@@ -22,7 +21,7 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+
 
 from api.serializers import (
     MachineListSerializer, 
@@ -210,7 +209,6 @@ def postDataAPI(URL, postData):
     return None
 
 @csrf_exempt
-@logged_in_or_basicauth()
 def plist_api(request, kind, filepath=None):
     '''Basic API calls for working with Munki plist files'''
     if kind not in ['manifests', 'pkgsinfo', 'catalogs']:
@@ -531,7 +529,6 @@ def plist_api(request, kind, filepath=None):
     return HttpResponse(status=404)
 
 @csrf_exempt
-@logged_in_or_basicauth()
 def file_api(request, kind, filepath=None):
     '''Basic API calls for working with non-plist Munki files'''
     if kind not in ['icons', 'pkgs']:
@@ -692,6 +689,7 @@ class ReportsDetailAPIView(CreateModelMixin, DestroyModelMixin, UpdateModelMixin
     serializer_class = MachineDetailSerializer
     
     lookup_url_kwarg = "serial_number"
+    pk_url_kwarg = "serial_number"
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -724,6 +722,11 @@ class CatalogsListView(GenericAPIView, ListModelMixin):
         filter_terms = self.request.GET.copy()
         LOGGER.debug("filter_terms: %s", filter_terms)
 
+        # remove the _ parameter
+        if '_' in filter_terms.keys():
+            del filter_terms['_']
+
+        # remove the api_fields parameter
         api_fields = None
         if 'api_fields' in filter_terms.keys():
             api_fields = filter_terms['api_fields']
@@ -810,6 +813,11 @@ class ManifestsListView(GenericAPIView, ListModelMixin):
         filter_terms = self.request.GET.copy()
         LOGGER.debug("filter_terms: %s", filter_terms)
 
+        # remove the _ parameter
+        if '_' in filter_terms.keys():
+            del filter_terms['_']
+
+        # remove the api_fields parameter
         api_fields = None
         if 'api_fields' in filter_terms.keys():
             api_fields = filter_terms['api_fields']
@@ -870,6 +878,11 @@ class ManifestsDetailAPIView(GenericAPIView, ListModelMixin):
         queryset = self.get_queryset()
         filter_terms = self.request.GET.copy()
 
+        # remove the _ parameter
+        if '_' in filter_terms.keys():
+            del filter_terms['_']
+
+        # remove the api_fields parameter
         api_fields = None
         if 'api_fields' in filter_terms.keys():
             api_fields = filter_terms['api_fields']
@@ -904,6 +917,11 @@ class PkgsinfoListView(GenericAPIView, ListModelMixin):
         queryset = self.get_queryset()
         filter_terms = self.request.GET.copy()
 
+        # remove the _ parameter
+        if '_' in filter_terms.keys():
+            del filter_terms['_']
+
+        # remove the api_fields parameter
         api_fields = None
         if 'api_fields' in filter_terms.keys():
             api_fields = filter_terms['api_fields']
