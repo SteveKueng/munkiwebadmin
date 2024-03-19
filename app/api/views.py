@@ -1,24 +1,33 @@
 """
 api/views.py
 """
-from django.http import HttpResponse
-from django.http import QueryDict
-from django.http import FileResponse
-from django.core import serializers
+from rest_framework.response import Response
+from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.mixins import (
+    CreateModelMixin, 
+    DestroyModelMixin,
+    UpdateModelMixin,
+    ListModelMixin
+)
+
+from django.http import HttpResponse, QueryDict, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
-from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from api.models import Plist, MunkiFile
 from api.models import FileError, FileWriteError, FileReadError, \
                        FileAlreadyExistsError, \
                        FileDoesNotExistError, FileDeleteError
 
-from reports.models import Machine, MunkiReport
-from inventory.models import Inventory
-from vault.models import localAdmin, passwordAccess
+from reports.models import Machine
 from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
+
+from api.serializers import (
+    MachineListSerializer, 
+    MachineDetailSerializer
+)
 
 import datetime
 import json
@@ -29,7 +38,6 @@ import plistlib
 import re
 import base64
 import bz2
-import hashlib
 import zlib
 import requests
 import urllib
@@ -61,7 +69,7 @@ if PROXY_ADDRESS != "":
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
-    if isinstance(value, (int, float, bool, basestring, dict)):
+    if isinstance(value, (int, float, bool, str, dict)):
         return [str(value).lower()]
     if isinstance(value, list):
         return [str(item).lower() for item in value]
@@ -94,7 +102,7 @@ def convert_strings_to_dates(jdata):
         r"^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\dZ*$")
     if isinstance(jdata, dict):
         for key, value in jdata.items():
-            if ('date' in key.lower() and isinstance(value, basestring)
+            if ('date' in key.lower() and isinstance(value, str)
                     and iso_date_pattern.match(value)):
                 jdata[key] = datetime.datetime.strptime(
                     value[:19], "%Y-%m-%dT%H:%M:%S")
@@ -675,347 +683,6 @@ def file_api(request, kind, filepath=None):
 
 @csrf_exempt
 @logged_in_or_basicauth()
-def db_api(request, kind, subclass=None, serial_number=None):
-    if kind not in ['report', 'vault', 'inventory']:
-        return HttpResponse(status=404)
-
-    # ------- get submit -------
-    try:
-        submit = json.loads(request.body)
-    except:
-        submit = request.POST
-    
-    submission_type = submit.get('submission_type', None)
-
-    # ----------- RESPONSE TYPE -----------------
-    response_type = 'json'
-    if request.META.get('HTTP_ACCEPT') == 'application/xml':
-        response_type = 'xml'
-
-    # ----------- GET -----------------
-    if request.method == 'GET':
-        LOGGER.debug("Got API GET request for %s", kind)
-
-        filter_terms = request.GET.copy()
-        if '_' in filter_terms.keys():
-            del filter_terms['_']
-        if 'api_fields' in filter_terms.keys():
-            api_fields = filter_terms['api_fields'].split(',')
-            del filter_terms['api_fields']
-        else:
-            api_fields = None
-        
-        response = list()
-        if kind in ['report']:
-            if not request.user.has_perm('reports.can_view_reports'):
-                raise PermissionDenied
-            if serial_number:
-                try:
-                    item_list = serializers.serialize(response_type, Machine.objects.filter(serial_number=serial_number), fields=(api_fields))
-                except Machine.DoesNotExist:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'MachineDoesNotExist',
-                                    'detail': '%s does not exist' % serial_number}),
-                        content_type='application/json', status=404)
-            else:
-                item_list = serializers.serialize(response_type, Machine.objects.all(), fields=(api_fields))
-
-            return HttpResponse(
-                item_list,
-                content_type='application/'+response_type, status=201)
-        
-        if kind in ['vault'] and subclass == "reasons" and serial_number:
-            if not request.user.has_perm('vault.view_passwordAccess'):
-                raise PermissionDenied
-            try:
-                access = passwordAccess.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
-            except Machine.DoesNotExist:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'MachineDoesNotExist',
-                                'detail': '%s does not exist' % serial_number}),
-                    content_type='application/json', status=404)
-            
-
-            if response_type == 'json':
-                response = serializers.serialize('json', access, fields=(api_fields), indent=2, use_natural_foreign_keys=True,  use_natural_primary_keys=True)
-            else:
-                response = serializers.serialize('xml', access, fields=(api_fields), indent=2, use_natural_foreign_keys=True,  use_natural_primary_keys=True)
-            return HttpResponse(
-                response,
-                content_type='application/'+response_type, status=201)
-
-        if kind in ['vault'] and subclass == "expire" and serial_number:
-            if not request.user.has_perm('vault.view_expireDate'):
-                raise PermissionDenied
-            try:
-                localadmin = localAdmin.objects.filter(machine=Machine.objects.get(serial_number=serial_number))
-            except Machine.DoesNotExist:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'MachineDoesNotExist',
-                                'detail': '%s does not exist' % serial_number}),
-                    content_type='application/json', status=404)
-            
-            if response_type == 'json':
-                response = serializers.serialize('json', localadmin, fields=(['expireDate']))
-            else:
-                response = serializers.serialize('xml', localadmin, fields=(['expireDate']))
-            return HttpResponse(
-                response[1:-1],
-                content_type='application/'+response_type, status=200)
-    
-    # ----------- HTTP_X_METHODOVERRIDE -----------------
-    if 'HTTP_X_METHODOVERRIDE' in request.META.keys():
-        # support browsers/libs that don't directly support the other verbs
-        http_method = request.META['HTTP_X_METHODOVERRIDE']
-        if http_method.lower() == 'delete':
-            request.method = 'DELETE'
-            request.META['REQUEST_METHOD'] = 'DELETE'
-            request.DELETE = QueryDict(request.body)
-
-    # ----------- POST -----------------
-    if request.method == 'POST':
-        LOGGER.debug("Got API POST request for %s", kind)
-        if serial_number:
-            try:
-                machine = Machine.objects.get(serial_number=serial_number)
-            except Machine.DoesNotExist:
-                machine = Machine(serial_number=serial_number)
-            if kind in ['report']:
-                if not request.user.has_perm('reports.change_machine'):
-                    raise PermissionDenied
-                try:
-                    report = MunkiReport.objects.get(machine=machine)
-                except MunkiReport.DoesNotExist:
-                    report = MunkiReport(machine=machine)
-
-                if machine and report:
-                    LOGGER.debug("Report %s for machine %s", machine, report)
-                    machine.remote_ip = request.META['REMOTE_ADDR']
-                    report.activity = ""
-
-                    if not machine.hostname and 'name' in submit:
-                        machine.hostname = submit.get('name')
-                    if 'username' in submit:
-                        machine.username = submit.get('username')
-
-                    if 'base64bz2report' in submit:
-                        report.update_report(submit.get('base64bz2report'))
-
-                    # extract machine data from the report
-                    report_data = report.get_report() 
-                    if 'MachineInfo' in report_data:
-                        machine.os_version = report_data['MachineInfo'].get('os_vers', machine.os_version)
-                        machine.cpu_arch = report_data['MachineInfo'].get('arch', machine.cpu_arch)
-
-                    hwinfo = {}
-                    if 'SystemProfile' in report_data.get('MachineInfo', []):
-                        if 'SPHardwareDataType' in report_data['MachineInfo']['SystemProfile'][0].keys():
-                            hwinfo = report_data['MachineInfo']['SystemProfile'][0]['SPHardwareDataType'][0]
-
-                    LOGGER.debug("hwinfo %s", hwinfo)
-                    if hwinfo:
-                        # model lookup
-                        if hwinfo.get('machine_model', None):
-                            machine.machine_model = hwinfo['machine_model']
-                        model_name = model_lookup(serial_number).get('name', None)
-                        if model_name:
-                            machine.machine_model = model_name
-
-                        # get image url
-                        machine.img_url = get_device_img_url(serial_number)
-
-                        # get cpu type
-                        if hwinfo.get('cpu_type', None):
-                            machine.cpu_type = hwinfo['cpu_type']
-                        if hwinfo.get('chip_type', None):
-                            machine.cpu_type = hwinfo['chip_type']
-                        
-                        # get cpu speed
-                        if hwinfo.get('current_processor_speed', None):
-                            machine.cpu_speed = hwinfo['current_processor_speed']
-                        
-                        # get pyhsical memory
-                        if hwinfo.get('physical_memory', None):
-                            machine.ram = hwinfo['physical_memory']
-                    
-                    if not machine.os_version:
-                        machine.os_version = "unknown"
-
-                    LOGGER.debug("machine %s", machine)
-                    
-                    report.runtype = submit.get('runtype', 'UNKNOWN')
-
-                    if submission_type == 'postflight':
-                        report.runstate = u"done"
-
-                    if submission_type == 'preflight':
-                        report.runstate = u"in progress"
-                        report.activity = report.encode({"Updating": "preflight"})
-
-                    if submission_type == 'report_broken_client':
-                        report.runstate = u"broken client"
-                        report.errors = 1
-                        report.warnings = 0
-
-                    report.timestamp = timezone.now()
-                    try:
-                        machine.save()
-                    except Exception as e:
-                        LOGGER.error("machine save error: %s", e)
-                    try:
-                        report.save()
-                    except Exception as e:
-                        LOGGER.error("report save error: %s", e)
-
-            elif kind in ['inventory']:
-                # list of bundleids to ignore
-                bundleid_ignorelist = [
-                    'com.apple.print.PrinterProxy'
-                ]
-                LOGGER.debug("Request for machine %s", machine)
-                if machine:
-                    compressed_inventory = submit.get('base64bz2inventory')
-                    if compressed_inventory:
-                        compressed_inventory = compressed_inventory.replace(" ", "+")
-                        inventory_str = decode_to_string(compressed_inventory)
-                        try:
-                            inventory_list = plistlib.loads(inventory_str)
-                        except Exception:
-                            inventory_list = None
-                        if inventory_list:
-                            LOGGER.debug(inventory_list)
-                            try:
-                                inventory_meta = Inventory.objects.get(machine=machine)
-                            except Inventory.DoesNotExist:
-                                inventory_meta = Inventory(machine=machine)
-                            inventory_meta.sha256hash = \
-                                hashlib.sha256(inventory_str).hexdigest()
-                            # clear existing inventoryitems
-                            machine.inventoryitem_set.all().delete()
-                            # insert current inventory items
-                            for item in inventory_list:
-                                # skip items in bundleid_ignorelist.
-                                if not item.get('bundleid') in bundleid_ignorelist:
-                                    i_item = machine.inventoryitem_set.create(
-                                        name=item.get('name', ''),
-                                        version=item.get('version', ''),
-                                        bundleid=item.get('bundleid', ''),
-                                        bundlename=item.get('CFBundleName', ''),
-                                        path=item.get('path', '')
-                                        )
-                            inventory_meta.save()
-                        return HttpResponse(status=200)
-                return HttpResponse(status=404)
-
-            elif kind in ['vault'] and subclass == "set":
-                if not request.user.has_perm('vault.change_localadmin'):
-                    raise PermissionDenied
-                # set password
-                value = submit.get('value', None)
-                value = base64.b64decode(value)
-                if value:
-                    try:
-                        localadmin = localAdmin.objects.get(machine=machine)
-                    except localAdmin.DoesNotExist:
-                        localadmin = localAdmin(machine=machine)
-                    localadmin.setPassword(value)
-                    localadmin.save()
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing value'}),
-                        content_type='application/json', status=400)
-
-            elif kind in ['vault'] and subclass == "show":
-                if not request.user.has_perm('vault.show_password'):
-                    raise PermissionDenied
-                reason = submit.get('reason', None)
-                if reason:
-                    try:
-                        localadmin = localAdmin.objects.get(machine=Machine.objects.get(serial_number=serial_number))
-                        password = localadmin.getPassword(request.user, reason)
-                    except Machine.DoesNotExist:
-                        return HttpResponse(
-                            json.dumps({'result': 'failed',
-                                        'exception_type': 'MachineDoesNotExist',
-                                        'detail': '%s does not exist' % serial_number}),
-                            content_type='application/json', status=404)
-                    except localAdmin.DoesNotExist:
-                        return HttpResponse(
-                            json.dumps({'result': 'failed',
-                                        'exception_type': 'No Password found',
-                                        'detail': 'No password found for %s' % serial_number}),
-                            content_type='application/json', status=404)
-
-                    
-                    if response_type == 'json':
-                        return HttpResponse(
-                            json.dumps(password) + '\n',
-                            content_type='application/json', status=201)
-                    else:
-                        return HttpResponse(
-                            password,
-                            content_type='application/xml', status=201)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': 'BadRequest',
-                                    'detail': 'Missing reason'}),
-                        content_type='application/json', status=400)
-            else:
-                return HttpResponse(status=404)
-            return HttpResponse(status=204)
-
-        return HttpResponse(status=404)
-    # ----------- PUT -----------------
-    if request.method == 'PUT':
-        LOGGER.debug("Got API PUT request for %s", kind)
-        if not request.user.has_perm('reports.change_machine'):
-            raise PermissionDenied
-        if serial_number:
-            try:
-                machine = Machine.objects.get(serial_number=serial_number)
-            except Machine.DoesNotExist:
-                machine = Machine(serial_number=serial_number)
-
-            if 'name' in submit:
-                machine.hostname = submit.get('name')
-                machine.save()
-                return HttpResponse(status=201)
-
-    # ----------- DELETE -----------------
-    elif request.method == 'DELETE':
-        LOGGER.debug("Got API DELETE request for %s", kind)
-        if not request.user.has_perm('reports.delete_machine'):
-            raise PermissionDenied
-        if not serial_number:
-            return HttpResponse(
-                json.dumps({'result': 'failed',
-                            'exception_type': 'MassDeleteNotSupported',
-                            'detail': 'Deleting all items is not supported'}
-                        ),
-                content_type='application/json', status=403)
-        try:
-            Machine.objects.filter(serial_number=serial_number).delete()
-        except Machine.DoesNotExist:
-                return HttpResponse(
-                    json.dumps({'result': 'failed',
-                                'exception_type': 'MachineDoesNotExist',
-                                'detail': '%s does not exist' % serial_number}),
-                    content_type='application/json', status=404)
-        else:
-            # success
-            return HttpResponse(status=204)
-    
-    # ----------- error 404 -----------------
-    return HttpResponse(status=404)
-
-@csrf_exempt
-@logged_in_or_basicauth()
 def santa_api(request, kind, submission_type, machine_id):
     LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, machine_id))
 
@@ -1053,3 +720,414 @@ def santa_api(request, kind, submission_type, machine_id):
 
     if submission_type == "postflight":
         return HttpResponse(status=200)
+
+
+class ReportsListAPIView(ListAPIView):
+    queryset = Machine.objects.all()
+    serializer_class = MachineListSerializer
+
+
+class ReportsDetailAPIView(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, RetrieveAPIView):
+    queryset = Machine.objects.all()
+    serializer_class = MachineDetailSerializer
+    
+    lookup_url_kwarg = "serial_number"
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+    
+
+class CatalogsListView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.list('catalogs')
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+
+        filter_terms = self.request.GET.copy()
+        LOGGER.debug("filter_terms: %s", filter_terms)
+
+        api_fields = None
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields']
+            del filter_terms['api_fields']
+
+        response = []
+        for item_name in queryset:
+            LOGGER.debug("item_name: %s", item_name)
+            plist = Plist.read('catalogs', item_name)
+            plist = convert_dates_to_strings(plist)
+            plist = {'contents': plist}
+            plist['filename'] = item_name
+            matches_filters = True
+            for key, value in filter_terms.items():
+                LOGGER.debug("key: %s, value: %s", key, value)
+                LOGGER.debug("plist: %s", plist)
+                if key not in plist:
+                    LOGGER.debug("key not in plist")
+                    matches_filters = False
+                    continue
+                plist_value = normalize_value_for_filtering(plist[key])
+                match = next(
+                    (item for item in plist_value
+                        if value.lower() in item.lower()), None)
+                if not match:
+                    matches_filters = False
+                    continue
+            
+            if matches_filters:
+                if api_fields:
+                    # filter to just the requested fields
+                    plist = {key: plist[key] for key in plist.keys()
+                                if key in api_fields}
+                    LOGGER.debug("plist: %s", plist)
+                response.append(plist)
+        return response
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request):
+        return Response(self.get_object())
+
+
+class CatalogsDetailAPIView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.read('catalogs', self.kwargs['filepath'])
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        response = convert_dates_to_strings(response)
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        return queryset
+        
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request, filepath):
+        return Response(self.get_object())
+    
+
+class ManifestsListView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.list('manifests')
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+
+        filter_terms = self.request.GET.copy()
+        LOGGER.debug("filter_terms: %s", filter_terms)
+
+        api_fields = None
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields']
+            del filter_terms['api_fields']
+
+        response = []
+        for item_name in queryset:
+            LOGGER.debug("item_name: %s", item_name)
+            plist = Plist.read('manifests', item_name)
+            plist = convert_dates_to_strings(plist)
+            plist['filename'] = item_name
+            matches_filters = True
+            for key, value in filter_terms.items():
+                LOGGER.debug("key: %s, value: %s", key, value)
+                LOGGER.debug("plist: %s", plist)
+                if key not in plist:
+                    LOGGER.debug("key not in plist")
+                    matches_filters = False
+                    continue
+                plist_value = normalize_value_for_filtering(plist[key])
+                match = next(
+                    (item for item in plist_value
+                        if value.lower() in item.lower()), None)
+                if not match:
+                    matches_filters = False
+                    continue
+            
+            if matches_filters:
+                if api_fields:
+                    # filter to just the requested fields
+                    plist = {key: plist[key] for key in plist.keys()
+                                if key in api_fields}
+                    LOGGER.debug("plist: %s", plist)
+                response.append(plist)
+        return response
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request):
+        return Response(self.get_object())
+
+
+class ManifestsDetailAPIView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.read('manifests', self.kwargs['filepath'])
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        response = convert_dates_to_strings(response)
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        filter_terms = self.request.GET.copy()
+
+        api_fields = None
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields']
+            del filter_terms['api_fields']
+        
+        if api_fields:
+            for key in list(queryset):
+                if key not in api_fields:
+                    del queryset[key]
+        return queryset
+        
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request, filepath):
+        return Response(self.get_object())
+
+
+class PkgsinfoListView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.list('pkgsinfo')
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        filter_terms = self.request.GET.copy()
+
+        api_fields = None
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields']
+            del filter_terms['api_fields']
+
+        response = []
+        for item_name in queryset:
+            LOGGER.debug("item_name: %s", item_name)
+            plist = Plist.read('pkgsinfo', item_name)
+            plist = convert_dates_to_strings(plist)
+            plist['filename'] = item_name
+            matches_filters = True
+            for key, value in filter_terms.items():
+                LOGGER.debug("key: %s, value: %s", key, value)
+                LOGGER.debug("plist: %s", plist)
+                if key not in plist:
+                    LOGGER.debug("key not in plist")
+                    matches_filters = False
+                    continue
+                plist_value = normalize_value_for_filtering(plist[key])
+                match = next(
+                    (item for item in plist_value
+                        if value.lower() in item.lower()), None)
+                if not match:
+                    matches_filters = False
+                    continue
+            
+            if matches_filters:
+                if api_fields:
+                    # filter to just the requested fields
+                    plist = {key: plist[key] for key in plist.keys()
+                                if key in api_fields}
+                    LOGGER.debug("plist: %s", plist)
+                response.append(plist)
+        return response
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request):
+        return Response(self.get_object())
+
+
+class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = Plist.read('pkgsinfo', self.kwargs['filepath'])
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        response = convert_dates_to_strings(response)
+        return response
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        filter_terms = self.request.GET.copy()
+
+        api_fields = None
+        if 'api_fields' in filter_terms.keys():
+            api_fields = filter_terms['api_fields']
+            del filter_terms['api_fields']
+        
+        if api_fields:
+            for key in list(queryset):
+                if key not in api_fields:
+                    del queryset[key]
+        return queryset
+        
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request, filepath):
+        return Response(self.get_object())
+
+
+class PkgsListView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = MunkiFile.list('pkgs')
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
+        return self.get_queryset()
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request):
+        return Response(self.get_object())    
+
+
+class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get']
+    
+    def get_queryset(self):
+        filepath = self.kwargs['filepath']
+        fullpath = MunkiFile.get_fullpath('pkgs', filepath)
+        if not os.path.exists(fullpath):
+            return Response({'result': 'failed',
+                            'exception_type': 'FileDoesNotExist',
+                            'detail': '%s does not exist' % filepath})
+        try:
+            response = FileResponse(
+                open(fullpath, 'rb'),
+                content_type=mimetypes.guess_type(fullpath)[0])
+            response['Content-Length'] = os.path.getsize(fullpath)
+            response['Content-Disposition'] = (
+                'attachment; filename="%s"' % os.path.basename(filepath))
+            return response
+        except (IOError, OSError) as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
+    
+    def get_object(self):
+        return self.get_queryset()
+        
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request, filepath):
+        return self.get_object()
+
+
+class IconsListView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get', 'post']
+    
+    def get_queryset(self):
+        try:
+            response = MunkiFile.list('icons')
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
+        return self.get_queryset()
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request):
+        return Response(self.get_object())
+
+
+class IconsDetailAPIView(GenericAPIView, ListModelMixin):
+    http_method_names = ['get']
+    
+    def get_queryset(self):
+        filepath = self.kwargs['filepath']
+        fullpath = MunkiFile.get_fullpath('icons', filepath)
+        if not os.path.exists(fullpath):
+            return Response({'result': 'failed',
+                            'exception_type': 'FileDoesNotExist',
+                            'detail': '%s does not exist' % filepath})
+        try:
+            response = FileResponse(
+                open(fullpath, 'rb'),
+                content_type=mimetypes.guess_type(fullpath)[0])
+            response['Content-Length'] = os.path.getsize(fullpath)
+            response['Content-Disposition'] = (
+                'attachment; filename="%s"' % os.path.basename(filepath))
+            return response
+        except (IOError, OSError) as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
+    
+    def get_object(self):
+        return self.get_queryset()
+        
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def list(self, request, filepath):
+        return self.get_object()
+

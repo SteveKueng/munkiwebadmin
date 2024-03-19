@@ -1,21 +1,20 @@
 from django.urls import re_path as url
 import api.views
 
+from api.views import ReportsListAPIView, ReportsDetailAPIView, CatalogsListView, CatalogsDetailAPIView, ManifestsListView, ManifestsDetailAPIView, PkgsinfoListView, PkgsinfoDetailAPIView, PkgsListView, PkgsDetailAPIView, IconsListView, IconsDetailAPIView
+
 urlpatterns = [
-    url(r'^(?P<kind>catalogs$)', api.views.plist_api),
-    url(r'^(?P<kind>catalogs)/(?P<filepath>.*$)', api.views.plist_api),
-    url(r'^(?P<kind>manifests$)', api.views.plist_api),
-    url(r'^(?P<kind>manifests)/(?P<filepath>.*$)', api.views.plist_api),
-    url(r'^(?P<kind>pkgsinfo$)', api.views.plist_api),
-    url(r'^(?P<kind>pkgsinfo)/(?P<filepath>.*$)', api.views.plist_api),
-    url(r'^(?P<kind>icons$)', api.views.file_api),
-    url(r'^(?P<kind>icons)/(?P<filepath>.*$)', api.views.file_api),
-    url(r'^(?P<kind>pkgs$)', api.views.file_api),
-    url(r'^(?P<kind>pkgs)/(?P<filepath>.*$)', api.views.file_api),
-    url(r'^(?P<kind>vault)/(?P<subclass>[a-zA-Z]+$)', api.views.db_api),
-    url(r'^(?P<kind>vault)/(?P<subclass>[a-zA-Z]+)/(?P<serial_number>[a-zA-Z0-9]+$)', api.views.db_api),
+    url(r'^reports$', ReportsListAPIView.as_view(), name="report-list"),
+    url(r'^reports/(?P<serial_number>[a-zA-Z0-9]+)$', ReportsDetailAPIView.as_view(), name="report-detail"),
+    url(r'^catalogs$', CatalogsListView.as_view(), name="catalog-list"),
+    url(r'^catalogs/(?P<filepath>.*$)', CatalogsDetailAPIView.as_view(), name="catalog-detail"),
+    url(r'^manifests$', ManifestsListView.as_view(), name="manifest-list"),
+    url(r'^manifests/(?P<filepath>.*$)', ManifestsDetailAPIView.as_view()),
+    url(r'^pkgsinfo$', PkgsinfoListView.as_view(), name="pkgsinfo-list"),
+    url(r'^pkgsinfo/(?P<filepath>.*$)', PkgsinfoDetailAPIView.as_view(), name="pkgsinfo-detail"),
+    url(r'^pkgs$', PkgsListView.as_view(), name="pkgs-list"),
+    url(r'^pkgs/(?P<filepath>.*$)', PkgsDetailAPIView.as_view(), name="pkgs-download"),
+    url(r'^icons$', IconsListView.as_view(), name="icon-list"),
+    url(r'^icons/(?P<filepath>.*$)', IconsDetailAPIView.as_view(), name="icon-download"),
     url(r'^(?P<kind>santa)(?:/(?P<submission_type>[a-zA-Z]+))(?:/(?P<machine_id>[a-zA-Z0-9]+))?', api.views.santa_api),
-    url(r'^(?P<kind>inventory)/(?P<serial_number>[a-zA-Z0-9]+$)', api.views.db_api),
-    url(r'^(?P<kind>[a-zA-Z]+$)', api.views.db_api),
-    url(r'^(?P<kind>[a-zA-Z]+)/(?P<serial_number>.[a-zA-Z0-9]+$)', api.views.db_api),
 ]
