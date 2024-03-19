@@ -16,5 +16,4 @@ urlpatterns = [
     url(r'^pkgs/(?P<filepath>.*$)', PkgsDetailAPIView.as_view(), name="pkgs-download"),
     url(r'^icons$', IconsListView.as_view(), name="icon-list"),
     url(r'^icons/(?P<filepath>.*$)', IconsDetailAPIView.as_view(), name="icon-download"),
-    url(r'^(?P<kind>santa)(?:/(?P<submission_type>[a-zA-Z]+))(?:/(?P<machine_id>[a-zA-Z0-9]+))?', api.views.santa_api),
 ]
