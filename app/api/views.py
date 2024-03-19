@@ -681,46 +681,6 @@ def file_api(request, kind, filepath=None):
             # success
             return HttpResponse(status=204)
 
-@csrf_exempt
-@logged_in_or_basicauth()
-def santa_api(request, kind, submission_type, machine_id):
-    LOGGER.debug("Got API request for %s, %s:%s" % (kind, submission_type, machine_id))
-
-
-    payload = request.body
-    content_encoding = request.META.get('HTTP_CONTENT_ENCODING', None)
-    if content_encoding:
-        payload = json.loads(zlib.decompress(payload))
-
-    LOGGER.debug(payload)
-
-    if submission_type == "preflight":
-        contend = { 'machine_id': machine_id,
-                'batch_size': 20,
-                #'upload_logs_url': 'http://localhost:8000/api/santa/log/' + payload["serial_num"]
-                }
-        return HttpResponse(
-                            json.dumps(contend) + '\n',
-                            content_type='application/json', status=200)
-
-    if submission_type == "log":
-        contend = {'machine_id': machine_id }
-        return HttpResponse(
-                            json.dumps(contend),
-                            content_type='application/json', status=200)
-
-    if submission_type == "ruledownload":
-        contend = { "client_mode": "MONITOR", "rules": { "rule_type": "BINARY", "policy": "BLACKLIST", "sha256": "0494fb788198359df09179bc4ce32b8e93b59e64f518c001cd64a7f2ff1e5c38", "custom_msg": "blacklist SourceTree" } }
-        return HttpResponse(
-                            json.dumps(contend),
-                            content_type='application/json', status=200)
-
-    if submission_type == "eventupload":
-        return HttpResponse(status=200)
-
-    if submission_type == "postflight":
-        return HttpResponse(status=200)
-
 
 class ReportsListAPIView(ListAPIView):
     queryset = Machine.objects.all()
