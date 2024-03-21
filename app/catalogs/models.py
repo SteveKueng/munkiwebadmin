@@ -8,6 +8,7 @@ import plistlib
 from xml.parsers.expat import ExpatError
 
 from django.conf import settings
+from django.db import models
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 
@@ -139,3 +140,7 @@ class Catalog(object):
                        if item.get('installer_item_location') == pkg_path]
             matching_count = len(matches)
         return matching_count
+
+
+class Catalogs(models.Model):
+    pass

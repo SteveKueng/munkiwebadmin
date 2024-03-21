@@ -9,6 +9,7 @@ from rest_framework.mixins import (
     UpdateModelMixin,
     ListModelMixin
 )
+from rest_framework.permissions import DjangoModelPermissions
 
 from django.http import HttpResponse, QueryDict, FileResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -21,7 +22,9 @@ from api.models import FileError, FileWriteError, FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine
-
+from manifests.models import ManifestFile
+from pkgsinfo.models import PkginfoFile
+from catalogs.models import Catalogs
 
 from api.serializers import (
     MachineListSerializer, 
@@ -37,7 +40,6 @@ import plistlib
 import re
 import base64
 import bz2
-import zlib
 import requests
 import urllib
 
@@ -680,11 +682,15 @@ def file_api(request, kind, filepath=None):
 
 
 class ReportsListAPIView(ListAPIView):
+    permission_classes = [DjangoModelPermissions]
+
     queryset = Machine.objects.all()
     serializer_class = MachineListSerializer
 
 
 class ReportsDetailAPIView(CreateModelMixin, DestroyModelMixin, UpdateModelMixin, RetrieveAPIView):
+    permission_classes = [DjangoModelPermissions]
+    
     queryset = Machine.objects.all()
     serializer_class = MachineDetailSerializer
     
@@ -706,10 +712,11 @@ class ReportsDetailAPIView(CreateModelMixin, DestroyModelMixin, UpdateModelMixin
 
 class CatalogsListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.list('catalogs')
+            response = Catalogs.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
@@ -717,7 +724,7 @@ class CatalogsListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = Plist.list('catalogs')
 
         filter_terms = self.request.GET.copy()
         LOGGER.debug("filter_terms: %s", filter_terms)
@@ -773,19 +780,20 @@ class CatalogsListView(GenericAPIView, ListModelMixin):
 
 class CatalogsDetailAPIView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.read('catalogs', self.kwargs['filepath'])
+            response = Catalogs.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
             return Response({})
-        response = convert_dates_to_strings(response)
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = Plist.read('catalogs', self.kwargs['filepath'])
+        queryset = convert_dates_to_strings(queryset)
         return queryset
         
     def get(self, request, *args, **kwargs):
@@ -797,10 +805,13 @@ class CatalogsDetailAPIView(GenericAPIView, ListModelMixin):
 
 class ManifestsListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.list('manifests')
+            items = Plist.list('manifests')
+            response = ManifestFile.objects.all()
+            response.values = items
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
@@ -808,7 +819,7 @@ class ManifestsListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().values
 
         filter_terms = self.request.GET.copy()
         LOGGER.debug("filter_terms: %s", filter_terms)
@@ -863,19 +874,20 @@ class ManifestsListView(GenericAPIView, ListModelMixin):
 
 class ManifestsDetailAPIView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.read('manifests', self.kwargs['filepath'])
+            response = ManifestFile.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
             return Response({})
-        response = convert_dates_to_strings(response)
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = Plist.read('manifests', self.kwargs['filepath'])
+        queryset = convert_dates_to_strings(queryset)
         filter_terms = self.request.GET.copy()
 
         # remove the _ parameter
