@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
     url(r'^logout/', logout_then_login, name='logout'),
-    url(r'^oauth2/', include('django_auth_adfs.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^manifests/', include('manifests.urls')),
     url(r'^reports/', include('reports.urls')),
