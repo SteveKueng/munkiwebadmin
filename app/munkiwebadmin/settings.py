@@ -27,9 +27,6 @@ DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
 FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', 'VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI=')
 REPO_MANAGEMENT_ONLY = os.getenv("REPO_MANAGEMENT_ONLY", 'False').lower() in ('true', '1', 't')
-CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
-TENANT_ID = os.getenv('TENANT_ID', None)
 
 # enable git integration
 if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
@@ -39,21 +36,19 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
 
-# Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
     ALLOWED_HOSTS.append(os.environ.get('WEBSITE_HOSTNAME'))
     CSRF_TRUSTED_ORIGINS.append(os.environ.get('WEBSITE_HOSTNAME'))
 
-# debug mode
 DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
-# CORS settings
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ORIGIN_WHITELIST = ()
 LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
 USE_LDAP = False
+KERBEROS_REALM = os.getenv('KERBEROS_REALM')
 
 TIMEOUT = 20 # default 20
 
@@ -77,7 +72,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'encrypted_model_fields',
     'rest_framework',
-    'django_auth_adfs',
 
     # our apps
     'api',
@@ -100,7 +94,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_auth_adfs.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'munkiwebadmin.urls'
@@ -221,10 +214,6 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'propagate': False,
         },
-        'django_auth_adfs': {
-            'handlers': ['console'],
-            'level': LOGLEVEL,
-        },
     },
 }
 
@@ -251,49 +240,26 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-# rest framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'django_auth_adfs.rest_framework.AdfsAccessTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
-}
-
-# azure adfs settings
-AUTH_ADFS = {
-    'AUDIENCE': CLIENT_ID,
-    'CLIENT_ID': CLIENT_ID,
-    'CLIENT_SECRET': CLIENT_SECRET,
-    'CLAIM_MAPPING': {'first_name': 'given_name',
-                    'last_name': 'family_name',
-                    'email': 'upn',},
-    'MIRROR_GROUPS': True,
-    'USERNAME_CLAIM': 'upn',
-    'TENANT_ID': TENANT_ID,
-    'RELYING_PARTY_ID': CLIENT_ID,
-    "GROUP_TO_FLAG_MAPPING": {"is_staff": ["ikuengUsers"],
-                              "is_superuser": "ikuengAdmins"},
-    'LOGIN_EXEMPT_URLS': [
-        '^api',
-    ],
-}
-
-# auth settings
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-)
 if USE_LDAP:
-    AUTHENTICATION_BACKENDS + ('django_auth_ldap.backend.LDAPBackend',)
-
-if CLIENT_SECRET:
-    AdfsAuthCodeBackend = 'django_auth_adfs.backend.AdfsAuthCodeBackend'
-    AdfsAccessTokenBackend= 'django_auth_adfs.backend.AdfsAccessTokenBackend'
-    AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend, AdfsAccessTokenBackend)
+    if KERBEROS_REALM:
+        AUTHENTICATION_BACKENDS = (
+            'django_remote_auth_ldap.backend.RemoteUserLDAPBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        )
+    else:
+        AUTHENTICATION_BACKENDS = (
+            'django_auth_ldap.backend.LDAPBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        )
+else:
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 LOGIN_URL='/login/'
 LOGIN_REDIRECT_URL = '/'
 
 ADMINS = (
-     ('Local Admin', 'admin@example.com'),
+     ('Local Admin', 'root@example.com'),
 )
 MANAGERS = ADMINS
