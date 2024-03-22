@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'encrypted_model_fields',
+    'rest_framework',
 
     # our apps
     'api',
@@ -82,7 +83,6 @@ INSTALLED_APPS = [
     'reports',
     'icons',
     'santa',
-    'vault',
 ]
 
 MIDDLEWARE = [
