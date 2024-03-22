@@ -99,6 +99,7 @@
       <input id="username" name="username" class="form-control" placeholder="Username" required="" autofocus="" type="username">
       <input id="password" name="password" class="form-control" placeholder="Password" required="" type="password">
       <button class="btn btn-primary w-100" type="submit">Sign in</button>
+      <a href="{% url 'django_auth_adfs:login' %}" class="btn" type="button"><img src="{% get_static_prefix %}img/ms-signin_dark.svg" alt=""></a>
     </form>
   </body>
   <script type="module" src="{% get_static_prefix %}js/color-modes.js"></script>
