@@ -1,11 +1,7 @@
 from django.db import models
-from datetime import datetime
 import plistlib
-from xml.parsers.expat import ExpatError
 import base64
 import bz2
-from uuid import uuid4
-from django.contrib.auth.models import User, Group
 import django
 
 class Machine(models.Model):
@@ -39,7 +35,7 @@ class Machine(models.Model):
         ordering = ['hostname']
 
 class MunkiReport(models.Model):
-    machine = models.ForeignKey(Machine, on_delete=models.CASCADE)
+    machine = models.ForeignKey(Machine, on_delete=models.CASCADE, related_name='munkireport')
     timestamp = models.DateTimeField(default=django.utils.timezone.now)
     runtype = models.CharField(max_length=64)
     runstate = models.CharField(max_length=16)

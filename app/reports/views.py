@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.conf import settings
 from django.db.models import Count

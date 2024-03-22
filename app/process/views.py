@@ -15,7 +15,6 @@ import sys
 
 from django.conf import settings
 from munkiwebadmin.utils import MunkiGit
-from munkiwebadmin.django_basic_auth import logged_in_or_basicauth
 
 REPO_DIR = settings.MUNKI_REPO_DIR
 MAKECATALOGS = settings.MAKECATALOGS_PATH
@@ -81,7 +80,6 @@ def index(request):
                         content_type='application/json')
 
 @csrf_exempt
-@logged_in_or_basicauth()
 def run(request):
     '''Start running our lengthy process'''
     if request.method == 'POST':
