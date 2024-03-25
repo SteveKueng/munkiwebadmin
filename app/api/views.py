@@ -28,7 +28,8 @@ from catalogs.models import Catalogs
 
 from api.serializers import (
     MachineListSerializer, 
-    MachineDetailSerializer
+    MachineDetailSerializer,
+    ManifestSerializer
 )
 
 import datetime
@@ -806,7 +807,8 @@ class CatalogsDetailAPIView(GenericAPIView, ListModelMixin):
 class ManifestsListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
     permission_classes = [DjangoModelPermissions]
-    
+    serializer_class = ManifestSerializer
+
     def get_queryset(self):
         try:
             items = Plist.list('manifests')
@@ -872,10 +874,11 @@ class ManifestsListView(GenericAPIView, ListModelMixin):
         return Response(self.get_object())
 
 
-class ManifestsDetailAPIView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get', 'post']
+class ManifestsDetailAPIView(GenericAPIView, ListModelMixin, CreateModelMixin, DestroyModelMixin, UpdateModelMixin):
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     permission_classes = [DjangoModelPermissions]
-    
+    serializer_class = ManifestSerializer
+
     def get_queryset(self):
         try:
             response = ManifestFile.objects.all()
@@ -910,15 +913,31 @@ class ManifestsDetailAPIView(GenericAPIView, ListModelMixin):
         return self.list(request, *args, **kwargs)
     
     def list(self, request, filepath):
-        return Response(self.get_object())
+        serializer = ManifestSerializer(self.get_object())
+        return Response(serializer.data)
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ManifestSerializer(data=request.data)
+        if serializer.is_valid():
+            Plist.new(serializer.data, "manifests", serializer.data['filepath'], request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400) 
+    
+    def put(self, request, *args, **kwargs):
+        serializer = ManifestSerializer(data=request.data)
+        if serializer.is_valid():
+            Plist.write(serializer.data, "manifests", self.kwargs['filepath'], request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 class PkgsinfoListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.list('pkgsinfo')
+            response = PkginfoFile.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
@@ -926,7 +945,7 @@ class PkgsinfoListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = Plist.list('pkgsinfo')
         filter_terms = self.request.GET.copy()
 
         # remove the _ parameter
@@ -979,19 +998,20 @@ class PkgsinfoListView(GenericAPIView, ListModelMixin):
 
 class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = Plist.read('pkgsinfo', self.kwargs['filepath'])
+            response = PkginfoFile.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
             return Response({})
-        response = convert_dates_to_strings(response)
         return response
     
     def get_object(self):
-        queryset = self.get_queryset()
+        queryset = Plist.read('pkgsinfo', self.kwargs['filepath'])
+        queryset = convert_dates_to_strings(queryset)
         filter_terms = self.request.GET.copy()
 
         api_fields = None
@@ -1014,10 +1034,11 @@ class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
 
 class PkgsListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = MunkiFile.list('pkgs')
+            response = PkginfoFile.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
@@ -1025,7 +1046,7 @@ class PkgsListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        return self.get_queryset()
+        return MunkiFile.list('pkgs')
     
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -1036,8 +1057,18 @@ class PkgsListView(GenericAPIView, ListModelMixin):
 
 class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
     http_method_names = ['get']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
+        try:
+            response = PkginfoFile.objects.all()
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
         filepath = self.kwargs['filepath']
         fullpath = MunkiFile.get_fullpath('pkgs', filepath)
         if not os.path.exists(fullpath):
@@ -1056,9 +1087,6 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
             return Response({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)})
-    
-    def get_object(self):
-        return self.get_queryset()
         
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -1069,10 +1097,11 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
 
 class IconsListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         try:
-            response = MunkiFile.list('icons')
+            response = PkginfoFile.objects.all()
         except FileDoesNotExistError as err:
             return Response({})
         except FileReadError as err:
@@ -1080,7 +1109,7 @@ class IconsListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        return self.get_queryset()
+        return MunkiFile.list('icons')
     
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -1091,8 +1120,18 @@ class IconsListView(GenericAPIView, ListModelMixin):
 
 class IconsDetailAPIView(GenericAPIView, ListModelMixin):
     http_method_names = ['get']
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
+        try:
+            response = PkginfoFile.objects.all()
+        except FileDoesNotExistError as err:
+            return Response({})
+        except FileReadError as err:
+            return Response({})
+        return response
+    
+    def get_object(self):
         filepath = self.kwargs['filepath']
         fullpath = MunkiFile.get_fullpath('icons', filepath)
         if not os.path.exists(fullpath):
@@ -1111,9 +1150,6 @@ class IconsDetailAPIView(GenericAPIView, ListModelMixin):
             return Response({'result': 'failed',
                             'exception_type': str(type(err)),
                             'detail': str(err)})
-    
-    def get_object(self):
-        return self.get_queryset()
         
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
