@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from reports.models import Machine, MunkiReport
+from manifests.models import ManifestFile
 from rest_framework import serializers
 
 class MunkiReportDetailSerializer(ModelSerializer):
@@ -50,3 +51,19 @@ class MachineDetailSerializer(ModelSerializer):
         ]
         #read_only_fields = ('munkireport',)
         depth = 1
+
+class ManifestSerializer(ModelSerializer):
+    managed_installs = serializers.ListField(child=serializers.CharField(), required=False)
+    managed_uninstalls = serializers.ListField(child=serializers.CharField(), required=False)
+    optional_installs = serializers.ListField(child=serializers.CharField(), required=False)
+    included_manifests = serializers.ListField(child=serializers.CharField(), required=False)
+    display_name = serializers.CharField(required=False, allow_blank=True)
+    class Meta:
+        model = ManifestFile
+        fields = [
+            'managed_installs',
+            'managed_uninstalls',
+            'optional_installs',
+            'included_manifests',
+            'display_name'
+        ]
