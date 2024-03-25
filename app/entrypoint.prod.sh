@@ -24,8 +24,8 @@ if [ "$DATABASE" == "postgres" ]; then
 fi
 
 # migrate database
-python manage.py makemigrations inventory manifests pkgsinfo process reports santa vault
-python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate --noinput
 
 echo "Starting $NAME as `whoami`"
 
