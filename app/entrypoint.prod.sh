@@ -25,7 +25,7 @@ fi
 
 # migrate database
 python manage.py makemigrations
-python manage.py migrate --noinput
+python manage.py migrate
 
 echo "Starting $NAME as `whoami`"
 
