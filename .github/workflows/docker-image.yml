@@ -25,6 +25,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./app
-          file: ./app/Dockerfile.prod
+          file: ./docker/Dockerfile.prod
           push: true
           tags: ${{ secrets.DOCKER_USER }}/munkiwebadmin:latest

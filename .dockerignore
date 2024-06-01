@@ -11,3 +11,6 @@ favicon.ico
 # hidden mac settings
 .DS_Store
 .vscode/settings.json
+
+# Ignore the virtual environment
+virtualenv
