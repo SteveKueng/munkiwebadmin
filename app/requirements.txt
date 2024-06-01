@@ -2,7 +2,6 @@ django==4.2.11
 psycopg2-binary==2.9.9
 gunicorn==22.0.0
 mysqlclient==2.2.4
-django-encrypted-model-fields==0.6.5
 python-ldap==3.4.3
 django-auth-ldap==4.5.0
 django-cors-headers==4.2.0

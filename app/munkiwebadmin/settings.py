@@ -18,24 +18,16 @@ MEDIA_URL = "/media/"
 APPNAME = os.getenv('APPNAME', 'MunkiWebAdmin')
 MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR', '/munkirepo')
 MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH', '/munkitools/makecatalogs')
-MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
-ICONS_URL = MEDIA_URL
-PROXY_ADDRESS = os.getenv('PROXY_ADDRESS', '')
-DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
-MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
-FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', 'VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI=')
+DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST', 'serial_number')
 REPO_MANAGEMENT_ONLY = os.getenv("REPO_MANAGEMENT_ONLY", 'False').lower() in ('true', '1', 't')
-CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
-TENANT_ID = os.getenv('TENANT_ID', None)
-
-# enable git integration
-if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
-    GIT_PATH = '/usr/bin/git'
-
 SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
+
+# Azure AD settings
+CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
+TENANT_ID = os.getenv('TENANT_ID', None)
 
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
@@ -44,6 +36,13 @@ if os.environ.get('WEBSITE_HOSTNAME'):
 
 # debug mode
 DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
+
+#not changing this
+MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
+MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
+ICONS_URL = MEDIA_URL
+if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
+    GIT_PATH = '/usr/bin/git'
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = DEBUG

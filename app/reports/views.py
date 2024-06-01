@@ -21,11 +21,6 @@ import logging
 LOGGER = logging.getLogger('munkiwebadmin')
 
 try:
-    PROXY_ADDRESS = settings.PROXY_ADDRESS
-except AttributeError:
-    PROXY_ADDRESS = ""
-
-try:
     DEFAULT_MANIFEST = settings.DEFAULT_MANIFEST
 except AttributeError:
     DEFAULT_MANIFEST = "serial_number"
@@ -39,16 +34,6 @@ try:
     ICONS_URL = settings.ICONS_URL
 except AttributeError:
     ICONS_URL = ""
-
-proxies = {
-    "http":  PROXY_ADDRESS,
-    "https": PROXY_ADDRESS
-}
-
-if PROXY_ADDRESS:
-    proxy = urllib.request.ProxyHandler(proxies)
-    opener = urllib.request.build_opener(proxy)
-    urllib.request.install_opener(opener)
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'

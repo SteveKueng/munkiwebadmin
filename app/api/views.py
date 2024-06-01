@@ -47,22 +47,9 @@ import urllib
 LOGGER = logging.getLogger('munkiwebadmin')
 
 try:
-    PROXY_ADDRESS = settings.PROXY_ADDRESS
-except AttributeError:
-    PROXY_ADDRESS = ""
-
-try:
     TIMEOUT = settings.TIMEOUT
 except AttributeError:
     TIMEOUT = 20
-
-proxies = {}
-if PROXY_ADDRESS != "":
-    proxies = {
-        "http": 'http://'+PROXY_ADDRESS,
-        "https": 'https://'+PROXY_ADDRESS
-    }
-
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
