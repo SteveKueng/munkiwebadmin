@@ -6,7 +6,6 @@ export LANGUAGE_CODE='en-us'
 export ALLOWED_HOSTS='localhost 127.0.0.1 [::1]'
 export DEFAULT_MANIFEST=''
 export PROXY_ADDRESS=''
-export VAULT_USERNAME='admin'
 export DEBUG=1
 export MUNKI_REPO_DIR='/Users/Shared/munki_repo'
 export MAKECATALOGS_PATH='/usr/local/munki/makecatalogs'
@@ -20,7 +19,7 @@ fi
 
 cd app
 
-python manage.py makemigrations manifests pkgsinfo process reports vault inventory
+python manage.py makemigrations manifests pkgsinfo process reports inventory
 python manage.py migrate --noinput
 
 # Start the development server

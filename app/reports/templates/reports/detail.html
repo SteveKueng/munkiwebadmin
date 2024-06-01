@@ -25,7 +25,7 @@
 				{% if machine.hostname %}
 				<div class="d-none d-sm-block">
 					<a type="button" class="btn btn-secondary" href="vnc://{{ machine.hostname.strip }}">ScreenSharing <i class="far fa-clone"></i></a>
-					<a type="button" class="btn btn-secondary" href="ssh://{{ vault_username }}@{{ machine.hostname.strip }}">SSH <i class="fas fa-terminal"></i></a>
+					<a type="button" class="btn btn-secondary" href="ssh://{{ machine.hostname.strip }}">SSH <i class="fas fa-terminal"></i></a>
 				</div>
 				{% endif %}
 			</div>
@@ -44,11 +44,6 @@
 					<li class="nav-item" role="presentation">
 						<button class="nav-link" id="inverntorytab" data-bs-toggle="tab" data-bs-target="#inverntorytab-pane" type="button" role="tab" aria-controls="inverntorytab-pane" aria-selected="false">Inventory</button>
 					</li>
-					{% if perms.vault.view_passwordAccess %}
-					<li class="nav-item" role="presentation">
-						<button class="nav-link" id="admintab" data-bs-toggle="tab" data-bs-target="#admintab-pane" type="button" role="tab" aria-controls="admintab-pane" aria-selected="false">Password</button>
-					</li>
-					{% endif %}
 				</ul>
 				<div class="tab-content" id="detail_content" >
 					<div class="tab-pane  show tabDetail active" id="softwaretab-pane" role="tabpanel" aria-labelledby="softwaretab" tabindex="0">
@@ -489,51 +484,6 @@
 							</div>
 						</div>
 					</div>
-					{% if perms.vault.view_passwordAccess  %}
-					<div class="tab-pane  show tabDetail" id="admintab-pane" role="tabpanel" aria-labelledby="admintab" tabindex="0">
-						<div class="panel-body">
-							<div class="row mb-3">
-								<div class='col-md-12' id="showPass">
-									<h4>Admin login</h4>
-									<form id="reasonForm">
-										<div class="input-group mb-2">
-											<span class="input-group-text">Reason</span>
-											<textarea class="form-control" aria-label="Reason"></textarea>
-										</div>
-										<button type="submit" class="btn btn-primary" id="showPassButton">Show</button>
-									</form>
-
-									<table id="showPassTable" class='table table-bordered d-none'>
-										<tbody>
-											<tr>
-												<td style='width: 90px;'><b>User</b></td>
-												<td>{{ vault_username }}</td>
-											</tr>
-											<tr>
-												<td style='width: 90px;'><b>Password</b></td>
-												<td id="password"></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>	
-							</div>
-							<div class="row">
-								<div class='col-md-12'>
-									<div class="section_label"><h4>Admin access</h4></div>
-									<table id="passwordAccess" class="table table-striped table-bordered" width="100%">
-										<thead>
-											<tr>
-												<th>User</th>
-												<th>Reason</th>
-												<th>Date</th>
-											</tr>
-										</thead>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-					{% endif %}
 				</div>
 			</div>	
 			<div class="modal-footer">

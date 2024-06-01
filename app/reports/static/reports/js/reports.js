@@ -756,55 +756,6 @@ function getHostname(serial, handleData) {
     });
 }
 
-function loadPasswordAccess(serial) {
-    var machineURL = '/api/vault/reasons/'+serial;
-    passwordAccessTable = $('#passwordAccess').DataTable( {
-    ajax: {
-        url: machineURL,
-        dataSrc: ''
-    },
-    columns: [
-        { data: 'fields.user.0' },
-        { data: 'fields.reason' },
-        { data: 'fields.date', type: 'date' },
-    ],
-    "columnDefs": [
-        {
-            "render": function ( data, type, row ) {
-                return new Date(data)
-            },
-            "width": "100px",
-            "targets": 2
-        },
-    ],
-    "bPaginate": false,
-    "bInfo": false,
-    "bFilter": false,
-    "aaSorting": [[2,"desc"]]
-    } );
-}
-
-function showPassword(reason) {
-    var machineURL = '/api/vault/show/'+current_pathname;
-    $.ajax({
-        method: 'POST',
-        url: machineURL,
-        data: { "reason" : reason},
-        success: function(data) {
-            var html = data + ' <button type="button" class="btn btn-default btn-xs" onclick="copyTextToClipboard(\'' + data + '\');"><i class="fa fa-clipboard" aria-hidden="true"></i></button>'
-            $("#password").html( html );
-            $("#reasonForm").addClass("d-none")
-            $("#showPassTable").removeClass("d-none")
-            passwordAccessTable.ajax.reload();
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR["responseJSON"]["detail"])
-            $("#errorModalDetailText").text(jqXHR["responseJSON"]["detail"]);
-            $("#errorModal").modal("show");
-        }
-    });
-}
-
 function loadInventory(serial) {
     url = "/inventory/detail/" + serial
     $.ajax({

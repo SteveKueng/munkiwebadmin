@@ -21,7 +21,6 @@ MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH', '/munkitools/makecatalogs')
 MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
 ICONS_URL = MEDIA_URL
 CONVERT_TO_QWERTZ = os.getenv('CONVERT_TO_QWERTZ')
-VAULT_USERNAME = os.getenv('VAULT_USERNAME', 'admin')
 PROXY_ADDRESS = os.getenv('PROXY_ADDRESS', '')
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST')
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
