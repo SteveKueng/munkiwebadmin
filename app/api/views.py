@@ -52,11 +52,6 @@ except AttributeError:
     PROXY_ADDRESS = ""
 
 try:
-    CONVERT_TO_QWERTZ = settings.CONVERT_TO_QWERTZ
-except AttributeError:
-    CONVERT_TO_QWERTZ = False
-
-try:
     TIMEOUT = settings.TIMEOUT
 except AttributeError:
     TIMEOUT = 20
@@ -118,21 +113,6 @@ def convert_strings_to_dates(jdata):
             if isinstance(value, (list, dict)):
                 value = convert_strings_to_dates(value)
         return jdata
-
-
-def convert_to_qwertz(string):
-    newString = ""
-    for c in string:
-        if c == "z":
-            c = "y"
-        elif c == "Z":
-            c = "Y"
-        elif c == "y":
-            c = "z"
-        elif c == "Y":
-            c = "Z"
-        newString = newString + c
-    return newString
 
 
 def convert_html_to_json(raw_html):
