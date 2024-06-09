@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - testmwa2
+name: Build and deploy Python app to Azure Web App
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r app/requirements.txt
+        run: pip install -r app/requirements_azure.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
