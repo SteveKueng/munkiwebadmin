@@ -35,7 +35,7 @@ WORKDIR /usr/src/app
 
 # install dependencies
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install -r requirements_docker.txt
 
 # create dirs
 RUN mkdir /munkirepo
