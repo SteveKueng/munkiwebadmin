@@ -5,12 +5,12 @@ export TIME_ZONE='Europe/Zurich'
 export LANGUAGE_CODE='en-us'
 export ALLOWED_HOSTS='localhost 127.0.0.1 [::1]'
 export DEFAULT_MANIFEST=''
-export PROXY_ADDRESS=''
 export DEBUG=1
-export MUNKI_REPO_DIR='/Users/Shared/munki_repo'
-export MAKECATALOGS_PATH='/usr/local/munki/makecatalogs'
-export FIELD_ENCRYPTION_KEY='VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI='
+export MUNKI_REPO_DIR='https://munkiumb.blob.core.windows.net/munkirepo'
+export MUNKI_REPO_PLUGIN='AzureRepo'
+export MUNKITOOLS_DIR='/usr/local/munki'
 export REPO_MANAGEMENT_ONLY='False'
+
 
 # Create the munki repo directory
 if [ ! -d $MUNKI_REPO_DIR ]; then

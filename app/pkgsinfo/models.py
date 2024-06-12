@@ -25,7 +25,6 @@ except AttributeError:
     GIT = None
 
 REPO_DIR = settings.MUNKI_REPO_DIR
-CATALOGS_PATH = os.path.join(REPO_DIR, 'catalogs')
 PKGSINFO_PATH = os.path.join(REPO_DIR, 'pkgsinfo')
 PKGSINFO_PATH_PREFIX_LEN = len(PKGSINFO_PATH) + 1
 PKGSINFO_STATUS_TAG = 'pkgsinfo_list_process'
@@ -111,19 +110,14 @@ class Pkginfo(Plist):
         record(message='Starting scan of pkgsinfo data')
         files = cls.list('pkgsinfo')
         record(message='Processing %s files' % len(files))
-        all_catalog = os.path.join(CATALOGS_PATH, 'all')
-        try:
-            with open(all_catalog, 'rb') as f:
-                all_items = plistlib.load(f)
-        except (ExpatError, OSError, IOError):
-            all_items = []
+        all_items = cls.read('catalogs', 'all')
         use_slower_approach = False
         if len(all_items) != len(files):
             LOGGER.debug('number of files differ from all catalog')
             use_slower_approach = True
-        elif any_files_in_list_newer_than(files, all_catalog):
-            LOGGER.debug('files newer than all catalog')
-            use_slower_approach = True
+        #elif any_files_in_list_newer_than(files, all_catalog):
+        #    LOGGER.debug('files newer than all catalog')
+        #    use_slower_approach = True
         pkginfo_dict = defaultdict(list)
         record(message='Assembling pkgsinfo data')
         if use_slower_approach:

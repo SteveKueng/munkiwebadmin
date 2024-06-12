@@ -41,15 +41,9 @@ import plistlib
 import re
 import base64
 import bz2
-import requests
 import urllib
 
 LOGGER = logging.getLogger('munkiwebadmin')
-
-try:
-    TIMEOUT = settings.TIMEOUT
-except AttributeError:
-    TIMEOUT = 20
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -153,30 +147,6 @@ def decode_to_string(data):
         return bz2.decompress(bz2data)
     except Exception:
         return None
-
-
-def getDataFromAPI(URL):
-    try:
-        response = requests.get(URL, timeout=TIMEOUT)
-    except requests.exceptions.Timeout:
-        pass
-    else:
-        if response.status_code in [200, 201, 202, 203, 204]:
-            response.encoding = "utf-8-sig"
-            return convert_html_to_json(response.text)
-    return None
-
-
-def postDataAPI(URL, postData):
-    try:
-        response = requests.post(URL, timeout=TIMEOUT, data=postData)
-    except requests.exceptions.Timeout:
-        pass
-    else:
-        if response.status_code in [200, 201, 202, 203, 204]:
-            response.encoding = "utf-8-sig"
-            return convert_html_to_json(response.text)
-    return None
 
 @csrf_exempt
 def plist_api(request, kind, filepath=None):

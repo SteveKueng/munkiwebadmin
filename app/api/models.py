@@ -4,20 +4,37 @@ api/models.py
 from django.conf import settings
 
 import os
+import sys
 import logging
 import plistlib
-from xml.parsers.expat import ExpatError
 
-from munkiwebadmin.utils import MunkiGit
-from process.utils import record_status
-
-REPO_DIR = settings.MUNKI_REPO_DIR
 LOGGER = logging.getLogger('munkiwebadmin')
+REPO_DIR = settings.MUNKI_REPO_DIR
+REPO_PLUGIN = settings.MUNKI_REPO_PLUGIN
+MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
+
+# import munkitools
+sys.path.append(MUNKITOOLS_DIR)
 
 try:
-    GIT = settings.GIT_PATH
-except AttributeError:
-    GIT = None
+    from munkilib.cliutils import ConfigurationSaveError
+    from munkilib.cliutils import configure as _configure
+    from munkilib.cliutils import libedit
+    from munkilib.cliutils import get_version, pref, path2url
+    from munkilib.wrappers import (get_input,
+                                readPlistFromString, writePlistToString,
+                                PlistReadError, PlistWriteError)
+    from munkilib import munkirepo
+except ImportError:
+    LOGGER.error('Failed to import munkilib')
+    raise
+
+# connect to the munki repo
+try:
+    repo = munkirepo.connect(REPO_DIR, REPO_PLUGIN)
+except munkirepo.RepoError as err:
+    print(u'Repo error: %s' % err, file=sys.stderr)
+    raise
 
 
 class FileError(Exception):
@@ -50,29 +67,60 @@ class FileAlreadyExistsError(FileError):
     pass
 
 
+class MunkiRepo(object):
+    '''Pseudo-Django object'''
+    @classmethod
+    def list(cls, kind):
+        '''Returns a list of available plists'''
+        plists = repo.itemlist(kind)
+        return plists
+    
+    @classmethod
+    def read(cls, kind, pathname):
+        '''Reads a plist file and returns the plist as a dictionary'''
+        try:
+            return readPlistFromString(repo.get(kind + '/' + pathname))
+        except munkirepo.RepoError as err:
+            LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
+            return {}
+    
+    @classmethod
+    def write(cls, data, kind, pathname, user):
+        '''Writes a text data to (plist) file'''
+        filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
+        plist_parent_dir = os.path.dirname(filepath)
+        if not os.path.exists(plist_parent_dir):
+            try:
+                # attempt to create missing intermediate dirs
+                os.makedirs(plist_parent_dir)
+            except OSError as err:
+                LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
+                raise FileWriteError(err)
+        try:
+            fileref=open(filepath,'wb')
+            plistlib.dump(data, fileref)
+            fileref.close()
+            LOGGER.info('Wrote %s/%s', kind, pathname)
+        except (IOError, OSError) as err:
+            LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
+            raise FileWriteError(err)
+    
+    @classmethod
+    def delete(cls, kind, pathname, user):
+        '''Deletes a plist file'''
+        try:
+            repo.delete(kind + '/' + pathname)
+            LOGGER.info('Deleted %s/%s', kind, pathname)
+        except munkirepo.RepoError as err:
+            LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
+            raise FileDeleteError(err)
+
 class Plist(object):
     '''Pseudo-Django object'''
     @classmethod
     def list(cls, kind):
         '''Returns a list of available plists'''
-        kind_dir = os.path.join(REPO_DIR, kind)
-        plists = []
-        for dirpath, dirnames, filenames in os.walk(kind_dir):
-            record_status(
-                '%s_list_process' % kind,
-                message='Scanning %s...' % dirpath[len(kind_dir)+1:])
-            # don't recurse into directories that start with a period.
-            dirnames[:] = [name for name in dirnames
-                           if not name.startswith('.')]
-            subdir = dirpath[len(kind_dir):].lstrip(os.path.sep)
-            if os.path.sep == '\\':
-                plists.extend([os.path.join(subdir, name).replace('\\', '/')
-                               for name in filenames
-                               if not name.startswith('.')])
-            else:
-                plists.extend([os.path.join(subdir, name)
-                               for name in filenames
-                               if not name.startswith('.')])
+        plists = repo.itemlist(kind)
         return plists
 
     @classmethod
@@ -114,8 +162,6 @@ class Plist(object):
             plistlib.dump(plist, plistFile)
             plistFile.close()
             LOGGER.info('Created %s/%s', kind, pathname)
-            if user and GIT:
-                MunkiGit().add_file_at_path(filepath, user)
         except (IOError, OSError) as err:
             LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
@@ -124,18 +170,10 @@ class Plist(object):
     @classmethod
     def read(cls, kind, pathname):
         '''Reads a plist file and returns the plist as a dictionary'''
-        filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
-        if not os.path.exists(filepath):
-            raise FileDoesNotExistError('%s/%s not found' % (kind, pathname))
         try:
-            with open(filepath, 'rb') as fp:
-                plistdata = plistlib.load(fp)
-            return plistdata
-        except (IOError, OSError) as err:
+            return readPlistFromString(repo.get(kind + '/' + pathname))
+        except munkirepo.RepoError as err:
             LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
-            raise FileReadError(err)
-        except (ExpatError, IOError):
-            # could not parse, return empty dict
             return {}
 
     @classmethod
@@ -155,8 +193,6 @@ class Plist(object):
             plistlib.dump(data, fileref)
             fileref.close()
             LOGGER.info('Wrote %s/%s', kind, pathname)
-            if user and GIT:
-                MunkiGit().add_file_at_path(filepath, user)
         except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
@@ -171,8 +207,6 @@ class Plist(object):
         try:
             os.unlink(filepath)
             LOGGER.info('Deleted %s/%s', kind, pathname)
-            if user and GIT:
-                MunkiGit().delete_file_at_path(filepath, user)
         except (IOError, OSError) as err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)
@@ -233,8 +267,6 @@ class MunkiFile(object):
                 for chunk in fileupload.chunks():
                     LOGGER.debug('Writing chunk...')
                     fileref.write(chunk)
-            if user and GIT and kind == "icons":
-                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -250,8 +282,6 @@ class MunkiFile(object):
         try:
             with open(filepath, 'wb') as fileref:
                 fileref.write(filedata)
-            if user and GIT and kind == "icons":
-                MunkiGit().add_file_at_path(filepath, user)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except (IOError, OSError) as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
@@ -261,13 +291,13 @@ class MunkiFile(object):
     def delete(cls, kind, pathname, user):
         '''Deletes file at pathname'''
         filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
+
+
         if not os.path.exists(filepath):
             raise FileDoesNotExistError(
                 '%s/%s does not exist' % (kind, pathname))
         try:
             os.unlink(filepath)
-            if user and GIT and kind == "icons":
-                MunkiGit().delete_file_at_path(filepath, user)
             LOGGER.info('Deleted %s/%s', kind, pathname)
         except (IOError, OSError) as err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
