@@ -9,7 +9,7 @@ from django.conf import settings
 
 from pkgsinfo.models import Pkginfo, PKGSINFO_STATUS_TAG
 from process.models import Process
-from api.models import Plist, \
+from api.models import Plist, MunkiRepo, \
                        FileError, FileDoesNotExistError
 
 import json
@@ -18,7 +18,7 @@ import os
 import plistlib
 import urllib
 
-REPO_DIR = settings.MUNKI_REPO_DIR
+REPO_DIR = settings.MUNKI_REPO_URL
 ICONS_DIR = os.path.join(REPO_DIR, 'icons')
 STATIC_URL = settings.STATIC_URL
 try:
@@ -146,7 +146,7 @@ def detail(request, pkginfo_path):
     if request.method == 'GET':
         LOGGER.debug("Got read request for %s", pkginfo_path)
         try:
-            plist = Plist.read('pkgsinfo', pkginfo_path)
+            plist = MunkiRepo.read('pkgsinfo', pkginfo_path)
         except FileDoesNotExistError:
             raise Http404("%s does not exist" % pkginfo_path)
         default_items = {

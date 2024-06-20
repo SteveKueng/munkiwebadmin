@@ -14,17 +14,11 @@ import time
 import sys
 
 from django.conf import settings
-from munkiwebadmin.utils import MunkiGit
 
-REPO_DIR = settings.MUNKI_REPO_DIR
+REPO_DIR = settings.MUNKI_REPO_URL
 MAKECATALOGS = settings.MAKECATALOGS_PATH
 
 LOGGER = logging.getLogger('munkiwebadmin')
-
-try:
-    GIT = settings.GIT_PATH
-except AttributeError:
-    GIT = None
 
 def pid_exists(pid):
     """Check whether pid exists in the current process table."""
@@ -118,9 +112,6 @@ def run(request):
             if proc.poll() != None:
                 break
 
-        if request.user and GIT:
-            MunkiGit().add_file_at_path(os.path.join(REPO_DIR, "icons"), request.user)
-            MunkiGit().add_file_at_path(os.path.join(REPO_DIR, "catalogs"), request.user)
         record.statustext = 'Done'
         record.exited = True
         record.exitcode = proc.returncode

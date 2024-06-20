@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from api.models import Plist, FileDoesNotExistError, FileReadError
+from api.models import MunkiRepo, FileDoesNotExistError, FileReadError
 from process.models import Process
 
 import json
@@ -41,7 +41,7 @@ def index(request, manifest_path=None):
             LOGGER.debug("Got read request for %s", manifest_path)
             key_list = {'catalogs', 'included_manifests', 'featured_items', 'managed_installs', 'managed_uninstalls', 'managed_updates', 'optional_installs'}
             try:
-                plist = Plist.read('manifests', manifest_path)
+                plist = MunkiRepo.read('manifests', manifest_path)
                 for key in key_list:
                     if key not in plist:
                         plist[key] = []

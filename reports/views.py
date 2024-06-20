@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Machine, MunkiReport
 from catalogs.models import Catalog
-from api.models import Plist, FileDoesNotExistError, FileReadError
+from api.models import Plist, MunkiRepo, FileDoesNotExistError, FileReadError
 
 import os
 import plistlib
@@ -25,11 +25,7 @@ try:
 except AttributeError:
     DEFAULT_MANIFEST = "serial_number"
 
-try:
-    MUNKI_REPO_DIR = settings.MUNKI_REPO_DIR
-except AttributeError:
-    MUNKI_REPO_DIR = False
-    
+
 try:
     ICONS_URL = settings.ICONS_URL
 except AttributeError:
@@ -213,7 +209,7 @@ def getManifest(request, manifest_path):
     """ returns json manifest """
     LOGGER.debug("Got read request for %s", manifest_path)
     try:
-        plist = Plist.read('manifests', manifest_path)
+        plist = MunkiRepo.read('manifests', manifest_path)
     except (FileDoesNotExistError, FileReadError) as err:
         return HttpResponse(
             json.dumps({'result': 'failed',

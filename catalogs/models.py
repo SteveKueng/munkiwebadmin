@@ -10,7 +10,7 @@ from xml.parsers.expat import ExpatError
 from django.conf import settings
 from django.db import models
 
-REPO_DIR = settings.MUNKI_REPO_DIR
+REPO_DIR = settings.MUNKI_REPO_URL
 
 
 def trim_version_string(version_string):

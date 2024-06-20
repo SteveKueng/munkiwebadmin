@@ -15,16 +15,10 @@ from xml.parsers.expat import ExpatError
 from django.conf import settings
 from process.utils import record_status
 from catalogs.models import Catalog
-from api.models import Plist, MunkiFile, \
+from api.models import MunkiRepo, \
                        FileReadError, FileWriteError, FileDeleteError
-from munkiwebadmin.utils import MunkiGit
 
-try:
-    GIT = settings.GIT_PATH
-except AttributeError:
-    GIT = None
-
-REPO_DIR = settings.MUNKI_REPO_DIR
+REPO_DIR = settings.MUNKI_REPO_URL
 PKGSINFO_PATH = os.path.join(REPO_DIR, 'pkgsinfo')
 PKGSINFO_PATH_PREFIX_LEN = len(PKGSINFO_PATH) + 1
 PKGSINFO_STATUS_TAG = 'pkgsinfo_list_process'
@@ -93,7 +87,7 @@ class PkginfoFile(models.Model):
     pass
 
 
-class Pkginfo(Plist):
+class Pkginfo(MunkiRepo):
     '''Models pkginfo items'''
     @classmethod
     def data(cls):
@@ -176,7 +170,7 @@ class Pkginfo(Plist):
             else:
                 if delete_this_pkg:
                     try:
-                        MunkiFile.delete('pkgs', pkg_path, user)
+                        MunkiRepo.delete('pkgs', pkg_path)
                     except FileDeleteError as err:
                         errors.append('Error %s when removing %s'
                                       % (err, pkg_path))

@@ -9,8 +9,8 @@ import logging
 import plistlib
 
 LOGGER = logging.getLogger('munkiwebadmin')
-REPO_DIR = settings.MUNKI_REPO_DIR
-REPO_PLUGIN = settings.MUNKI_REPO_PLUGIN
+MUNKI_REPO_URL = settings.MUNKI_REPO_URL
+MUNKI_REPO_PLUGIN = settings.MUNKI_REPO_PLUGIN
 MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
 
 # import munkitools
@@ -31,7 +31,7 @@ except ImportError:
 
 # connect to the munki repo
 try:
-    repo = munkirepo.connect(REPO_DIR, REPO_PLUGIN)
+    repo = munkirepo.connect(MUNKI_REPO_URL, MUNKI_REPO_PLUGIN)
 except munkirepo.RepoError as err:
     print(u'Repo error: %s' % err, file=sys.stderr)
     raise
@@ -76,6 +76,15 @@ class MunkiRepo(object):
         return plists
     
     @classmethod
+    def get(cls, kind, pathname):
+        '''Reads a plist file and returns the plist as a dictionary'''
+        try:
+            return repo.get(kind + '/' + pathname)
+        except munkirepo.RepoError as err:
+            LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
+            return ''
+
+    @classmethod
     def read(cls, kind, pathname):
         '''Reads a plist file and returns the plist as a dictionary'''
         try:
@@ -85,28 +94,18 @@ class MunkiRepo(object):
             return {}
     
     @classmethod
-    def write(cls, data, kind, pathname, user):
+    def write(cls, data, kind, pathname):
         '''Writes a text data to (plist) file'''
-        filepath = os.path.join(REPO_DIR, kind, os.path.normpath(pathname))
-        plist_parent_dir = os.path.dirname(filepath)
-        if not os.path.exists(plist_parent_dir):
-            try:
-                # attempt to create missing intermediate dirs
-                os.makedirs(plist_parent_dir)
-            except OSError as err:
-                LOGGER.error('Create failed for %s/%s: %s', kind, pathname, err)
-                raise FileWriteError(err)
         try:
-            fileref=open(filepath,'wb')
-            plistlib.dump(data, fileref)
-            fileref.close()
+            print('Writing %s to %s/%s' % (data, kind, pathname))
+            repo.put(kind + '/' + pathname, writePlistToString(data))
             LOGGER.info('Wrote %s/%s', kind, pathname)
-        except (IOError, OSError) as err:
+        except munkirepo.RepoError as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
             raise FileWriteError(err)
     
     @classmethod
-    def delete(cls, kind, pathname, user):
+    def delete(cls, kind, pathname):
         '''Deletes a plist file'''
         try:
             repo.delete(kind + '/' + pathname)
