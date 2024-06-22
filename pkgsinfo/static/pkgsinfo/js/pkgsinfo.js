@@ -530,11 +530,9 @@ function savePkginfoItem(closeAfterSave=false) {
     var plist_data = editor.getValue();
     var pkginfoItemURL = '/api/pkgsinfo/' + current_pathname;
     $.ajax({
-        type: 'POST',
+        type: 'PUT',
         url: pkginfoItemURL,
-        headers: {'X-METHODOVERRIDE': 'PUT',
-                  'Content-Type': 'application/xml',
-                  'Accept': 'application/xml'},
+        headers: {'Content-Type': 'application/xml'},
         data: plist_data,
         timeout: 10000,
         success: function(data) {
@@ -645,11 +643,10 @@ function deletePkginfoList() {
     var pkginfo_list = get_checked_items();
     var deletePkg = $('#mass_delete_pkg').is(':checked');
     $.ajax({
-        type: 'POST',
+        type: 'DELETE',
         url: '/pkgsinfo/',
         data: JSON.stringify({'pkginfo_list': pkginfo_list,
                               'deletePkg': deletePkg}),
-        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             rebuildCatalogs();
             window.location.hash = '';
@@ -674,12 +671,12 @@ function deletePkginfoList() {
 }
 
 function deleteInstallerItem(installer_item_path) {
+    console.log(installer_item_path)
     if (installer_item_path) {
         the_url = "/api/pkgs/" + installer_item_path
         $.ajax({
-            type: 'POST',
+            type: 'DELETE',
             url: the_url,
-            headers: {'X-METHODOVERRIDE': 'DELETE'},
             success: function(data) {
                 // do nothing
             },
@@ -707,11 +704,10 @@ function deletePkginfoItem() {
     $('.modal-backdrop').remove();
     var pkginfoItemURL = '/api/pkgsinfo/' + current_pathname;
     var delete_pkg = $('#delete_pkg').is(':checked');
-    var installer_item_path = $('#pathname').data('installer-item-path');
+    var installer_item_path = $('#pkginfoItemLabel').data('installer-item-path');
     $.ajax({
-        type: 'POST',
+        type: 'DELETE',
         url: pkginfoItemURL,
-        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             if (delete_pkg) {
                 deleteInstallerItem(installer_item_path);

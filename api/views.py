@@ -412,10 +412,7 @@ class ManifestsDetailAPIView(GenericAPIView, ListModelMixin, CreateModelMixin, D
         return Response(serializer.data)
     
     def post(self, request, *args, **kwargs):
-        data = request.data
-        
-
-        serializer = ManifestSerializer(data=data)
+        serializer = ManifestSerializer(data=request.data)
         if serializer.is_valid():
             MunkiRepo.write(serializer.data, "manifests", kwargs['filepath'])
             return Response(serializer.data, status=201)
@@ -427,11 +424,21 @@ class ManifestsDetailAPIView(GenericAPIView, ListModelMixin, CreateModelMixin, D
             MunkiRepo.write(serializer.data, "manifests", kwargs['filepath'])
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+    def delete(self, request, *args, **kwargs):
+        try:
+            MunkiRepo.delete('manifests', kwargs['filepath'])
+            return Response(status=204)
+        except FileDeleteError as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
 
 
 class PkgsinfoListView(GenericAPIView, ListModelMixin):
     http_method_names = ['get', 'post']
     permission_classes = [DjangoModelPermissions]
+    parser_classes = [PlistXMLParser, JSONParser]
     
     def get_queryset(self):
         try:
@@ -495,8 +502,9 @@ class PkgsinfoListView(GenericAPIView, ListModelMixin):
 
 
 class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     permission_classes = [DjangoModelPermissions]
+    parser_classes = [PlistXMLParser, JSONParser]
     
     def get_queryset(self):
         try:
@@ -528,6 +536,32 @@ class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
     
     def list(self, request, filepath):
         return Response(self.get_object())
+    
+    def post(self, request, *args, **kwargs):
+        if request.data:
+            MunkiRepo.write(request.data, "pkgsinfo", kwargs['filepath'])
+            return Response({}, status=201)
+        return Response({}, status=400)
+
+    def put(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        if kwargs.get('deletePkg', False):
+            try:
+                MunkiRepo.delete('pkgs', kwargs['installer_item_location'])
+            except FileDeleteError as err:
+                return Response({'result': 'failed',
+                                'exception_type': str(type(err)),
+                                'detail': str(err)})
+
+        try:
+            MunkiRepo.delete('pkgsinfo', kwargs['filepath'])
+            return Response(status=204)
+        except FileDeleteError as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
 
 
 class PkgsListView(GenericAPIView, ListModelMixin):
@@ -554,7 +588,7 @@ class PkgsListView(GenericAPIView, ListModelMixin):
 
 
 class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get']
+    http_method_names = ['get', 'delete']
     permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
@@ -588,6 +622,16 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def list(self, request, filepath):
         return self.get_object()
+    
+    def delete(self, request, *args, **kwargs):
+        print(kwargs)
+        try:
+            MunkiRepo.delete('pkgs', kwargs['filepath'])
+            return Response(status=204)
+        except FileDeleteError as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
 
 
 class IconsListView(GenericAPIView, ListModelMixin):

@@ -49,10 +49,8 @@ def pkg_ref_count(pkginfo_path, catalog_items):
 def process_file(pkginfo_path):
     '''Worker function called by our multiprocessing pool. Reads a pkginfo
     file and returns a tuple of name, version, catalogs, and relative path'''
-    filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        with open(filepath, 'rb') as f:
-            pkginfo = plistlib.load(f)
+        pkginfo = MunkiRepo.read('pkgsinfo', pkginfo_path)
     except (ExpatError, IOError):
         return ()
     return (pkginfo.get('name', 'NO_NAME'),

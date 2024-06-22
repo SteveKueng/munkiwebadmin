@@ -590,9 +590,8 @@ function deleteManifestItem(manifest_name) {
     $('.modal-backdrop').remove();
     var manifestItemURL = '/api/manifests/' + manifest_name;
     $.ajax({
-        method: 'POST',
+        method: 'DELETE',
         url: manifestItemURL,
-        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             hideSaveOrCancelBtns();
             window.location.hash = '';

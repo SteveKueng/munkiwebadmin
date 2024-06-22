@@ -17,6 +17,7 @@ MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
 sys.path.append(MUNKITOOLS_DIR)
 
 try:
+    from munkilib.admin import makecatalogslib
     from munkilib.cliutils import ConfigurationSaveError
     from munkilib.cliutils import configure as _configure
     from munkilib.cliutils import libedit
@@ -113,6 +114,15 @@ class MunkiRepo(object):
         except munkirepo.RepoError as err:
             LOGGER.error('Delete failed for %s/%s: %s', kind, pathname, err)
             raise FileDeleteError(err)
+    
+    @classmethod
+    def makecatalogs(cls, output_fn=print):
+        '''Calls makecatalogs'''
+        try:
+            makecatalogslib.makecatalogs(repo, {}, output_fn=output_fn)
+        except makecatalogslib.MakeCatalogsError as err:
+            LOGGER.error('makecatalogs failed: %s', err)
+            raise FileError(err)
 
 class Plist(object):
     '''Pseudo-Django object'''
