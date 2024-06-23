@@ -31,16 +31,12 @@ LOGGER = logging.getLogger('munkiwebadmin')
 
 def get_icon_url(pkginfo_plist):
     '''Attempt to build an icon url for the pkginfo'''
-    if ICONS_URL:
-        icon_known_exts = ['.bmp', '.gif', '.icns', '.jpg', '.jpeg', '.png',
-                           '.psd', '.tga', '.tif', '.tiff', '.yuv']
-        icon_name = pkginfo_plist.get('icon_name') or pkginfo_plist['name']
-        if not os.path.splitext(icon_name)[1] in icon_known_exts:
-            icon_name += '.png'
-        icon_path = os.path.join(ICONS_DIR, icon_name)
-        if os.path.isfile(icon_path):
-            return ICONS_URL + "/" + urllib.parse.quote(icon_name.encode('UTF-8'))
-    return STATIC_URL + 'img/GenericPkg.png'
+    icon_known_exts = ['.bmp', '.gif', '.icns', '.jpg', '.jpeg', '.png',
+                        '.psd', '.tga', '.tif', '.tiff', '.yuv']
+    icon_name = pkginfo_plist.get('icon_name') or pkginfo_plist['name']
+    if not os.path.splitext(icon_name)[1] in icon_known_exts:
+        icon_name += '.png'
+    return "/api/icons/" + urllib.parse.quote(icon_name.encode('UTF-8'))
 
 
 def status(request):

@@ -15,8 +15,6 @@ $(document).on('hide.bs.modal','#iconItem', function () {
       return;
   } else {
     ($('#iconItem').data('bs.modal') || {})._isShown = true;
-    window.location.hash = '';
-    current_pathname = "";
   }
 });
 
@@ -43,7 +41,7 @@ var render_name = function(data, type, row, meta) {
 }
 
 var render_icon = function(data, type, row, meta) {
-    return '<img src="/media/'+row+'" alt="'+row+'" width="20">';
+    return '<img src="/api/icons/' + row +'" alt="" width="20"  onerror=\'this.src="/static/img/GenericPkg.png";\'>';
 }
 
 function initIconsTable() {
@@ -96,6 +94,8 @@ function initIconsTable() {
 
 function cancelEdit() {
     hideSaveOrCancelBtns();
+    window.location.hash = '';
+    current_pathname = "";
     $("#iconItem").modal("hide");
 }
 
@@ -140,9 +140,8 @@ function deleteIconItem() {
     $('.modal-backdrop').remove();
     var iconItemURL = '/api/icons/' + current_pathname;
     $.ajax({
-        type: 'POST',
+        type: 'DELETE',
         url: iconItemURL,
-        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             rebuildCatalogs();
             window.location.hash = '';
@@ -179,8 +178,9 @@ function getIconItem(pathname) {
     hideSaveOrCancelBtns();
     detectUnsavedChanges();
     $('#pathname').text(pathname.replace(/%20/g, " "));
+    $("#iconImg").prop("src", "/api/icons/" + pathname);
     $("#iconImg").prop("alt", pathname);
-    $("#iconImg").prop("src", "/media/"+pathname);
+
     $("#inputIconName").prop("value", pathname.replace(/%20/g, " "));
     current_pathname = pathname;
     requested_pathname = "";
@@ -198,12 +198,14 @@ function uploadIcon() {
     $.ajax({
         type: 'PUT',
         url: iconItemURL,
-        data: file,
+        data: "img="+file,
         timeout: 10000,
         processData: false,
         success: function(data) {
             rebuildCatalogs();
             $("#newIconModal").modal("hide");
+            $("#previewImg").prop("src", "/static/img/imgPlaceholder.png");
+            $("#new-icon-name").val("");
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $("#errorModalTitleText").text("Icons write error");

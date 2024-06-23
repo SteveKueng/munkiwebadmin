@@ -12,14 +12,11 @@ from rest_framework.mixins import (
 )
 from rest_framework.permissions import DjangoModelPermissions
 
-from django.http import HttpResponse, QueryDict, FileResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import PermissionDenied
+from django.http import FileResponse
 from django.conf import settings
 
-from api.models import Plist, MunkiFile, MunkiRepo
-from api.models import FileError, FileWriteError, FileReadError, \
-                       FileAlreadyExistsError, \
+from api.models import Plist, MunkiRepo
+from api.models import FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
 from reports.models import Machine
@@ -43,6 +40,7 @@ import base64
 import bz2
 import urllib
 import sys
+import io
 
 LOGGER = logging.getLogger('munkiwebadmin')
 MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
@@ -658,7 +656,7 @@ class IconsListView(GenericAPIView, ListModelMixin):
 
 
 class IconsDetailAPIView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get']
+    http_method_names = ['get', 'post', 'put', 'delete']
     permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
@@ -672,18 +670,15 @@ class IconsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def get_object(self):
         filepath = self.kwargs['filepath']
-        fullpath = MunkiFile.get_fullpath('icons', filepath)
-        if not os.path.exists(fullpath):
-            return Response({'result': 'failed',
-                            'exception_type': 'FileDoesNotExist',
-                            'detail': '%s does not exist' % filepath})
+        item = MunkiRepo.get('icons', filepath)
+        buffer = io.BytesIO(item)
+        buffer.seek(0)
+
         try:
             response = FileResponse(
-                open(fullpath, 'rb'),
-                content_type=mimetypes.guess_type(fullpath)[0])
-            response['Content-Length'] = os.path.getsize(fullpath)
-            response['Content-Disposition'] = (
-                'attachment; filename="%s"' % os.path.basename(filepath))
+                buffer,
+                content_type=mimetypes.guess_type(filepath)[0],
+                filename=filepath)
             return response
         except (IOError, OSError) as err:
             return Response({'result': 'failed',
@@ -695,4 +690,25 @@ class IconsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def list(self, request, filepath):
         return self.get_object()
+    
+    def post(self, request, *args, **kwargs):
+        if request.data:
+            imgBase64 = request.data['img'].split(',')[1].replace(" ", "+")
+            img = base64.b64decode(imgBase64)
+
+            MunkiRepo.writedata(img, "icons", kwargs['filepath'])
+            return Response({}, status=201)
+        return Response({}, status=400)
+    
+    def put(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        try:
+            MunkiRepo.delete('icons', kwargs['filepath'])
+            return Response(status=204)
+        except FileDeleteError as err:
+            return Response({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)})
 

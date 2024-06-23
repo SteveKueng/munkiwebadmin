@@ -78,7 +78,7 @@ class MunkiRepo(object):
     
     @classmethod
     def get(cls, kind, pathname):
-        '''Reads a plist file and returns the plist as a dictionary'''
+        '''Reads a file and returns the contents'''
         try:
             return repo.get(kind + '/' + pathname)
         except munkirepo.RepoError as err:
@@ -100,6 +100,17 @@ class MunkiRepo(object):
         try:
             print('Writing %s to %s/%s' % (data, kind, pathname))
             repo.put(kind + '/' + pathname, writePlistToString(data))
+            LOGGER.info('Wrote %s/%s', kind, pathname)
+        except munkirepo.RepoError as err:
+            LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
+            raise FileWriteError(err)
+        
+    @classmethod
+    def writedata(cls, data, kind, pathname):
+        '''Writes a text data to file'''
+        try:
+            print('Writing %s to %s/%s' % (data, kind, pathname))
+            repo.put(kind + '/' + pathname, data)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except munkirepo.RepoError as err:
             LOGGER.error('Write failed for %s/%s: %s', kind, pathname, err)
