@@ -75,7 +75,7 @@ class MunkiRepo(object):
             return repo.get(kind + '/' + pathname)
         except munkirepo.RepoError as err:
             LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
-            return ''
+            raise FileReadError(err)
 
     @classmethod
     def read(cls, kind, pathname):
@@ -84,7 +84,7 @@ class MunkiRepo(object):
             return readPlistFromString(repo.get(kind + '/' + pathname))
         except munkirepo.RepoError as err:
             LOGGER.error('Read failed for %s/%s: %s', kind, pathname, err)
-            return {}
+            raise FileReadError(err)
     
     @classmethod
     def write(cls, data, kind, pathname):

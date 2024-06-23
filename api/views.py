@@ -600,7 +600,10 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def get_object(self):
         filepath = self.kwargs['filepath']
-        item = MunkiRepo.get('pkgs', filepath)
+        try:
+            item = MunkiRepo.get('pkgs', self.kwargs['filepath'])
+        except FileReadError as err:
+            return Response({})
         
         try:
             response = FileResponse(
