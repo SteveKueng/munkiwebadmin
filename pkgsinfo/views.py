@@ -9,7 +9,7 @@ from django.conf import settings
 
 from pkgsinfo.models import Pkginfo, PKGSINFO_STATUS_TAG
 from process.models import Process
-from api.models import Plist, \
+from api.models import MunkiRepo, \
                        FileError, FileDoesNotExistError
 
 import json
@@ -18,29 +18,18 @@ import os
 import plistlib
 import urllib
 
-REPO_DIR = settings.MUNKI_REPO_DIR
-ICONS_DIR = os.path.join(REPO_DIR, 'icons')
 STATIC_URL = settings.STATIC_URL
-try:
-    ICONS_URL = settings.ICONS_URL
-except AttributeError:
-    ICONS_URL = None
-
 LOGGER = logging.getLogger('munkiwebadmin')
 
 
 def get_icon_url(pkginfo_plist):
     '''Attempt to build an icon url for the pkginfo'''
-    if ICONS_URL:
-        icon_known_exts = ['.bmp', '.gif', '.icns', '.jpg', '.jpeg', '.png',
-                           '.psd', '.tga', '.tif', '.tiff', '.yuv']
-        icon_name = pkginfo_plist.get('icon_name') or pkginfo_plist['name']
-        if not os.path.splitext(icon_name)[1] in icon_known_exts:
-            icon_name += '.png'
-        icon_path = os.path.join(ICONS_DIR, icon_name)
-        if os.path.isfile(icon_path):
-            return ICONS_URL + "/" + urllib.parse.quote(icon_name.encode('UTF-8'))
-    return STATIC_URL + 'img/GenericPkg.png'
+    icon_known_exts = ['.bmp', '.gif', '.icns', '.jpg', '.jpeg', '.png',
+                        '.psd', '.tga', '.tif', '.tiff', '.yuv']
+    icon_name = pkginfo_plist.get('icon_name') or pkginfo_plist['name']
+    if not os.path.splitext(icon_name)[1] in icon_known_exts:
+        icon_name += '.png'
+    return "/api/icons/" + urllib.parse.quote(icon_name.encode('UTF-8'))
 
 
 def status(request):
@@ -146,7 +135,7 @@ def detail(request, pkginfo_path):
     if request.method == 'GET':
         LOGGER.debug("Got read request for %s", pkginfo_path)
         try:
-            plist = Plist.read('pkgsinfo', pkginfo_path)
+            plist = MunkiRepo.read('pkgsinfo', pkginfo_path)
         except FileDoesNotExistError:
             raise Http404("%s does not exist" % pkginfo_path)
         default_items = {

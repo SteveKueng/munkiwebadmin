@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-xl-down">
     <div class="modal-content">
       <div class="modal-header">
-          <img src="{{ icon_url }}" class='pkginfo-icon pull-left' height='32' style="margin-top:3px; margin-right:10px;"/>
+          <img src="{{ icon_url }}" class='pkginfo-icon pull-left' height='32' style="margin-top:3px; margin-right:10px;" onerror="this.src='/static/img/GenericPkg.png';"/>
           <h1 class="modal-title fs-5" data-installer-item-path='{{ installer_item_path }}' id="pkginfoItemLabel">{{ pathname }}</h1>
           {% if perms.pkgsinfo.delete_pkginfofile %}
           <button type="button" class="btn btn-danger pull-right" onClick="getPkgRefCount()" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>

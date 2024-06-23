@@ -479,8 +479,7 @@ function duplicateManifestItem() {
     $.ajax({
         method: 'POST',
         url: manifestItemURL,
-        headers: {'Content-Type': 'application/xml',
-                  'Accept': 'application/xml'},
+        headers: {'Content-Type': 'application/xml'},
         data: plist_data,
         timeout: 10000,
         cache: false,
@@ -515,8 +514,7 @@ function saveManifestItem() {
         method: 'POST',
         url: manifestItemURL,
         headers: {'X-METHODOVERRIDE': 'PUT',
-                  'Content-Type': 'application/xml',
-                  'Accept': 'application/xml'},
+                  'Content-Type': 'application/xml'},
         data: plist_data,
         timeout: 10000,
         success: function(data) {
@@ -592,9 +590,8 @@ function deleteManifestItem(manifest_name) {
     $('.modal-backdrop').remove();
     var manifestItemURL = '/api/manifests/' + manifest_name;
     $.ajax({
-        method: 'POST',
+        method: 'DELETE',
         url: manifestItemURL,
-        headers: {'X-METHODOVERRIDE': 'DELETE'},
         success: function(data) {
             hideSaveOrCancelBtns();
             window.location.hash = '';

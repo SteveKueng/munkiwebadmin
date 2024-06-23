@@ -12,12 +12,6 @@ export MAKECATALOGS_PATH='/usr/local/munki/makecatalogs'
 export FIELD_ENCRYPTION_KEY='VDKEyIzST-hbtX7rvA7LPue63E0XB0m3pZEFWKk0BKI='
 export REPO_MANAGEMENT_ONLY='False'
 
-# Create the munki repo directory
-if [ ! -d $MUNKI_REPO_DIR ]; then
-    mkdir -p $MUNKI_REPO_DIR
-fi
-
-cd app
 
 python manage.py makemigrations manifests pkgsinfo process reports inventory
 python manage.py migrate --noinput

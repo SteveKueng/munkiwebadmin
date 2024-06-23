@@ -16,13 +16,17 @@ MEDIA_URL = "/media/"
 ###########################################################################
 # APPNAME is user-visible web app name
 APPNAME = os.getenv('APPNAME', 'MunkiWebAdmin')
-MUNKI_REPO_DIR = os.getenv('MUNKI_REPO_DIR', '/munkirepo')
-MAKECATALOGS_PATH = os.getenv('MAKECATALOGS_PATH', '/munkitools/makecatalogs')
 DEFAULT_MANIFEST = os.getenv('DEFAULT_MANIFEST', 'serial_number')
 REPO_MANAGEMENT_ONLY = os.getenv("REPO_MANAGEMENT_ONLY", 'False').lower() in ('true', '1', 't')
 SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGEME!!!")
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(" ")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
+
+# Munki repo settings
+MUNKI_REPO_URL = os.getenv('MUNKI_REPO_URL', '/munkirepo')
+MUNKI_REPO_PLUGIN = os.getenv('MUNKI_REPO_PLUGIN', 'FileRepo')
+MUNKITOOLS_DIR = os.getenv('MUNKITOOLS_DIR', '/munkitools')
+MAKECATALOGS_PATH = MUNKITOOLS_DIR + '/makecatalogs'
 
 # Azure AD settings
 CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
@@ -39,10 +43,6 @@ DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
 #not changing this
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
-MEDIA_ROOT = os.path.join(MUNKI_REPO_DIR, 'icons')
-ICONS_URL = MEDIA_URL
-if os.path.isdir(os.path.join(MUNKI_REPO_DIR, '.git')):
-    GIT_PATH = '/usr/bin/git'
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = DEBUG
@@ -51,13 +51,6 @@ LOGIN_EXEMPT_URLS = ()
 
 # django ldap auth
 USE_LDAP = False
-
-TIMEOUT = 20 # default 20
-
-try:
-    execfile("/config/settings.py")
-except:
-    pass
 
 ###########################################################################
 # munkiwebadmin-specific end
@@ -120,6 +113,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'munkiwebadmin.wsgi.application'
 
+""" if os.getenv('AZURE_DB_STRING'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': ,
+            'USER': ,
+            'PASSWORD': ,
+            'HOST': ,
+            'PORT': ,
+        }
+    }
+el """
 if os.getenv('DB') == 'postgres':
     DATABASES = {
         'default': {
@@ -176,11 +181,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-#### end basic Django settings
-if DEBUG:
-    LOGLEVEL = 'DEBUG'
-else:
-    LOGLEVEL = 'WARNING'
+
+LOGLEVEL = 'WARNING'
 
 LOGGING = {
     'version': 1,

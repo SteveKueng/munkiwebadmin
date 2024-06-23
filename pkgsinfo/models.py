@@ -15,33 +15,21 @@ from xml.parsers.expat import ExpatError
 from django.conf import settings
 from process.utils import record_status
 from catalogs.models import Catalog
-from api.models import Plist, MunkiFile, \
+from api.models import MunkiRepo, \
                        FileReadError, FileWriteError, FileDeleteError
-from munkiwebadmin.utils import MunkiGit
 
-try:
-    GIT = settings.GIT_PATH
-except AttributeError:
-    GIT = None
-
-REPO_DIR = settings.MUNKI_REPO_DIR
-CATALOGS_PATH = os.path.join(REPO_DIR, 'catalogs')
-PKGSINFO_PATH = os.path.join(REPO_DIR, 'pkgsinfo')
-PKGSINFO_PATH_PREFIX_LEN = len(PKGSINFO_PATH) + 1
 PKGSINFO_STATUS_TAG = 'pkgsinfo_list_process'
-
 LOGGER = logging.getLogger('munkiwebadmin')
 
 def pkg_ref_count(pkginfo_path, catalog_items):
     '''Returns the number of pkginfo items containing a reference to
     the installer_item_location in pkginfo_path and the relative path to
     the installer_item_location'''
-    filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        with open(filepath, 'rb') as f:
-            plistdata = plistlib.load(f)
-    except (ExpatError, IOError):
+        plistdata = MunkiRepo.read('pkgsinfo', pkginfo_path)
+    except FileReadError:
         return 0, ''
+    
     pkg_path = plistdata.get('installer_item_location')
     if not pkg_path:
         return 0, ''
@@ -56,10 +44,8 @@ def pkg_ref_count(pkginfo_path, catalog_items):
 def process_file(pkginfo_path):
     '''Worker function called by our multiprocessing pool. Reads a pkginfo
     file and returns a tuple of name, version, catalogs, and relative path'''
-    filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        with open(filepath, 'rb') as f:
-            pkginfo = plistlib.load(f)
+        pkginfo = MunkiRepo.read('pkgsinfo', pkginfo_path)
     except (ExpatError, IOError):
         return ()
     return (pkginfo.get('name', 'NO_NAME'),
@@ -72,14 +58,15 @@ def process_file(pkginfo_path):
 def any_files_in_list_newer_than(files, filepath):
     '''Returns true if any file in the list of files
     is newer that filepath'''
-    try:
+    # todo: needs to be fixed
+    '''try:
         mtime = os.stat(filepath).st_mtime
     except OSError:
         return True
     for fname in files:
         fullpath = os.path.join(PKGSINFO_PATH, fname)
         if os.stat(fullpath).st_mtime > mtime:
-            return True
+            return True'''
     return False
 
 
@@ -94,7 +81,7 @@ class PkginfoFile(models.Model):
     pass
 
 
-class Pkginfo(Plist):
+class Pkginfo(MunkiRepo):
     '''Models pkginfo items'''
     @classmethod
     def data(cls):
@@ -111,19 +98,14 @@ class Pkginfo(Plist):
         record(message='Starting scan of pkgsinfo data')
         files = cls.list('pkgsinfo')
         record(message='Processing %s files' % len(files))
-        all_catalog = os.path.join(CATALOGS_PATH, 'all')
-        try:
-            with open(all_catalog, 'rb') as f:
-                all_items = plistlib.load(f)
-        except (ExpatError, OSError, IOError):
-            all_items = []
+        all_items = cls.read('catalogs', 'all')
         use_slower_approach = False
         if len(all_items) != len(files):
             LOGGER.debug('number of files differ from all catalog')
             use_slower_approach = True
-        elif any_files_in_list_newer_than(files, all_catalog):
-            LOGGER.debug('files newer than all catalog')
-            use_slower_approach = True
+        #elif any_files_in_list_newer_than(files, all_catalog):
+        #    LOGGER.debug('files newer than all catalog')
+        #    use_slower_approach = True
         pkginfo_dict = defaultdict(list)
         record(message='Assembling pkgsinfo data')
         if use_slower_approach:
@@ -182,7 +164,7 @@ class Pkginfo(Plist):
             else:
                 if delete_this_pkg:
                     try:
-                        MunkiFile.delete('pkgs', pkg_path, user)
+                        MunkiRepo.delete('pkgs', pkg_path)
                     except FileDeleteError as err:
                         errors.append('Error %s when removing %s'
                                       % (err, pkg_path))

@@ -3,14 +3,12 @@ catalogs/models.py
 
 """
 #from django.db import models
-import os
-import plistlib
 from xml.parsers.expat import ExpatError
 
 from django.conf import settings
 from django.db import models
 
-REPO_DIR = settings.MUNKI_REPO_DIR
+from api.models import MunkiRepo
 
 
 def trim_version_string(version_string):
@@ -38,36 +36,17 @@ class Catalog(object):
     def list(cls):
         '''Returns a list of available catalogs, which is a list
         of catalog names (strings)'''
-        catalogs_path = os.path.join(REPO_DIR, 'catalogs')
-        catalogs = []
-        for name in os.listdir(catalogs_path):
-            if name.startswith("._") or name == ".DS_Store" or name == 'all':
-                # don't process these
-                continue
-            try:
-                # attempt to read the plist so we know it's valid
-                with open(os.path.join(catalogs_path, name), 'rb') as f:
-                    _ = plistlib.load(f)
-            except (ExpatError, IOError):
-                # skip items that aren't valid plists
-                pass
-            else:
-                catalogs.append(name)
-        return catalogs
+        return MunkiRepo.list('catalogs')
 
     @classmethod
     def next_catalog_contents(cls):
         '''Generator that returns the next catalog name and its contents'''
-        catalogs_path = os.path.join(REPO_DIR, 'catalogs')
-        if not os.path.isdir(catalogs_path):
-            return
-        for name in os.listdir(catalogs_path):
+        for name in MunkiRepo.list('catalogs'):
             if name.startswith("._") or name == ".DS_Store" or name == 'all':
                 # don't process these
                 continue
             try:
-                with open(os.path.join(catalogs_path, name), 'rb') as f:
-                    catalog = plistlib.load(f)
+                catalog = MunkiRepo.read('catalogs', name)
             except (ExpatError, IOError):
                 # skip items that aren't valid plists
                 pass
@@ -78,17 +57,7 @@ class Catalog(object):
     def detail(cls, catalog_name):
         '''Gets the contents of a catalog, which is a list
         of pkginfo items'''
-        catalog_path = os.path.join(
-            REPO_DIR, 'catalogs', catalog_name)
-        if os.path.exists(catalog_path):
-            try:
-                with open(catalog_path, 'rb') as f:
-                    catalog_items = plistlib.load(f)
-                return catalog_items
-            except (ExpatError, IOError):
-                return None
-        else:
-            return None
+        return MunkiRepo.read('catalogs', catalog_name)
 
     @classmethod
     def catalog_info(cls):
