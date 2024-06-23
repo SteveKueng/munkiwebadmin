@@ -15,7 +15,7 @@ from rest_framework.permissions import DjangoModelPermissions
 from django.http import FileResponse
 from django.conf import settings
 
-from api.models import Plist, MunkiRepo
+from api.models import MunkiRepo
 from api.models import FileReadError, \
                        FileDoesNotExistError, FileDeleteError
 
@@ -216,7 +216,7 @@ class CatalogsListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        queryset = Plist.list('catalogs')
+        queryset = MunkiRepo.list('catalogs')
 
         filter_terms = self.request.GET.copy()
         LOGGER.debug("filter_terms: %s", filter_terms)
@@ -303,7 +303,7 @@ class ManifestsListView(GenericAPIView, ListModelMixin):
 
     def get_queryset(self):
         try:
-            items = Plist.list('manifests')
+            items = MunkiRepo.list('manifests')
             response = ManifestFile.objects.all()
             response.values = items
         except FileDoesNotExistError as err:
@@ -448,7 +448,7 @@ class PkgsinfoListView(GenericAPIView, ListModelMixin):
         return response
     
     def get_object(self):
-        queryset = Plist.list('pkgsinfo')
+        queryset = MunkiRepo.list('pkgsinfo')
         filter_terms = self.request.GET.copy()
 
         # remove the _ parameter

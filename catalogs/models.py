@@ -3,16 +3,12 @@ catalogs/models.py
 
 """
 #from django.db import models
-import os
-import plistlib
 from xml.parsers.expat import ExpatError
 
 from django.conf import settings
 from django.db import models
 
 from api.models import MunkiRepo
-
-REPO_DIR = settings.MUNKI_REPO_URL
 
 
 def trim_version_string(version_string):

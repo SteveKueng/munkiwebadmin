@@ -9,7 +9,7 @@ from django.conf import settings
 
 from pkgsinfo.models import Pkginfo, PKGSINFO_STATUS_TAG
 from process.models import Process
-from api.models import Plist, MunkiRepo, \
+from api.models import MunkiRepo, \
                        FileError, FileDoesNotExistError
 
 import json
@@ -18,14 +18,7 @@ import os
 import plistlib
 import urllib
 
-REPO_DIR = settings.MUNKI_REPO_URL
-ICONS_DIR = os.path.join(REPO_DIR, 'icons')
 STATIC_URL = settings.STATIC_URL
-try:
-    ICONS_URL = settings.ICONS_URL
-except AttributeError:
-    ICONS_URL = None
-
 LOGGER = logging.getLogger('munkiwebadmin')
 
 

@@ -43,8 +43,6 @@ DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
 
 #not changing this
 MUNKISCRIPTS_PATH = os.path.join(BASE_DIR, 'munkiscripts', 'build')
-MEDIA_ROOT = os.path.join(MUNKI_REPO_URL, 'icons')
-ICONS_URL = MEDIA_URL
 
 # CORS settings
 CORS_ORIGIN_ALLOW_ALL = DEBUG
@@ -183,11 +181,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-#### end basic Django settings
-if DEBUG:
-    LOGLEVEL = 'DEBUG'
-else:
-    LOGLEVEL = 'WARNING'
+
+LOGLEVEL = 'WARNING'
 
 LOGGING = {
     'version': 1,

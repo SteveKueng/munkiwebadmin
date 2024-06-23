@@ -18,23 +18,18 @@ from catalogs.models import Catalog
 from api.models import MunkiRepo, \
                        FileReadError, FileWriteError, FileDeleteError
 
-REPO_DIR = settings.MUNKI_REPO_URL
-PKGSINFO_PATH = os.path.join(REPO_DIR, 'pkgsinfo')
-PKGSINFO_PATH_PREFIX_LEN = len(PKGSINFO_PATH) + 1
 PKGSINFO_STATUS_TAG = 'pkgsinfo_list_process'
-
 LOGGER = logging.getLogger('munkiwebadmin')
 
 def pkg_ref_count(pkginfo_path, catalog_items):
     '''Returns the number of pkginfo items containing a reference to
     the installer_item_location in pkginfo_path and the relative path to
     the installer_item_location'''
-    filepath = os.path.join(PKGSINFO_PATH, os.path.normpath(pkginfo_path))
     try:
-        with open(filepath, 'rb') as f:
-            plistdata = plistlib.load(f)
-    except (ExpatError, IOError):
+        plistdata = MunkiRepo.read('pkgsinfo', pkginfo_path)
+    except FileReadError:
         return 0, ''
+    
     pkg_path = plistdata.get('installer_item_location')
     if not pkg_path:
         return 0, ''
@@ -63,14 +58,15 @@ def process_file(pkginfo_path):
 def any_files_in_list_newer_than(files, filepath):
     '''Returns true if any file in the list of files
     is newer that filepath'''
-    try:
+    # todo: needs to be fixed
+    '''try:
         mtime = os.stat(filepath).st_mtime
     except OSError:
         return True
     for fname in files:
         fullpath = os.path.join(PKGSINFO_PATH, fname)
         if os.stat(fullpath).st_mtime > mtime:
-            return True
+            return True'''
     return False
 
 

@@ -9,11 +9,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Machine, MunkiReport
 from catalogs.models import Catalog
-from api.models import Plist, MunkiRepo, FileDoesNotExistError, FileReadError
+from api.models import MunkiRepo, FileDoesNotExistError, FileReadError
 
 import os
 import plistlib
-import urllib
 from datetime import timedelta, date
 import json
 import logging
