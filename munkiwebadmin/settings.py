@@ -23,7 +23,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").spl
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost").split(" ")
 
 # Munki repo settings
-MUNKI_REPO_URL = os.getenv('MUNKI_REPO_URL', '/munkirepo')
+MUNKI_REPO_URL = os.getenv('MUNKI_REPO_URL', 'file:///munkirepo')
 MUNKI_REPO_PLUGIN = os.getenv('MUNKI_REPO_PLUGIN', 'FileRepo')
 MUNKITOOLS_DIR = os.getenv('MUNKITOOLS_DIR', '/munkitools')
 MAKECATALOGS_PATH = MUNKITOOLS_DIR + '/makecatalogs'
