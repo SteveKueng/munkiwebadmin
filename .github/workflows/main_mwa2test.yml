@@ -34,7 +34,7 @@ jobs:
         run: pwd; ls -al
         
       - name: Install munkitools
-        run: curl -Lk -o munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip /tmp/munkitools.zip -d munkitools && rm -rf /tmp/munkitools.zip 
+        run: curl -Lk -o /tmp/munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip /tmp/munkitools.zip -d munkitools && rm -rf /tmp/munkitools.zip 
 
       - name: Run collectstatic
         run: python manage.py collectstatic --noinput
