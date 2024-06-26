@@ -43,7 +43,7 @@ ENTRA_ONLY = os.getenv('ENTRA_ONLY', 'False').lower() in ('true', '1', 't')
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
     ALLOWED_HOSTS.append(os.environ.get('WEBSITE_HOSTNAME'))
-    CSRF_TRUSTED_ORIGINS.append(os.environ.get('WEBSITE_HOSTNAME'))
+    CSRF_TRUSTED_ORIGINS.append("https://" + os.environ.get('WEBSITE_HOSTNAME'))
 
 # debug mode
 DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't')
