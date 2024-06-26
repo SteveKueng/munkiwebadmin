@@ -10,3 +10,4 @@ setuptools==70.0.0
 python-ldap==3.4.4
 django-auth-ldap==4.8.0
 azure-storage-blob==12.20.0
+whitenoise==6.7.0
