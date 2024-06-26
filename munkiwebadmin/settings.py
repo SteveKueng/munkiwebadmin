@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "http://localhost"
 MUNKI_REPO_URL = os.getenv('MUNKI_REPO_URL', 'file:///munkirepo')
 if MUNKI_REPO_URL.startswith('file://'):
     if not os.path.exists(MUNKI_REPO_URL[7:]):
-        MUNKI_REPO_URL = os.path.join('file://', BASE_DIR, 'munkirepo')
+        MUNKI_REPO_URL = os.path.join('file:///' + BASE_DIR, 'munkirepo')
 
 MUNKI_REPO_PLUGIN = os.getenv('MUNKI_REPO_PLUGIN', 'FileRepo')
 MUNKITOOLS_DIR = os.getenv('MUNKITOOLS_DIR', '/munkitools')
