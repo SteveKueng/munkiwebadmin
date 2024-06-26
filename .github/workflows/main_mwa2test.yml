@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements_azure.txt
 
-      - name: create munkitools directory
-        run: mkdir -p munkitools
+      - name: create munkirepo directory
+        run: mkdir munkirepo
         
       - name: Install munkitools
         run: curl -Lk -o /tmp/munkitools.zip `curl --silent https://api.github.com/repos/munki/munki/releases/latest | /usr/bin/awk '/zipball_url/ { print $2 }' | sed 's/[",]//g'` && unzip /tmp/munkitools.zip -d /tmp/munkitools && rm -rf /tmp/munkitools.zip && cp -R /tmp/munkitools/munki-munki-*/code/client munkitools && rm -rf /tmp/munkitools
