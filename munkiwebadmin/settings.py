@@ -32,6 +32,7 @@ MAKECATALOGS_PATH = MUNKITOOLS_DIR + '/makecatalogs'
 CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
 TENANT_ID = os.getenv('TENANT_ID', None)
+ENTRA_ONLY = os.getenv('ENTRA_ONLY', 'False').lower() in ('true', '1', 't')
 
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
@@ -286,10 +287,17 @@ if USE_LDAP:
 if CLIENT_SECRET:
     AdfsAuthCodeBackend = 'django_auth_adfs.backend.AdfsAuthCodeBackend'
     AdfsAccessTokenBackend= 'django_auth_adfs.backend.AdfsAccessTokenBackend'
-    AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend, AdfsAccessTokenBackend)
+    if ENTRA_ONLY:
+        AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend)
+    else:
+        AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend, AdfsAccessTokenBackend)
 
 LOGIN_URL='/login/'
 LOGIN_REDIRECT_URL = '/'
+
+if ENTRA_ONLY:
+    LOGIN_URL = '/oauth2/login'
+    LOGIN_REDIRECT_URL = '/'
 
 ADMINS = (
      ('Local Admin', 'admin@example.com'),

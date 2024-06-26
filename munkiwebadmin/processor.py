@@ -18,13 +18,23 @@ try:
 except:
     REPO_MANAGEMENT_ONLY = False
 
+try:
+    ENTRA_ONLY = settings.ENTRA_ONLY
+except:
+    ENTRA_ONLY = False
+
+try:
+    TENANT_ID = settings.TENANT_ID
+except:
+    TENANT_ID = None
+
 def index(request):
-    try:
+    imgString = static('img/placeholder.jpg')
+    try:   
         image = request.user.ldap_user.attrs["thumbnailPhoto"]
         imgString = "data:image/png;base64,"+base64.b64encode(image[0])
     except:
-        imgString = static('img/placeholder.jpg')
         pass
 
-    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'APPNAME': APPNAME, 'userImage': imgString }
+    return {'REPO_MANAGEMENT_ONLY': REPO_MANAGEMENT_ONLY, 'ENTRA_ONLY': ENTRA_ONLY, 'TENANT_ID': TENANT_ID, 'APPNAME': APPNAME, 'userImage': imgString }
 
