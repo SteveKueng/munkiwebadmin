@@ -27,7 +27,7 @@ MUNKI_REPO_URL = os.getenv('MUNKI_REPO_URL', 'file:///munkirepo')
 MUNKI_REPO_PLUGIN = os.getenv('MUNKI_REPO_PLUGIN', 'FileRepo')
 MUNKITOOLS_DIR = os.getenv('MUNKITOOLS_DIR', '/munkitools')
 if not os.path.exists(MUNKITOOLS_DIR):
-    MUNKITOOLS_DIR = os.join(BASE_DIR, 'munkitools')
+    MUNKITOOLS_DIR = os.path.join(BASE_DIR, 'munkitools')
 
 
 # Azure AD settings
