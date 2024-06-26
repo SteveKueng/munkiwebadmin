@@ -14,8 +14,6 @@ from django.conf import settings
 from api.models import MunkiRepo
 from process.utils import record_status
 
-MAKECATALOGS = settings.MAKECATALOGS_PATH
-
 FLAG_FILE = '/tmp/makecatalogs_running'
 MAKECATALOGS_STATUS_TAG = 'makecatalogs_process'
 

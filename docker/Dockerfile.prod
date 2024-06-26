@@ -22,11 +22,6 @@ RUN apt-get update \
 # set work directory
 WORKDIR /tmp
 
-# build blobfuse
-RUN git clone https://github.com/Azure/azure-storage-fuse/
-WORKDIR /tmp/azure-storage-fuse
-RUN ./build.sh
-
 # set work directory
 WORKDIR /usr/src/app
 
@@ -69,7 +64,6 @@ COPY --from=builder /usr/src/app/wheels /wheels
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 COPY --from=builder /tmp/munkitools/munki-munki-*/code/client /munkitools
-COPY --from=builder /tmp/azure-storage-fuse/blobfuse2 /usr/local/bin
 
 RUN chmod +x /home/app/web/entrypoint.prod.sh
 

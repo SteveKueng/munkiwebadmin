@@ -23,13 +23,6 @@ RUN apt-get update \
 # set work directory
 WORKDIR /tmp
 
-# build blobfuse
-RUN git clone https://github.com/Azure/azure-storage-fuse/
-WORKDIR /tmp/azure-storage-fuse
-RUN ./build.sh
-RUN cp blobfuse2 /usr/local/bin
-RUN rm -rf /tmp/azure-storage-fuse
-
 # set work directory
 WORKDIR /usr/src/app
 
