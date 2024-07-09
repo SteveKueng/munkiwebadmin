@@ -90,7 +90,6 @@ class MunkiRepo(object):
     def write(cls, data, kind, pathname):
         '''Writes a text data to (plist) file'''
         try:
-            print('Writing %s to %s/%s' % (data, kind, pathname))
             repo.put(kind + '/' + pathname, writePlistToString(data))
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except munkirepo.RepoError as err:
@@ -101,7 +100,6 @@ class MunkiRepo(object):
     def writedata(cls, data, kind, pathname):
         '''Writes a text data to file'''
         try:
-            print('Writing %s to %s/%s' % (data, kind, pathname))
             repo.put(kind + '/' + pathname, data)
             LOGGER.info('Wrote %s/%s', kind, pathname)
         except munkirepo.RepoError as err:
@@ -119,7 +117,7 @@ class MunkiRepo(object):
             raise FileDeleteError(err)
     
     @classmethod
-    def makecatalogs(cls, output_fn=print):
+    def makecatalogs(cls, output_fn=None):
         '''Calls makecatalogs'''
         try:
             makecatalogslib.makecatalogs(repo, {}, output_fn=output_fn)

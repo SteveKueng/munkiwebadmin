@@ -625,7 +625,6 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
         return self.get_object()
     
     def delete(self, request, *args, **kwargs):
-        print(kwargs)
         try:
             MunkiRepo.delete('pkgs', kwargs['filepath'])
             return Response(status=204)
