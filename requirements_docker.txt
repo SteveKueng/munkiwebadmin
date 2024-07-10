@@ -1,4 +1,4 @@
-django==4.2.13
+django==4.2.14
 psycopg2-binary==2.9.9
 gunicorn==22.0.0
 mysqlclient==2.2.4
