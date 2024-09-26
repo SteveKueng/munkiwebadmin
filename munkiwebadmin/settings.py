@@ -278,8 +278,9 @@ AUTH_ADFS = {
     'USERNAME_CLAIM': 'upn',
     'TENANT_ID': TENANT_ID,
     'RELYING_PARTY_ID': CLIENT_ID,
-    "GROUP_TO_FLAG_MAPPING": {"is_staff": ["ikuengUsers"],
-                              "is_superuser": "ikuengAdmins"},
+    'GROUPS_CLAIM': 'groups',
+    "GROUP_TO_FLAG_MAPPING": {"is_staff": os.environ.get("STAFF_USERS", "localhost 127.0.0.1 [::1]").split(" "),
+                              "is_superuser": os.environ.get("SUPER_USERS", "localhost 127.0.0.1 [::1]").split(" ")},
     'LOGIN_EXEMPT_URLS': [
         '^api',
     ],
