@@ -33,12 +33,12 @@ MUNKITOOLS_DIR = os.getenv('MUNKITOOLS_DIR', '/munkitools')
 if not os.path.exists(MUNKITOOLS_DIR):
     MUNKITOOLS_DIR = os.path.join(BASE_DIR, 'munkitools')
 
-
 # Azure AD settings
 CLIENT_ID = os.getenv('CLIENT_ID', 'ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
 TENANT_ID = os.getenv('TENANT_ID', None)
 ENTRA_ONLY = os.getenv('ENTRA_ONLY', 'False').lower() in ('true', '1', 't')
+EXCLUDE_API = os.getenv('EXCLUDE_API', False)
 
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
@@ -267,6 +267,12 @@ REST_FRAMEWORK = {
 }
 
 # azure adfs settings
+LOGIN_EXCLUDE_URLS = []
+if EXCLUDE_API:
+    LOGIN_EXCLUDE_URLS = [
+        '^api',
+    ]
+
 AUTH_ADFS = {
     'AUDIENCE': CLIENT_ID,
     'CLIENT_ID': CLIENT_ID,
@@ -281,9 +287,7 @@ AUTH_ADFS = {
     'GROUPS_CLAIM': 'groups',
     "GROUP_TO_FLAG_MAPPING": {"is_staff": os.environ.get("STAFF_USERS", "localhost 127.0.0.1 [::1]").split(" "),
                               "is_superuser": os.environ.get("SUPER_USERS", "localhost 127.0.0.1 [::1]").split(" ")},
-    'LOGIN_EXEMPT_URLS': [
-        '^api',
-    ],
+    'LOGIN_EXEMPT_URLS': LOGIN_EXCLUDE_URLS,
 }
 
 # auth settings
@@ -297,7 +301,7 @@ if CLIENT_SECRET:
     AdfsAuthCodeBackend = 'django_auth_adfs.backend.AdfsAuthCodeBackend'
     AdfsAccessTokenBackend= 'django_auth_adfs.backend.AdfsAccessTokenBackend'
     if ENTRA_ONLY:
-        AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend)
+        AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend,)
     else:
         AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + (AdfsAuthCodeBackend, AdfsAccessTokenBackend)
 
@@ -305,7 +309,7 @@ LOGIN_URL='/login/'
 LOGIN_REDIRECT_URL = '/'
 
 if ENTRA_ONLY:
-    LOGIN_URL = '/oauth2/login'
+    LOGIN_URL = "django_auth_adfs:login"
     LOGIN_REDIRECT_URL = '/'
 
 ADMINS = (
