@@ -41,6 +41,9 @@ ENTRA_ONLY = os.getenv('ENTRA_ONLY', 'False').lower() in ('true', '1', 't')
 EXCLUDE_API = os.getenv('EXCLUDE_API', False)
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', False)
 
+if SECURE_SSL_REDIRECT:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
     ALLOWED_HOSTS.append(os.environ.get('WEBSITE_HOSTNAME'))
