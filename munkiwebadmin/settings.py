@@ -39,6 +39,7 @@ CLIENT_SECRET = os.getenv('CLIENT_SECRET', None)
 TENANT_ID = os.getenv('TENANT_ID', None)
 ENTRA_ONLY = os.getenv('ENTRA_ONLY', 'False').lower() in ('true', '1', 't')
 EXCLUDE_API = os.getenv('EXCLUDE_API', False)
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', False)
 
 # Azure App Service
 if os.environ.get('WEBSITE_HOSTNAME'):
