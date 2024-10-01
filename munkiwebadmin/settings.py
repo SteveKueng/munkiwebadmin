@@ -289,8 +289,8 @@ AUTH_ADFS = {
     'TENANT_ID': TENANT_ID,
     'RELYING_PARTY_ID': CLIENT_ID,
     'GROUPS_CLAIM': 'groups',
-    "GROUP_TO_FLAG_MAPPING": {"is_staff": os.environ.get("STAFF_USERS", "localhost 127.0.0.1 [::1]").split(" "),
-                              "is_superuser": os.environ.get("SUPER_USERS", "localhost 127.0.0.1 [::1]").split(" ")},
+    "GROUP_TO_FLAG_MAPPING": {"is_staff": os.environ.get("STAFF_USERS", "").split(";"),
+                              "is_superuser": os.environ.get("SUPER_USERS", "").split(";")},
     'LOGIN_EXEMPT_URLS': LOGIN_EXCLUDE_URLS,
 }
 
