@@ -158,7 +158,7 @@ class Pkginfo(MunkiRepo):
                     # file that refers to it
                     delete_this_pkg = True
             try:
-                cls.delete('pkgsinfo', pathname, user)
+                cls.delete('pkgsinfo', pathname)
             except FileDeleteError as err:
                 errors.append('Error %s when removing %s' % (err, pathname))
             else:
@@ -206,9 +206,8 @@ class Pkginfo(MunkiRepo):
                 # remove catalogs to remove
                 plist['catalogs'] = [item for item in plist['catalogs']
                                      if item not in catalogs_to_remove]
-                data = plistlib.writePlistToString(plist)
                 try:
-                    cls.write(data, 'pkgsinfo', pathname, user)
+                    cls.write(plist, 'pkgsinfo', pathname)
                 except FileWriteError as err:
                     LOGGER.error('Update failed for %s: %s', pathname, err)
                     errors.append('Error %s when updating %s' % (err, pathname))

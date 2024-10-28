@@ -68,36 +68,33 @@ def index(request):
                    'search': request.GET.get('search', ''),
                    'catalog': request.GET.get('catalog', 'all')}
         return render(request, 'pkgsinfo/pkgsinfo.html', context=context)
-    if request.method == 'POST':
-        # DELETE
-        if request.META.has_key('HTTP_X_METHODOVERRIDE'):
-            http_method = request.META['HTTP_X_METHODOVERRIDE']
-            if http_method.lower() == 'delete':
-                LOGGER.info("Got mass delete request for pkginfos")
-                if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
-                    return HttpResponse(
-                        json.dumps({
-                            'result': 'failed',
-                            'exception_type': 'PkginfoDeletePermissionDenied',
-                            'detail': "Missing needed permissions"}),
-                        content_type='application/json', status=403)
-                json_data = json.loads(request.body)
-                pkginfo_list = json_data.get('pkginfo_list', [])
-                try:
-                    Pkginfo.mass_delete(
-                        pkginfo_list, request.user,
-                        delete_pkgs=json_data.get('deletePkg', False)
-                    )
-                except FileError as err:
-                    return HttpResponse(
-                        json.dumps({'result': 'failed',
-                                    'exception_type': str(type(err)),
-                                    'detail': str(err)}),
-                        content_type='application/json', status=403)
-                else:
-                    return HttpResponse(
-                        json.dumps({'result': 'success'}),
-                        content_type='application/json')
+    if request.method == "DELETE":
+        LOGGER.info("Got mass delete request for pkginfos")
+        if not request.user.has_perm('pkgsinfo.delete_pkginfofile'):
+            return HttpResponse(
+                json.dumps({
+                    'result': 'failed',
+                    'exception_type': 'PkginfoDeletePermissionDenied',
+                    'detail': "Missing needed permissions"}),
+                content_type='application/json', status=403)
+        json_data = json.loads(request.body)
+        pkginfo_list = json_data.get('pkginfo_list', [])
+        try:
+            Pkginfo.mass_delete(
+                pkginfo_list, request.user,
+                delete_pkgs=json_data.get('deletePkg', False)
+            )
+        except FileError as err:
+            return HttpResponse(
+                json.dumps({'result': 'failed',
+                            'exception_type': str(type(err)),
+                            'detail': str(err)}),
+                content_type='application/json', status=403)
+        else:
+            return HttpResponse(
+                json.dumps({'result': 'success'}),
+                content_type='application/json')
+    if request.method == 'POST':       
         # regular POST (update/change)
         LOGGER.info("Got mass update request for pkginfos")
         if not request.user.has_perm('pkgsinfo.change_pkginfofile'):
