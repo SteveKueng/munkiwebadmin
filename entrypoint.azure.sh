@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# install dependencies
+apt-get update
+apt-get install -y p7zip-full
+
 # migrate database
 python manage.py makemigrations catalogs pkgsinfo reports manifests inventory icons santa process
 python manage.py migrate
