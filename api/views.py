@@ -739,7 +739,8 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
             return Response({'error': f'Failed to create pkginfo: {str(e)}'}, status=500)
         finally:
             # Temporäre Datei löschen
-            os.remove(temp_file_path)
+            LOGGER.info(f"Deleting temporary file: {temp_file_path}")
+            #os.remove(temp_file_path)
 
         item_name = os.path.basename(filepath)
         pkg_path = os.path.join(destination_path, item_name)

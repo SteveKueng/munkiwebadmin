@@ -318,18 +318,18 @@ def diskImageIsMounted(dmgpath):
 def mountdmg(dmgpath, mountpoint=None):
     """Extracts a DMG file on Linux using 7z instead of mounting."""
     if not mountpoint:
-        mountpoint = os.path.join(tempfile.gettempdir(), "mnt_" + os.path.basename(dmgpath))
+        mountpoint = os.path.join(tempfile.gettempdir(), "mnt_" + os.path.splitext(os.path.basename(dmgpath))[0])
     
-    # Erstelle das Mount-Verzeichnis
+    # create mountpoint if it doesn't exist
     os.makedirs(mountpoint, exist_ok=True)
 
-    # Prüfen, ob `7z` installiert ist
+    # check if 7z is installed
     if not shutil.which("7z"):
         print("Error: `7z` is not installed. Install it with `apt install p7zip-full`.", file=sys.stderr)
         return ""
 
-    # Extrahiere den Inhalt der .dmg-Datei
-    extract_cmd = ["7z", "x", dmgpath, f"-o{mountpoint}"]
+    # extract the DMG file
+    extract_cmd = ["7z", "x", dmgpath, f"-o{mountpoint}", "-y"]
     proc = subprocess.run(extract_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if proc.returncode != 0:
@@ -347,7 +347,7 @@ def unmountdmg(dmgpath, mountpoint):
         print(f"Warning: {mountpoint} does not exist.", file=sys.stderr)
         return
     
-    # Lösche das gesamte extrahierte Verzeichnis
+    # delete the mountpoint
     try:
         shutil.rmtree(mountpoint)
         print(f"{mountpoint} successfully removed.")
