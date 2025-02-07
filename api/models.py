@@ -5,6 +5,7 @@ from django.conf import settings
 
 import sys
 import logging
+import platform
 
 LOGGER = logging.getLogger('munkiwebadmin')
 MUNKI_REPO_URL = settings.MUNKI_REPO_URL
@@ -21,6 +22,12 @@ try:
 except ImportError:
     LOGGER.error('Failed to import munkilib')
     raise
+
+if platform.system() == "Darwin":
+    from munkilib.admin.munkiimportlib import find_matching_pkginfo
+else:
+    from api.utils.munkiimport_linux import find_matching_pkginfo
+
 
 # connect to the munki repo
 try:
@@ -124,3 +131,8 @@ class MunkiRepo(object):
         except makecatalogslib.MakeCatalogsError as err:
             LOGGER.error('makecatalogs failed: %s', err)
             raise FileError(err)
+        
+    @classmethod
+    def find_matching_pkginfo(cls, pkginfo):
+        '''Returns a list of pkginfo items matching a given match string'''
+        return find_matching_pkginfo(repo, pkginfo)

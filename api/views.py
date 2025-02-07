@@ -14,6 +14,8 @@ from rest_framework.permissions import DjangoModelPermissions
 
 from django.http import FileResponse
 from django.conf import settings
+from django.utils.timezone import now 
+from django.contrib.auth.models import User 
 
 from api.models import MunkiRepo
 from api.models import FileReadError, \
@@ -41,6 +43,8 @@ import bz2
 import urllib
 import sys
 import io
+import tempfile
+import platform
 
 LOGGER = logging.getLogger('munkiwebadmin')
 MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
@@ -49,11 +53,16 @@ MUNKITOOLS_DIR = settings.MUNKITOOLS_DIR
 sys.path.append(MUNKITOOLS_DIR)
 
 try:
-    from munkilib.wrappers import (readPlistFromString,
-                                PlistReadError)
+    from munkilib.wrappers import (readPlistFromString, PlistReadError)
 except ImportError:
     LOGGER.error('Failed to import munkilib')
     raise
+
+if platform.system() == "Darwin":
+    from munkilib.admin.pkginfolib import makepkginfo
+else:
+    from api.utils.munkiimport_linux import makepkginfo
+
 
 def normalize_value_for_filtering(value):
     '''Converts value to a list of strings'''
@@ -563,7 +572,7 @@ class PkgsinfoDetailAPIView(GenericAPIView, ListModelMixin):
 
 
 class PkgsListView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get', 'post']
+    http_method_names = ['get']
     permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
@@ -586,7 +595,7 @@ class PkgsListView(GenericAPIView, ListModelMixin):
 
 
 class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
-    http_method_names = ['get', 'delete']
+    http_method_names = ['get', 'post', 'put', 'delete']
     permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
@@ -623,6 +632,152 @@ class PkgsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def list(self, request, filepath):
         return self.get_object()
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Handles package uploads and directly stores them in the Munki repository.
+        """
+        LOGGER.info("Received POST request for package upload.")
+
+        if 'file' not in request.FILES:
+            return Response({'error': 'No file provided'}, status=400)
+
+        uploaded_file = request.FILES['file']
+        filename = uploaded_file.name
+        file_ext = os.path.splitext(filename)[1].lower()
+
+        # Allow only .pkg and .dmg files
+        if file_ext not in ['.pkg', '.dmg']:
+            return Response({'error': 'Only .pkg and .dmg files are allowed'}, status=400)
+
+        # Define destination path in the repo using filepath from kwargs
+        if 'filepath' not in kwargs:
+            return Response({'error': 'No filepath provided'}, status=400)
+        filepath = kwargs['filepath']  # Get filepath from URL
+
+        # Save the file using MunkiRepo.writedata
+        try:
+            file_data = uploaded_file.read()
+        except Exception as e:
+            return Response({'error': f'Failed to save file: {str(e)}'}, status=500)
+        
+        # Generate `pkginfo`
+        try:
+            temp_file_path = os.path.join(tempfile.gettempdir(), filename)
+            with open(temp_file_path, "wb") as temp_file:
+                temp_file.write(file_data)
+
+            LOGGER.info(f"Temporary file created: {temp_file_path}")
+
+            options = {}
+            pkginfo = makepkginfo(temp_file_path, options)
+            if not pkginfo:
+                return Response({'error': 'Failed to generate pkginfo'}, status=500)
+
+            arch = ""
+            if len(pkginfo.get("supported_architectures", [])) == 1:
+                arch = "-%s" % pkginfo["supported_architectures"][0]
+
+  
+            pkginfo_ext = ".plist"
+            destination_path = os.path.dirname(filepath)
+            pkginfo_name = '%s-%s%s%s' % (pkginfo['name'], pkginfo['version'],
+                                    arch, pkginfo_ext)
+            pkginfo_path = os.path.join(destination_path, pkginfo_name) 
+
+            index = 0
+            pkgsinfo_list = MunkiRepo.list('pkgsinfo')
+            while pkginfo_path in pkgsinfo_list:
+                index += 1
+                pkginfo_name = '%s-%s%s__%s%s' % (pkginfo['name'], pkginfo['version'],
+                                                arch, index, pkginfo_ext)
+                pkginfo_path = os.path.join(destination_path, pkginfo_name)
+
+            # Add metadata to the pkginfo
+            current_user = request.user if request.user.is_authenticated else "Unknown"
+            pkginfo["_metadata"] = {
+                "created_by": current_user.username,
+                "creation_date": now().isoformat(),
+                "munkiwebadmin_upload": True,
+            }
+
+             # try to find existing pkginfo items that match this one
+            matchingpkginfo = MunkiRepo.find_matching_pkginfo(pkginfo)
+            if matchingpkginfo:
+                if ('installer_item_hash' in matchingpkginfo and
+                        matchingpkginfo['installer_item_hash'] ==
+                        pkginfo.get('installer_item_hash')):
+                    return Response({'error': 'This item is identical to an existing item in the repo'}, status=400)
+
+                # replace the pkginfo with the matching one
+                pkginfo['name'] = matchingpkginfo['name']
+                pkginfo['display_name'] = (
+                    matchingpkginfo.get('display_name') or
+                    pkginfo.get('display_name') or
+                    matchingpkginfo['name'])
+                pkginfo['description'] = pkginfo.get('description') or \
+                    matchingpkginfo.get('description', '')
+                for key in ['blocking_applications',
+                            'forced_install',
+                            'forced_uninstall',
+                            'unattended_install',
+                            'unattended_uninstall',
+                            'requires',
+                            'update_for',
+                            'category',
+                            'developer',
+                            'icon_name',
+                            'unused_software_removal_info',
+                            'localized_strings',
+                            'featured']:
+                    if key in matchingpkginfo:
+                        pkginfo[key] = matchingpkginfo[key]
+
+            LOGGER.info(f"pkginfo created: {pkginfo_path}")
+        except Exception as e:
+            LOGGER.error(f"Failed to create pkginfo: {e}")
+            return Response({'error': f'Failed to create pkginfo: {str(e)}'}, status=500)
+        finally:
+            # Temporäre Datei löschen
+            os.remove(temp_file_path)
+
+        item_name = os.path.basename(filepath)
+        pkg_path = os.path.join(destination_path, item_name)
+        name, ext = os.path.splitext(item_name)
+        vers = pkginfo.get('version', None)
+        if vers:
+            if not name.endswith(vers):
+                # add the version number to the end of the filename
+                item_name = '%s-%s%s' % (name, vers, ext)
+                pkg_path = os.path.join(destination_path, item_name)
+
+        pkgs_list = MunkiRepo.list('pkgs')
+        while pkg_path in pkgs_list:
+            index += 1
+            item_name = '%s__%s%s' % (name, index, ext)
+            pkg_path = os.path.join(destination_path, item_name)
+        
+        # upload the file
+        try:
+            MunkiRepo.writedata(file_data, "pkgs", pkg_path)
+        except Exception as err:
+            return Response({'error': 'Failed to write file'}, status=500)
+        
+        # Set the installer_item_location to the filepath
+        pkginfo['installer_item_location'] = pkg_path
+
+        # upload the pkginfo
+        try:
+            MunkiRepo.write(pkginfo, "pkgsinfo", pkginfo_path)
+        except Exception as err:
+            return Response({'error': 'Failed to write pkginfo'}, status=500)
+
+        # Return the path to the new pkginfo to open the editor
+        return Response({'message': 'Upload and pkginfo creation successful', 'pkginfo_path': pkginfo_path}, status=201)
+
+    def put(self, request, *args, **kwargs):
+        """Allows updating an existing package file in the Munki repository."""
+        return self.post(request, *args, **kwargs)
     
     def delete(self, request, *args, **kwargs):
         try:
@@ -672,7 +827,12 @@ class IconsDetailAPIView(GenericAPIView, ListModelMixin):
     
     def get_object(self):
         filepath = self.kwargs['filepath']
-        item = MunkiRepo.get('icons', filepath)
+        
+        try:
+            item = MunkiRepo.get('icons', filepath)
+        except FileReadError as err:
+            return Response({})
+        
         buffer = io.BytesIO(item)
         buffer.seek(0)
 

@@ -25,6 +25,10 @@ $(document).ready(function() {
     $('#mass_edit_catalogs').on('click', openMassEditModal);
     $(".chosen-select").chosen({width: "100%"});
 
+    document.getElementById("uploadModal").addEventListener("hidden.bs.modal", function () {
+        resetUploadForm();
+    });
+
     $(window).on('hashchange', function() {
         hash = window.location.hash;
         if (hash.length > 1) {
@@ -732,4 +736,163 @@ function deletePkginfoItem() {
             $("#errorModal").modal("show");
         },
     });
+}
+
+function uploadPackage() {
+    var fileInput = document.getElementById("fileInput");
+    var subdirectoryInput = document.getElementById("subdirectoryPath");
+    var uploadAlertContainer = document.getElementById("uploadAlertContainer");
+    var progressBar = document.getElementById("uploadProgressBar");
+    var uploadButton = document.getElementById("uploadButton");
+    var closeButton = document.getElementById("closeButton");
+    var uploadModal = document.getElementById("uploadModal");
+
+    // Reset messages and progress
+    uploadAlertContainer.innerHTML = "";
+    progressBar.style.width = "0%";
+    progressBar.innerText = "";
+
+    if (!fileInput.files.length) {
+        showAlert("Please select a file to upload.", "danger");
+        return;
+    }
+
+    if (!subdirectoryInput.value.trim()) {
+        showAlert("Please enter a subdirectory path.", "warning");
+        return;
+    }
+    var file = fileInput.files[0];
+    var subdirectory = subdirectoryInput.value.trim();
+    var formData = new FormData();
+    formData.append("file", file);
+    formData.append("subdirectory", subdirectory);
+
+    fileInput.disabled = true;
+    subdirectoryInput.disabled = true;
+    uploadButton.disabled = true;
+    uploadButton.innerHTML = "Uploading...";
+    closeButton.disabled = true;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", `/api/pkgs/${encodeURIComponent(subdirectory.replace(/\/$/, '') + '/' + file.name)}`, true);
+
+    // Set CSRF token header
+    xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+    xhr.upload.onprogress = function(event) {
+        if (event.lengthComputable) {
+            var percentComplete = Math.round((event.loaded / event.total) * 100);
+            progressBar.style.width = percentComplete + "%";
+            progressBar.innerText = percentComplete + "%";
+
+            if (percentComplete === 100) {
+                setTimeout(() => {
+                    progressBar.classList.add("progress-bar-animated");
+                    progressBar.classList.add("progress-bar-striped");
+                    progressBar.innerText = "Preparing package...";
+                }, 500); // Kleine Verzögerung für bessere UX
+            }
+        }
+    };
+
+    xhr.onload = function() {
+        if (xhr.status === 201) {
+            let response = JSON.parse(xhr.responseText);
+            let pkginfoPath = response.pkginfo_path;  // Enthält bereits '#'
+
+            showAlert("Upload successful! Preparing package...", "success");
+
+            setTimeout(() => {
+                // Hide modal
+                var modalInstance = bootstrap.Modal.getInstance(uploadModal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+
+                // reset form
+                document.getElementById("uploadForm").reset();
+
+                // Reset messages and progress
+                progressBar.style.width = "0%";
+                progressBar.innerText = "";
+
+                // clear status message
+                uploadAlertContainer.innerHTML = "";
+                
+                // rebuild catalog
+                rebuildCatalogs();
+
+                // redirect to the new pkginfo item
+                window.location.href = `/pkgsinfo/#${pkginfoPath}`;
+            }, 1000);
+        } else {
+            try {
+                let response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    showAlert(`Upload failed: ${response.error}`, "danger");
+                } else {
+                    showAlert("Upload failed due to an unknown error.", "danger");
+                }
+            } catch (e) {
+                showAlert(`Upload failed: ${xhr.responseText}`, "danger");
+            }
+
+            fileInput.disabled = false;
+            subdirectoryInput.disabled = false;
+            uploadButton.disabled = false;
+            uploadButton.innerHTML = "Upload";
+            closeButton.disabled = false;
+        }
+    };
+
+    xhr.onerror = function() {
+        showAlert("Error: Upload failed due to a network issue.", "danger");
+
+        fileInput.disabled = false;
+        subdirectoryInput.disabled = false;
+        uploadButton.disabled = false;
+        uploadButton.innerHTML = "Upload";
+        closeButton.disabled = false;
+    };
+
+    xhr.send(formData);
+}
+
+// Get CSRF token from cookies
+function getCSRFToken() {
+    let cookieValue = null;
+    let cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith("csrftoken=")) {
+            cookieValue = cookie.substring("csrftoken=".length, cookie.length);
+            break;
+        }
+    }
+    return cookieValue;
+}
+
+function resetUploadForm() {
+    document.getElementById("uploadForm").reset();
+    document.getElementById("uploadAlertContainer").innerHTML = "";
+    document.getElementById("uploadProgressBar").style.width = "0%";
+    document.getElementById("uploadProgressBar").innerText = "";
+
+    // 🔓 Buttons & Inputs wieder aktivieren
+    document.getElementById("fileInput").disabled = false;
+    document.getElementById("subdirectoryPath").disabled = false;
+    document.getElementById("uploadButton").disabled = false;
+    document.getElementById("uploadButton").innerHTML = "Upload";
+    document.getElementById("closeButton").disabled = false;
+}
+
+function showAlert(message, type = "success") {
+    var alertContainer = document.getElementById("uploadAlertContainer");
+    var alertHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    alertContainer.innerHTML = alertHTML;
 }

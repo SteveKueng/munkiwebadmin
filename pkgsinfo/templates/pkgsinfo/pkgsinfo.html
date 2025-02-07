@@ -35,7 +35,9 @@
               </ul>
             </div>
             <button type="button" id="makecatalogs" class="btn btn-primary" onClick="rebuildCatalogs()">Makecatalogs</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload Package</button>
           </div>
+          
           <div class="input-group">
             <div class="btn-group" role="group">
               <button type="button" id="massaction_dropdown" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -123,7 +125,7 @@ Bootstrap modal for confirming mass pkginfo deletion
       <div class="modal-body">
         <p id="massDeleteConfirmationModalBodyText">Really delete the selected pkginfo items?</p>
         <p>This action cannot be undone.</p>
-        <div class="checkbox pull-right">
+        <div class="checkbox float-end">
             <label>
                 <input type="checkbox" id="mass_delete_pkg">
                 Also delete installer items
@@ -180,5 +182,40 @@ Bootstrap modal for errors
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
+</div>
+
+<!-- Bootstrap Modal for Upload -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="uploadModalLabel">Upload Package</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="fileInput" class="form-label">Select .pkg or .dmg file</label>
+            <input class="form-control" type="file" id="fileInput" accept=".pkg,.dmg" required>
+          </div>
+          <div class="mb-3">
+            <label for="subdirectoryPath" class="form-label">Subdirectory Path</label>
+            <input class="form-control" type="text" id="subdirectoryPath" placeholder="e.g., apps/firefox/" required>
+          </div>
+        </form>
+        <!-- Upload Progress Bar -->
+        <div class="progress mt-2">
+          <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+              role="progressbar" style="width: 0%;"></div>
+        </div>
+        <!-- Upload Status Feedback -->
+        <div id="uploadAlertContainer" class="mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="closeButton" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="uploadButton" class="btn btn-primary" onclick="uploadPackage()">Upload</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock content %}
