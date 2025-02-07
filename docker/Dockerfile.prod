@@ -16,7 +16,7 @@ RUN apt-get update \
     libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev \
     build-essential libssl-dev libffi-dev libjpeg-dev \
     libpq-dev liblcms2-dev libblas-dev libatlas-base-dev pkg-config curl unzip \
-    git fuse3 libfuse3-dev golang p7zip-full dmg2img \
+    git fuse3 libfuse3-dev golang p7zip-full \
     && rm -rf /var/lib/apt/lists/*
 
 # set work directory

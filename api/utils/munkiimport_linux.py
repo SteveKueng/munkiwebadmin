@@ -316,58 +316,43 @@ def diskImageIsMounted(dmgpath):
 
 
 def mountdmg(dmgpath, mountpoint=None):
-    """Mounts a DMG file on Linux by first converting it to IMG format and handling HFS+ filesystems."""
+    """Extracts a DMG file on Linux using 7z instead of mounting."""
     if not mountpoint:
         mountpoint = os.path.join(tempfile.gettempdir(), "mnt_" + os.path.basename(dmgpath))
     
+    # Erstelle das Mount-Verzeichnis
     os.makedirs(mountpoint, exist_ok=True)
 
-    # Konvertiere .dmg zu .img
-    imgpath = os.path.splitext(dmgpath)[0] + ".img"
-    convert_cmd = ["dmg2img", "-i", dmgpath, "-o", imgpath]
-    proc = subprocess.run(convert_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    if proc.returncode != 0:
-        print(f"Error converting {dmgpath} to {imgpath}: {proc.stderr.decode('utf-8')}", file=sys.stderr)
+    # Prüfen, ob `7z` installiert ist
+    if not shutil.which("7z"):
+        print("Error: `7z` is not installed. Install it with `apt install p7zip-full`.", file=sys.stderr)
         return ""
 
-    # Versuche, die .img-Datei mit `mount -t hfsplus` zu mounten
-    mount_cmd = ["mount", "-t", "hfsplus", "-o", "loop", imgpath, mountpoint]
-    proc = subprocess.run(mount_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Extrahiere den Inhalt der .dmg-Datei
+    extract_cmd = ["7z", "x", dmgpath, f"-o{mountpoint}"]
+    proc = subprocess.run(extract_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if proc.returncode != 0:
-        print(f"Error mounting {imgpath}: {proc.stderr.decode('utf-8')}", file=sys.stderr)
+        print(f"Error extracting {dmgpath}: {proc.stderr.decode('utf-8')}", file=sys.stderr)
         return ""
 
+    print(f"DMG extracted to {mountpoint}")
     return mountpoint
 
 
 def unmountdmg(dmgpath, mountpoint):
-    """Unmounts a mounted DMG"""
+    """Cleans up extracted DMG files using 7z."""
     
-    if not os.path.ismount(mountpoint):
-        print(f"Warning: {mountpoint} is not mounted.", file=sys.stderr)
+    if not os.path.exists(mountpoint):
+        print(f"Warning: {mountpoint} does not exist.", file=sys.stderr)
         return
     
-    proc = subprocess.run(["umount", mountpoint], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if proc.returncode != 0:
-        print(f"Error unmounting {mountpoint}: {proc.stderr.decode('utf-8')}", file=sys.stderr)
-        return
-    
-    print(f"{mountpoint} successfully unmounted.")
-
-    # Entferne das Mount-Verzeichnis
+    # Lösche das gesamte extrahierte Verzeichnis
     try:
-        os.rmdir(mountpoint)
+        shutil.rmtree(mountpoint)
+        print(f"{mountpoint} successfully removed.")
     except OSError as e:
-        print(f"Warning: Konnte {mountpoint} nicht entfernen: {e}", file=sys.stderr)
-
-    # delete the .img file
-    imgpath = os.path.splitext(dmgpath)[0] + ".img"
-    try:
-        os.remove(imgpath)
-    except OSError as e:
-        print(f"Warning: Could not remove {imgpath}: {e}", file=sys.stderr)
+        print(f"Warning: Could not remove {mountpoint}: {e}", file=sys.stderr)
 
 
 def hasValidDiskImageExt(path):
