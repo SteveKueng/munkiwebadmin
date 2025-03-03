@@ -1,3 +1,8 @@
+This repo will no longer be maintained
+please have a look at the new webadmin here:
+https://github.com/SteveKueng/mwa3
+
+
 # MunkiWebAdmin
 ## Introduction
 This is version 2 of MunkiWebAdmin, a web-based administration tool for Munki.
